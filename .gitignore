@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Builds and caches
+.next/
+dist/
+build/
+out/
+coverage/
+.turbo/
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Environment and secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Database dumps and backups
+*.sql
+!packages/db/prisma/migrations/**/*.sql
+*.sql.gz
+*.dump
+*.ibd
+backups/
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code local settings
+.claude/settings.local.json
