@@ -4,6 +4,12 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed
+- 2026-11-04 — Homepage prototype v2: immersive, booking-first layout with
+  hero slideshow, trending carousel, mood mosaic, stay cards and newsletter;
+  six new licensed photos (Sundarbans, Boga Lake, Kaptai, Nafakhum, Panam
+  City, Lawachara, Saint Martin's); two unused photos removed.
+
 ### Added
 - 2026-11-04 — Phase 1 documentation: `CLAUDE.md`, product requirements,
   system architecture, ADR-0001…0009, database design, API conventions,

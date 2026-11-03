@@ -49,12 +49,23 @@ Digits use `tabular-nums lining-nums` wherever prices or dates align.
 - Motion: 140 ms (hover), 260 ms (image zoom), `cubic-bezier(.2,.7,.2,1)`;
   all motion disabled under `prefers-reduced-motion`.
 
-## Components shown in the prototype
+## Components shown in the prototype (v2, immersive)
 
-Header with sticky blur · hero (copy + full-bleed photo) · tabbed search with
-guests stepper popover · six-season selector (ritu) · destination cards ·
-featured tour card with departure chips · compact tour rows · full-bleed
-"field notes" band · promise columns · footer with photo credits.
+Owner feedback on v1 (2026-11-04): it needed to feel more striking and more
+clearly like a booking site. v2 keeps the Kantha palette, type and stitch but
+leads with photography.
+
+Transparent-to-solid header · full-bleed hero slideshow with crossfade, slow
+drift, stitch-line progress indicators and a pause control · search card
+straddling the fold (Stays, Tours, Flights soon, Visa soon; icon fields,
+guests stepper, quick-pick chips) · trust strip · trending carousel with
+scroll-snap and arrow controls · "explore by mood" photo mosaic · stay cards
+(wishlist, free-cancellation badge, stitched score, amenities, price incl.
+VAT) · six-season panel with crossfading photo · featured tour with departure
+chips and compact trip cards · promise cards · newsletter band · footer with
+payment marks and photo credits.
+
+Radius changed in v2: 10 px for controls, 18 px for photo cards and panels.
 
 ## Still to design (Phase 2)
 

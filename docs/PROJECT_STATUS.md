@@ -21,7 +21,8 @@ _Last updated: 2026-11-04_
 
 ## In progress
 
-- Phase 2 design: homepage prototype is ready for owner review.
+- Phase 2 design: homepage prototype v2 (immersive, booking-first) is ready
+  for owner review. v1 was judged not striking enough by the owner.
 
 ## Next recommended actions
 

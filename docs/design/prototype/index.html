@@ -9,37 +9,38 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@500&display=swap">
 <style>
-/* Layout: editorial asymmetric grid on cool paper; indigo ink, madder used only for stitch lines and the single primary action; photography carries colour. */
+/* Layout: immersive photo-led booking page. Full-bleed cinematic hero, search card straddling the fold, then alternating image-rich bands: carousel, mosaic, stays grid, seasons, tours. Indigo ink, madder stitch accents, photography carries colour. */
 :root {
-  --paper: #f3f4f8;
-  --paper-2: #e8eaf2;
+  --paper: #f4f5f9;
+  --paper-2: #e9ebf3;
   --card: #ffffff;
   --ink: #1c2452;
-  --ink-2: #4a5178;
+  --ink-2: #4f5679;
   --madder: #b23a2e;
   --thread: #a8822f;
-  --rule: #d3d7e6;
-  --on-ink: #f3f4f8;
-  --shade: rgba(16, 20, 48, 0.55);
+  --rule: #d8dbe8;
+  --night: #0f1330;
+  --on-photo: #ffffff;
+  --shadow: 0 24px 60px -28px rgba(15, 19, 48, .5);
   --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
   --f-text: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
   --f-bn: "Noto Serif Bengali", "Hind Siliguri", serif;
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 112px;
-  --r-1: 2px; --r-2: 6px;
-  --t-fast: 140ms; --t-med: 260ms; --ease: cubic-bezier(.2,.7,.2,1);
-  --max: 1240px;
+  --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 72px; --s-9: 112px;
+  --r-1: 3px; --r-2: 10px; --r-3: 18px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --max: 1280px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #10142b; --paper-2: #171c3a; --card: #1b2145; --ink: #e9ebf5; --ink-2: #aab0cf;
-    --madder: #e0705f; --thread: #d7b265; --rule: #2d3460; --on-ink: #10142b; --shade: rgba(5, 7, 20, 0.62);
-    color-scheme: dark;
+    --paper: #0f1330; --paper-2: #161b3e; --card: #1a2048; --ink: #eceef7; --ink-2: #a9afcf;
+    --madder: #e2735f; --thread: #d9b467; --rule: #2b3263; --night: #090c22;
+    --shadow: 0 24px 60px -28px rgba(0, 0, 0, .8); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #10142b; --paper-2: #171c3a; --card: #1b2145; --ink: #e9ebf5; --ink-2: #aab0cf;
-  --madder: #e0705f; --thread: #d7b265; --rule: #2d3460; --on-ink: #10142b; --shade: rgba(5, 7, 20, 0.62);
-  color-scheme: dark;
+  --paper: #0f1330; --paper-2: #161b3e; --card: #1a2048; --ink: #eceef7; --ink-2: #a9afcf;
+  --madder: #e2735f; --thread: #d9b467; --rule: #2b3263; --night: #090c22;
+  --shadow: 0 24px 60px -28px rgba(0, 0, 0, .8); color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -51,297 +52,510 @@ button, input, select { font: inherit; color: inherit; }
 .gut { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .inner { max-width: var(--max); margin: 0 auto; }
 h1, h2, h3 { font-family: var(--f-display); font-weight: 500; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
-.label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); }
+.label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--madder); }
 .num { font-variant-numeric: tabular-nums lining-nums; }
+.ico { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.stitch { height: 2px; border: 0; margin: 0; background-image: linear-gradient(90deg, var(--madder) 0 9px, transparent 9px 16px); background-size: 16px 2px; background-repeat: repeat-x; }
 
-/* The running stitch: the system's one motif */
-.stitch { height: 2px; background-image: linear-gradient(90deg, var(--madder) 0 9px, transparent 9px 16px); background-size: 16px 2px; background-repeat: repeat-x; border: 0; margin: 0; }
-.stitch.thread { background-image: linear-gradient(90deg, var(--thread) 0 9px, transparent 9px 16px); }
-
-/* ---------- Header ---------- */
-header.site { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: saturate(1.2) blur(8px); }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
-.nav { display: flex; align-items: center; gap: var(--s-6); padding-block: 14px; }
-.logo { font-family: var(--f-display); font-size: 1.65rem; font-weight: 600; text-decoration: none; letter-spacing: 0.01em; line-height: 1; }
+/* ---------- Header (transparent over hero, solid after scroll) ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--night); }
+header.site { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 50; color: var(--on-photo); transition: background .3s var(--ease), color .3s var(--ease), box-shadow .3s var(--ease); }
+header.site.solid { background: var(--card); color: var(--ink); box-shadow: 0 1px 0 var(--rule); }
+.nav { display: flex; align-items: center; gap: var(--s-6); height: 72px; }
+.logo { font-family: var(--f-display); font-size: 1.8rem; font-weight: 600; text-decoration: none; line-height: 1; }
 .logo i { color: var(--madder); font-style: normal; }
-.nav ul { display: flex; gap: var(--s-5); list-style: none; margin: 0; padding: 0; font-size: 0.92rem; }
-.nav ul a { text-decoration: none; padding-block: 4px; border-bottom: 2px solid transparent; }
-.nav ul a:hover { border-bottom-color: var(--madder); }
-.nav .soon { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); margin-left: 4px; }
-.nav .right { margin-left: auto; display: flex; gap: var(--s-4); align-items: center; font-size: 0.88rem; }
-.btn-line { border: 1.5px solid var(--ink); background: transparent; padding: 7px 16px; border-radius: var(--r-1); cursor: pointer; font-weight: 600; }
-.btn-line:hover { background: var(--ink); color: var(--paper); }
-@media (max-width: 820px) { .nav ul, .nav .cur { display: none; } }
+header.site:not(.solid) .logo i { color: #f0c27a; }
+.nav ul { display: flex; gap: var(--s-5); list-style: none; margin: 0; padding: 0; font-size: 0.94rem; font-weight: 500; }
+.nav ul a { text-decoration: none; padding-block: 6px; border-bottom: 2px solid transparent; }
+.nav ul a:hover { border-bottom-color: currentColor; }
+.nav ul sup { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: .75; margin-left: 3px; }
+.nav .right { margin-left: auto; display: flex; gap: var(--s-4); align-items: center; font-size: 0.9rem; }
+.nav .pill { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid currentColor; border-radius: 999px; padding: 7px 16px; font-weight: 600; background: none; cursor: pointer; text-decoration: none; }
+.nav .pill:hover { background: var(--on-photo); color: var(--night); }
+header.site.solid .nav .pill:hover { background: var(--ink); color: var(--card); }
+@media (max-width: 860px) { .nav ul, .nav .cur { display: none; } }
 
-/* ---------- Hero ---------- */
-.hero { padding-block: var(--s-6) 0; }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--s-6); align-items: end; }
-.hero-copy { padding-block: var(--s-7) var(--s-8); }
-.hero h1 { font-size: clamp(2.6rem, 6.4vw, 5.4rem); line-height: 0.98; letter-spacing: -0.025em; }
-.hero h1 em { font-style: italic; color: var(--madder); }
-.hero .lede { font-size: 1.08rem; color: var(--ink-2); max-width: 36ch; margin: var(--s-5) 0 0; }
-.hero-photo { position: relative; margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
-.hero-photo img { width: 100%; aspect-ratio: 4 / 3.35; object-fit: cover; object-position: 38% 60%; }
-.hero-photo figcaption { position: absolute; right: var(--s-4); bottom: calc(var(--s-4) + 64px); color: #fff; font-size: 0.74rem; text-shadow: 0 1px 6px rgba(0,0,0,.5); text-align: right; }
-@media (max-width: 860px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 0; }
-  .hero-photo { order: -1; margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); }
-  .hero-photo img { aspect-ratio: 4 / 3; }
-  .hero-copy { padding-block: var(--s-6) var(--s-6); }
-  .hero-photo figcaption { bottom: var(--s-3); }
+/* ---------- Hero slideshow ---------- */
+.hero { position: relative; height: clamp(600px, 86vh, 860px); background: var(--night); color: var(--on-photo); overflow: hidden; }
+.slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s var(--ease); }
+.slide.on { opacity: 1; }
+.slide img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); }
+.slide.on img { animation: drift 9s linear forwards; }
+@keyframes drift { from { transform: scale(1.12); } to { transform: scale(1.02); } }
+.hero::after { content: ""; position: absolute; inset: 0; background:
+  linear-gradient(180deg, rgba(9,12,34,.55) 0%, rgba(9,12,34,0) 22%, rgba(9,12,34,0) 45%, rgba(9,12,34,.78) 100%); pointer-events: none; }
+.hero-copy { position: absolute; z-index: 2; left: 0; right: 0; bottom: 150px; }
+.hero-copy .label { color: #f0c27a; }
+.hero h1 { font-size: clamp(2.9rem, 7.4vw, 6.6rem); line-height: 0.95; letter-spacing: -0.03em; max-width: 12ch; margin-top: 14px; text-shadow: 0 2px 30px rgba(0,0,0,.25); }
+.hero h1 em { font-style: italic; color: #f0c27a; }
+.hero-copy p { max-width: 40ch; font-size: 1.1rem; margin: 18px 0 0; color: rgba(255,255,255,.88); }
+.slide-meta { position: absolute; z-index: 2; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 150px; display: grid; justify-items: end; gap: 10px; text-align: right; }
+.slide-meta .place { font-family: var(--f-display); font-size: 1.35rem; font-style: italic; }
+.slide-meta .credit { font-size: 0.7rem; opacity: .75; }
+.dots { display: flex; gap: 6px; align-items: center; }
+.dots button { width: 34px; height: 18px; border: 0; background: none; padding: 0; cursor: pointer; display: grid; align-items: center; }
+.dots button span { display: block; height: 2px; background-image: linear-gradient(90deg, rgba(255,255,255,.55) 0 6px, transparent 6px 10px); background-size: 10px 2px; position: relative; overflow: hidden; }
+.dots button span::after { content: ""; position: absolute; inset: 0; background: #fff; transform: scaleX(0); transform-origin: left; }
+.dots button[aria-current="true"] span::after { animation: fill 6.5s linear forwards; }
+.hero.paused .dots button[aria-current="true"] span::after { animation-play-state: paused; }
+@keyframes fill { to { transform: scaleX(1); } }
+.pause { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); background: rgba(9,12,34,.25); color: #fff; display: grid; place-items: center; cursor: pointer; margin-left: 6px; }
+.pause svg { width: 12px; height: 12px; fill: currentColor; }
+@media (max-width: 760px) {
+  .hero { height: auto; min-height: 640px; }
+  .hero-copy { bottom: auto; top: 120px; }
+  .slide-meta { bottom: 60px; right: 16px; left: 16px; justify-items: start; text-align: left; }
 }
 
-/* ---------- Search ---------- */
-.search-wrap { position: relative; margin-top: -64px; z-index: 5; }
-@media (max-width: 860px) { .search-wrap { margin-top: 0; } }
-.search { background: var(--card); border: 1.5px solid var(--ink); box-shadow: 0 18px 40px -24px rgba(16,20,48,.45); }
-.tabs { display: flex; gap: var(--s-5); padding: var(--s-3) var(--s-5) 0; border-bottom: 1px solid var(--rule); }
-.tab { background: none; border: 0; padding: var(--s-2) 0 var(--s-3); cursor: pointer; font-weight: 600; font-size: 0.95rem; color: var(--ink-2); position: relative; }
+/* ---------- Search card ---------- */
+.search-wrap { position: relative; z-index: 10; margin-top: -96px; }
+.search { background: var(--card); border-radius: var(--r-3); box-shadow: var(--shadow); overflow: visible; }
+.tabs { display: flex; gap: 4px; padding: 10px 14px 0; flex-wrap: wrap; }
+.tab { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; padding: 12px 16px 14px; cursor: pointer; font-weight: 600; font-size: 0.95rem; color: var(--ink-2); position: relative; border-radius: var(--r-2) var(--r-2) 0 0; }
+.tab:hover { color: var(--ink); }
 .tab[aria-selected="true"] { color: var(--ink); }
-.tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background-image: linear-gradient(90deg, var(--madder) 0 9px, transparent 9px 16px); background-size: 16px 2px; }
-.tab small { font-weight: 500; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; margin-left: 6px; color: var(--thread); }
-.fields { display: grid; grid-template-columns: 2.2fr 1fr 1fr 1.4fr auto; }
-.field { padding: var(--s-3) var(--s-5) var(--s-4); border-right: 1px dashed var(--rule); min-width: 0; position: relative; }
-.field label, .field .label { display: block; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--madder); font-weight: 600; margin-bottom: 2px; }
-.field input, .field select, .field .pick { width: 100%; border: 0; background: transparent; padding: 2px 0; font-size: 1rem; font-weight: 500; outline-offset: 4px; }
-.field .pick { text-align: left; cursor: pointer; }
-.go { background: var(--ink); color: var(--paper); border: 0; padding: 0 var(--s-6); font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; min-height: 64px; transition: background var(--t-fast) var(--ease); }
-.go:hover { background: var(--madder); }
-.go svg { width: 18px; height: 18px; }
-.pop { position: absolute; top: calc(100% + 6px); right: 0; left: 0; min-width: 260px; background: var(--card); border: 1.5px solid var(--ink); padding: var(--s-4); z-index: 10; display: grid; gap: var(--s-3); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 2px; background-image: linear-gradient(90deg, var(--madder) 0 9px, transparent 9px 16px); background-size: 16px 2px; }
+.tab small { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--thread); }
+.fields { display: grid; grid-template-columns: 2fr 1.1fr 1.1fr 1.3fr auto; gap: 10px; padding: 14px; border-top: 1px solid var(--rule); }
+.field { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border: 1.5px solid var(--rule); border-radius: var(--r-2); min-width: 0; position: relative; background: var(--card); transition: border-color .15s; }
+.field:hover, .field:focus-within { border-color: var(--ink); }
+.field .ico { color: var(--madder); }
+.field > div { min-width: 0; flex: 1; }
+.field label, .field .lab { display: block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+.field input, .field select, .field .pick { width: 100%; border: 0; background: transparent; padding: 0; font-size: 1rem; font-weight: 600; outline: none; }
+.field .pick { text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.go { background: var(--madder); color: #fff; border: 0; border-radius: var(--r-2); padding: 0 30px; font-weight: 700; font-size: 1.02rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 62px; transition: filter .15s, transform .15s; }
+.go:hover { filter: brightness(1.08); }
+.go:active { transform: translateY(1px); }
+.pop { position: absolute; top: calc(100% + 8px); right: 0; min-width: 290px; background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-2); box-shadow: var(--shadow); padding: var(--s-5); z-index: 20; display: grid; gap: var(--s-4); }
 .step { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
-.step span small { display: block; color: var(--ink-2); font-size: 0.78rem; }
+.step small { display: block; color: var(--ink-2); font-size: 0.8rem; }
 .step .ctl { display: flex; align-items: center; gap: var(--s-3); }
-.step button { width: 32px; height: 32px; border: 1.5px solid var(--ink); background: transparent; border-radius: 50%; cursor: pointer; font-weight: 700; line-height: 1; }
-.step button:disabled { opacity: .35; cursor: not-allowed; }
-.note { padding: var(--s-4) var(--s-5); font-size: 0.92rem; color: var(--ink-2); }
-.status { min-height: 1.4em; font-size: 0.85rem; color: var(--ink-2); padding: var(--s-2) 2px 0; }
-@media (max-width: 860px) {
+.step button { width: 34px; height: 34px; border: 1.5px solid var(--ink); background: transparent; border-radius: 50%; cursor: pointer; font-weight: 700; }
+.step button:disabled { opacity: .3; cursor: not-allowed; }
+.quick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 0 14px 16px; font-size: 0.86rem; }
+.quick span { color: var(--ink-2); margin-right: 4px; }
+.chip { border: 1px dashed var(--ink-2); border-radius: 999px; padding: 5px 13px; background: none; cursor: pointer; }
+.chip:hover { border-style: solid; border-color: var(--ink); }
+.note { padding: 22px 22px 26px; border-top: 1px solid var(--rule); color: var(--ink-2); margin: 0; }
+.status { min-height: 1.5em; font-size: 0.86rem; color: var(--ink-2); padding: 10px 6px 0; margin: 0; }
+@media (max-width: 980px) {
   .fields { grid-template-columns: 1fr 1fr; }
-  .field { border-right: 0; border-bottom: 1px dashed var(--rule); }
   .field.wide, .go { grid-column: 1 / -1; }
-  .field:nth-child(2) { border-right: 1px dashed var(--rule); }
-  .go { justify-content: center; }
 }
+@media (max-width: 760px) { .search-wrap { margin-top: -40px; } }
 
-/* ---------- Sections ---------- */
+/* Trust strip */
+.trust { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-5); padding-block: var(--s-6) 0; }
+.trust div { display: flex; gap: 12px; align-items: flex-start; font-size: 0.9rem; color: var(--ink-2); }
+.trust b { display: block; color: var(--ink); font-weight: 600; }
+.trust .ico { color: var(--madder); width: 26px; height: 26px; margin-top: 2px; }
+@media (max-width: 860px) { .trust { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .trust { grid-template-columns: 1fr; } }
+
+/* Section heads */
 section.block { padding-block: var(--s-9) 0; }
 .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-4) var(--s-6); margin-bottom: var(--s-6); }
-.head h2 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.04; max-width: 18ch; }
-.head p { max-width: 44ch; margin: 0; color: var(--ink-2); }
-.sample { display: inline-block; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px dashed var(--thread); color: var(--thread); padding: 1px 8px; border-radius: 999px; margin-top: var(--s-3); }
+.head h2 { font-size: clamp(2.1rem, 4.2vw, 3.4rem); line-height: 1.02; max-width: 17ch; margin-top: 10px; }
+.head h2 em { font-style: italic; color: var(--madder); }
+.head p { max-width: 42ch; margin: 0; color: var(--ink-2); }
+.arrows { display: flex; gap: 8px; }
+.arrow { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--ink); background: none; cursor: pointer; display: grid; place-items: center; }
+.arrow:hover { background: var(--ink); color: var(--card); }
+.sample { display: inline-flex; gap: 6px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border: 1px dashed var(--thread); color: var(--thread); padding: 2px 10px; border-radius: 999px; margin-top: var(--s-5); }
 
-/* Six seasons */
-.ritu { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
-.ritu button { background: none; border: 0; border-right: 1px dashed var(--rule); padding: var(--s-4) var(--s-3); text-align: left; cursor: pointer; display: grid; gap: 2px; position: relative; transition: background var(--t-fast) var(--ease); }
-.ritu button:last-child { border-right: 0; }
-.ritu button:hover { background: var(--paper-2); }
-.ritu .bn { font-family: var(--f-bn); font-size: 1.15rem; }
-.ritu .en { font-weight: 600; font-size: 0.9rem; }
-.ritu .mo { font-size: 0.74rem; color: var(--ink-2); }
-.ritu button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
-.ritu button[aria-pressed="true"] .mo { color: color-mix(in srgb, var(--paper) 75%, transparent); }
-.ritu .now { position: absolute; top: 8px; right: 10px; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--thread); }
-@media (max-width: 760px) { .ritu { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ritu button:nth-child(3) { border-right: 0; } .ritu button:nth-child(-n+3) { border-bottom: 1px dashed var(--rule); } }
-.ritu-note { margin: var(--s-4) 0 var(--s-5); color: var(--ink-2); max-width: 70ch; min-height: 3.2em; }
+/* ---------- Trending carousel ---------- */
+.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 23%); gap: var(--s-4); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px; scrollbar-width: thin; }
+@media (max-width: 760px) { .rail { grid-auto-columns: 74%; } }
+.tile { position: relative; border-radius: var(--r-3); overflow: hidden; scroll-snap-align: start; aspect-ratio: 3 / 4.2; color: #fff; text-decoration: none; background: var(--night); }
+.tile img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.tile:hover img { transform: scale(1.06); }
+.tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(9,12,34,0) 45%, rgba(9,12,34,.85) 100%); }
+.tile .tx { position: absolute; z-index: 1; left: 18px; right: 18px; bottom: 18px; display: grid; gap: 4px; }
+.tile h3 { font-size: 1.7rem; line-height: 1.05; }
+.tile .sub { font-size: 0.84rem; opacity: .85; }
+.tile .from { margin-top: 8px; display: inline-flex; align-self: start; justify-self: start; gap: 6px; background: rgba(255,255,255,.95); color: #1c2452; border-radius: 999px; padding: 4px 12px; font-size: 0.82rem; }
+.tile .from b { font-weight: 700; }
+.tile .tag { position: absolute; z-index: 1; top: 14px; left: 14px; background: #b23a2e; color: #fff; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
 
-.dests { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: var(--s-5); }
-@media (max-width: 900px) { .dests { grid-template-columns: 1fr 1fr; } .dests .d:first-child { grid-column: 1 / -1; } }
-@media (max-width: 560px) { .dests { grid-template-columns: 1fr; } }
-.d { text-decoration: none; display: grid; gap: var(--s-3); min-width: 0; }
-.d .ph { overflow: hidden; background: var(--paper-2); }
-.d img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; transition: transform var(--t-med) var(--ease); }
-.d:first-child img { aspect-ratio: 4 / 4.2; }
-.d:hover img { transform: scale(1.03); }
-.d .meta { display: flex; justify-content: space-between; gap: var(--s-3); align-items: baseline; }
-.d h3 { font-size: 1.55rem; }
-.d .where { font-size: 0.85rem; color: var(--ink-2); }
-.d .price { font-size: 0.9rem; white-space: nowrap; }
-.d .price b { font-weight: 700; }
+/* ---------- Mood mosaic ---------- */
+.mosaic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: 260px 260px; gap: var(--s-4); }
+.mosaic a { position: relative; border-radius: var(--r-3); overflow: hidden; color: #fff; text-decoration: none; background: var(--night); min-width: 0; }
+.mosaic a:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+.mosaic a:nth-child(4) { grid-row: span 2; }
+.mosaic img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
+.mosaic a:hover img { transform: scale(1.05); }
+.mosaic a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(200deg, rgba(9,12,34,0) 40%, rgba(9,12,34,.8) 100%); }
+.mosaic .tx { position: absolute; z-index: 1; left: 20px; bottom: 18px; right: 20px; }
+.mosaic .mood { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #f0c27a; }
+.mosaic h3 { font-size: 1.6rem; line-height: 1.1; margin-top: 4px; }
+.mosaic a:nth-child(1) h3 { font-size: clamp(2rem, 3.4vw, 2.8rem); }
+.mosaic .go-arrow { position: absolute; z-index: 1; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.92); color: #1c2452; display: grid; place-items: center; opacity: 0; transform: translateY(6px); transition: .3s var(--ease); }
+.mosaic a:hover .go-arrow, .mosaic a:focus-visible .go-arrow { opacity: 1; transform: none; }
+@media (max-width: 900px) {
+  .mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 300px 220px 220px 220px; }
+  .mosaic a:nth-child(1) { grid-column: 1 / -1; grid-row: auto; }
+  .mosaic a:nth-child(4) { grid-row: auto; }
+}
 
-/* Tours */
-.tours { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--s-6); }
-@media (max-width: 900px) { .tours { grid-template-columns: 1fr; } }
-.feature { background: var(--card); border: 1px solid var(--rule); display: grid; grid-template-rows: auto 1fr; min-width: 0; }
-.feature img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
-.feature .body { padding: var(--s-5) var(--s-6) var(--s-6); display: grid; gap: var(--s-4); }
-.feature h3 { font-size: 2rem; line-height: 1.1; }
-.facts { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-size: 0.88rem; color: var(--ink-2); margin: 0; padding: 0; list-style: none; }
-.facts b { color: var(--ink); font-weight: 600; }
-.deps { display: flex; flex-wrap: wrap; gap: var(--s-2); }
-.dep { border: 1.5px dashed var(--ink-2); padding: 4px 12px; font-size: 0.84rem; background: none; cursor: pointer; border-radius: var(--r-1); }
-.dep[aria-pressed="true"] { border-style: solid; border-color: var(--ink); background: var(--ink); color: var(--paper); }
-.dep .left { color: var(--madder); font-weight: 600; margin-left: 6px; }
-.dep[aria-pressed="true"] .left { color: var(--thread); }
-.book-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s-4); padding-top: var(--s-4); border-top: 1px solid var(--rule); }
-.book-row .from { font-size: 0.82rem; color: var(--ink-2); }
-.book-row .amt { font-family: var(--f-display); font-size: 1.9rem; line-height: 1; }
-.btn { background: var(--ink); color: var(--paper); border: 0; padding: 12px 22px; font-weight: 700; cursor: pointer; border-radius: var(--r-1); }
-.btn:hover { background: var(--madder); }
-.list { display: grid; gap: var(--s-5); align-content: start; }
-.row { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: var(--s-4); text-decoration: none; align-items: start; padding-bottom: var(--s-5); border-bottom: 1px dashed var(--rule); }
-.row:last-child { border-bottom: 0; }
-.row img { width: 140px; aspect-ratio: 1; object-fit: cover; }
-.row h3 { font-size: 1.3rem; line-height: 1.15; margin-bottom: 4px; }
-.row p { margin: 0; font-size: 0.88rem; color: var(--ink-2); }
-.row .p { margin-top: var(--s-2); font-size: 0.9rem; color: var(--ink); }
-@media (max-width: 460px) { .row { grid-template-columns: 96px minmax(0, 1fr); } .row img { width: 96px; } }
+/* ---------- Stays grid ---------- */
+.stays { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-5); }
+@media (max-width: 1080px) { .stays { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .stays { grid-template-columns: 1fr; } }
+.stay { display: grid; gap: 12px; min-width: 0; text-decoration: none; }
+.stay .ph { position: relative; border-radius: var(--r-3); overflow: hidden; aspect-ratio: 4 / 3.3; background: var(--paper-2); }
+.stay .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+.stay:hover .ph img { transform: scale(1.05); }
+.heart { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,255,255,.92); color: #1c2452; display: grid; place-items: center; cursor: pointer; }
+.heart svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.heart[aria-pressed="true"] { color: #b23a2e; }
+.heart[aria-pressed="true"] svg { fill: currentColor; }
+.badge { position: absolute; left: 12px; bottom: 12px; background: rgba(255,255,255,.94); color: #1c5b3a; font-size: 0.74rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.stay .row1 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.stay h3 { font-family: var(--f-text); font-size: 1.04rem; font-weight: 700; letter-spacing: 0; line-height: 1.3; }
+.score { display: inline-flex; align-items: center; gap: 5px; font-size: 0.86rem; font-weight: 700; white-space: nowrap; }
+.score i { width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--madder); display: grid; place-items: center; font-style: normal; font-size: 0.72rem; color: var(--madder); }
+.stay .loc { font-size: 0.86rem; color: var(--ink-2); margin-top: -8px; }
+.amen { display: flex; gap: 12px; color: var(--ink-2); }
+.amen .ico { width: 18px; height: 18px; }
+.stay .price { display: flex; align-items: baseline; gap: 6px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+.stay .price b { font-size: 1.2rem; }
+.stay .price small { color: var(--ink-2); font-size: 0.8rem; }
 
-/* Field notes band */
-.band { margin-top: var(--s-9); position: relative; color: #f3f4f8; }
-.band img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-.band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,16,40,.82) 0%, rgba(12,16,40,.55) 45%, rgba(12,16,40,0) 80%); }
-.band .inner { position: relative; z-index: 1; padding-block: var(--s-9); }
-.band .label { color: #d7b265; }
-.band h2 { font-size: clamp(2rem, 4.4vw, 3.4rem); line-height: 1.05; max-width: 15ch; margin: var(--s-3) 0 var(--s-4); }
-.band p { max-width: 46ch; margin: 0 0 var(--s-3); color: #dfe2ee; }
-.band .credit { position: absolute; z-index: 1; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 10px; font-size: 0.72rem; color: #dfe2ee; }
+/* ---------- Seasons ---------- */
+.seasons { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s-7); align-items: stretch; background: var(--night); color: #eef0f8; border-radius: var(--r-3); overflow: hidden; }
+.seasons .pic { position: relative; min-height: 460px; }
+.seasons .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s var(--ease); }
+.seasons .pic img.on { opacity: 1; }
+.seasons .pic .cap { position: absolute; left: 18px; bottom: 16px; z-index: 1; color: #fff; font-family: var(--f-display); font-style: italic; font-size: 1.3rem; text-shadow: 0 1px 12px rgba(0,0,0,.5); }
+.seasons .side { padding: var(--s-7) var(--s-7) var(--s-7) 0; display: grid; gap: var(--s-4); align-content: center; }
+.seasons .label { color: #f0c27a; }
+.seasons h2 { font-size: clamp(2rem, 3.6vw, 3rem); line-height: 1.05; }
+.ritu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ritu button { background: rgba(255,255,255,.06); border: 1px dashed rgba(255,255,255,.25); color: inherit; padding: 12px 12px 10px; border-radius: var(--r-2); text-align: left; cursor: pointer; display: grid; gap: 1px; position: relative; transition: background .2s; }
+.ritu button:hover { background: rgba(255,255,255,.12); }
+.ritu button[aria-pressed="true"] { background: #eef0f8; color: #1c2452; border-style: solid; border-color: #eef0f8; }
+.ritu .bn { font-family: var(--f-bn); font-size: 1.15rem; line-height: 1.3; }
+.ritu .en { font-weight: 600; font-size: 0.86rem; }
+.ritu .mo { font-size: 0.7rem; opacity: .7; }
+.ritu .now { position: absolute; top: 8px; right: 10px; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #f0c27a; }
+.ritu button[aria-pressed="true"] .now { color: #b23a2e; }
+.ritu-note { margin: 0; color: rgba(238,240,248,.82); min-height: 3.3em; }
+.ritu-go { display: flex; flex-wrap: wrap; gap: 8px; }
+.ritu-go a { color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: 6px 14px; font-size: 0.86rem; text-decoration: none; }
+.ritu-go a:hover { background: #fff; color: #1c2452; }
+@media (max-width: 900px) { .seasons { grid-template-columns: 1fr; gap: 0; } .seasons .pic { min-height: 300px; } .seasons .side { padding: var(--s-6) var(--s-5); } }
 
-/* Promises */
-.promises { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
+/* ---------- Tours ---------- */
+.tours { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--s-6); }
+@media (max-width: 960px) { .tours { grid-template-columns: 1fr; } }
+.feature { position: relative; border-radius: var(--r-3); overflow: hidden; color: #fff; min-height: 560px; display: grid; align-content: end; background: var(--night); }
+.feature > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.feature::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(9,12,34,0) 25%, rgba(9,12,34,.9) 100%); }
+.feature .body { position: relative; z-index: 1; padding: var(--s-6); display: grid; gap: 14px; }
+.feature .label { color: #f0c27a; }
+.feature h3 { font-size: clamp(2rem, 3.4vw, 2.7rem); line-height: 1.05; }
+.facts { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.88rem; opacity: .9; margin: 0; padding: 0; list-style: none; }
+.deps { display: flex; flex-wrap: wrap; gap: 8px; }
+.dep { border: 1.5px dashed rgba(255,255,255,.6); color: #fff; padding: 6px 14px; font-size: 0.85rem; background: none; cursor: pointer; border-radius: 999px; }
+.dep[aria-pressed="true"] { border-style: solid; background: #fff; color: #1c2452; }
+.dep .left { color: #f0c27a; font-weight: 700; margin-left: 6px; }
+.dep[aria-pressed="true"] .left { color: #b23a2e; }
+.book-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 14px; padding-top: 14px; border-top: 1px dashed rgba(255,255,255,.3); }
+.book-row small { font-size: 0.8rem; opacity: .8; display: block; }
+.book-row .amt { font-family: var(--f-display); font-size: 2.2rem; line-height: 1; }
+.btn { background: var(--madder); color: #fff; border: 0; padding: 14px 24px; font-weight: 700; cursor: pointer; border-radius: var(--r-2); }
+.btn:hover { filter: brightness(1.08); }
+.list { display: grid; gap: var(--s-4); align-content: start; }
+.trip { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: var(--s-4); text-decoration: none; background: var(--card); border-radius: var(--r-3); padding: 12px; border: 1px solid var(--rule); transition: transform .25s var(--ease), box-shadow .25s; }
+.trip:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.trip img { width: 150px; height: 100%; min-height: 128px; object-fit: cover; border-radius: var(--r-2); }
+.trip .t { padding: 4px 6px 4px 0; display: grid; gap: 4px; align-content: center; }
+.trip h3 { font-size: 1.28rem; line-height: 1.15; }
+.trip p { margin: 0; font-size: 0.86rem; color: var(--ink-2); }
+.trip .p { font-size: 0.9rem; }
+@media (max-width: 460px) { .trip { grid-template-columns: 100px minmax(0, 1fr); } .trip img { width: 100px; } }
+
+/* ---------- Promises ---------- */
+.promises { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); }
 @media (max-width: 860px) { .promises { grid-template-columns: 1fr; } }
-.promise { display: grid; gap: var(--s-3); align-content: start; }
-.promise .stitch { width: 64px; }
-.promise h3 { font-size: 1.45rem; line-height: 1.15; }
-.promise p { margin: 0; color: var(--ink-2); max-width: 38ch; }
+.promise { background: var(--card); border: 1px solid var(--rule); border-radius: var(--r-3); padding: var(--s-6); display: grid; gap: 12px; align-content: start; }
+.promise .ico { width: 34px; height: 34px; color: var(--madder); }
+.promise h3 { font-size: 1.5rem; line-height: 1.15; }
+.promise p { margin: 0; color: var(--ink-2); }
 
-/* Footer */
-footer { margin-top: var(--s-9); background: var(--ink); color: var(--on-ink); padding-block: var(--s-8) var(--s-6); }
-footer .cols { display: grid; grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
+/* ---------- Newsletter band ---------- */
+.band { position: relative; margin-top: var(--s-9); color: #fff; overflow: hidden; }
+.band > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(9,12,34,.85), rgba(9,12,34,.35) 70%, rgba(9,12,34,.15)); }
+.band .inner { position: relative; z-index: 1; padding-block: var(--s-9); display: grid; gap: 16px; }
+.band .label { color: #f0c27a; }
+.band h2 { font-size: clamp(2rem, 4.4vw, 3.5rem); line-height: 1.04; max-width: 14ch; }
+.band p { max-width: 44ch; margin: 0; color: rgba(255,255,255,.85); }
+.sub-form { display: flex; flex-wrap: wrap; gap: 10px; max-width: 520px; margin-top: 8px; }
+.sub-form input { flex: 1 1 240px; min-width: 0; border: 1.5px solid rgba(255,255,255,.6); background: rgba(9,12,34,.35); color: #fff; border-radius: var(--r-2); padding: 14px 16px; }
+.sub-form input::placeholder { color: rgba(255,255,255,.65); }
+.band .credit { position: absolute; z-index: 1; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 10px; font-size: 0.7rem; opacity: .75; }
+
+/* ---------- Footer ---------- */
+footer { background: var(--night); color: #e7e9f4; padding-block: var(--s-8) var(--s-6); }
+footer .cols { display: grid; grid-template-columns: 1.5fr repeat(3, minmax(0, 1fr)); gap: var(--s-6); }
 @media (max-width: 860px) { footer .cols { grid-template-columns: 1fr 1fr; } footer .cols > :first-child { grid-column: 1 / -1; } }
-footer .logo { color: var(--on-ink); font-size: 2.2rem; }
-footer h4 { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; margin: 0 0 var(--s-3); opacity: .7; font-weight: 600; }
-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 0.92rem; }
+footer .logo { font-size: 2.4rem; }
+footer .logo i { color: #f0c27a; }
+footer h4 { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; opacity: .65; font-weight: 700; }
+footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 0.92rem; }
 footer a { text-decoration: none; }
 footer a:hover { text-decoration: underline; }
-footer .stitch { margin: var(--s-7) 0 var(--s-5); background-image: linear-gradient(90deg, var(--thread) 0 9px, transparent 9px 16px); }
-footer .fine { font-size: 0.8rem; opacity: .75; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); justify-content: space-between; }
-details.credits { margin-top: var(--s-4); font-size: 0.78rem; opacity: .8; }
+.pay { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.pay span { border: 1px solid rgba(255,255,255,.25); border-radius: 6px; padding: 4px 10px; font-size: 0.76rem; font-weight: 600; }
+footer .stitch { margin: var(--s-7) 0 var(--s-5); background-image: linear-gradient(90deg, #d9b467 0 9px, transparent 9px 16px); }
+footer .fine { font-size: 0.8rem; opacity: .7; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+details.credits { margin-top: 18px; font-size: 0.78rem; opacity: .75; }
 details.credits summary { cursor: pointer; }
-details.credits ul { margin-top: var(--s-3); font-size: 0.78rem; gap: 4px; }
+details.credits ul { margin-top: 10px; font-size: 0.76rem; gap: 4px; }
 
-.proto-flag { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 40; background: var(--card); color: var(--ink); border: 1px dashed var(--thread); font-size: 0.72rem; padding: 4px 10px; border-radius: 999px; }
+.proto-flag { position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 70; background: var(--card); color: var(--ink); border: 1px dashed var(--thread); font-size: 0.72rem; padding: 5px 12px; border-radius: 999px; box-shadow: var(--shadow); }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
 </style>
 </head>
 <body>
 
-<header class="site gut">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5M7 11.5a1.5 1.5 0 1 0 0-.01"/></symbol>
+  <symbol id="i-boat" viewBox="0 0 24 24"><path d="M3 15h18l-2.5 4h-13zM6 15V9h9l3 6M10 9V5"/></symbol>
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M10.5 13.5 4 11l1-2 7 1 4-4.5a1.8 1.8 0 0 1 2.5 2.5L14 12l1 7-2 1-2.5-6.5L8 16v3l-1.5.5L5 17l-1.5-1.5L4 14h3z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v4h4M9.5 12h6M9.5 15.5h6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-taka" viewBox="0 0 24 24"><path d="M7 4c2 0 3 1 3 3v9a3 3 0 0 0 6 0v-1M6 9h8"/><circle cx="12" cy="12" r="9.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v6c0 4.5 3.2 7.8 7.5 9 4.3-1.2 7.5-4.5 7.5-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14.5h2"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19" r=".8"/></symbol>
+  <symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3c0 1.5 1 1.5 1 3M12 3c0 1.5 1 1.5 1 3"/></symbol>
+  <symbol id="i-view" viewBox="0 0 24 24"><path d="m2 18 6-8 4 5 3-3 7 6zM16.5 7.5a1.5 1.5 0 1 0 0-.01"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4zM4 16v2M20 16v2M4 12h16"/><circle cx="7.5" cy="14" r=".6"/><circle cx="16.5" cy="14" r=".6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></symbol>
+</svg>
+
+<header class="site gut" id="hdr">
   <div class="inner nav">
     <a class="logo" href="#top" aria-label="Pegah home">Pegah<i>.</i></a>
     <ul>
       <li><a href="#stays">Stays</a></li>
       <li><a href="#tours">Tours</a></li>
-      <li><a href="#top">Flights</a><span class="soon">soon</span></li>
-      <li><a href="#top">Visa</a><span class="soon">soon</span></li>
+      <li><a href="#explore">Destinations</a></li>
+      <li><a href="#top">Flights<sup>soon</sup></a></li>
     </ul>
     <div class="right">
       <span class="cur num">৳ BDT · EN</span>
-      <button class="btn-line" type="button">Sign in</button>
+      <button class="pill" type="button"><svg class="ico" style="width:16px;height:16px"><use href="#i-user"/></svg>Sign in</button>
     </div>
   </div>
 </header>
 
 <main id="top">
-  <section class="hero gut">
-    <div class="inner hero-grid">
-      <div class="hero-copy">
-        <div class="label">Travel planned in Bangladesh</div>
-        <h1 style="margin-top: 14px;">Wake up where the <em>tea</em> grows.</h1>
-        <p class="lede">Bungalows in Sylhet's tea country, houseboats on the haor, sunrise above the clouds at Sajek. Prices in taka, and one planner who answers when you call.</p>
-      </div>
-      <figure class="hero-photo" style="margin:0">
-        <img src="images/jaflong-tea-mist.jpg" width="1920" height="1221" alt="A tea worker carrying baskets on a shoulder pole walks through a tea garden at Jaflong, with misty hills glowing orange at dawn." fetchpriority="high">
-        <figcaption>Jaflong, Sylhet · Photo: Abdul Momin, CC BY-SA 4.0</figcaption>
-      </figure>
+  <!-- Hero -->
+  <section class="hero" id="hero" aria-label="Featured places">
+    <div class="slide on" data-place="Jaflong, Sylhet" data-credit="Photo: Abdul Momin · CC BY-SA 4.0">
+      <img src="images/jaflong-tea-mist.jpg" width="1920" height="1221" alt="A tea worker walks through a tea garden at Jaflong as misty hills glow orange at dawn." fetchpriority="high">
+    </div>
+    <div class="slide" data-place="Sundarbans, Khulna" data-credit="Photo: Hiroki Ogawa · CC BY 3.0">
+      <img src="images/hero-sundarbans-sunrise.jpg" width="1920" height="1440" alt="The sun rises through mist over a mangrove channel in the Sundarbans." loading="lazy">
+    </div>
+    <div class="slide" data-place="Ratargul, Sylhet" data-credit="Photo: Abdulmominbd · CC BY-SA 4.0">
+      <img src="images/hero-ratargul-boatman.jpg" width="1920" height="1331" alt="A boatman paddles under arching trees in the Ratargul swamp forest." loading="lazy">
+    </div>
+    <div class="slide" data-place="Boga Lake, Bandarban" data-credit="Photo: Mazharul Sabuz · CC BY-SA 4.0">
+      <img src="images/hero-boga-lake.jpg" width="1920" height="1080" alt="Clouds reflected in the still water of Boga Lake, ringed by forested hills." loading="lazy">
     </div>
 
-    <div class="inner search-wrap">
-      <form class="search" id="search" novalidate>
-        <div class="tabs" role="tablist" aria-label="What are you booking?">
-          <button class="tab" type="button" role="tab" id="t-stays" aria-selected="true" aria-controls="p-stays">Stays</button>
-          <button class="tab" type="button" role="tab" id="t-tours" aria-selected="false" aria-controls="p-tours">Tours</button>
-          <button class="tab" type="button" role="tab" id="t-flights" aria-selected="false" aria-controls="p-flights">Flights<small>soon</small></button>
-        </div>
-
-        <div id="p-stays" role="tabpanel" aria-labelledby="t-stays" class="fields">
-          <div class="field wide">
-            <label for="q-where">Where</label>
-            <input id="q-where" list="places" value="Srimangal, Sylhet" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="q-in">Check-in</label>
-            <input id="q-in" type="date">
-          </div>
-          <div class="field">
-            <label for="q-out">Check-out</label>
-            <input id="q-out" type="date">
-          </div>
-          <div class="field">
-            <span class="label" id="g-lab">Guests</span>
-            <button class="pick" type="button" id="g-btn" aria-expanded="false" aria-controls="g-pop" aria-labelledby="g-lab g-btn">2 adults · 1 room</button>
-            <div class="pop" id="g-pop" hidden>
-              <div class="step"><span>Adults<small>13 and over</small></span><span class="ctl"><button type="button" data-k="adults" data-d="-1" aria-label="Fewer adults">−</button><b class="num" id="c-adults">2</b><button type="button" data-k="adults" data-d="1" aria-label="More adults">+</button></span></div>
-              <div class="step"><span>Children<small>Under 13</small></span><span class="ctl"><button type="button" data-k="children" data-d="-1" aria-label="Fewer children">−</button><b class="num" id="c-children">0</b><button type="button" data-k="children" data-d="1" aria-label="More children">+</button></span></div>
-              <div class="step"><span>Rooms</span><span class="ctl"><button type="button" data-k="rooms" data-d="-1" aria-label="Fewer rooms">−</button><b class="num" id="c-rooms">1</b><button type="button" data-k="rooms" data-d="1" aria-label="More rooms">+</button></span></div>
-            </div>
-          </div>
-          <button class="go" type="submit">Search stays
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-
-        <div id="p-tours" role="tabpanel" aria-labelledby="t-tours" class="fields" hidden>
-          <div class="field wide">
-            <label for="t-where">Destination</label>
-            <input id="t-where" list="places" value="Tanguar Haor, Sunamganj" autocomplete="off">
-          </div>
-          <div class="field">
-            <label for="t-month">Month</label>
-            <select id="t-month"></select>
-          </div>
-          <div class="field">
-            <label for="t-people">Travellers</label>
-            <select id="t-people"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select>
-          </div>
-          <div class="field">
-            <label for="t-kind">Style</label>
-            <select id="t-kind"><option>Any</option><option>Houseboat</option><option>Hill trek</option><option>Heritage walk</option><option>Beach</option></select>
-          </div>
-          <button class="go" type="submit">Find tours
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-
-        <div id="p-flights" role="tabpanel" aria-labelledby="t-flights" hidden>
-          <p class="note">Flight booking opens once our airline ticketing partner is live. We will only show fares we can actually issue.</p>
-        </div>
-
-        <datalist id="places">
-          <option value="Srimangal, Sylhet"><option value="Jaflong, Sylhet"><option value="Ratargul, Sylhet">
-          <option value="Tanguar Haor, Sunamganj"><option value="Sajek Valley, Rangamati"><option value="Cox's Bazar">
-          <option value="Old Dhaka">
-        </datalist>
-      </form>
-      <p class="status" id="status" role="status" aria-live="polite"></p>
+    <div class="hero-copy gut">
+      <div class="inner">
+        <div class="label">Stays · Tours · Planning across Bangladesh</div>
+        <h1>Bangladesh, <em>beautifully</em> booked.</h1>
+        <p>Tea-country bungalows, Sundarbans launches and haor houseboats. Real prices in taka, confirmed by the people who host you.</p>
+      </div>
+    </div>
+    <div class="slide-meta">
+      <div class="place" id="place" aria-live="polite">Jaflong, Sylhet</div>
+      <div class="credit" id="credit">Photo: Abdul Momin · CC BY-SA 4.0</div>
+      <div class="dots" id="dots" role="group" aria-label="Choose photo"></div>
     </div>
   </section>
 
-  <!-- Six seasons -->
+  <!-- Search -->
+  <div class="gut">
+    <div class="inner search-wrap">
+      <form class="search" id="search" novalidate>
+        <div class="tabs" role="tablist" aria-label="What are you booking?">
+          <button class="tab" type="button" role="tab" id="t-stays" aria-selected="true" aria-controls="p-stays"><svg class="ico"><use href="#i-bed"/></svg>Stays</button>
+          <button class="tab" type="button" role="tab" id="t-tours" aria-selected="false" aria-controls="p-tours" tabindex="-1"><svg class="ico"><use href="#i-boat"/></svg>Tours</button>
+          <button class="tab" type="button" role="tab" id="t-flights" aria-selected="false" aria-controls="p-flights" tabindex="-1"><svg class="ico"><use href="#i-plane"/></svg>Flights <small>soon</small></button>
+          <button class="tab" type="button" role="tab" id="t-visa" aria-selected="false" aria-controls="p-visa" tabindex="-1"><svg class="ico"><use href="#i-doc"/></svg>Visa <small>soon</small></button>
+        </div>
+
+        <div id="p-stays" role="tabpanel" aria-labelledby="t-stays">
+          <div class="fields">
+            <div class="field wide"><svg class="ico"><use href="#i-pin"/></svg><div><label for="q-where">Where to?</label><input id="q-where" list="places" value="Srimangal, Sylhet" autocomplete="off"></div></div>
+            <div class="field"><svg class="ico"><use href="#i-cal"/></svg><div><label for="q-in">Check-in</label><input id="q-in" type="date"></div></div>
+            <div class="field"><svg class="ico"><use href="#i-cal"/></svg><div><label for="q-out">Check-out</label><input id="q-out" type="date"></div></div>
+            <div class="field"><svg class="ico"><use href="#i-user"/></svg><div>
+              <span class="lab" id="g-lab">Guests</span>
+              <button class="pick" type="button" id="g-btn" aria-expanded="false" aria-controls="g-pop" aria-labelledby="g-lab g-btn">2 adults · 1 room</button>
+            </div>
+              <div class="pop" id="g-pop" hidden>
+                <div class="step"><span>Adults<small>13 and over</small></span><span class="ctl"><button type="button" data-k="adults" data-d="-1" aria-label="Fewer adults">−</button><b class="num" id="c-adults">2</b><button type="button" data-k="adults" data-d="1" aria-label="More adults">+</button></span></div>
+                <div class="step"><span>Children<small>Under 13</small></span><span class="ctl"><button type="button" data-k="children" data-d="-1" aria-label="Fewer children">−</button><b class="num" id="c-children">0</b><button type="button" data-k="children" data-d="1" aria-label="More children">+</button></span></div>
+                <div class="step"><span>Rooms</span><span class="ctl"><button type="button" data-k="rooms" data-d="-1" aria-label="Fewer rooms">−</button><b class="num" id="c-rooms">1</b><button type="button" data-k="rooms" data-d="1" aria-label="More rooms">+</button></span></div>
+              </div>
+            </div>
+            <button class="go" type="submit">Search<svg class="ico"><use href="#i-arrow"/></svg></button>
+          </div>
+          <div class="quick"><span>Popular:</span>
+            <button class="chip" type="button" data-q="Srimangal, Sylhet">Tea-garden weekend</button>
+            <button class="chip" type="button" data-q="Cox's Bazar">Sea-view in Cox's Bazar</button>
+            <button class="chip" type="button" data-q="Sajek Valley, Rangamati">Sajek cottages</button>
+            <button class="chip" type="button" data-q="Saint Martin's Island">Saint Martin's</button>
+          </div>
+        </div>
+
+        <div id="p-tours" role="tabpanel" aria-labelledby="t-tours" hidden>
+          <div class="fields">
+            <div class="field wide"><svg class="ico"><use href="#i-pin"/></svg><div><label for="t-where">Destination</label><input id="t-where" list="places" value="Sundarbans" autocomplete="off"></div></div>
+            <div class="field"><svg class="ico"><use href="#i-cal"/></svg><div><label for="t-month">Month</label><select id="t-month"></select></div></div>
+            <div class="field"><svg class="ico"><use href="#i-user"/></svg><div><label for="t-people">Travellers</label><select id="t-people"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6+</option></select></div></div>
+            <div class="field"><svg class="ico"><use href="#i-boat"/></svg><div><label for="t-kind">Style</label><select id="t-kind"><option>Any style</option><option>Houseboat</option><option>Launch cruise</option><option>Hill trek</option><option>Heritage walk</option></select></div></div>
+            <button class="go" type="submit">Find tours<svg class="ico"><use href="#i-arrow"/></svg></button>
+          </div>
+        </div>
+        <div id="p-flights" role="tabpanel" aria-labelledby="t-flights" hidden><p class="note">Flight booking opens once our airline ticketing partner is live. We will only show fares we can actually issue.</p></div>
+        <div id="p-visa" role="tabpanel" aria-labelledby="t-visa" hidden><p class="note">Visa assistance is coming. You will be able to check requirements by country and track your application here.</p></div>
+
+        <datalist id="places">
+          <option value="Srimangal, Sylhet"><option value="Jaflong, Sylhet"><option value="Ratargul, Sylhet"><option value="Sundarbans">
+          <option value="Tanguar Haor, Sunamganj"><option value="Sajek Valley, Rangamati"><option value="Kaptai Lake, Rangamati">
+          <option value="Bandarban"><option value="Cox's Bazar"><option value="Saint Martin's Island"><option value="Old Dhaka"><option value="Sonargaon">
+        </datalist>
+      </form>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+
+      <div class="trust">
+        <div><svg class="ico"><use href="#i-taka"/></svg><span><b>Prices in taka</b>VAT and fees included before you pay</span></div>
+        <div><svg class="ico"><use href="#i-shield"/></svg><span><b>Really confirmed</b>Confirmed only when your host confirms</span></div>
+        <div><svg class="ico"><use href="#i-wallet"/></svg><span><b>Pay your way</b>Cards, bKash and Nagad via secure checkout</span></div>
+        <div><svg class="ico"><use href="#i-chat"/></svg><span><b>A named planner</b>One person to call, start to finish</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trending -->
+  <section class="block gut" id="trending">
+    <div class="inner">
+      <div class="head">
+        <div><div class="label" id="trend-label">Right now · Hemanta</div><h2>Where people are going <em>this season</em></h2></div>
+        <div class="arrows">
+          <button class="arrow" type="button" id="prev" aria-label="Scroll left"><svg class="ico"><use href="#i-left"/></svg></button>
+          <button class="arrow" type="button" id="next" aria-label="Scroll right"><svg class="ico"><use href="#i-arrow"/></svg></button>
+        </div>
+      </div>
+      <div class="rail" id="rail" tabindex="0" aria-label="Trending destinations">
+        <a class="tile" href="#stays"><img src="images/sajek-sunrise.jpg" width="1000" height="750" loading="lazy" alt="Sunrise over misty hills at Sajek Valley."><span class="tag">Best in Hemanta</span><div class="tx"><h3>Sajek Valley</h3><span class="sub">Rangamati · above the clouds</span><span class="from num">from <b>৳ 6,200</b> / night</span></div></a>
+        <a class="tile" href="#stays"><img src="images/coxs-bazar-sunset.jpg" width="1000" height="667" loading="lazy" alt="Sunset over the beach at Cox's Bazar."><div class="tx"><h3>Cox's Bazar</h3><span class="sub">The longest natural sea beach</span><span class="from num">from <b>৳ 7,400</b> / night</span></div></a>
+        <a class="tile" href="#stays"><img src="images/saint-martin-boats.jpg" width="1000" height="563" loading="lazy" alt="Wooden fishing boats moored off the beach at Saint Martin's Island."><div class="tx"><h3>Saint Martin's</h3><span class="sub">The coral island</span><span class="from num">from <b>৳ 5,900</b> / night</span></div></a>
+        <a class="tile" href="#stays"><img src="images/srimangal-tea.jpg" width="1000" height="683" loading="lazy" alt="Rows of tea bushes on a hillside near Srimangal."><div class="tx"><h3>Srimangal</h3><span class="sub">Tea capital of the country</span><span class="from num">from <b>৳ 4,800</b> / night</span></div></a>
+        <a class="tile" href="#stays"><img src="images/kaptai-bridge.jpg" width="1000" height="662" loading="lazy" alt="The orange hanging bridge over Kaptai Lake in Rangamati."><div class="tx"><h3>Kaptai Lake</h3><span class="sub">Rangamati · lake and hills</span><span class="from num">from <b>৳ 4,200</b> / night</span></div></a>
+        <a class="tile" href="#stays"><img src="images/nafakhum-falls.jpg" width="1000" height="663" loading="lazy" alt="Nafakhum waterfall in Bandarban surrounded by green forest."><div class="tx"><h3>Nafakhum</h3><span class="sub">Bandarban · trek to the falls</span><span class="from num">from <b>৳ 3,600</b> / night</span></div></a>
+      </div>
+      <span class="sample">Sample prices for design review</span>
+    </div>
+  </section>
+
+  <!-- Mosaic -->
+  <section class="block gut" id="explore">
+    <div class="inner">
+      <div class="head">
+        <div><div class="label">Explore by mood</div><h2>Six ways to <em>see</em> Bangladesh</h2></div>
+        <p>From mangrove creeks to Mughal ruins. Start with how you want the trip to feel.</p>
+      </div>
+      <div class="mosaic">
+        <a href="#tours"><img src="images/hero-sundarbans-sunrise.jpg" width="1920" height="1440" loading="lazy" alt="Mist and sunrise over a Sundarbans channel."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Wild</div><h3>The Sundarbans</h3></div></a>
+        <a href="#tours"><img src="images/hero-boga-lake.jpg" width="1920" height="1080" loading="lazy" alt="Clouds reflected in Boga Lake."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Hills</div><h3>Bandarban</h3></div></a>
+        <a href="#tours"><img src="images/tanguar-crossing.jpg" width="1000" height="973" loading="lazy" alt="A wooden boat crossing Tanguar Haor."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Water</div><h3>The haors</h3></div></a>
+        <a href="#tours"><img src="images/panam-city.jpg" width="1000" height="1333" loading="lazy" alt="Old brick mansions lining the main street of Panam City in Sonargaon."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Heritage</div><h3>Panam City</h3></div></a>
+        <a href="#tours"><img src="images/lawachara-mist.jpg" width="1000" height="701" loading="lazy" alt="Tall thin trees in morning mist at Lawachara forest."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Forest</div><h3>Lawachara</h3></div></a>
+        <a href="#tours"><img src="images/saint-martin-boats.jpg" width="1000" height="563" loading="lazy" alt="Fishing boats off Saint Martin's Island."><span class="go-arrow"><svg class="ico"><use href="#i-arrow"/></svg></span><div class="tx"><div class="mood">Sea</div><h3>The coast</h3></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stays -->
   <section class="block gut" id="stays">
     <div class="inner">
       <div class="head">
-        <div>
-          <div class="label">Six seasons, six different countries</div>
-          <h2 style="margin-top:10px">Go where the season is right.</h2>
-        </div>
-        <p>Bangladesh keeps six ritu, not four. A haor that is a sea in Barsha is a cricket pitch by Sheet. Pick a season and we will show you where it is at its best.</p>
+        <div><div class="label">Handpicked stays</div><h2>Places to <em>wake up</em> in</h2></div>
+        <p>Every property is visited by our team before it is listed. Prices are per night for two, with VAT.</p>
       </div>
-      <div class="ritu" role="group" aria-label="Choose a season" id="ritu"></div>
-      <p class="ritu-note" id="ritu-note" aria-live="polite"></p>
-      <div class="dests" id="dests"></div>
-      <span class="sample">Sample prices for design review</span>
+      <div class="stays" id="stay-grid">
+        <a class="stay" href="#stays">
+          <div class="ph"><img src="images/srimangal-tea.jpg" width="1000" height="683" loading="lazy" alt="Tea garden slopes beside a bungalow stay in Srimangal."><button class="heart" type="button" aria-pressed="false" aria-label="Save Tea Estate Bungalow"><svg><use href="#i-heart"/></svg></button><span class="badge">Free cancellation</span></div>
+          <div class="row1"><h3>Tea Estate Bungalow</h3><span class="score"><i>9.2</i>Superb</span></div>
+          <div class="loc">Srimangal, Moulvibazar</div>
+          <div class="amen" aria-label="Wi-Fi, breakfast, garden view"><svg class="ico"><use href="#i-wifi"/></svg><svg class="ico"><use href="#i-cup"/></svg><svg class="ico"><use href="#i-view"/></svg></div>
+          <div class="price num"><b>৳ 8,400</b><small>/ night · incl. VAT</small></div>
+        </a>
+        <a class="stay" href="#stays">
+          <div class="ph"><img src="images/hero-boga-lake.jpg" width="1920" height="1080" loading="lazy" alt="Lake and forested hills near a lakeside cottage in Bandarban."><button class="heart" type="button" aria-pressed="false" aria-label="Save Lakeside Hill Cottage"><svg><use href="#i-heart"/></svg></button><span class="badge">Free cancellation</span></div>
+          <div class="row1"><h3>Lakeside Hill Cottage</h3><span class="score"><i>8.8</i>Excellent</span></div>
+          <div class="loc">Ruma, Bandarban</div>
+          <div class="amen" aria-label="Breakfast, lake view, transfer"><svg class="ico"><use href="#i-cup"/></svg><svg class="ico"><use href="#i-view"/></svg><svg class="ico"><use href="#i-car"/></svg></div>
+          <div class="price num"><b>৳ 5,200</b><small>/ night · incl. VAT</small></div>
+        </a>
+        <a class="stay" href="#stays">
+          <div class="ph"><img src="images/coxs-bazar-sunset.jpg" width="1000" height="667" loading="lazy" alt="Sunset over the sea at Cox's Bazar seen from a beachfront stay."><button class="heart" type="button" aria-pressed="false" aria-label="Save Marine Drive Sea-View Suites"><svg><use href="#i-heart"/></svg></button></div>
+          <div class="row1"><h3>Marine Drive Sea-View Suites</h3><span class="score"><i>8.6</i>Excellent</span></div>
+          <div class="loc">Inani, Cox's Bazar</div>
+          <div class="amen" aria-label="Wi-Fi, sea view, breakfast"><svg class="ico"><use href="#i-wifi"/></svg><svg class="ico"><use href="#i-view"/></svg><svg class="ico"><use href="#i-cup"/></svg></div>
+          <div class="price num"><b>৳ 9,900</b><small>/ night · incl. VAT</small></div>
+        </a>
+        <a class="stay" href="#stays">
+          <div class="ph"><img src="images/kaptai-bridge.jpg" width="1000" height="662" loading="lazy" alt="Kaptai Lake near a lakeside resort in Rangamati."><button class="heart" type="button" aria-pressed="false" aria-label="Save Kaptai Lake Floating Lodge"><svg><use href="#i-heart"/></svg></button><span class="badge">Free cancellation</span></div>
+          <div class="row1"><h3>Kaptai Lake Floating Lodge</h3><span class="score"><i>8.9</i>Excellent</span></div>
+          <div class="loc">Rangamati Sadar</div>
+          <div class="amen" aria-label="Breakfast, lake view, boat transfer"><svg class="ico"><use href="#i-cup"/></svg><svg class="ico"><use href="#i-view"/></svg><svg class="ico"><use href="#i-boat"/></svg></div>
+          <div class="price num"><b>৳ 6,700</b><small>/ night · incl. VAT</small></div>
+        </a>
+      </div>
+      <span class="sample">Sample properties, scores and prices for design review</span>
+    </div>
+  </section>
+
+  <!-- Seasons -->
+  <section class="block gut" aria-labelledby="sea-h">
+    <div class="inner seasons">
+      <div class="pic" id="sea-pic">
+        <img src="images/srimangal-tea.jpg" width="1000" height="683" alt="" data-k="sri">
+        <img src="images/hero-ratargul-boatman.jpg" width="1920" height="1331" alt="" data-k="rata" loading="lazy">
+        <img src="images/tanguar-houseboat.jpg" width="1000" height="774" alt="" data-k="haor" loading="lazy">
+        <img src="images/sajek-sunrise.jpg" width="1000" height="750" alt="" data-k="sajek" loading="lazy">
+        <img src="images/coxs-bazar-sunset.jpg" width="1000" height="667" alt="" data-k="coxs" loading="lazy">
+        <img src="images/jaflong-tea-mist.jpg" width="1920" height="1221" alt="" data-k="jaf" loading="lazy">
+        <span class="cap" id="sea-cap"></span>
+      </div>
+      <div class="side">
+        <div class="label">Six seasons, not four</div>
+        <h2 id="sea-h">Go where the season is right.</h2>
+        <div class="ritu" id="ritu" role="group" aria-label="Choose a season"></div>
+        <p class="ritu-note" id="ritu-note" aria-live="polite"></p>
+        <div class="ritu-go" id="ritu-go"></div>
+      </div>
     </div>
   </section>
 
@@ -349,102 +563,99 @@ details.credits ul { margin-top: var(--s-3); font-size: 0.78rem; gap: 4px; }
   <section class="block gut" id="tours">
     <div class="inner">
       <div class="head">
-        <div>
-          <div class="label">Small-group tours</div>
-          <h2 style="margin-top:10px">Trips we run ourselves.</h2>
-        </div>
-        <p>Fixed departures with a Pegah host on board. The price you see includes food, transfers and VAT.</p>
+        <div><div class="label">Small-group tours</div><h2>Trips we <em>host</em> ourselves</h2></div>
+        <p>Fixed departures with a Pegah host. Food, transfers and VAT are in the price.</p>
       </div>
       <div class="tours">
         <article class="feature">
-          <img src="images/tanguar-houseboat.jpg" width="1000" height="774" loading="lazy" alt="A wooden two-deck houseboat crossing the open water of Tanguar Haor under a blue sky with distant hills.">
+          <img src="images/tanguar-houseboat.jpg" width="1000" height="774" loading="lazy" alt="A wooden houseboat crossing Tanguar Haor under a blue sky.">
           <div class="body">
-            <div class="label">Sunamganj · 2 nights</div>
+            <div class="label">Sunamganj · 2 nights · houseboat</div>
             <h3>Tanguar Haor by houseboat</h3>
-            <ul class="facts">
-              <li><b>Departs</b> Sunamganj ghat, 7:00</li>
-              <li><b>Sleeps</b> 8 per boat</li>
-              <li><b>Includes</b> cabin, all meals, life jackets</li>
-            </ul>
-            <div>
-              <div class="label" style="margin-bottom:8px">Next departures</div>
-              <div class="deps" id="deps" role="group" aria-label="Choose a departure date">
-                <button class="dep num" type="button" aria-pressed="true" data-p="14500">Thu 12 Nov<span class="left">3 left</span></button>
-                <button class="dep num" type="button" aria-pressed="false" data-p="14500">Thu 19 Nov<span class="left">6 left</span></button>
-                <button class="dep num" type="button" aria-pressed="false" data-p="15800">Thu 26 Nov<span class="left">8 left</span></button>
-              </div>
+            <ul class="facts"><li>Departs Sunamganj ghat, 7:00</li><li>8 guests per boat</li><li>Cabin, all meals, life jackets</li></ul>
+            <div class="deps" id="deps" role="group" aria-label="Choose a departure date">
+              <button class="dep num" type="button" aria-pressed="true" data-p="14500">Thu 12 Nov<span class="left">3 left</span></button>
+              <button class="dep num" type="button" aria-pressed="false" data-p="14500">Thu 19 Nov<span class="left">6 left</span></button>
+              <button class="dep num" type="button" aria-pressed="false" data-p="15800">Thu 26 Nov<span class="left">8 left</span></button>
             </div>
             <div class="book-row">
-              <div><div class="from">Per person, sharing</div><div class="amt num" id="amt">৳ 14,500</div></div>
+              <div><small>Per person, sharing</small><div class="amt num" id="amt">৳ 14,500</div></div>
               <button class="btn" type="button" id="hold">Hold my place</button>
             </div>
           </div>
         </article>
         <div class="list">
-          <a class="row" href="#tours">
-            <img src="images/ratargul-boatman.jpg" width="1000" height="693" loading="lazy" alt="A boatman paddles a narrow wooden boat under the arching trees of Ratargul swamp forest.">
-            <div><div class="label">Sylhet · Day trip</div><h3>Ratargul swamp forest by dinghy</h3><p>Two hours on the water among submerged koroch trees, with a village lunch.</p><div class="p num">from <b>৳ 3,200</b></div></div>
-          </a>
-          <a class="row" href="#tours">
-            <img src="images/sajek-sunrise.jpg" width="1000" height="750" loading="lazy" alt="Sunrise over layers of misty hills at Sajek Valley, seen through bare tree branches.">
-            <div><div class="label">Rangamati · 3 days</div><h3>Sajek sunrise and the Konglak ridge</h3><p>Jeep from Khagrachari, two nights in a ridge cottage, dawn walk to Konglak Para.</p><div class="p num">from <b>৳ 11,900</b></div></div>
-          </a>
-          <a class="row" href="#tours">
-            <img src="images/lalbagh-fort.jpg" width="1000" height="750" loading="lazy" alt="The pink Mughal-era tomb of Pari Bibi at Lalbagh Fort with lawns and rose beds in front.">
-            <div><div class="label">Dhaka · Half day</div><h3>Old Dhaka: Lalbagh to the Buriganga</h3><p>Morning walk through the fort, Armanitola and Shankhari Bazar, ending on a ferry.</p><div class="p num">from <b>৳ 2,400</b></div></div>
-          </a>
+          <a class="trip" href="#tours"><img src="images/hero-sundarbans-sunrise.jpg" width="1920" height="1440" loading="lazy" alt="Sunrise over a Sundarbans channel."><div class="t"><div class="label">Khulna · 3 days</div><h3>Sundarbans launch cruise</h3><p>Katka and Kochikhali by launch, with forest guard and guide on board.</p><div class="p num">from <b>৳ 16,900</b></div></div></a>
+          <a class="trip" href="#tours"><img src="images/ratargul-boatman.jpg" width="1000" height="693" loading="lazy" alt="A boatman in Ratargul swamp forest."><div class="t"><div class="label">Sylhet · Day trip</div><h3>Ratargul by dinghy</h3><p>Two hours among submerged koroch trees, then a village lunch.</p><div class="p num">from <b>৳ 3,200</b></div></div></a>
+          <a class="trip" href="#tours"><img src="images/panam-city.jpg" width="1000" height="1333" loading="lazy" alt="Panam City's old brick street."><div class="t"><div class="label">Sonargaon · Day trip</div><h3>Panam City and the folk museum</h3><p>The old merchant street, Goaldi Mosque and the Folk Arts museum.</p><div class="p num">from <b>৳ 2,900</b></div></div></a>
+          <a class="trip" href="#tours"><img src="images/nafakhum-falls.jpg" width="1000" height="663" loading="lazy" alt="Nafakhum waterfall."><div class="t"><div class="label">Bandarban · 4 days</div><h3>Thanchi to Nafakhum trek</h3><p>Boat up the Sangu, two nights in Remakri, guided walk to the falls.</p><div class="p num">from <b>৳ 13,500</b></div></div></a>
         </div>
       </div>
       <span class="sample">Sample tours and prices for design review</span>
     </div>
   </section>
 
-  <!-- Field notes -->
-  <section class="band gut" aria-labelledby="fn">
-    <img src="images/ratargul-light.jpg" width="1000" height="667" loading="lazy" alt="">
-    <div class="inner">
-      <div class="label">Field notes</div>
-      <h2 id="fn">Ratargul is a forest you visit by boat.</h2>
-      <p>It is one of the few freshwater swamp forests left in Bangladesh. From June to September the water rises around the trunks and the only way through is a hand-paddled dinghy.</p>
-      <p>Go early. The light comes through the canopy before ten, and the forest is quiet.</p>
-    </div>
-    <span class="credit">Ratargul · Photo: Nawas Sharif, CC BY-SA 4.0</span>
-  </section>
-
   <!-- Promises -->
   <section class="block gut">
     <div class="inner">
-      <div class="head"><div><div class="label">How we plan</div><h2 style="margin-top:10px">What you can hold us to.</h2></div></div>
+      <div class="head"><div><div class="label">How we plan</div><h2>What you can <em>hold us</em> to</h2></div></div>
       <div class="promises">
-        <div class="promise"><hr class="stitch"><h3>The price is the price.</h3><p>Taxes, VAT and service charges are in the number you see before you pay. No fee appears at the last step.</p></div>
-        <div class="promise"><hr class="stitch"><h3>Confirmed means confirmed.</h3><p>We only call a booking confirmed when the hotel or operator has confirmed it to us, and we send the voucher the same minute.</p></div>
-        <div class="promise"><hr class="stitch"><h3>A planner, not a ticket number.</h3><p>Every trip has one named Pegah planner you can call or message, from booking until you are home.</p></div>
+        <div class="promise"><svg class="ico"><use href="#i-taka"/></svg><h3>The price is the price.</h3><p>Taxes, VAT and service charges are in the number you see before you pay. Nothing is added at the last step.</p></div>
+        <div class="promise"><svg class="ico"><use href="#i-shield"/></svg><h3>Confirmed means confirmed.</h3><p>We only call a booking confirmed when the hotel or operator has confirmed it to us, and your voucher arrives the same minute.</p></div>
+        <div class="promise"><svg class="ico"><use href="#i-chat"/></svg><h3>A planner, not a ticket number.</h3><p>Every trip has one named Pegah planner you can call or message, from booking until you are home.</p></div>
       </div>
     </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="band gut" aria-labelledby="nl-h">
+    <img src="images/lawachara-mist.jpg" width="1000" height="701" loading="lazy" alt="">
+    <div class="inner">
+      <div class="label">Season letters</div>
+      <h2 id="nl-h">First to know when the season opens.</h2>
+      <p>One email at the start of each ritu: new departures, early prices, and where the light is best.</p>
+      <form class="sub-form" id="nl" novalidate>
+        <label for="nl-email" class="label" style="position:absolute;left:-9999px">Email address</label>
+        <input id="nl-email" type="email" placeholder="you@example.com" autocomplete="email">
+        <button class="btn" type="submit">Subscribe</button>
+      </form>
+      <p id="nl-msg" role="status" aria-live="polite" style="min-height:1.4em;font-size:.9rem"></p>
+    </div>
+    <span class="credit">Lawachara · Photo: Abdulmominbd, CC BY-SA 4.0</span>
   </section>
 </main>
 
 <footer class="gut">
   <div class="inner">
     <div class="cols">
-      <div><a class="logo" href="#top">Pegah<i style="color:var(--thread);font-style:normal">.</i></a><p style="max-width:32ch;opacity:.8;margin:12px 0 0">Stays, tours and travel planning across Bangladesh.</p></div>
-      <div><h4>Travel</h4><ul><li><a href="#stays">Stays</a></li><li><a href="#tours">Tours</a></li><li><a href="#top">Flights (soon)</a></li><li><a href="#top">Visa (soon)</a></li></ul></div>
+      <div>
+        <a class="logo" href="#top">Pegah<i>.</i></a>
+        <p style="max-width:34ch;opacity:.8;margin:14px 0 0">Stays, tours and travel planning across Bangladesh.</p>
+        <div class="pay" aria-label="Planned payment methods"><span>Visa</span><span>Mastercard</span><span>bKash</span><span>Nagad</span></div>
+      </div>
+      <div><h4>Travel</h4><ul><li><a href="#stays">Stays</a></li><li><a href="#tours">Tours</a></li><li><a href="#explore">Destinations</a></li><li><a href="#top">Flights (soon)</a></li><li><a href="#top">Visa (soon)</a></li></ul></div>
       <div><h4>Help</h4><ul><li><a href="#top">Manage a booking</a></li><li><a href="#top">Cancellations and refunds</a></li><li><a href="#top">Payment methods</a></li><li><a href="#top">Contact a planner</a></li></ul></div>
       <div><h4>Pegah</h4><ul><li><a href="#top">About</a></li><li><a href="#top">For hotels and operators</a></li><li><a href="#top">For travel agents</a></li><li><a href="#top">Terms and privacy</a></li></ul></div>
     </div>
     <hr class="stitch">
     <div class="fine"><span>© 2026 Pegah. Prices in BDT.</span><span>Design prototype · not a live booking site</span></div>
     <details class="credits">
-      <summary>Photo credits</summary>
+      <summary>Photo credits (Wikimedia Commons)</summary>
       <ul>
-        <li>Jaflong tea garden: Abdul Momin, <a href="https://commons.wikimedia.org/wiki/File:Jaflong_Sylhet.jpg">CC BY-SA 4.0</a></li>
-        <li>Ratargul boatman: Abdulmominbd (retouched by Aristeas, Iifar), <a href="https://commons.wikimedia.org/wiki/File:Ratargul_785_retouched.jpg">CC BY-SA 4.0</a></li>
-        <li>Ratargul light: Nawas Sharif, <a href="https://commons.wikimedia.org/wiki/File:%E0%A6%B0%E0%A6%B9%E0%A6%B8%E0%A7%8D%E0%A6%AF%E0%A7%87_%E0%A6%98%E0%A7%87%E0%A6%B0%E0%A6%BE_%E0%A6%9C%E0%A6%B2%E0%A6%BE%E0%A6%AC%E0%A6%A8.jpg">CC BY-SA 4.0</a></li>
-        <li>Sajek sunrise: Rocky Masum, <a href="https://commons.wikimedia.org/wiki/File:Sunrise_at_Sajek_Valley.jpg">CC BY-SA 4.0</a></li>
-        <li>Tanguar Haor houseboat and crossing: Ahnaf Tahmid Manan, <a href="https://commons.wikimedia.org/wiki/File:Tanguar_Haor_Houseboat.jpg">CC BY-SA 4.0</a></li>
-        <li>Srimangal tea garden: Xahidur Reza, <a href="https://commons.wikimedia.org/wiki/File:Tea_Garden_near_Srimangal,_Sylhet,_Bangladesh.jpg">CC BY 2.0</a></li>
-        <li>Cox's Bazar sunset: CAPTAIN RAJU, <a href="https://commons.wikimedia.org/wiki/File:Sunsets_(Cox%27s_Bazar)_in_2025.04.jpg">CC0</a></li>
-        <li>Lalbagh Fort: Tasmin Tripty, <a href="https://commons.wikimedia.org/wiki/File:Lalbagh_Kella_(Lalbagh_Fort)_(3).jpg">CC BY-SA 4.0</a></li>
+        <li>Jaflong tea garden: Abdul Momin, CC BY-SA 4.0</li>
+        <li>Sundarbans sunrise: Hiroki Ogawa, CC BY 3.0</li>
+        <li>Ratargul boatman: Abdulmominbd (retouched by Aristeas, Iifar), CC BY-SA 4.0</li>
+        <li>Boga Lake: Mazharul Sabuz, CC BY-SA 4.0</li>
+        <li>Sajek sunrise: Rocky Masum, CC BY-SA 4.0</li>
+        <li>Tanguar Haor houseboat and crossing: Ahnaf Tahmid Manan, CC BY-SA 4.0</li>
+        <li>Srimangal tea garden: Xahidur Reza, CC BY 2.0</li>
+        <li>Cox's Bazar sunset: CAPTAIN RAJU, CC0</li>
+        <li>Saint Martin's Island: Tanvir Rahat, CC BY-SA 4.0</li>
+        <li>Kaptai Lake hanging bridge: Shakhawat Hossen Shafat, CC BY-SA 4.0</li>
+        <li>Nafakhum waterfall: Laj Mahmud, CC BY-SA 4.0</li>
+        <li>Panam City: Nafiul Ahmed Rafi, CC BY-SA 4.0</li>
+        <li>Lawachara forest: Abdulmominbd, CC BY-SA 4.0</li>
+        <li>Full list with source links: docs/design/IMAGE_CREDITS.md</li>
       </ul>
     </details>
   </div>
@@ -454,13 +665,59 @@ details.credits ul { margin-top: var(--s-3); font-size: 0.78rem; gap: 4px; }
 
 <script>
 (function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Header solid on scroll ----------
+  var hdr = document.getElementById('hdr');
+  function onScroll() { hdr.classList.toggle('solid', window.scrollY > 40); }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // ---------- Hero slideshow ----------
+  var hero = document.getElementById('hero');
+  var slides = Array.prototype.slice.call(hero.querySelectorAll('.slide'));
+  var dots = document.getElementById('dots'), place = document.getElementById('place'), credit = document.getElementById('credit');
+  var cur = 0, timer = null, paused = reduce;
+  slides.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-label', 'Show ' + s.dataset.place);
+    b.innerHTML = '<span></span>';
+    b.addEventListener('click', function () { show(i); restart(); });
+    dots.appendChild(b);
+  });
+  var pb = document.createElement('button');
+  pb.type = 'button'; pb.className = 'pause';
+  function setPauseIcon() {
+    pb.setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow');
+    pb.innerHTML = paused ? '<svg viewBox="0 0 12 12"><path d="M3 1.5v9l7.5-4.5z"/></svg>' : '<svg viewBox="0 0 12 12"><path d="M2.5 1.5h2.5v9H2.5zM7 1.5h2.5v9H7z"/></svg>';
+    hero.classList.toggle('paused', paused);
+  }
+  pb.addEventListener('click', function () { paused = !paused; setPauseIcon(); restart(); });
+  dots.appendChild(pb);
+  function show(i) {
+    slides[cur].classList.remove('on');
+    cur = (i + slides.length) % slides.length;
+    var s = slides[cur], img = s.querySelector('img');
+    img.loading = 'eager';
+    // restart the drift animation
+    img.style.animation = 'none'; void img.offsetWidth; img.style.animation = '';
+    s.classList.add('on');
+    place.textContent = s.dataset.place; credit.textContent = s.dataset.credit;
+    Array.prototype.forEach.call(dots.querySelectorAll('button[aria-label^="Show"]'), function (d, j) {
+      if (j === cur) { d.setAttribute('aria-current', 'true'); var sp = d.firstChild; sp.style.display = 'none'; void sp.offsetWidth; sp.style.display = ''; }
+      else d.removeAttribute('aria-current');
+    });
+  }
+  function restart() { clearInterval(timer); if (!paused) timer = setInterval(function () { show(cur + 1); }, 6500); }
+  setPauseIcon(); show(0); restart();
+  // preload the next slides after first paint
+  window.addEventListener('load', function () { slides.forEach(function (s) { s.querySelector('img').loading = 'eager'; }); });
+
   // ---------- Search tabs ----------
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
   function selectTab(t) {
     tabs.forEach(function (b) {
       var on = b === t;
-      b.setAttribute('aria-selected', on ? 'true' : 'false');
-      b.tabIndex = on ? 0 : -1;
+      b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1;
       document.getElementById(b.getAttribute('aria-controls')).hidden = !on;
     });
   }
@@ -468,32 +725,29 @@ details.credits ul { margin-top: var(--s-3); font-size: 0.78rem; gap: 4px; }
     t.addEventListener('click', function () { selectTab(t); });
     t.addEventListener('keydown', function (e) {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-      var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
-      selectTab(n); n.focus();
+      var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; selectTab(n); n.focus();
     });
   });
 
-  // ---------- Dates (default: next Thursday, 3 nights) ----------
+  // ---------- Dates ----------
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function parse(s) { return new Date(s + 'T00:00:00'); }
   var start = new Date(); start.setDate(start.getDate() + ((11 - start.getDay()) % 7 || 7));
-  var end = new Date(start); end.setDate(end.getDate() + 3);
+  var end = new Date(start); end.setDate(end.getDate() + 2);
   var qin = document.getElementById('q-in'), qout = document.getElementById('q-out');
-  qin.value = iso(start); qout.value = iso(end); qin.min = iso(new Date());
+  qin.value = iso(start); qout.value = iso(end); qin.min = iso(new Date()); qout.min = qin.value;
   qin.addEventListener('change', function () {
     qout.min = qin.value;
     if (qout.value <= qin.value) { var d = parse(qin.value); d.setDate(d.getDate() + 1); qout.value = iso(d); }
   });
-  var months = document.getElementById('t-month');
-  var now = new Date();
+  var months = document.getElementById('t-month'), now = new Date();
   for (var m = 0; m < 6; m++) {
-    var d = new Date(now.getFullYear(), now.getMonth() + m, 1);
-    var o = document.createElement('option'); o.textContent = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
-    months.appendChild(o);
+    var dm = new Date(now.getFullYear(), now.getMonth() + m, 1), o = document.createElement('option');
+    o.textContent = dm.toLocaleString('en-GB', { month: 'long', year: 'numeric' }); months.appendChild(o);
   }
 
-  // ---------- Guests popover ----------
+  // ---------- Guests ----------
   var gBtn = document.getElementById('g-btn'), gPop = document.getElementById('g-pop');
   var g = { adults: 2, children: 0, rooms: 1 }, lim = { adults: [1, 16], children: [0, 10], rooms: [1, 8] };
   function renderG() {
@@ -506,80 +760,88 @@ details.credits ul { margin-top: var(--s-3); font-size: 0.78rem; gap: 4px; }
     if (g.children) s += ', ' + g.children + (g.children === 1 ? ' child' : ' children');
     gBtn.textContent = s + ' · ' + g.rooms + (g.rooms === 1 ? ' room' : ' rooms');
   }
+  function closeG() { gPop.hidden = true; gBtn.setAttribute('aria-expanded', 'false'); }
   gBtn.addEventListener('click', function () { var open = gPop.hidden; gPop.hidden = !open; gBtn.setAttribute('aria-expanded', String(open)); });
   gPop.addEventListener('click', function (e) {
     var b = e.target.closest('button[data-k]'); if (!b) return;
     var k = b.dataset.k; g[k] = Math.min(lim[k][1], Math.max(lim[k][0], g[k] + Number(b.dataset.d)));
-    if (g.rooms > g.adults) g.rooms = g.adults;
-    renderG();
+    if (g.rooms > g.adults) g.rooms = g.adults; renderG();
   });
-  document.addEventListener('click', function (e) { if (!gPop.hidden && !e.target.closest('#g-pop') && e.target !== gBtn) { gPop.hidden = true; gBtn.setAttribute('aria-expanded', 'false'); } });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !gPop.hidden) { gPop.hidden = true; gBtn.setAttribute('aria-expanded', 'false'); gBtn.focus(); } });
+  document.addEventListener('click', function (e) { if (!gPop.hidden && !e.target.closest('#g-pop') && e.target !== gBtn) closeG(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !gPop.hidden) { closeG(); gBtn.focus(); } });
   renderG();
 
+  var qWhere = document.getElementById('q-where');
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) {
+    c.addEventListener('click', function () { qWhere.value = c.dataset.q; qWhere.focus(); });
+  });
   var status = document.getElementById('status');
   document.getElementById('search').addEventListener('submit', function (e) {
     e.preventDefault();
     var tours = document.getElementById('t-tours').getAttribute('aria-selected') === 'true';
     var nights = Math.round((parse(qout.value) - parse(qin.value)) / 864e5);
     status.textContent = tours
-      ? 'In the live site this lists ' + document.getElementById('t-kind').value.toLowerCase() + ' tours to ' + document.getElementById('t-where').value + '.'
-      : 'In the live site this shows stays in ' + document.getElementById('q-where').value + ' for ' + nights + (nights === 1 ? ' night' : ' nights') + ', with live prices.';
+      ? 'Prototype: the live site would list ' + document.getElementById('t-kind').value.toLowerCase() + ' tours for ' + document.getElementById('t-where').value + '.'
+      : 'Prototype: the live site would show stays in ' + qWhere.value + ' for ' + nights + (nights === 1 ? ' night' : ' nights') + ' with live prices.';
+  });
+
+  // ---------- Carousel ----------
+  var rail = document.getElementById('rail');
+  function step() { var t = rail.querySelector('.tile'); return t ? t.getBoundingClientRect().width + 16 : 300; }
+  document.getElementById('prev').addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: reduce ? 'auto' : 'smooth' }); });
+  document.getElementById('next').addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: reduce ? 'auto' : 'smooth' }); });
+
+  // ---------- Wishlist ----------
+  Array.prototype.forEach.call(document.querySelectorAll('.heart'), function (h) {
+    h.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); h.setAttribute('aria-pressed', h.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); });
   });
 
   // ---------- Six seasons ----------
-  var P = {
-    sajek: { n: 'Sajek Valley', w: 'Rangamati Hill District', img: 'sajek-sunrise.jpg', wh: '1000x750', p: 6200, a: 'Sunrise over layers of misty hills at Sajek Valley.' },
-    coxs: { n: "Cox's Bazar", w: 'Chattogram Division', img: 'coxs-bazar-sunset.jpg', wh: '1000x667', p: 7400, a: "Crowds on the wide beach at Cox's Bazar watching the sun set over the Bay of Bengal." },
-    sri: { n: 'Srimangal', w: 'Moulvibazar, Sylhet', img: 'srimangal-tea.jpg', wh: '1000x683', p: 4800, a: 'Rounded rows of tea bushes and shade trees on a hillside near Srimangal.' },
-    rata: { n: 'Ratargul', w: 'Gowainghat, Sylhet', img: 'ratargul-boatman.jpg', wh: '1000x693', p: 3900, a: 'A boatman paddles through the flooded Ratargul forest.' },
-    haor: { n: 'Tanguar Haor', w: 'Sunamganj, Sylhet', img: 'tanguar-crossing.jpg', wh: '1000x973', p: 5600, a: 'Two people with umbrellas cross Tanguar Haor in a long wooden boat past a half-submerged tree.' },
-    jaf: { n: 'Jaflong', w: 'Gowainghat, Sylhet', img: 'jaflong-tea-mist.jpg', wh: '1920x1221', p: 4500, a: 'A tea worker walks through a tea garden at Jaflong at dawn.' },
-    dhaka: { n: 'Old Dhaka', w: 'Lalbagh and the Buriganga', img: 'lalbagh-fort.jpg', wh: '1000x750', p: 6900, a: 'The pink tomb of Pari Bibi at Lalbagh Fort.' }
-  };
   var R = [
-    { bn: 'গ্রীষ্ম', en: 'Grishma', mo: 'mid-Apr – mid-Jun', m: [3, 4], go: ['sri', 'sajek', 'dhaka'], note: 'Summer. Hot on the plains, so head for altitude and shade: the first flush is being plucked in the tea gardens.' },
-    { bn: 'বর্ষা', en: 'Barsha', mo: 'mid-Jun – mid-Aug', m: [5, 6], go: ['rata', 'haor', 'jaf'], note: 'Monsoon. The season Ratargul and the haors are made for: the forest floods and the wetlands become an inland sea.' },
-    { bn: 'শরৎ', en: 'Sharat', mo: 'mid-Aug – mid-Oct', m: [7, 8], go: ['haor', 'sajek', 'rata'], note: 'Early autumn. Clear skies over full water; Sajek wakes up above a sea of cloud.' },
-    { bn: 'হেমন্ত', en: 'Hemanta', mo: 'mid-Oct – mid-Dec', m: [9, 10], go: ['sajek', 'coxs', 'sri'], note: 'Late autumn and harvest. Dry trails, cool mornings, and the beach season opening at Cox’s Bazar.' },
-    { bn: 'শীত', en: 'Sheet', mo: 'mid-Dec – mid-Feb', m: [11, 0], go: ['coxs', 'dhaka', 'sajek'], note: 'Winter. Calm sea, mild days, and the best walking weather in Old Dhaka. Book coast stays early.' },
-    { bn: 'বসন্ত', en: 'Basanta', mo: 'mid-Feb – mid-Apr', m: [1, 2], go: ['sri', 'jaf', 'dhaka'], note: 'Spring. Shimul and palash in flower, and the tea country turning green again.' }
+    { bn: 'গ্রীষ্ম', en: 'Grishma', mo: 'mid-Apr – mid-Jun', img: 'sri', cap: 'Srimangal tea gardens', go: ['Srimangal', 'Sajek Valley', 'Old Dhaka'], note: 'Summer. Hot on the plains, so head for altitude and shade. The first flush is being plucked in the tea gardens.' },
+    { bn: 'বর্ষা', en: 'Barsha', mo: 'mid-Jun – mid-Aug', img: 'rata', cap: 'Ratargul in flood', go: ['Ratargul', 'Tanguar Haor', 'Jaflong'], note: 'Monsoon. The season Ratargul and the haors are made for: the forest floods and the wetlands become an inland sea.' },
+    { bn: 'শরৎ', en: 'Sharat', mo: 'mid-Aug – mid-Oct', img: 'haor', cap: 'Tanguar Haor', go: ['Tanguar Haor', 'Sajek Valley', 'Kaptai Lake'], note: 'Early autumn. White kash flowers, clear skies over full water, and Sajek above a sea of cloud.' },
+    { bn: 'হেমন্ত', en: 'Hemanta', mo: 'mid-Oct – mid-Dec', img: 'sajek', cap: 'Sunrise at Sajek', go: ['Sajek Valley', "Cox's Bazar", 'Sundarbans'], note: 'Late autumn and harvest. Dry trails, cool mornings, and the beach and Sundarbans seasons opening.' },
+    { bn: 'শীত', en: 'Sheet', mo: 'mid-Dec – mid-Feb', img: 'coxs', cap: "Cox's Bazar", go: ["Cox's Bazar", "Saint Martin's", 'Sundarbans'], note: 'Winter. Calm sea, mild days and migratory birds. Book coast and island stays early.' },
+    { bn: 'বসন্ত', en: 'Basanta', mo: 'mid-Feb – mid-Apr', img: 'jaf', cap: 'Jaflong at dawn', go: ['Jaflong', 'Srimangal', 'Panam City'], note: 'Spring. Shimul and palash in flower, and the tea country turning green again.' }
   ];
-  // Each ritu spans four half-months, starting with Grishma on 15 April (half-month index 7).
   var half = now.getMonth() * 2 + (now.getDate() >= 15 ? 1 : 0);
-  var cur = Math.floor(((half - 7 + 24) % 24) / 4);
-  var ritu = document.getElementById('ritu'), note = document.getElementById('ritu-note'), dests = document.getElementById('dests');
-  function fmt(n) { return '৳ ' + n.toLocaleString('en-IN'); }
+  var curR = Math.floor(((half - 7 + 24) % 24) / 4);
+  document.getElementById('trend-label').textContent = 'Right now · ' + R[curR].en;
+  var ritu = document.getElementById('ritu'), note = document.getElementById('ritu-note'), goEl = document.getElementById('ritu-go');
+  var pics = Array.prototype.slice.call(document.querySelectorAll('#sea-pic img')), cap = document.getElementById('sea-cap');
   function showRitu(i) {
     Array.prototype.forEach.call(ritu.children, function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
-    note.textContent = R[i].note;
-    dests.innerHTML = R[i].go.map(function (k) {
-      var d = P[k], wh = d.wh.split('x');
-      return '<a class="d" href="#stays"><div class="ph"><img src="images/' + d.img + '" width="' + wh[0] + '" height="' + wh[1] + '" loading="lazy" alt="' + d.a.replace(/"/g, '&quot;') + '"></div>' +
-        '<div class="meta"><div><h3>' + d.n + '</h3><div class="where">' + d.w + '</div></div>' +
-        '<div class="price num">from <b>' + fmt(d.p) + '</b>/night</div></div></a>';
-    }).join('');
+    note.textContent = R[i].note; cap.textContent = R[i].cap;
+    pics.forEach(function (p) { var on = p.dataset.k === R[i].img; p.classList.toggle('on', on); if (on) p.loading = 'eager'; });
+    goEl.innerHTML = R[i].go.map(function (n) { return '<a href="#stays">' + n + ' →</a>'; }).join('');
   }
   R.forEach(function (r, i) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.innerHTML = (i === cur ? '<span class="now">Now</span>' : '') + '<span class="bn" lang="bn">' + r.bn + '</span><span class="en">' + r.en + '</span><span class="mo">' + r.mo + '</span>';
+    var b = document.createElement('button'); b.type = 'button';
+    b.innerHTML = (i === curR ? '<span class="now">Now</span>' : '') + '<span class="bn" lang="bn">' + r.bn + '</span><span class="en">' + r.en + '</span><span class="mo">' + r.mo + '</span>';
     b.addEventListener('click', function () { showRitu(i); });
     ritu.appendChild(b);
   });
-  showRitu(cur);
+  showRitu(curR);
 
   // ---------- Tour departures ----------
-  var deps = document.getElementById('deps'), amt = document.getElementById('amt');
+  function fmt(n) { return '৳ ' + n.toLocaleString('en-IN'); }
+  var deps = document.getElementById('deps'), amt = document.getElementById('amt'), hold = document.getElementById('hold');
   deps.addEventListener('click', function (e) {
     var b = e.target.closest('.dep'); if (!b) return;
     Array.prototype.forEach.call(deps.children, function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-    amt.textContent = fmt(Number(b.dataset.p));
+    amt.textContent = fmt(Number(b.dataset.p)); hold.textContent = 'Hold my place';
   });
-  document.getElementById('hold').addEventListener('click', function () {
+  hold.addEventListener('click', function () {
     var b = deps.querySelector('[aria-pressed="true"]');
-    status.textContent = '';
-    this.textContent = 'Prototype: the live site holds ' + b.firstChild.textContent + ' here';
+    hold.textContent = 'Prototype: would hold ' + b.firstChild.textContent;
+  });
+
+  // ---------- Newsletter ----------
+  document.getElementById('nl').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = document.getElementById('nl-email').value.trim(), msg = document.getElementById('nl-msg');
+    msg.textContent = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Prototype: the live site would subscribe ' + v + '.' : 'Enter an email address like name@example.com.';
   });
 })();
 </script>
