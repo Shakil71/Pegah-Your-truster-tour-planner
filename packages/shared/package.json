@@ -1,0 +1,9 @@
+{
+  "name": "@pegah/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pure presentation utilities shared by Pegah apps (money formatting, Bangladeshi seasons)",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

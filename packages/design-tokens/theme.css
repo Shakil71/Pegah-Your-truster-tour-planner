@@ -1,0 +1,61 @@
+/*
+ * Tailwind v4 theme mapping for Pegah tokens. Import after "tailwindcss" and
+ * tokens.css. Utilities: bg-paper, text-ink, bg-primary, text-primary-ink,
+ * font-display, rounded-card, shadow-lift, etc.
+ */
+@theme inline {
+  --color-paper: var(--pg-paper);
+  --color-paper-2: var(--pg-paper-2);
+  --color-card: var(--pg-card);
+  --color-ink: var(--pg-ink);
+  --color-ink-2: var(--pg-ink-2);
+  --color-ink-3: var(--pg-ink-3);
+  --color-rule: var(--pg-rule);
+  --color-night: var(--pg-night);
+  --color-night-2: var(--pg-night-2);
+  --color-primary: var(--pg-primary);
+  --color-primary-hover: var(--pg-primary-hover);
+  --color-primary-soft: var(--pg-primary-soft);
+  --color-primary-ink: var(--pg-primary-ink);
+  --color-on-primary: var(--pg-on-primary);
+  --color-thread: var(--pg-thread);
+  --color-good: var(--pg-good);
+  --color-good-soft: var(--pg-good-soft);
+  --color-warn: var(--pg-warn);
+  --color-warn-soft: var(--pg-warn-soft);
+  --color-critical: var(--pg-critical);
+  --color-critical-soft: var(--pg-critical-soft);
+  --color-info: var(--pg-info);
+  --color-info-soft: var(--pg-info-soft);
+
+  --font-display: var(--pg-font-display), "Bodoni 72", Didot, Georgia, serif;
+  --font-sans: var(--pg-font-text), "Segoe UI", system-ui, sans-serif;
+  --font-bn: var(--pg-font-bn), "Hind Siliguri", serif;
+
+  --radius-control: 10px;
+  --radius-card: 18px;
+
+  --shadow-lift: var(--pg-shadow);
+  --shadow-soft: var(--pg-shadow-sm);
+
+  --ease-pegah: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* The running stitch: Pegah's one ornament. */
+@utility stitch {
+  height: 2px;
+  background-image: linear-gradient(90deg, var(--pg-primary) 0 9px, transparent 9px 16px);
+  background-size: 16px 2px;
+  background-repeat: repeat-x;
+}
+
+@utility stitch-x {
+  background-image: linear-gradient(90deg, var(--pg-primary) 0 9px, transparent 9px 16px);
+  background-size: 16px 2px;
+  background-repeat: repeat-x;
+  background-position: left bottom;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}

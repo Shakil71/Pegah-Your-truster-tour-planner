@@ -5,11 +5,11 @@ deployment will happen without explicit owner approval.
 
 ## Target
 
-| Item | Value |
-| --- | --- |
-| Host | 192.168.197.100 (private address) |
-| OS | RHEL — exact release **unknown** |
-| Access | Non-root deploy user with SSH key (to be created by the owner) |
+| Item    | Value                                                           |
+| ------- | --------------------------------------------------------------- |
+| Host    | 192.168.197.100 (private address)                               |
+| OS      | RHEL — exact release **unknown**                                |
+| Access  | Non-root deploy user with SSH key (to be created by the owner)  |
 | Runtime | Native Node.js under systemd; Nginx; MySQL 8.4; Redis or Valkey |
 
 ## Step 1 — read-only inspection (not yet done)
@@ -40,12 +40,12 @@ Record the output here before planning any installation.
 
 ## Services
 
-| Unit | Listens | Notes |
-| --- | --- | --- |
-| pegah-web.service | 127.0.0.1:3000 | Next.js |
-| pegah-admin.service | 127.0.0.1:3001 | Next.js |
-| pegah-api.service | 127.0.0.1:4000 | NestJS |
-| pegah-worker.service | — | BullMQ consumers |
+| Unit                 | Listens        | Notes            |
+| -------------------- | -------------- | ---------------- |
+| pegah-web.service    | 127.0.0.1:3000 | Next.js          |
+| pegah-admin.service  | 127.0.0.1:3001 | Next.js          |
+| pegah-api.service    | 127.0.0.1:4000 | NestJS           |
+| pegah-worker.service | —              | BullMQ consumers |
 
 Hardening: `User=pegah`, `NoNewPrivileges=yes`, `ProtectSystem=strict`,
 `ReadWritePaths=/opt/pegah/shared/uploads /var/log/pegah`, `PrivateTmp=yes`.

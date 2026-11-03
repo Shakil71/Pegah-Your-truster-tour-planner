@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import "@pegah/design-tokens/tokens.css";
+@import "@pegah/design-tokens/theme.css";
+
+@source "../../../../packages/ui/src";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--pg-paper);
+    color: var(--pg-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px dashed var(--pg-primary);
+    outline-offset: 3px;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Hero photo drift (Ken Burns), restarted per slide via a key. */
+@keyframes pg-drift {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+@keyframes pg-fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+@utility animate-drift {
+  animation: pg-drift 9s linear forwards;
+}
+@utility animate-fill {
+  animation: pg-fill 6.5s linear forwards;
+}
+
+@utility scrim-hero {
+  background: linear-gradient(
+    180deg,
+    rgb(9 12 34 / 0.55) 0%,
+    rgb(9 12 34 / 0) 22%,
+    rgb(9 12 34 / 0) 45%,
+    rgb(9 12 34 / 0.8) 100%
+  );
+}
+@utility scrim-bottom {
+  background: linear-gradient(180deg, rgb(9 12 34 / 0) 40%, rgb(9 12 34 / 0.88) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

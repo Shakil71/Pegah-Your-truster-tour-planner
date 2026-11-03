@@ -1,0 +1,12 @@
+{
+  "name": "@pegah/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pegah design-system components shared by web and admin",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

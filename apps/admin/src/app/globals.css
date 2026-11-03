@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@import "@pegah/design-tokens/tokens.css";
+@import "@pegah/design-tokens/theme.css";
+
+@source "../../../../packages/ui/src";
+
+@layer base {
+  body {
+    background: var(--pg-paper);
+    color: var(--pg-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px dashed var(--pg-primary);
+    outline-offset: 2px;
+  }
+}
+
+@utility panel {
+  background: var(--pg-card);
+  border: 1px solid var(--pg-rule);
+  border-radius: var(--radius-card);
+}
+
+@keyframes pg-rise {
+  from {
+    opacity: 0.001;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@utility animate-rise {
+  animation: pg-rise 0.5s var(--ease-pegah) both;
+}
+
+@keyframes pg-ping {
+  75%,
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@utility animate-ping-soft {
+  animation: pg-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

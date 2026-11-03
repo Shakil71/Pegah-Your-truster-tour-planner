@@ -15,17 +15,17 @@ Status: **planned**. No backups are configured.
 
 ## Policy (proposed)
 
-| Tier | Schedule (Asia/Dhaka) | Retention |
-| --- | --- | --- |
-| Daily | 02:00 every day | 14 days |
-| Weekly | Sunday's daily copy promoted | 8 weeks |
-| Monthly | 1st of month's daily copy promoted | 12 months |
-| Binlogs | continuous | back to the oldest retained full backup |
+| Tier    | Schedule (Asia/Dhaka)              | Retention                               |
+| ------- | ---------------------------------- | --------------------------------------- |
+| Daily   | 02:00 every day                    | 14 days                                 |
+| Weekly  | Sunday's daily copy promoted       | 8 weeks                                 |
+| Monthly | 1st of month's daily copy promoted | 12 months                               |
+| Binlogs | continuous                         | back to the oldest retained full backup |
 
 ## Method
 
 - Consistent full backup: `mysqldump --single-transaction --routines --triggers
-  --events` (or Percona XtraBackup if the dataset grows), compressed.
+--events` (or Percona XtraBackup if the dataset grows), compressed.
 - Binary logs enabled with `binlog_expire_logs_seconds` covering retention, for
   point-in-time recovery.
 - A SHA-256 manifest per backup (file, size, checksum, MySQL version, binlog position).

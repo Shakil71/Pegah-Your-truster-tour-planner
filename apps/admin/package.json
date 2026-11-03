@@ -1,0 +1,20 @@
+{
+  "name": "@pegah/admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@pegah/design-tokens": "*",
+    "@pegah/shared": "*",
+    "@pegah/ui": "*",
+    "next": "16.4.5",
+    "react": "19.2.9",
+    "react-dom": "19.2.9"
+  }
+}

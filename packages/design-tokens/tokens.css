@@ -1,0 +1,90 @@
+/*
+ * Pegah "Kantha" design tokens.
+ * Primary: #FF852F (owner decision, ADR-0010). Orange fails text contrast on
+ * light surfaces, so:
+ *   - filled controls use --pg-primary with --pg-on-primary (indigo) text (6.1:1)
+ *   - orange text on light surfaces uses --pg-primary-ink (#B5520F, 5.0:1)
+ */
+:root {
+  --pg-paper: #f4f5f9;
+  --pg-paper-2: #e9ebf3;
+  --pg-card: #ffffff;
+  --pg-ink: #1c2452;
+  --pg-ink-2: #4f5679;
+  --pg-ink-3: #636988;
+  --pg-rule: #d8dbe8;
+  --pg-night: #0f1330;
+  --pg-night-2: #171c42;
+
+  --pg-primary: #ff852f;
+  --pg-primary-hover: #ff9b55;
+  --pg-primary-soft: #fff0e4;
+  --pg-primary-ink: #b5520f;
+  --pg-on-primary: #1c2452;
+
+  --pg-thread: #a8822f;
+
+  --pg-good: #1f7a4d;
+  --pg-good-soft: #e3f3ea;
+  --pg-warn: #8a5a00;
+  --pg-warn-soft: #fbefd2;
+  --pg-critical: #b42318;
+  --pg-critical-soft: #fde6e4;
+  --pg-info: #3949ab;
+  --pg-info-soft: #e7eafb;
+
+  --pg-shadow: 0 24px 60px -28px rgb(15 19 48 / 0.5);
+  --pg-shadow-sm: 0 6px 20px -12px rgb(15 19 48 / 0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --pg-paper: #0f1330;
+    --pg-paper-2: #161b3e;
+    --pg-card: #1a2048;
+    --pg-ink: #eceef7;
+    --pg-ink-2: #a9afcf;
+    --pg-ink-3: #8d94b8;
+    --pg-rule: #2b3263;
+    --pg-night: #090c22;
+    --pg-night-2: #10153a;
+    --pg-primary-soft: #3a2414;
+    --pg-primary-ink: #ffa365;
+    --pg-good: #6fd3a0;
+    --pg-good-soft: #143222;
+    --pg-warn: #f0bf5a;
+    --pg-warn-soft: #332611;
+    --pg-critical: #ff8a80;
+    --pg-critical-soft: #3a1a18;
+    --pg-info: #9fb0f5;
+    --pg-info-soft: #1e2650;
+    --pg-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.8);
+    --pg-shadow-sm: 0 6px 20px -12px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --pg-paper: #0f1330;
+  --pg-paper-2: #161b3e;
+  --pg-card: #1a2048;
+  --pg-ink: #eceef7;
+  --pg-ink-2: #a9afcf;
+  --pg-ink-3: #8d94b8;
+  --pg-rule: #2b3263;
+  --pg-night: #090c22;
+  --pg-night-2: #10153a;
+  --pg-primary-soft: #3a2414;
+  --pg-primary-ink: #ffa365;
+  --pg-good: #6fd3a0;
+  --pg-good-soft: #143222;
+  --pg-warn: #f0bf5a;
+  --pg-warn-soft: #332611;
+  --pg-critical: #ff8a80;
+  --pg-critical-soft: #3a1a18;
+  --pg-info: #9fb0f5;
+  --pg-info-soft: #1e2650;
+  --pg-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.8);
+  --pg-shadow-sm: 0 6px 20px -12px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}

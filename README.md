@@ -4,27 +4,51 @@ Pegah is a travel booking platform for Bangladesh: hotels, tours, flights and
 visa services, priced in BDT, with an architecture ready for international
 expansion.
 
-> **Status:** Phase 2 (design). No application code exists yet.
-> See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+> **Status:** Phase 2. The homepage and admin dashboard are built in Next.js
+> with **sample data**. There is no backend, database or payment integration
+> yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
-## What is here
+## Repository layout
 
-| Path | Contents |
-| --- | --- |
-| [CLAUDE.md](CLAUDE.md) | Engineering rules for Claude Code and contributors |
-| [docs/](docs/) | Requirements, architecture, database, API, design, security, testing and operations docs |
-| [docs/design/prototype/](docs/design/prototype/) | Static homepage design prototype (Kantha direction) |
+| Path                                             | Contents                                                                               |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| [apps/web](apps/web)                             | Customer site (Next.js App Router), port 3000                                          |
+| [apps/admin](apps/admin)                         | Staff back office (Next.js), port 3001                                                 |
+| [packages/design-tokens](packages/design-tokens) | Kantha tokens: CSS variables, Tailwind v4 theme, TS values                             |
+| [packages/ui](packages/ui)                       | Shared components: icons, logo, stitch, button styles                                  |
+| [packages/shared](packages/shared)               | Tested presentation utilities: money, Asia/Dhaka dates, six seasons                    |
+| [docs](docs)                                     | Requirements, architecture, ADRs, database, API, design, security, testing, operations |
+| [CLAUDE.md](CLAUDE.md)                           | Engineering rules for Claude Code and contributors                                     |
 
-## Planned stack
+## Run locally
 
-Next.js · NestJS (Fastify) · MySQL 8.4 + Prisma · Redis + BullMQ ·
-native RHEL with systemd and Nginx. No containers.
+Requires Node.js ≥ 20.9 (CI uses 22).
+
+```bash
+npm ci
+npm run dev:web     # http://localhost:3000
+npm run dev:admin   # http://localhost:3001
+```
+
+## Checks
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+The same checks run in GitHub Actions on every push to `main`/`develop` and on
+pull requests.
+
+## Stack
+
+Next.js 16 · React 19 · TypeScript 5.9 (strict) · Tailwind CSS 4 · Radix UI ·
+Vitest · Turborepo. Planned: NestJS (Fastify), MySQL 8.4 + Prisma, Redis +
+BullMQ, native RHEL with systemd and Nginx. No containers.
 Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md).
-
-## Viewing the design prototype
-
-Open `docs/design/prototype/index.html` in a browser. It is a static design
-reference, not the production application.
 
 ## Contributing
 

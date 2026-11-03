@@ -1,0 +1,11 @@
+{
+  "name": "@pegah/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pegah Kantha design tokens: CSS variables, Tailwind v4 theme mapping and TS values",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./tokens.css",
+    "./theme.css": "./theme.css"
+  }
+}

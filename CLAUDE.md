@@ -39,15 +39,15 @@ stricter rule wins.
 
 ## Fixed stack
 
-| Layer | Choice |
-| --- | --- |
+| Layer       | Choice                                                                                                                                             |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Web / admin | Next.js App Router, React, TypeScript strict, Tailwind, Radix UI, Motion (sparingly), React Hook Form, Zod, TanStack Query where needed, next-intl |
-| API | NestJS on Fastify, REST, OpenAPI, Zod validation (`nestjs-zod`), structured logs, RBAC |
-| Data | MySQL 8.4 LTS, Prisma migrations, InnoDB, utf8mb4 |
-| Async | Redis (or Valkey on RHEL 10), BullMQ, dedicated worker |
-| Infra | Native RHEL, Node.js, systemd, Nginx, SELinux enforcing, firewalld, SSH keys, GitHub Actions |
-| QA | ESLint, Prettier, tsc, Vitest, Playwright, axe, Lighthouse CI, k6, gitleaks, CodeQL |
-| Monitoring | Prometheus, Grafana, Loki, health endpoints |
+| API         | NestJS on Fastify, REST, OpenAPI, Zod validation (`nestjs-zod`), structured logs, RBAC                                                             |
+| Data        | MySQL 8.4 LTS, Prisma migrations, InnoDB, utf8mb4                                                                                                  |
+| Async       | Redis (or Valkey on RHEL 10), BullMQ, dedicated worker                                                                                             |
+| Infra       | Native RHEL, Node.js, systemd, Nginx, SELinux enforcing, firewalld, SSH keys, GitHub Actions                                                       |
+| QA          | ESLint, Prettier, tsc, Vitest, Playwright, axe, Lighthouse CI, k6, gitleaks, CodeQL                                                                |
+| Monitoring  | Prometheus, Grafana, Loki, health endpoints                                                                                                        |
 
 Verify version compatibility with the actual RHEL release before installing
 anything. Never blindly install "latest".
@@ -127,7 +127,10 @@ regressions, document. Never hide errors or weaken security to pass a check.
 ## Design
 
 Original identity for Pegah only. Approved direction: **Kantha** (see
-`docs/design/DESIGN_SYSTEM.md`). All colors, type, spacing, radius, shadow and
+`docs/design/DESIGN_SYSTEM.md`). Primary colour **#FF852F** (ADR-0010): use
+`--pg-on-primary` text on orange fills and `--pg-primary-ink` for orange text
+on light surfaces; never white text on orange. The owner prefers immersive,
+photo-led, clearly booking-style layouts over quiet editorial ones. All colors, type, spacing, radius, shadow and
 motion come from design tokens; no raw hex in components. Photography must be
 owned, commissioned or properly licensed with credits recorded in
 `docs/design/IMAGE_CREDITS.md`.

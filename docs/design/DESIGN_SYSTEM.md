@@ -1,9 +1,25 @@
 # Design System — "Kantha"
 
-Status: **direction approved (ADR-0007); tokens drafted in the static
-prototype; not yet extracted into `packages/design-tokens`.**
+Status: **tokens implemented in `packages/design-tokens` (CSS variables +
+Tailwind v4 theme); core components in `packages/ui`; homepage and admin
+dashboard built in Next.js.** Primary colour changed to `#FF852F` (ADR-0010).
 
-Reference implementation: [`prototype/index.html`](prototype/index.html).
+Source of truth: [`packages/design-tokens/tokens.css`](../../packages/design-tokens/tokens.css).
+The colour table below is a summary; if they differ, the CSS file wins.
+Historical static reference: [`prototype/index.html`](prototype/index.html)
+(uses the earlier madder accent).
+
+## Primary colour rules (ADR-0010)
+
+| Use                                         | Token                     | Value     | Contrast                             |
+| ------------------------------------------- | ------------------------- | --------- | ------------------------------------ |
+| Fills: buttons, badges, stitch, chart marks | `--pg-primary`            | `#ff852f` | decorative / with indigo text 6.07:1 |
+| Text on a primary fill                      | `--pg-on-primary`         | `#1c2452` | 6.07:1                               |
+| Orange text on light surfaces               | `--pg-primary-ink`        | `#b5520f` | 5.03:1 on white                      |
+| Orange text on dark surfaces                | `--pg-primary-ink` (dark) | `#ffa365` | 9.24:1 on night                      |
+| Soft tint backgrounds                       | `--pg-primary-soft`       | `#fff0e4` | —                                    |
+
+Never place white text on `#ff852f`.
 
 ## Idea
 
@@ -16,28 +32,32 @@ photography carries the colour.
 
 ### Colour
 
-| Token | Light | Dark | Use |
-| --- | --- | --- | --- |
-| `--paper` | `#f3f4f8` | `#10142b` | Page background |
-| `--paper-2` | `#e8eaf2` | `#171c3a` | Hover, image placeholder |
-| `--card` | `#ffffff` | `#1b2145` | Search panel, cards |
-| `--ink` | `#1c2452` | `#e9ebf5` | Text, primary buttons |
-| `--ink-2` | `#4a5178` | `#aab0cf` | Secondary text |
-| `--madder` | `#b23a2e` | `#e0705f` | Stitch lines, labels, hover on primary actions |
-| `--thread` | `#a8822f` | `#d7b265` | Secondary stitch, "now" and sample markers |
-| `--rule` | `#d3d7e6` | `#2d3460` | Hairlines, dashed field separators |
+| Token                                | Light          | Dark           | Use                                                |
+| ------------------------------------ | -------------- | -------------- | -------------------------------------------------- |
+| `--paper`                            | `#f3f4f8`      | `#10142b`      | Page background                                    |
+| `--paper-2`                          | `#e8eaf2`      | `#171c3a`      | Hover, image placeholder                           |
+| `--card`                             | `#ffffff`      | `#1b2145`      | Search panel, cards                                |
+| `--ink`                              | `#1c2452`      | `#e9ebf5`      | Text, primary buttons                              |
+| `--ink-2`                            | `#4a5178`      | `#aab0cf`      | Secondary text                                     |
+| `--pg-primary`                       | `#ff852f`      | `#ff852f`      | Primary actions, stitch lines, badges, chart marks |
+| `--pg-ink-3`                         | `#636988`      | `#8d94b8`      | Captions (≥ 4.5:1 on card and paper)               |
+| `--pg-thread`                        | `#a8822f`      | `#a8822f`      | "Sample" and "soon" markers                        |
+| `--pg-rule`                          | `#d8dbe8`      | `#2b3263`      | Hairlines, dashed field separators                 |
+| `--pg-good / warn / critical / info` | see tokens.css | see tokens.css | Booking status only, always with icon + label      |
 
-Rules: madder never fills large areas; it marks. No gradients except photo
-scrims. No raw hex in components.
+Rules: no gradients except photo scrims and the admin greeting glow. No raw
+hex in components except over photographs, where colours are fixed for
+legibility in both themes. Occupancy heatmaps use `sequentialPrimary` from
+`@pegah/design-tokens` (single hue, light → dark).
 
 ### Typography
 
-| Role | Family | Notes |
-| --- | --- | --- |
-| Display | Bodoni Moda (opsz) | Headlines ≥ 1.3 rem only; italic in madder for one emphasised word |
-| Text / UI | Hanken Grotesk | 16 px base, 1.6 line height |
-| Bangla display | Noto Serif Bengali | Season names; future Bangla headings |
-| Bangla text | Hind Siliguri | Planned for localisation |
+| Role           | Family             | Notes                                                              |
+| -------------- | ------------------ | ------------------------------------------------------------------ |
+| Display        | Bodoni Moda (opsz) | Headlines ≥ 1.3 rem only; italic in madder for one emphasised word |
+| Text / UI      | Hanken Grotesk     | 16 px base, 1.6 line height                                        |
+| Bangla display | Noto Serif Bengali | Season names; future Bangla headings                               |
+| Bangla text    | Hind Siliguri      | Planned for localisation                                           |
 
 Scale: 0.72 (labels, uppercase +0.14em) · 0.88 · 1 · 1.3 · 1.55 · 2 · 3.1 · 5.4 rem.
 Digits use `tabular-nums lining-nums` wherever prices or dates align.

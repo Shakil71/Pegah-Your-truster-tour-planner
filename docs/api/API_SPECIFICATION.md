@@ -19,16 +19,16 @@ summarises conventions.
 
 ## Planned slice 1 resources
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| POST | /auth/register, /auth/login, /auth/logout | Session lifecycle |
-| GET | /destinations, /destinations/{slug} | Discovery |
-| GET | /hotels/search | Availability and price search |
-| GET | /hotels/{slug} | Property detail and rooms |
-| GET | /tours, /tours/{slug} | Tour listing and detail |
-| POST | /bookings | Create booking and inventory hold (idempotent) |
-| POST | /bookings/{id}/payment-session | Start hosted payment |
-| POST | /webhooks/payments/sslcommerz | Verified payment callback |
-| POST | /bookings/{id}/cancellation | Request cancellation |
-| GET | /me/bookings, /me/bookings/{id} | Customer bookings |
-| GET | /health/live, /health/ready | Health checks |
+| Method | Path                                      | Purpose                                        |
+| ------ | ----------------------------------------- | ---------------------------------------------- |
+| POST   | /auth/register, /auth/login, /auth/logout | Session lifecycle                              |
+| GET    | /destinations, /destinations/{slug}       | Discovery                                      |
+| GET    | /hotels/search                            | Availability and price search                  |
+| GET    | /hotels/{slug}                            | Property detail and rooms                      |
+| GET    | /tours, /tours/{slug}                     | Tour listing and detail                        |
+| POST   | /bookings                                 | Create booking and inventory hold (idempotent) |
+| POST   | /bookings/{id}/payment-session            | Start hosted payment                           |
+| POST   | /webhooks/payments/sslcommerz             | Verified payment callback                      |
+| POST   | /bookings/{id}/cancellation               | Request cancellation                           |
+| GET    | /me/bookings, /me/bookings/{id}           | Customer bookings                              |
+| GET    | /health/live, /health/ready               | Health checks                                  |

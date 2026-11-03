@@ -1,6 +1,9 @@
 # System Architecture
 
-Status: **planned**. Nothing below is implemented yet unless marked otherwise.
+Status: **partly implemented.** Built: `apps/web`, `apps/admin`,
+`packages/design-tokens`, `packages/ui`, `packages/shared` (presentation
+utilities only, ADR-0012). Planned: `apps/api`, `apps/worker`,
+`packages/contracts`, `packages/api-client`, `packages/db`, `packages/config`.
 
 ## 1. Shape
 
@@ -27,17 +30,17 @@ infra/  nginx/ systemd/ deployment/ monitoring/ backup/
 
 ## 2. API modules
 
-| Module | Owns | Depends on |
-| --- | --- | --- |
-| auth | users, sessions, roles, permissions | audit |
-| catalog | destinations, hotels, rooms, tours, media | — |
-| inventory | room inventory, tour capacity, holds | catalog |
-| pricing | rates, taxes, fees, price snapshots | catalog, inventory |
-| booking | bookings, items, guests, state machine | inventory, pricing, payment |
-| payment | payments, payment events, gateway adapters | booking (via events) |
-| refund | refunds | payment, booking |
-| notification | email/SMS templates and dispatch (via worker) | outbox |
-| audit | audit events | — |
+| Module       | Owns                                          | Depends on                  |
+| ------------ | --------------------------------------------- | --------------------------- |
+| auth         | users, sessions, roles, permissions           | audit                       |
+| catalog      | destinations, hotels, rooms, tours, media     | —                           |
+| inventory    | room inventory, tour capacity, holds          | catalog                     |
+| pricing      | rates, taxes, fees, price snapshots           | catalog, inventory          |
+| booking      | bookings, items, guests, state machine        | inventory, pricing, payment |
+| payment      | payments, payment events, gateway adapters    | booking (via events)        |
+| refund       | refunds                                       | payment, booking            |
+| notification | email/SMS templates and dispatch (via worker) | outbox                      |
+| audit        | audit events                                  | —                           |
 
 Rules: modules call each other only through exported services; cross-module
 side effects go through the transactional outbox and the worker.
@@ -64,23 +67,23 @@ to 127.0.0.1; Nginx is the only public listener.
 Redis is a cache and queue, never the source of truth for bookings, payments,
 refunds, balances or inventory. Every key must be registered here before use.
 
-| Key format | Owner | TTL | Invalidation | Fallback |
-| --- | --- | --- | --- | --- |
-| `pg:v1:catalog:destination:{slug}` | catalog | 10 min | on destination update | read MySQL |
-| `pg:v1:search:hotel:{hash(query)}` | pricing | 2 min | expiry only; revalidated at hold | read MySQL |
-| `pg:v1:ratelimit:{route}:{ip}` | auth | window | expiry | auth routes fail closed; other routes fail open with an alert |
-| `bull:{queue}:*` | worker | BullMQ managed | BullMQ | outbox retries |
+| Key format                         | Owner   | TTL            | Invalidation                     | Fallback                                                      |
+| ---------------------------------- | ------- | -------------- | -------------------------------- | ------------------------------------------------------------- |
+| `pg:v1:catalog:destination:{slug}` | catalog | 10 min         | on destination update            | read MySQL                                                    |
+| `pg:v1:search:hotel:{hash(query)}` | pricing | 2 min          | expiry only; revalidated at hold | read MySQL                                                    |
+| `pg:v1:ratelimit:{route}:{ip}`     | auth    | window         | expiry                           | auth routes fail closed; other routes fail open with an alert |
+| `bull:{queue}:*`                   | worker  | BullMQ managed | BullMQ                           | outbox retries                                                |
 
 (Planned keys; update when implemented.)
 
 ## 6. Background jobs (planned)
 
-| Queue | Job | Trigger |
-| --- | --- | --- |
-| notifications | send booking email / SMS | outbox event |
-| documents | render voucher and invoice PDF | booking confirmed |
-| holds | expire inventory holds | delayed job at `expires_at` |
-| payments | reconcile pending payments with gateway | schedule (every 15 min) |
+| Queue         | Job                                     | Trigger                     |
+| ------------- | --------------------------------------- | --------------------------- |
+| notifications | send booking email / SMS                | outbox event                |
+| documents     | render voucher and invoice PDF          | booking confirmed           |
+| holds         | expire inventory holds                  | delayed job at `expires_at` |
+| payments      | reconcile pending payments with gateway | schedule (every 15 min)     |
 
 ## 7. Deployment
 
