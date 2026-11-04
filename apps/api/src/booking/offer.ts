@@ -3,7 +3,7 @@ import type { Prisma } from "@pegah/db";
 import { evaluateRoom, type RoomEvaluation } from "../catalog/hotel-search";
 import { toMoney } from "../common/money";
 import { dhakaToday, formatCalendarDate, stayNights } from "../common/time";
-import { priceTour, type TourPriceBreakdown } from "../pricing/pricing";
+import { priceTour, type DiscountedPrice, type TourPriceBreakdown } from "../pricing/pricing";
 import type { Tx } from "./inventory";
 
 /**
@@ -78,11 +78,18 @@ export function evaluateDeparture(
 }
 
 export function breakdown(
-  p: { baseMinor: bigint; serviceChargeMinor?: bigint; vatMinor: bigint; totalMinor: bigint },
+  p: {
+    baseMinor: bigint;
+    discountMinor?: bigint;
+    serviceChargeMinor?: bigint;
+    vatMinor: bigint;
+    totalMinor: bigint;
+  },
   currency: string,
 ): PriceBreakdown {
   return {
     base: toMoney(p.baseMinor, currency),
+    discount: toMoney(p.discountMinor ?? 0n, currency),
     serviceCharge: toMoney(p.serviceChargeMinor ?? 0n, currency),
     vat: toMoney(p.vatMinor, currency),
     total: toMoney(p.totalMinor, currency),
@@ -100,6 +107,12 @@ const DEPARTURE_LABEL = new Intl.DateTimeFormat("en-GB", {
   hourCycle: "h23",
 });
 
+/** A promotion outcome for a quote: applied (with the discounted price) or rejected. */
+export interface QuotePromo {
+  applied?: { code: string; name: string; price: DiscountedPrice };
+  error?: string;
+}
+
 /** "Thu, 12 Nov 2026, 07:00" in Dhaka time. */
 export function departureLabel(departsAt: Date): string {
   return DEPARTURE_LABEL.format(departsAt);
@@ -110,6 +123,7 @@ export function hotelQuote(
   p: StayParams,
   result: RoomEvaluation,
   now: Date,
+  promo?: QuotePromo,
 ): Quote {
   return {
     product: "HOTEL",
@@ -125,8 +139,10 @@ export function hotelQuote(
     available: result.ok,
     left: result.ok ? result.roomsLeft : null,
     unavailableReason: result.ok ? null : result.reason,
-    price: result.ok ? breakdown(result.price, room.hotel.currency) : null,
+    price: result.ok ? breakdown(promo?.applied?.price ?? result.price, room.hotel.currency) : null,
     cancellationPolicy: room.hotel.cancellationPolicy,
+    promotion: promo?.applied ? { code: promo.applied.code, name: promo.applied.name } : null,
+    promoError: promo?.error ?? null,
     pricedAt: now.toISOString(),
   };
 }
@@ -137,6 +153,7 @@ export function tourQuote(
   children: number,
   result: DepartureEvaluation,
   now: Date,
+  promo?: QuotePromo,
 ): Quote {
   return {
     product: "TOUR",
@@ -152,8 +169,10 @@ export function tourQuote(
     available: result.ok,
     left: result.seatsLeft,
     unavailableReason: result.ok ? null : result.reason,
-    price: result.ok ? breakdown(result.price, s.currency) : null,
+    price: result.ok ? breakdown(promo?.applied?.price ?? result.price, s.currency) : null,
     cancellationPolicy: null,
+    promotion: promo?.applied ? { code: promo.applied.code, name: promo.applied.name } : null,
+    promoError: promo?.error ?? null,
     pricedAt: now.toISOString(),
   };
 }

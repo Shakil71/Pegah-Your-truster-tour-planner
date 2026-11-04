@@ -37,15 +37,16 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Transactional email via the outbox. ⛔ Real sending needs SMTP credentials.
 - ✅ Traveller profiles and account profile editing.
 
-## Phase 6 — Operations admin 🔶
+## Phase 6 — Operations admin ✅ (media uploads pending server storage)
 
 - ✅ Destinations, hotels, room types, inventory and rate calendar (bulk, weekday rules).
 - ✅ Tours and departures with seat safety (close / reopen / cancel rules).
 - ✅ Customers list and detail; booking ↔ customer ↔ hotel/tour ↔ audit links;
   dashboard → catalog links; scoped booking lists.
-- ⬜ Coupons and promotions (server-side discount rules, usage limits).
-- ⬜ Reports (bookings, revenue, occupancy exports in CSV).
-- ⬜ Content (homepage sections, CMS pages) and media uploads with credits.
+- ✅ Coupons and promotions (server-side rules, limits under lock).
+- ✅ Sales report and bookings CSV (occupancy is on the dashboard and room calendar).
+- ✅ Content pages (About, Terms, Privacy…) with admin editor.
+- ⛔ Media uploads and homepage section editing — need a server storage folder, an Nginx `/media` location and SELinux labels (owner, root).
 
 ## Phase 7 — Partner portals ⬜
 

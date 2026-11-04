@@ -145,6 +145,14 @@ export default async function VoucherPage({ params }: { params: Promise<{ id: st
               <td className="py-1.5 text-ink-2">Base</td>
               <td className="py-1.5 text-right">{money(b.price.base)}</td>
             </tr>
+            {b.price.discount.amountMinor > 0 && (
+              <tr>
+                <td className="py-1 text-ink-2">
+                  Discount{b.promotionCode ? ` (${b.promotionCode})` : ""}
+                </td>
+                <td className="py-1 text-right">− {money(b.price.discount)}</td>
+              </tr>
+            )}
             {b.price.serviceCharge.amountMinor > 0 && (
               <tr>
                 <td className="py-1 text-ink-2">Service charge</td>

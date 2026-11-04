@@ -17,6 +17,8 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Phase 6 completion: promotions, sales reports + CSV, content pages (ADR-0025).
+
 - Phase 5 completion: cancellations and refunds, email outbox (off until SMTP),
   password reset/change, profile, saved travellers, vouchers (ADR-0024).
 

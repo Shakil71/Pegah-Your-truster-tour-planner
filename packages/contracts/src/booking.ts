@@ -6,6 +6,7 @@ import {
   CalendarDateSchema,
   InstantSchema,
   MoneySchema,
+  PromoCodeSchema,
   PublicIdSchema,
   nullableText,
 } from "./common";
@@ -96,6 +97,8 @@ export type BookingStatusTransitionRequest = z.infer<typeof BookingStatusTransit
 export const PriceBreakdownSchema = z
   .object({
     base: MoneySchema,
+    /** Promotion discount on the base (service charge and VAT apply after it). */
+    discount: MoneySchema,
     serviceCharge: MoneySchema,
     vat: MoneySchema,
     total: MoneySchema,
@@ -143,6 +146,7 @@ const partyRefine = <T extends { adults: number; children: number; guests: Guest
 export const HotelQuoteQuerySchema = z
   .object({
     roomId: PublicIdSchema,
+    promoCode: PromoCodeSchema.optional(),
     checkIn: CalendarDateSchema,
     checkOut: CalendarDateSchema,
     adults: z.coerce.number().int().min(1).max(36).default(2),
@@ -157,6 +161,7 @@ export type HotelQuoteQuery = z.infer<typeof HotelQuoteQuerySchema>;
 
 export const TourQuoteQuerySchema = z.object({
   departureId: PublicIdSchema,
+  promoCode: PromoCodeSchema.optional(),
   adults: z.coerce.number().int().min(1).max(30).default(2),
   children: z.coerce.number().int().min(0).max(30).default(0),
 });
@@ -187,6 +192,10 @@ export const QuoteSchema = z.object({
     .nullable(),
   price: PriceBreakdownSchema.nullable(),
   cancellationPolicy: nullableText(),
+  /** The promotion applied to `price`, if a valid code was given. */
+  promotion: z.object({ code: z.string(), name: z.string() }).nullable(),
+  /** Why a given code did not apply (the price is then without discount). */
+  promoError: nullableText(200),
   pricedAt: InstantSchema,
 });
 export type Quote = z.infer<typeof QuoteSchema>;
@@ -204,6 +213,8 @@ export const CreateHotelBookingRequestSchema = z
     guests: z.array(GuestInputSchema).min(1).max(54),
     /** The total the customer was shown; a mismatch answers 409 price-changed. */
     expectedTotal: MoneySchema,
+    /** Optional coupon; the expected total already includes its discount. */
+    promoCode: PromoCodeSchema.optional(),
   })
   .superRefine((v, ctx) => {
     if (v.checkOut <= v.checkIn) {
@@ -225,6 +236,8 @@ export const CreateTourBookingRequestSchema = z
     contact: BookingContactSchema,
     guests: z.array(GuestInputSchema).min(1).max(60),
     expectedTotal: MoneySchema,
+    /** Optional coupon; the expected total already includes its discount. */
+    promoCode: PromoCodeSchema.optional(),
   })
   .superRefine(partyRefine);
 
@@ -267,6 +280,8 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
   travellers: z.array(BookingGuestViewSchema),
   history: z.array(BookingStatusChangeSchema),
   allowedTransitions: z.array(BookingStatusSchema),
+  /** Coupon used for this booking, if any. */
+  promotionCode: nullableText(40),
   /** Payment attempts, newest first. */
   payments: z.array(PaymentViewSchema),
   /** True when online payment is enabled and this booking can be paid now. */

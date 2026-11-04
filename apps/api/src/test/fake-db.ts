@@ -128,6 +128,7 @@ export function createFakeDb(): FakeDb {
           guests: [],
           payments: [],
           refunds: [],
+          promotion: null,
           user: {
             publicId: "01JBX00000000000000000CSTM",
             fullName: "Test Traveller",
@@ -181,6 +182,7 @@ export function addBooking(db: FakeDb, overrides: Record<string, unknown>): Row 
     baseMinor: 3_400_000n,
     serviceChargeMinor: 340_000n,
     vatMinor: 561_000n,
+    discountMinor: 0n,
     totalMinor: 4_301_000n,
     contactName: "Test Traveller",
     contactEmail: "traveller@pegah.test",

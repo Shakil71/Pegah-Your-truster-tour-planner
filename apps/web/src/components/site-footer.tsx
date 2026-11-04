@@ -1,21 +1,36 @@
+import Link from "next/link";
 import { Logo } from "@pegah/ui";
 import { photoCredits } from "@/data/home";
 import { buildInfo } from "@/lib/build-info";
 
-const columns = [
-  { title: "Travel", links: ["Stays", "Tours", "Destinations", "Flights (soon)", "Visa (soon)"] },
+const columns: { title: string; links: { label: string; href: string | null }[] }[] = [
+  {
+    title: "Travel",
+    links: [
+      { label: "Stays", href: "/stays" },
+      { label: "Tours", href: "/tours" },
+      { label: "Destinations", href: "/#explore" },
+      { label: "Flights (soon)", href: null },
+      { label: "Visa (soon)", href: null },
+    ],
+  },
   {
     title: "Help",
     links: [
-      "Manage a booking",
-      "Cancellations and refunds",
-      "Payment methods",
-      "Contact a planner",
+      { label: "Manage a booking", href: "/account/bookings" },
+      { label: "Cancellations and refunds", href: "/pages/cancellations" },
+      { label: "Payment methods", href: "/pages/payments" },
+      { label: "Contact a planner", href: "/pages/contact" },
     ],
   },
   {
     title: "Pegah",
-    links: ["About", "For hotels and operators", "For travel agents", "Terms and privacy"],
+    links: [
+      { label: "About", href: "/pages/about" },
+      { label: "For hotels and operators", href: "/pages/partners" },
+      { label: "Terms", href: "/pages/terms" },
+      { label: "Privacy", href: "/pages/privacy" },
+    ],
   },
 ];
 
@@ -47,10 +62,14 @@ export function SiteFooter() {
               </h2>
               <ul className="grid gap-2 text-[0.92rem]">
                 {c.links.map((l) => (
-                  <li key={l}>
-                    <a href="#" className="hover:underline">
-                      {l}
-                    </a>
+                  <li key={l.label}>
+                    {l.href ? (
+                      <Link href={l.href} className="hover:underline">
+                        {l.label}
+                      </Link>
+                    ) : (
+                      <span className="opacity-60">{l.label}</span>
+                    )}
                   </li>
                 ))}
               </ul>

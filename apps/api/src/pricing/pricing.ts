@@ -91,3 +91,54 @@ export function priceTour(input: TourPriceInput): TourPriceBreakdown {
   const vatMinor = applyBps(baseMinor, input.vatBps);
   return { baseMinor, vatMinor, totalMinor: baseMinor + vatMinor };
 }
+
+export interface DiscountedPrice {
+  baseMinor: bigint;
+  discountMinor: bigint;
+  serviceChargeMinor: bigint;
+  vatMinor: bigint;
+  totalMinor: bigint;
+}
+
+/**
+ * Applies a promotion discount to the base, then recomputes service charge
+ * and VAT on the discounted base (taxes follow the price actually charged).
+ */
+export function priceWithDiscount(input: {
+  baseMinor: bigint;
+  discountMinor: bigint;
+  serviceChargeBps: number;
+  vatBps: number;
+}): DiscountedPrice {
+  if (input.discountMinor < 0n || input.discountMinor > input.baseMinor) {
+    throw new RangeError("Discount must be between zero and the base");
+  }
+  const net = input.baseMinor - input.discountMinor;
+  const serviceChargeMinor = applyBps(net, input.serviceChargeBps);
+  const vatMinor = applyBps(net + serviceChargeMinor, input.vatBps);
+  return {
+    baseMinor: input.baseMinor,
+    discountMinor: input.discountMinor,
+    serviceChargeMinor,
+    vatMinor,
+    totalMinor: net + serviceChargeMinor + vatMinor,
+  };
+}
+
+/** Discount a promotion gives on a base: percentage or fixed, capped by maxDiscount and the base. */
+export function promotionDiscount(
+  promo: {
+    kind: "PERCENT" | "FIXED";
+    percentBps: number | null;
+    amountMinor: bigint | null;
+    maxDiscountMinor: bigint | null;
+  },
+  baseMinor: bigint,
+): bigint {
+  let d =
+    promo.kind === "PERCENT"
+      ? applyBps(baseMinor, promo.percentBps ?? 0)
+      : (promo.amountMinor ?? 0n);
+  if (promo.maxDiscountMinor !== null && d > promo.maxDiscountMinor) d = promo.maxDiscountMinor;
+  return d > baseMinor ? baseMinor : d;
+}

@@ -83,6 +83,7 @@ export class BookingQueryService {
         guests: { orderBy: [{ isLead: "desc" }, { id: "asc" }] },
         payments: { orderBy: { id: "desc" } },
         refunds: { orderBy: { id: "desc" } },
+        promotion: { select: { code: true } },
         ...(actor === "STAFF" ? { emails: { orderBy: { id: "desc" as const }, take: 30 } } : {}),
       },
     });
@@ -146,6 +147,7 @@ export class BookingQueryService {
         checkOutTime: first?.hotelRoom?.hotel.checkOutTime ?? null,
         cancellationPolicy: first?.hotelRoom?.hotel.cancellationPolicy ?? null,
       },
+      promotionCode: booking.promotion?.code ?? null,
       refunds: booking.refunds.map((r) => ({
         id: r.publicId,
         amount: toMoney(r.amountMinor, r.currency),

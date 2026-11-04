@@ -6,6 +6,7 @@ import { requireCustomer, serverApi } from "@/lib/api-server";
 import { calendarDate, money } from "@/lib/format";
 import { parseStayParams } from "@/lib/trip";
 import { CheckoutForm } from "./checkout-form";
+import { PromoField } from "./promo-field";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -39,17 +40,21 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       }
     | { product: "TOUR"; departureId: string; adults: number; children: number }
     | null = null;
+  const promoCode =
+    sp.promo && /^[A-Za-z0-9-]{3,40}$/.test(sp.promo) ? sp.promo.toUpperCase() : undefined;
   if (sp.product === "HOTEL" && sp.room && ULID.test(sp.room)) {
     const stay = parseStayParams(sp);
     request = { product: "HOTEL", roomId: sp.room, ...stay };
     quote = await api.GET("/api/v1/quotes/hotel", {
-      params: { query: { roomId: sp.room, ...stay } },
+      params: { query: { roomId: sp.room, ...stay, ...(promoCode ? { promoCode } : {}) } },
     });
   } else if (sp.product === "TOUR" && sp.departure && ULID.test(sp.departure)) {
     const party = { adults: count(sp.adults, 1, 30, 2), children: count(sp.children, 0, 30, 0) };
     request = { product: "TOUR", departureId: sp.departure, ...party };
     quote = await api.GET("/api/v1/quotes/tour", {
-      params: { query: { departureId: sp.departure, ...party } },
+      params: {
+        query: { departureId: sp.departure, ...party, ...(promoCode ? { promoCode } : {}) },
+      },
     });
   }
 
@@ -102,6 +107,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             <CheckoutForm
               request={request}
               expectedTotal={q.price.total}
+              promoCode={q.promotion?.code}
               adultCount={q.adults}
               childCount={q.children}
               csrfToken={session.csrfToken}
@@ -150,6 +156,12 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                     </dt>
                     <dd>{money(q.price.base)}</dd>
                   </div>
+                  {q.price.discount.amountMinor > 0 && (
+                    <div className="flex justify-between text-good">
+                      <dt>Discount{q.promotion ? ` (${q.promotion.code})` : ""}</dt>
+                      <dd>− {money(q.price.discount)}</dd>
+                    </div>
+                  )}
                   {q.price.serviceCharge.amountMinor > 0 && (
                     <div className="flex justify-between">
                       <dt className="text-ink-2">Service charge</dt>
@@ -165,6 +177,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                     <dd>{money(q.price.total)}</dd>
                   </div>
                 </dl>
+                <PromoField current={promoCode ?? ""} applied={q.promotion} error={q.promoError} />
                 {q.cancellationPolicy && (
                   <p className="mt-4 text-[0.8rem] text-ink-3">{q.cancellationPolicy}</p>
                 )}

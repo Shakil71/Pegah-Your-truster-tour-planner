@@ -39,6 +39,7 @@ const FormSchema = z.object({
 export function CheckoutForm({
   request,
   expectedTotal,
+  promoCode,
   adultCount: adults,
   childCount: children,
   csrfToken,
@@ -47,6 +48,8 @@ export function CheckoutForm({
 }: {
   request: Request;
   expectedTotal: { amountMinor: number; currency: "BDT" | "USD" };
+  /** Applied coupon; the expected total already includes its discount. */
+  promoCode?: string;
   adultCount: number;
   childCount: number;
   csrfToken: string;
@@ -85,7 +88,13 @@ export function CheckoutForm({
     } = await browserApi.POST("/api/v1/bookings", {
       params: { header: { "Idempotency-Key": idempotencyKey } },
       headers: csrf(csrfToken),
-      body: { ...request, contact: values.contact, guests: values.guests, expectedTotal },
+      body: {
+        ...request,
+        contact: values.contact,
+        guests: values.guests,
+        expectedTotal,
+        ...(promoCode ? { promoCode } : {}),
+      },
     });
     if (response.ok && data) {
       router.push(`/account/bookings/${data.id}?new=1`);

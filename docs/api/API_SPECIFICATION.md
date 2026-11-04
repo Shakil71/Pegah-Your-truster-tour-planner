@@ -96,6 +96,21 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Promotions, reports and content (ADR-0025)
+
+| Method   | Path                        | Permission       | Purpose                            |
+| -------- | --------------------------- | ---------------- | ---------------------------------- |
+| GET/POST | /admin/promotions           | promotion:manage | List (with redemptions) / create   |
+| PUT      | /admin/promotions/{id}      | promotion:manage | Edit, pause or resume              |
+| GET      | /admin/reports/sales        | report:read      | Totals, by product, status and day |
+| GET      | /admin/reports/bookings.csv | report:read      | One row per booking (CSV download) |
+| GET/POST | /admin/pages                | content:manage   | Content pages                      |
+| GET/PUT  | /admin/pages/{slug}         | content:manage   | Read / edit a page                 |
+| GET      | /pages/{slug}               | public           | Published page only                |
+
+Quotes and `POST /bookings` accept an optional `promoCode`; quotes return
+`promotion` or `promoError`, and every price breakdown has a `discount` line.
+
 ## Account, cancellations and refunds (ADR-0024)
 
 | Method     | Path                                       | Auth                           | Purpose                                  |

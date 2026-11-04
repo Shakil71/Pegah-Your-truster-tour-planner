@@ -195,6 +195,12 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
                 <dt className="text-ink-2">Base</dt>
                 <dd>{money(b.price.base)}</dd>
               </div>
+              {b.price.discount.amountMinor > 0 && (
+                <div className="flex justify-between text-good">
+                  <dt>Discount{b.promotionCode ? ` (${b.promotionCode})` : ""}</dt>
+                  <dd>− {money(b.price.discount)}</dd>
+                </div>
+              )}
               {b.price.serviceCharge.amountMinor > 0 && (
                 <div className="flex justify-between">
                   <dt className="text-ink-2">Service charge</dt>

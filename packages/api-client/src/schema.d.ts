@@ -868,6 +868,118 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/promotions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GrowthAdminController_promotions"];
+    put?: never;
+    post: operations["GrowthAdminController_createPromotion"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/promotions/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["GrowthAdminController_updatePromotion"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/reports/sales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GrowthAdminController_sales"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/reports/bookings.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GrowthAdminController_bookingsCsv"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/pages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GrowthAdminController_pages"];
+    put?: never;
+    post: operations["GrowthAdminController_createPage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/pages/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["GrowthAdminController_page"];
+    put: operations["GrowthAdminController_updatePage"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/pages/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicPagesController_page"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -910,6 +1022,9 @@ export interface components {
         | "refund:approve"
         | "user:manage"
         | "audit:read"
+        | "promotion:manage"
+        | "report:read"
+        | "content:manage"
       )[];
     };
     SessionResponseDto_Output: {
@@ -1130,6 +1245,7 @@ export interface components {
     };
     PriceBreakdown_Output: {
       base: components["schemas"]["Money_Output"];
+      discount: components["schemas"]["Money_Output"];
       serviceCharge: components["schemas"]["Money_Output"];
       vat: components["schemas"]["Money_Output"];
       total: components["schemas"]["Money_Output"];
@@ -1269,6 +1385,7 @@ export interface components {
         | "REFUND_PENDING"
         | "REFUNDED"
       )[];
+      promotionCode: string | null;
       payments: components["schemas"]["Payment_Output"][];
       canPay: boolean;
       customer: {
@@ -1353,6 +1470,7 @@ export interface components {
             ageGroup: "ADULT" | "CHILD";
           }[];
           expectedTotal: components["schemas"]["Money"];
+          promoCode?: string;
         }
       | {
           /** @constant */
@@ -1371,6 +1489,7 @@ export interface components {
             ageGroup: "ADULT" | "CHILD";
           }[];
           expectedTotal: components["schemas"]["Money"];
+          promoCode?: string;
         };
     QuoteDto_Output: {
       /** @enum {string} */
@@ -1400,6 +1519,11 @@ export interface components {
         | null;
       price: components["schemas"]["PriceBreakdown_Output"] | null;
       cancellationPolicy: string | null;
+      promotion: {
+        code: string;
+        name: string;
+      } | null;
+      promoError: string | null;
       /** Format: date-time */
       pricedAt: string;
     };
@@ -1489,6 +1613,9 @@ export interface components {
         | "refund:approve"
         | "user:manage"
         | "audit:read"
+        | "promotion:manage"
+        | "report:read"
+        | "content:manage"
       )[];
       memberCount: number;
     };
@@ -1965,6 +2092,164 @@ export interface components {
     };
     MarkRefundPaidDto: {
       providerRef: string;
+    };
+    Promotion_Output: {
+      id: string;
+      code: string;
+      name: string;
+      /** @enum {string} */
+      kind: "PERCENT" | "FIXED";
+      percentBps: number | null;
+      amount: components["schemas"]["Money_Output"] | null;
+      minSpend: components["schemas"]["Money_Output"];
+      maxDiscount: components["schemas"]["Money_Output"] | null;
+      /** @enum {string} */
+      scope: "ALL" | "HOTEL" | "TOUR";
+      /** Format: date-time */
+      startsAt: string;
+      /** Format: date-time */
+      endsAt: string;
+      maxRedemptions: number | null;
+      perCustomerLimit: number;
+      /** @enum {string} */
+      status: "ACTIVE" | "PAUSED";
+      redemptions: number;
+      discountGiven: components["schemas"]["Money_Output"];
+    };
+    PromotionListDto_Output: {
+      items: components["schemas"]["Promotion_Output"][];
+    };
+    CreatePromotionDto: {
+      code: string;
+      promotion: {
+        name: string;
+        /** @enum {string} */
+        kind: "PERCENT" | "FIXED";
+        percentBps: number | null;
+        amount: components["schemas"]["Money"] | null;
+        minSpend: components["schemas"]["Money"];
+        maxDiscount: components["schemas"]["Money"] | null;
+        /** @enum {string} */
+        scope: "ALL" | "HOTEL" | "TOUR";
+        /** Format: date-time */
+        startsAt: string;
+        /** Format: date-time */
+        endsAt: string;
+        maxRedemptions: number | null;
+        perCustomerLimit: number;
+        /** @enum {string} */
+        status: "ACTIVE" | "PAUSED";
+      };
+    };
+    PromotionResultDto_Output: {
+      promotion: components["schemas"]["Promotion_Output"];
+    };
+    PromotionInputDto: {
+      name: string;
+      /** @enum {string} */
+      kind: "PERCENT" | "FIXED";
+      percentBps: number | null;
+      amount: components["schemas"]["Money"] | null;
+      minSpend: components["schemas"]["Money"];
+      maxDiscount: components["schemas"]["Money"] | null;
+      /** @enum {string} */
+      scope: "ALL" | "HOTEL" | "TOUR";
+      /** Format: date-time */
+      startsAt: string;
+      /** Format: date-time */
+      endsAt: string;
+      maxRedemptions: number | null;
+      perCustomerLimit: number;
+      /** @enum {string} */
+      status: "ACTIVE" | "PAUSED";
+    };
+    SalesReportDto_Output: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      totals: {
+        bookings: number;
+        confirmedBookings: number;
+        confirmedValue: components["schemas"]["Money_Output"];
+        discounts: components["schemas"]["Money_Output"];
+        refunded: components["schemas"]["Money_Output"];
+        netRevenue: components["schemas"]["Money_Output"];
+      };
+      byStatus: {
+        /** @enum {string} */
+        status:
+          | "DRAFT"
+          | "PENDING_AVAILABILITY"
+          | "PENDING_PAYMENT"
+          | "PAYMENT_PROCESSING"
+          | "CONFIRMED"
+          | "COMPLETED"
+          | "FAILED"
+          | "EXPIRED"
+          | "MANUAL_REVIEW"
+          | "CANCELLATION_REQUESTED"
+          | "CANCELLED"
+          | "REFUND_PENDING"
+          | "REFUNDED";
+        count: number;
+      }[];
+      byProduct: {
+        /** @enum {string} */
+        type: "HOTEL" | "TOUR";
+        name: string;
+        bookings: number;
+        confirmedValue: components["schemas"]["Money_Output"];
+      }[];
+      byDay: {
+        /** Format: date */
+        date: string;
+        bookings: number;
+        confirmedValue: components["schemas"]["Money_Output"];
+      }[];
+    };
+    ContentPageListDto_Output: {
+      items: {
+        slug: string;
+        title: string;
+        /** @enum {string} */
+        status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+        /** Format: date-time */
+        updatedAt: string;
+      }[];
+    };
+    ContentPageDto_Output: {
+      title: string;
+      summary: string;
+      body: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      slug: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    CreateContentPageDto: {
+      title: string;
+      summary: string;
+      body: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      slug: string;
+    };
+    ContentPageInputDto: {
+      title: string;
+      summary: string;
+      body: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+    };
+    PublicContentPageDto_Output: {
+      slug: string;
+      title: string;
+      summary: string;
+      body: string;
+      /** Format: date-time */
+      updatedAt: string;
     };
   };
   responses: never;
@@ -2495,6 +2780,7 @@ export interface operations {
     parameters: {
       query: {
         roomId: string;
+        promoCode?: string;
         checkIn: string;
         checkOut: string;
         adults?: number;
@@ -2521,6 +2807,7 @@ export interface operations {
     parameters: {
       query: {
         departureId: string;
+        promoCode?: string;
         adults?: number;
         children?: number;
       };
@@ -3414,6 +3701,224 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  GrowthAdminController_promotions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionListDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_createPromotion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePromotionDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionResultDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_updatePromotion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PromotionInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PromotionResultDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_sales: {
+    parameters: {
+      query: {
+        from: string;
+        to: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SalesReportDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_bookingsCsv: {
+    parameters: {
+      query: {
+        from: string;
+        to: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  GrowthAdminController_pages: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentPageListDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_createPage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateContentPageDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentPageDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_page: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentPageDto_Output"];
+        };
+      };
+    };
+  };
+  GrowthAdminController_updatePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContentPageInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContentPageDto_Output"];
+        };
+      };
+    };
+  };
+  PublicPagesController_page: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicContentPageDto_Output"];
+        };
       };
     };
   };

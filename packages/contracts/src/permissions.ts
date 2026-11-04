@@ -18,6 +18,9 @@ export const PERMISSIONS = {
   "refund:approve": "Approve or reject refunds (audited)",
   "user:manage": "Create staff users and assign roles (audited)",
   "audit:read": "Read the audit log",
+  "promotion:manage": "Create and edit coupon codes",
+  "report:read": "View and export sales reports",
+  "content:manage": "Edit website content pages",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

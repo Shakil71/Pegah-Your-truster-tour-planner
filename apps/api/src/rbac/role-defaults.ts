@@ -30,17 +30,31 @@ export const ROLE_DEFAULTS: Record<
       "catalog:read",
       "inventory:manage",
       "customer:read",
+      "report:read",
     ],
   },
   finance: {
     name: "Finance",
     description: "Reconciles payments and approves refunds.",
-    permissions: ["dashboard:read", "booking:read", "payment:read", "refund:approve", "audit:read"],
+    permissions: [
+      "dashboard:read",
+      "booking:read",
+      "payment:read",
+      "refund:approve",
+      "audit:read",
+      "report:read",
+    ],
   },
   content: {
     name: "Content",
     description: "Maintains destinations, hotels, rooms and tours.",
-    permissions: ["dashboard:read", "catalog:read", "catalog:manage"],
+    permissions: [
+      "dashboard:read",
+      "catalog:read",
+      "catalog:manage",
+      "content:manage",
+      "promotion:manage",
+    ],
   },
   support: {
     name: "Customer support",

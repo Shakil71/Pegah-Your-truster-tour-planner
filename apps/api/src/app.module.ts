@@ -39,6 +39,8 @@ import { ProblemFilter } from "./common/problem";
 import { APP_CONFIG, type AppConfig } from "./config/config";
 import { EmailService } from "./email/email.service";
 import { OutboxDispatcher } from "./email/outbox-dispatcher.service";
+import { GrowthAdminController, PublicPagesController } from "./growth/growth.controllers";
+import { GrowthService } from "./growth/growth.service";
 import { HealthController } from "./health/health.controller";
 import { IdempotencyService } from "./idempotency/idempotency.service";
 import {
@@ -50,6 +52,7 @@ import {
 import { PaymentService } from "./payments/payment.service";
 import { paymentProvider } from "./payments/provider.factory";
 import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
+import { PromotionService } from "./promotions/promotion.service";
 
 export interface AppModuleOptions {
   config: AppConfig;
@@ -88,6 +91,8 @@ export class AppModule {
         AccountController,
         PasswordResetController,
         AdminRefundsController,
+        GrowthAdminController,
+        PublicPagesController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -115,6 +120,8 @@ export class AppModule {
         OutboxDispatcher,
         AccountService,
         CancellationService,
+        PromotionService,
+        GrowthService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },

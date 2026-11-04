@@ -384,6 +384,9 @@ model Booking {
   baseMinor          BigInt        @map("base_minor")
   serviceChargeMinor BigInt        @default(0) @map("service_charge_minor")
   vatMinor           BigInt        @default(0) @map("vat_minor")
+  /// Promotion discount on the base, before service charge and VAT.
+  discountMinor      BigInt        @default(0) @map("discount_minor")
+  promotionId        BigInt?       @map("promotion_id") @db.UnsignedBigInt
   totalMinor         BigInt        @map("total_minor")
   contactName        String        @map("contact_name") @db.VarChar(120)
   contactEmail       String        @map("contact_email") @db.VarChar(254)
@@ -392,14 +395,15 @@ model Booking {
   createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
-  user     User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
-  items    BookingItem[]
-  guests   BookingGuest[]
-  holds    InventoryHold[]
-  history  BookingStatusHistory[]
-  payments Payment[]
-  refunds  Refund[]
-  emails   EmailMessage[]
+  user      User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items     BookingItem[]
+  guests    BookingGuest[]
+  holds     InventoryHold[]
+  history   BookingStatusHistory[]
+  payments  Payment[]
+  refunds   Refund[]
+  promotion Promotion?             @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+  emails    EmailMessage[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -587,6 +591,76 @@ model PaymentEvent {
   @@unique([provider, eventKey])
   @@index([paymentId])
   @@map("payment_events")
+}
+
+// ─── Promotions ──────────────────────────────────────────────────────────────
+
+enum PromotionKind {
+  /// Percentage of the base, in basis points.
+  PERCENT
+  /// Fixed amount off the base, in minor units.
+  FIXED
+}
+
+enum PromotionScope {
+  ALL
+  HOTEL
+  TOUR
+}
+
+enum PromotionStatus {
+  ACTIVE
+  PAUSED
+}
+
+/// Coupon codes. Redemptions are the bookings that reference the promotion
+/// (expired, failed and unpaid-cancelled bookings do not count).
+/// CHECK constraints in migration SQL keep values sane.
+model Promotion {
+  id               BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId         String          @unique @map("public_id") @db.Char(26)
+  /// Upper-case code customers type, e.g. MONSOON10.
+  code             String          @unique @db.VarChar(40)
+  name             String          @db.VarChar(120)
+  kind             PromotionKind
+  percentBps       Int?            @map("percent_bps") @db.UnsignedSmallInt
+  amountMinor      BigInt?         @map("amount_minor")
+  currency         String          @default("BDT") @db.Char(3)
+  /// Minimum base (before taxes) for the code to apply.
+  minSpendMinor    BigInt          @default(0) @map("min_spend_minor")
+  /// Upper bound on the discount (useful for percentages).
+  maxDiscountMinor BigInt?         @map("max_discount_minor")
+  scope            PromotionScope  @default(ALL)
+  startsAt         DateTime        @map("starts_at") @db.DateTime(3)
+  endsAt           DateTime        @map("ends_at") @db.DateTime(3)
+  maxRedemptions   Int?            @map("max_redemptions") @db.UnsignedInt
+  perCustomerLimit Int             @default(1) @map("per_customer_limit") @db.UnsignedSmallInt
+  status           PromotionStatus @default(ACTIVE)
+  createdAt        DateTime        @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime        @updatedAt @map("updated_at") @db.DateTime(3)
+
+  bookings Booking[]
+
+  @@index([status, startsAt, endsAt])
+  @@map("promotions")
+}
+
+// ─── Content ─────────────────────────────────────────────────────────────────
+
+/// Simple editable pages (About, Terms, Privacy…). Plain text with blank-line
+/// paragraphs and "## " headings; rendered as text, never as raw HTML.
+model ContentPage {
+  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  slug        String        @unique @db.VarChar(80)
+  title       String        @db.VarChar(160)
+  summary     String        @db.VarChar(300)
+  body        String        @db.Text
+  status      PublishStatus @default(DRAFT)
+  updatedById BigInt?       @map("updated_by_id") @db.UnsignedBigInt
+  createdAt   DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@map("content_pages")
 }
 
 // ─── Refunds ─────────────────────────────────────────────────────────────────

@@ -82,6 +82,8 @@ log "Database migrations"
 (set -a; . "$ENV_DIR/migrate.env"; set +a; npm run --silent migrate:deploy -w @pegah/db)
 log "RBAC seed (idempotent)"
 (set -a; . "$ENV_DIR/api.env"; set +a; node apps/api/dist/cli/seed-rbac.js)
+log "Content page drafts (idempotent; never publishes)"
+(set -a; . "$ENV_DIR/api.env"; set +a; node apps/api/dist/cli/seed-content.js)
 
 PREVIOUS="$(readlink -f "$ROOT/current" 2>/dev/null || true)"
 switch_to() { ln -sfn "$1" "$ROOT/current.next" && mv -T "$ROOT/current.next" "$ROOT/current"; }

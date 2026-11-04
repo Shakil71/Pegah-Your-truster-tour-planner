@@ -24,6 +24,13 @@ export type Money = z.infer<typeof MoneySchema>;
  */
 export const nullableText = (max = 10_000) => z.string().max(max).nullable();
 
+/** Coupon codes: upper-case letters, digits and dashes; input is normalised. */
+export const PromoCodeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .pipe(z.string().regex(/^[A-Z0-9-]{3,40}$/, "Use 3–40 letters, digits or dashes"));
+
 /** Public identifiers are ULIDs (26 Crockford base32 characters). */
 export const PublicIdSchema = z
   .string()

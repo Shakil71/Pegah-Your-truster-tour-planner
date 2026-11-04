@@ -398,3 +398,26 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   nationality; no identity documents. Offered as suggestions at checkout.
 - **Vouchers:** the voucher/invoice page renders only for CONFIRMED or
   COMPLETED bookings.
+
+## ADR-0025 — Promotions, sales reports and content pages
+
+- **Status:** Accepted (2026-11-04)
+- **Promotions:** coupon codes (`promotions` table) with percent or fixed
+  value, minimum spend, maximum discount, scope (stays / tours / all), time
+  window, total and per-customer limits, active/paused. The discount comes off
+  the base; service charge and VAT are computed on the discounted base, so the
+  booking CHECK becomes `total = base − discount + service charge + VAT`.
+  Quotes report why a code does not apply; booking creation re-validates the
+  code under a row lock on the promotion, so limits hold under concurrency.
+  Redemptions are the bookings referencing the promotion, excluding expired,
+  failed and cancelled ones (an unpaid hold that expires gives its use back).
+- **Reports:** sales summary (bookings, confirmed value, discounts, refunds
+  paid, net revenue, by product/status/day) and a per-booking CSV (UTF-8 BOM,
+  formula-injection safe). Dhaka calendar days; max 366 days per report.
+- **Content pages:** plain-text pages (blank-line paragraphs, `## ` headings)
+  rendered by React as text, never as HTML. Starter drafts for the footer links
+  are created on deploy but never published automatically; legal pages need
+  the owner's review.
+- **Permissions:** `promotion:manage`, `report:read`, `content:manage`
+  (owner, admin; operations and finance get reports; content gets content and
+  promotions). `seed:rbac` applies them on deploy.

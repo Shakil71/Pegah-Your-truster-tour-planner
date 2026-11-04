@@ -7,7 +7,9 @@ import { ProblemException } from "../common/problem";
 import { parseStay } from "../common/stay-dates";
 import { dhakaToday, formatCalendarDate, stayNights } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
+import { priceWithDiscount } from "../pricing/pricing";
 import { PRISMA, type Db } from "../prisma/prisma.service";
+import { PromotionService } from "../promotions/promotion.service";
 import { assertTransition } from "./booking-state-machine";
 import { lockRoomNights, lockTourSchedule, type Tx } from "./inventory";
 import {
@@ -71,6 +73,7 @@ export class BookingCreateService {
     @Inject(PRISMA) private readonly db: Db,
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    @Inject(PromotionService) private readonly promotions: PromotionService,
   ) {}
 
   /** Returns the new booking's public id. */
@@ -128,7 +131,18 @@ export class BookingCreateService {
         await lockRoomNights(tx, room.id, stay.checkIn, stay.checkOut);
         const result = await evaluateStay(tx, room, params);
         if (!result.ok) throw unavailable(result.reason);
-        const quote = hotelQuote(room, params, result, now);
+        const applied = req.promoCode
+          ? await this.applyPromo(tx, req.promoCode, {
+              productType: "HOTEL",
+              baseMinor: result.price.baseMinor,
+              currency: room.hotel.currency,
+              userId: ctx.userId,
+              now,
+              serviceChargeBps: room.hotel.serviceChargeBps,
+              vatBps: room.hotel.vatBps,
+            })
+          : null;
+        const quote = hotelQuote(room, params, result, now, applied ? { applied } : undefined);
         this.assertSamePrice(quote, req.expectedTotal);
 
         const updated = await tx.roomInventory.updateMany({
@@ -138,15 +152,17 @@ export class BookingCreateService {
         if (updated.count !== stay.nights) throw unavailable("no-inventory");
 
         const holdExpiresAt = this.holdUntil(now);
-        const p = result.price;
+        const p = applied?.price ?? { ...result.price, discountMinor: 0n };
         const { bookingId, publicId } = await this.insertBooking(tx, {
           ctx,
+          promotionId: applied?.promotionId ?? null,
           productType: "HOTEL",
           productName: room.hotel.name,
           startDate: stay.checkIn,
           endDate: stay.checkOut,
           currency: room.hotel.currency,
           baseMinor: p.baseMinor,
+          discountMinor: p.discountMinor,
           serviceChargeMinor: p.serviceChargeMinor,
           vatMinor: p.vatMinor,
           totalMinor: p.totalMinor,
@@ -213,7 +229,25 @@ export class BookingCreateService {
         });
         const result = evaluateDeparture(s, req.adults, req.children, now);
         if (!result.ok) throw unavailable(result.reason);
-        const quote = tourQuote(s, req.adults, req.children, result, now);
+        const applied = req.promoCode
+          ? await this.applyPromo(tx, req.promoCode, {
+              productType: "TOUR",
+              baseMinor: result.price.baseMinor,
+              currency: s.currency,
+              userId: ctx.userId,
+              now,
+              serviceChargeBps: 0,
+              vatBps: s.tour.vatBps,
+            })
+          : null;
+        const quote = tourQuote(
+          s,
+          req.adults,
+          req.children,
+          result,
+          now,
+          applied ? { applied } : undefined,
+        );
         this.assertSamePrice(quote, req.expectedTotal);
 
         const party = req.adults + req.children;
@@ -223,16 +257,18 @@ export class BookingCreateService {
         });
 
         const holdExpiresAt = this.holdUntil(now);
-        const p = result.price;
+        const p = applied?.price ?? { ...result.price, serviceChargeMinor: 0n, discountMinor: 0n };
         const { bookingId, publicId } = await this.insertBooking(tx, {
           ctx,
+          promotionId: applied?.promotionId ?? null,
           productType: "TOUR",
           productName: s.tour.title,
           startDate: dhakaToday(s.departsAt),
           endDate: dhakaToday(s.returnsAt),
           currency: s.currency,
           baseMinor: p.baseMinor,
-          serviceChargeMinor: 0n,
+          discountMinor: p.discountMinor,
+          serviceChargeMinor: p.serviceChargeMinor,
           vatMinor: p.vatMinor,
           totalMinor: p.totalMinor,
           contact: req.contact,
@@ -277,6 +313,37 @@ export class BookingCreateService {
     );
   }
 
+  /** Validates a promo code under a row lock and returns the discounted price. */
+  private async applyPromo(
+    tx: Tx,
+    code: string,
+    ctx: {
+      productType: "HOTEL" | "TOUR";
+      baseMinor: bigint;
+      currency: string;
+      userId: bigint;
+      now: Date;
+      serviceChargeBps: number;
+      vatBps: number;
+    },
+  ) {
+    const { promotion, discountMinor } = await this.promotions.resolve(tx, code, {
+      ...ctx,
+      lock: true,
+    });
+    return {
+      code: promotion.code,
+      name: promotion.name,
+      promotionId: promotion.id,
+      price: priceWithDiscount({
+        baseMinor: ctx.baseMinor,
+        discountMinor,
+        serviceChargeBps: ctx.serviceChargeBps,
+        vatBps: ctx.vatBps,
+      }),
+    };
+  }
+
   private assertSamePrice(quote: Quote, expected: { amountMinor: number; currency: string }) {
     const total = quote.price!.total;
     if (total.amountMinor !== expected.amountMinor || total.currency !== expected.currency) {
@@ -288,12 +355,14 @@ export class BookingCreateService {
     tx: Tx,
     b: {
       ctx: CreateBookingContext;
+      promotionId: bigint | null;
       productType: "HOTEL" | "TOUR";
       productName: string;
       startDate: Date;
       endDate: Date;
       currency: string;
       baseMinor: bigint;
+      discountMinor: bigint;
       serviceChargeMinor: bigint;
       vatMinor: bigint;
       totalMinor: bigint;
@@ -319,6 +388,8 @@ export class BookingCreateService {
         guestCount: b.guests.length,
         currency: b.currency,
         baseMinor: b.baseMinor,
+        discountMinor: b.discountMinor,
+        promotionId: b.promotionId,
         serviceChargeMinor: b.serviceChargeMinor,
         vatMinor: b.vatMinor,
         totalMinor: b.totalMinor,

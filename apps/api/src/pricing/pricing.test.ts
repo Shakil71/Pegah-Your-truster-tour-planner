@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyBps, priceStay, priceTour } from "./pricing";
+import { applyBps, priceStay, priceTour, priceWithDiscount, promotionDiscount } from "./pricing";
 
 describe("applyBps", () => {
   it("computes basis points on minor units", () => {
@@ -95,5 +95,44 @@ describe("priceTour", () => {
     expect(() =>
       priceTour({ adults: 0, children: 2, priceAdultMinor: 1n, priceChildMinor: 1n, vatBps: 0 }),
     ).toThrow(RangeError);
+  });
+});
+
+describe("promotions pricing", () => {
+  it("caps percentage discounts and never exceeds the base", () => {
+    const pct = {
+      kind: "PERCENT" as const,
+      percentBps: 1000,
+      amountMinor: null,
+      maxDiscountMinor: 150_000n,
+    };
+    expect(promotionDiscount(pct, 1_700_000n)).toBe(150_000n); // 10% = 170,000 capped at 150,000
+    expect(promotionDiscount({ ...pct, maxDiscountMinor: null }, 1_700_000n)).toBe(170_000n);
+    const fixed = {
+      kind: "FIXED" as const,
+      percentBps: null,
+      amountMinor: 900_000n,
+      maxDiscountMinor: null,
+    };
+    expect(promotionDiscount(fixed, 500_000n)).toBe(500_000n);
+  });
+
+  it("recomputes service charge and VAT on the discounted base", () => {
+    const p = priceWithDiscount({
+      baseMinor: 1_700_000n,
+      discountMinor: 150_000n,
+      serviceChargeBps: 1000,
+      vatBps: 1500,
+    });
+    expect(p).toEqual({
+      baseMinor: 1_700_000n,
+      discountMinor: 150_000n,
+      serviceChargeMinor: 155_000n,
+      vatMinor: 255_750n,
+      totalMinor: 1_960_750n,
+    });
+    expect(() =>
+      priceWithDiscount({ baseMinor: 100n, discountMinor: 101n, serviceChargeBps: 0, vatBps: 0 }),
+    ).toThrow();
   });
 });

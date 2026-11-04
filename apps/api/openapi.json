@@ -863,6 +863,14 @@
             }
           },
           {
+            "name": "promoCode",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "checkIn",
             "required": true,
             "in": "query",
@@ -941,6 +949,14 @@
             "in": "query",
             "schema": {
               "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "promoCode",
+            "required": false,
+            "in": "query",
+            "schema": {
               "type": "string"
             }
           },
@@ -2400,6 +2416,346 @@
         ],
         "tags": ["admin"]
       }
+    },
+    "/api/v1/admin/promotions": {
+      "get": {
+        "operationId": "GrowthAdminController_promotions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      },
+      "post": {
+        "operationId": "GrowthAdminController_createPromotion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePromotionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/admin/promotions/{id}": {
+      "put": {
+        "operationId": "GrowthAdminController_updatePromotion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/admin/reports/sales": {
+      "get": {
+        "operationId": "GrowthAdminController_sales",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesReportDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/admin/reports/bookings.csv": {
+      "get": {
+        "operationId": "GrowthAdminController_bookingsCsv",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/admin/pages": {
+      "get": {
+        "operationId": "GrowthAdminController_pages",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentPageListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      },
+      "post": {
+        "operationId": "GrowthAdminController_createPage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContentPageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentPageDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/admin/pages/{slug}": {
+      "get": {
+        "operationId": "GrowthAdminController_page",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentPageDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      },
+      "put": {
+        "operationId": "GrowthAdminController_updatePage",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentPageInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentPageDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-growth"]
+      }
+    },
+    "/api/v1/pages/{slug}": {
+      "get": {
+        "operationId": "PublicPagesController_page",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicContentPageDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["content"]
+      }
     }
   },
   "info": {
@@ -2546,7 +2902,10 @@
                 "payment:read",
                 "refund:approve",
                 "user:manage",
-                "audit:read"
+                "audit:read",
+                "promotion:manage",
+                "report:read",
+                "content:manage"
               ]
             }
           }
@@ -3629,6 +3988,9 @@
           "base": {
             "$ref": "#/components/schemas/Money_Output"
           },
+          "discount": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
           "serviceCharge": {
             "$ref": "#/components/schemas/Money_Output"
           },
@@ -3639,7 +4001,7 @@
             "$ref": "#/components/schemas/Money_Output"
           }
         },
-        "required": ["base", "serviceCharge", "vat", "total"],
+        "required": ["base", "discount", "serviceCharge", "vat", "total"],
         "additionalProperties": false
       },
       "BookingItem_Output": {
@@ -4022,6 +4384,17 @@
               ]
             }
           },
+          "promotionCode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "payments": {
             "type": "array",
             "items": {
@@ -4158,6 +4531,7 @@
           "travellers",
           "history",
           "allowedTransitions",
+          "promotionCode",
           "payments",
           "canPay",
           "customer",
@@ -4315,6 +4689,9 @@
               },
               "expectedTotal": {
                 "$ref": "#/components/schemas/Money"
+              },
+              "promoCode": {
+                "type": "string"
               }
             },
             "required": [
@@ -4391,6 +4768,9 @@
               },
               "expectedTotal": {
                 "$ref": "#/components/schemas/Money"
+              },
+              "promoCode": {
+                "type": "string"
               }
             },
             "required": [
@@ -4527,6 +4907,37 @@
               }
             ]
           },
+          "promotion": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["code", "name"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "promoError": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "pricedAt": {
             "type": "string",
             "format": "date-time",
@@ -4549,6 +4960,8 @@
           "unavailableReason",
           "price",
           "cancellationPolicy",
+          "promotion",
+          "promoError",
           "pricedAt"
         ],
         "additionalProperties": false
@@ -4860,7 +5273,10 @@
                 "payment:read",
                 "refund:approve",
                 "user:manage",
-                "audit:read"
+                "audit:read",
+                "promotion:manage",
+                "report:read",
+                "content:manage"
               ]
             }
           },
@@ -7272,6 +7688,639 @@
           }
         },
         "required": ["providerRef"]
+      },
+      "Promotion_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["PERCENT", "FIXED"]
+          },
+          "percentBps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minSpend": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "maxDiscount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["ALL", "HOTEL", "TOUR"]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "maxRedemptions": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perCustomerLimit": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "PAUSED"]
+          },
+          "redemptions": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "discountGiven": {
+            "$ref": "#/components/schemas/Money_Output"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "kind",
+          "percentBps",
+          "amount",
+          "minSpend",
+          "maxDiscount",
+          "scope",
+          "startsAt",
+          "endsAt",
+          "maxRedemptions",
+          "perCustomerLimit",
+          "status",
+          "redemptions",
+          "discountGiven"
+        ],
+        "additionalProperties": false
+      },
+      "PromotionListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Promotion_Output"
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "CreatePromotionDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "promotion": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "kind": {
+                "type": "string",
+                "enum": ["PERCENT", "FIXED"]
+              },
+              "percentBps": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "amount": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "minSpend": {
+                "$ref": "#/components/schemas/Money"
+              },
+              "maxDiscount": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Money"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "scope": {
+                "type": "string",
+                "enum": ["ALL", "HOTEL", "TOUR"]
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "endsAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "maxRedemptions": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "perCustomerLimit": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "status": {
+                "type": "string",
+                "enum": ["ACTIVE", "PAUSED"]
+              }
+            },
+            "required": [
+              "name",
+              "kind",
+              "percentBps",
+              "amount",
+              "minSpend",
+              "maxDiscount",
+              "scope",
+              "startsAt",
+              "endsAt",
+              "maxRedemptions",
+              "perCustomerLimit",
+              "status"
+            ]
+          }
+        },
+        "required": ["code", "promotion"]
+      },
+      "PromotionResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "promotion": {
+            "$ref": "#/components/schemas/Promotion_Output"
+          }
+        },
+        "required": ["promotion"],
+        "additionalProperties": false
+      },
+      "PromotionInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["PERCENT", "FIXED"]
+          },
+          "percentBps": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "minSpend": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "maxDiscount": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["ALL", "HOTEL", "TOUR"]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "maxRedemptions": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "perCustomerLimit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "PAUSED"]
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "percentBps",
+          "amount",
+          "minSpend",
+          "maxDiscount",
+          "scope",
+          "startsAt",
+          "endsAt",
+          "maxRedemptions",
+          "perCustomerLimit",
+          "status"
+        ]
+      },
+      "SalesReportDto_Output": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "bookings": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "confirmedBookings": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "confirmedValue": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "discounts": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "refunded": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "netRevenue": {
+                "$ref": "#/components/schemas/Money_Output"
+              }
+            },
+            "required": [
+              "bookings",
+              "confirmedBookings",
+              "confirmedValue",
+              "discounts",
+              "refunded",
+              "netRevenue"
+            ],
+            "additionalProperties": false
+          },
+          "byStatus": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "DRAFT",
+                    "PENDING_AVAILABILITY",
+                    "PENDING_PAYMENT",
+                    "PAYMENT_PROCESSING",
+                    "CONFIRMED",
+                    "COMPLETED",
+                    "FAILED",
+                    "EXPIRED",
+                    "MANUAL_REVIEW",
+                    "CANCELLATION_REQUESTED",
+                    "CANCELLED",
+                    "REFUND_PENDING",
+                    "REFUNDED"
+                  ]
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["status", "count"],
+              "additionalProperties": false
+            }
+          },
+          "byProduct": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["HOTEL", "TOUR"]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "bookings": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "confirmedValue": {
+                  "$ref": "#/components/schemas/Money_Output"
+                }
+              },
+              "required": ["type", "name", "bookings", "confirmedValue"],
+              "additionalProperties": false
+            }
+          },
+          "byDay": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
+                "bookings": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "confirmedValue": {
+                  "$ref": "#/components/schemas/Money_Output"
+                }
+              },
+              "required": ["date", "bookings", "confirmedValue"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["from", "to", "totals", "byStatus", "byProduct", "byDay"],
+        "additionalProperties": false
+      },
+      "ContentPageListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": ["slug", "title", "status", "updatedAt"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "ContentPageDto_Output": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 50000
+          },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["title", "summary", "body", "status", "slug", "updatedAt"],
+        "additionalProperties": false
+      },
+      "CreateContentPageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 50000
+          },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": ["title", "summary", "body", "status", "slug"]
+      },
+      "ContentPageInputDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 50000
+          },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          }
+        },
+        "required": ["title", "summary", "body", "status"]
+      },
+      "PublicContentPageDto_Output": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["slug", "title", "summary", "body", "updatedAt"],
+        "additionalProperties": false
       }
     }
   }

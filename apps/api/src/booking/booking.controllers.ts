@@ -195,15 +195,24 @@ export class QuotesController {
 
   @Get("hotel")
   @ZodResponse({ status: 200, type: QuoteDto })
-  hotel(@Query() query: HotelQuoteQueryDto, @Res({ passthrough: true }) reply: FastifyReply) {
+  hotel(
+    @Query() query: HotelQuoteQueryDto,
+    @Req() request: FastifyRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
     void reply.header("cache-control", "no-store");
-    return this.quotes.hotel(query);
+    // Signed-in customers get per-customer promo limits checked too.
+    return this.quotes.hotel(query, request.auth?.user.id ?? null);
   }
 
   @Get("tour")
   @ZodResponse({ status: 200, type: QuoteDto })
-  tour(@Query() query: TourQuoteQueryDto, @Res({ passthrough: true }) reply: FastifyReply) {
+  tour(
+    @Query() query: TourQuoteQueryDto,
+    @Req() request: FastifyRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
     void reply.header("cache-control", "no-store");
-    return this.quotes.tour(query);
+    return this.quotes.tour(query, request.auth?.user.id ?? null);
   }
 }

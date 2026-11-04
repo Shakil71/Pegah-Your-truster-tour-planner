@@ -4,6 +4,18 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 6 completion: promotions, reports, content (2026-11-04)
+
+- Promotions: admin CRUD, codes at checkout (server re-pricing), discount on the
+  base with taxes recomputed, limits under row lock, redemptions returned on
+  expiry (ADR-0025). Discount shown on checkout, trip page, voucher and admin.
+- Sales report with CSV export (safe against spreadsheet formula injection).
+- Content pages with an admin editor, public `/pages/{slug}`, real footer
+  links, starter drafts created on deploy (never auto-published).
+- Permissions `promotion:manage`, `report:read`, `content:manage`.
+- Migration `20261107090000_promotions_content` (widened bookings CHECK).
+- Tests: growth MySQL integration suite, discount pricing unit tests.
+
 ### Added — Phase 5 completion (2026-11-04)
 
 - Cancellation request → staff decision (refund capped at the amount paid,
