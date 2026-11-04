@@ -218,8 +218,9 @@ EOF
 # ── 4. systemd units ──────────────────────────────────────────────────────────
 log "systemd units"
 install -m 0644 "$INFRA_DIR"/systemd/pegah-*.service "$INFRA_DIR"/systemd/pegah-*.timer /etc/systemd/system/
-install -d -m 0755 /opt/pegah/bin
-install -m 0755 "$INFRA_DIR/deploy/deploy.sh" "$INFRA_DIR/deploy/deploy-agent.sh" \
+# Owned by pegah: deploy.sh replaces these with each release's versions.
+install -d -m 0755 -o "$APP_USER" -g "$APP_USER" /opt/pegah/bin
+install -m 0755 -o "$APP_USER" -g "$APP_USER" "$INFRA_DIR/deploy/deploy.sh" "$INFRA_DIR/deploy/deploy-agent.sh" \
   "$INFRA_DIR/backup/mysql-backup.sh" /opt/pegah/bin/
 systemctl daemon-reload
 # App units start on the first deploy (no release exists yet).

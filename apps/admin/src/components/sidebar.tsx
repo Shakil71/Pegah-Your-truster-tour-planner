@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, Logo, cx } from "@pegah/ui";
+import { buildInfo } from "@/lib/build-info";
 import { navGroups } from "@/lib/nav";
 
 export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () => void }) {
@@ -86,6 +87,9 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
           Sandbox environment
         </p>
         <p className="mt-1 text-white/60">Sample data. The admin API is not connected yet.</p>
+        <p className="tabular mt-2 text-[0.72rem] text-white/45">
+          Build {buildInfo.sha} · {buildInfo.builtAtLabel}
+        </p>
       </div>
     </aside>
   );

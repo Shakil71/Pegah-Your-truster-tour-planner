@@ -169,3 +169,21 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   sudo limited to restarting Pegah units. Redis is not used until Phase 4.
 - **Revisit:** if the repository becomes private, a runner with a protected
   `production` environment is an alternative.
+
+## ADR-0017 — Every CI-green push to `main` deploys to production
+
+- **Status:** Accepted (2026-11-04), amends ADR-0016
+- **Context:** The owner asked to see the effect of each push on the server
+  directly ("push er impact ami visually server theke dekte pari").
+- **Decision:** The deploy agent deploys the head of `main` as soon as the CI
+  job for that exact commit succeeds. The owner authorised this automatic
+  deployment on 2026-11-04; pushing to `main` (which Claude does only with the
+  owner's approval) is the production approval. `v*` tags remain release
+  markers and can be deployed manually with `deploy.sh vX.Y.Z`.
+- **Visibility:** every build carries its commit: web footer and admin
+  sidebar show `Build <sha> · <time Dhaka>`, and `/api/v1/health/live` returns
+  `commit` and `builtAt`. History in `/opt/pegah/shared/state/deploy-history`.
+- **Safety kept:** CI must pass; failed health checks roll back; failed
+  commits are never retried; migrations must be backward compatible.
+- **Revisit:** add a separate staging instance before real customers arrive,
+  so `develop` deploys to staging and production returns to explicit releases.

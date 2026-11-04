@@ -694,11 +694,23 @@
           "version": {
             "type": "string"
           },
+          "commit": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "builtAt": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "time": {
             "type": "string"
           }
         },
-        "required": ["status", "checks", "version", "time"],
+        "required": ["status", "checks", "version", "commit", "builtAt", "time"],
         "additionalProperties": false
       },
       "RegisterRequestDto": {

@@ -3,6 +3,8 @@ import { ApiTags } from "@nestjs/swagger";
 import { SkipThrottle } from "@nestjs/throttler";
 import { HealthResponseSchema, type HealthResponse } from "@pegah/contracts";
 import type { FastifyReply } from "fastify";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { createZodDto, ZodResponse } from "nestjs-zod";
 import { Public } from "../auth/decorators";
 import { PRISMA, type Db } from "../prisma/prisma.service";
@@ -10,6 +12,22 @@ import { PRISMA, type Db } from "../prisma/prisma.service";
 class HealthResponseDto extends createZodDto(HealthResponseSchema) {}
 
 const VERSION = process.env.npm_package_version ?? "0.1.0";
+
+/** Written by infra/deploy/deploy.sh at the release root; absent locally. */
+function readBuildInfo(): { commit: string | null; builtAt: string | null } {
+  try {
+    // dist/health (or src/health) → apps/api → apps → release root
+    const raw = readFileSync(resolve(__dirname, "../../../../build-info.json"), "utf8");
+    const info = JSON.parse(raw) as { commit?: unknown; builtAt?: unknown };
+    return {
+      commit: typeof info.commit === "string" ? info.commit : null,
+      builtAt: typeof info.builtAt === "string" ? info.builtAt : null,
+    };
+  } catch {
+    return { commit: null, builtAt: null };
+  }
+}
+const BUILD = readBuildInfo();
 
 /** Liveness (process is up) and readiness (dependencies reachable) probes. */
 @ApiTags("health")
@@ -22,7 +40,13 @@ export class HealthController {
   @Get("live")
   @ZodResponse({ status: 200, type: HealthResponseDto })
   live(): HealthResponse {
-    return { status: "ok", checks: {}, version: VERSION, time: new Date().toISOString() };
+    return {
+      status: "ok",
+      checks: {},
+      version: VERSION,
+      ...BUILD,
+      time: new Date().toISOString(),
+    };
   }
 
   @Get("ready")
@@ -49,6 +73,7 @@ export class HealthController {
       status: database === "up" ? "ok" : "down",
       checks: { database },
       version: VERSION,
+      ...BUILD,
       time: new Date().toISOString(),
     };
   }

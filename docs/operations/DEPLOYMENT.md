@@ -145,16 +145,20 @@ sudo bash /home/pegah/pegah-infra/server/bootstrap-root.sh
 ## Release procedure (CI/CD)
 
 1. Work merges to `develop`, then `main`; GitHub Actions CI runs on every push
-   (format, lint, typecheck, tests, build, OpenAPI drift).
-2. **Approval = tag.** The owner (or Claude with the owner's explicit approval)
-   pushes a semantic version tag on `main`, e.g. `v0.3.0`.
-3. Within 2 minutes `pegah-deploy-agent` sees the tag, checks that the CI job
-   for that exact commit succeeded, and runs `deploy.sh`. A failed CI marks the
-   tag as rejected; it is never deployed.
+   (infra script syntax, format, lint, typecheck, tests, build, OpenAPI drift).
+2. **Push to `main` = production approval** (ADR-0017). Within 2 minutes
+   `pegah-deploy-agent` sees the new head, waits until the CI job for that exact
+   commit has succeeded, and runs `deploy.sh <sha>`. A failed CI marks the
+   commit as rejected; it is never deployed.
+3. A deploy takes roughly 5–10 minutes (clone, `npm ci`, build, migrate).
 4. Health checks: `/api/v1/health/ready`, web `/`, admin `/`. On failure the
    previous release is restored automatically.
-5. History: `/opt/pegah/shared/state/deploy-history`; logs:
-   `journalctl -u pegah-deploy-agent`.
+5. **See what is live:** web footer and admin sidebar show
+   `Build <sha> · <time>`; `GET /api/v1/health/live` returns `commit` and
+   `builtAt`. Server history: `/opt/pegah/shared/state/deploy-history`; logs:
+   `journalctl -u pegah-deploy-agent -f`.
+6. `deploy.sh` also installs the release's own `infra/deploy` scripts into
+   `/opt/pegah/bin`, so CI/CD changes deploy themselves without root.
 
 Why pull-based (ADR-0016): the repository is public, so a self-hosted GitHub
 runner on this server would let fork pull requests attempt to run code on it;

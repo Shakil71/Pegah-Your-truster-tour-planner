@@ -1,5 +1,6 @@
 import { Logo } from "@pegah/ui";
 import { photoCredits } from "@/data/home";
+import { buildInfo } from "@/lib/build-info";
 
 const columns = [
   { title: "Travel", links: ["Stays", "Tours", "Destinations", "Flights (soon)", "Visa (soon)"] },
@@ -60,6 +61,17 @@ export function SiteFooter() {
         <div className="flex flex-wrap justify-between gap-x-6 gap-y-2 text-[0.8rem] opacity-70">
           <span>© 2026 Pegah. Prices in BDT.</span>
           <span>Design build · sample data · not a live booking site</span>
+          {buildInfo.commitUrl ? (
+            <a
+              href={buildInfo.commitUrl}
+              className="tabular underline-offset-2 hover:underline"
+              title="Deployed commit"
+            >
+              Build {buildInfo.sha} · {buildInfo.builtAtLabel}
+            </a>
+          ) : (
+            <span className="tabular">Build {buildInfo.sha}</span>
+          )}
         </div>
         <details className="mt-[18px] text-[0.78rem] opacity-75">
           <summary className="cursor-pointer">Photo credits (Wikimedia Commons)</summary>
