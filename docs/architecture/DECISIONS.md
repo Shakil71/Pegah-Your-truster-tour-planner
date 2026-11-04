@@ -349,3 +349,27 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   documented request/response shapes only. It must pass the sandbox checklist
   in `docs/operations/SSLCOMMERZ_INTEGRATION.md` before customers use it.
 - **Revisit:** refunds through the API, confirmation emails via the worker.
+
+## ADR-0023 — Back-office catalog and inventory management
+
+- **Status:** Accepted (2026-11-04)
+- **Decision:**
+  - Staff manage destinations, hotels, room types, the per-night inventory and
+    rate calendar, tours and departures through `/api/v1/admin/*`, guarded by
+    `catalog:read`, `catalog:manage` and `inventory:manage`; customers are
+    readable with `customer:read`.
+  - Slugs are fixed at creation, so website links and admin links never break.
+  - Inventory edits take the same row locks as booking creation and refuse to
+    set rooms on sale below rooms held or sold (`409 below-committed`);
+    departures refuse capacity below seats held or sold, and cancellation while
+    seats are taken (close first). Past dates cannot be edited.
+  - Rate and price changes apply only to new bookings; bookings keep their
+    price snapshot.
+  - Every change is audited (`catalog.*`, `inventory.*`) with staff and IP.
+  - Modules are linked: booking detail carries `customer` and `product`
+    (slug, departure); booking lists filter by customer, hotel or tour; hotel
+    and tour lists show active bookings; the dashboard links into the catalog.
+  - All admin DTO classes are prefixed `Admin…`; a test fails on duplicate DTO
+    class names, because Swagger silently merges same-named schemas.
+- **Consequence:** public catalog responses are browser-cached (search 30 s,
+  pages up to 5 min), so edits appear on the website within that window.

@@ -500,6 +500,214 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/destinations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_destinations"];
+    put?: never;
+    post: operations["CatalogAdminController_createDestination"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/destinations/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["CatalogAdminController_updateDestination"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/hotels": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_hotels"];
+    put?: never;
+    post: operations["CatalogAdminController_createHotel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/hotels/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_hotel"];
+    put: operations["CatalogAdminController_updateHotel"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/hotels/{slug}/rooms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CatalogAdminController_createRoom"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/rooms/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["CatalogAdminController_updateRoom"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/rooms/{id}/calendar": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_calendar"];
+    put: operations["CatalogAdminController_updateCalendar"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/tours": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_tours"];
+    put?: never;
+    post: operations["CatalogAdminController_createTour"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/tours/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_tour"];
+    put: operations["CatalogAdminController_updateTour"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/tours/{slug}/departures": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CatalogAdminController_createDeparture"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/departures/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["CatalogAdminController_updateDeparture"];
+    trace?: never;
+  };
+  "/api/v1/admin/customers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_customerList"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/customers/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_customer"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -883,6 +1091,17 @@ export interface components {
       )[];
       payments: components["schemas"]["Payment_Output"][];
       canPay: boolean;
+      customer: {
+        id: string;
+        fullName: string;
+        email: string;
+      };
+      product: {
+        /** @enum {string} */
+        type: "HOTEL" | "TOUR";
+        slug: string;
+        departureId: string | null;
+      };
     };
     BookingStatusTransitionRequestDto: {
       /** @enum {string} */
@@ -1171,6 +1390,321 @@ export interface components {
         riskLevel: number | null;
       }[];
       nextCursor: string | null;
+    };
+    AdminDestination_Output: {
+      slug: string;
+      name: string;
+      nameBn: string | null;
+      region: string;
+      summary: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+      hotelCount: number;
+      tourCount: number;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AdminDestinationListDto_Output: {
+      items: components["schemas"]["AdminDestination_Output"][];
+    };
+    AdminCreateDestinationDto: {
+      name: string;
+      nameBn?: string | null;
+      region: string;
+      summary: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+      slug: string;
+    };
+    AdminDestinationResultDto_Output: {
+      destination: components["schemas"]["AdminDestination_Output"];
+    };
+    AdminDestinationInputDto: {
+      name: string;
+      nameBn?: string | null;
+      region: string;
+      summary: string;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+    };
+    AdminHotelSummary_Output: {
+      id: string;
+      slug: string;
+      name: string;
+      destination: {
+        slug: string;
+        name: string;
+      };
+      starRating: number | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      roomCount: number;
+      activeBookings: number;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AdminHotelListDto_Output: {
+      items: components["schemas"]["AdminHotelSummary_Output"][];
+    };
+    AdminCreateHotelDto: {
+      destinationSlug: string;
+      name: string;
+      nameBn?: string | null;
+      starRating: number | null;
+      addressLine: string;
+      summary: string;
+      description?: string | null;
+      checkInTime: string;
+      checkOutTime: string;
+      cancellationPolicy: string;
+      serviceChargeBps: number;
+      vatBps: number;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      slug: string;
+    };
+    AdminRoom_Output: {
+      name: string;
+      description: string;
+      maxAdults: number;
+      maxChildren: number;
+      bedType: string;
+      sizeSqm: number | null;
+      isActive: boolean;
+      id: string;
+    };
+    AdminHotelDetailDto_Output: {
+      id: string;
+      slug: string;
+      name: string;
+      destination: {
+        slug: string;
+        name: string;
+      };
+      starRating: number | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      roomCount: number;
+      activeBookings: number;
+      /** Format: date-time */
+      updatedAt: string;
+      nameBn: string | null;
+      addressLine: string;
+      summary: string;
+      description: string | null;
+      checkInTime: string;
+      checkOutTime: string;
+      cancellationPolicy: string;
+      serviceChargeBps: number;
+      vatBps: number;
+      rooms: components["schemas"]["AdminRoom_Output"][];
+    };
+    AdminHotelInputDto: {
+      destinationSlug: string;
+      name: string;
+      nameBn?: string | null;
+      starRating: number | null;
+      addressLine: string;
+      summary: string;
+      description?: string | null;
+      checkInTime: string;
+      checkOutTime: string;
+      cancellationPolicy: string;
+      serviceChargeBps: number;
+      vatBps: number;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+    };
+    AdminRoomInputDto: {
+      name: string;
+      description: string;
+      maxAdults: number;
+      maxChildren: number;
+      bedType: string;
+      sizeSqm: number | null;
+      isActive: boolean;
+    };
+    AdminRoomResultDto_Output: {
+      room: components["schemas"]["AdminRoom_Output"];
+    };
+    CalendarDay_Output: {
+      /** Format: date */
+      date: string;
+      total: number | null;
+      held: number;
+      sold: number;
+      rate: components["schemas"]["Money_Output"] | null;
+    };
+    AdminRoomCalendarDto_Output: {
+      room: {
+        id: string;
+        name: string;
+      };
+      hotel: {
+        slug: string;
+        name: string;
+        currency: string;
+      };
+      days: components["schemas"]["CalendarDay_Output"][];
+    };
+    AdminCalendarUpdateDto: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      weekdays?: number[];
+      total?: number;
+      rate?: components["schemas"]["Money"];
+    };
+    AdminCalendarUpdateResultDto_Output: {
+      datesUpdated: number;
+    };
+    AdminTourSummary_Output: {
+      id: string;
+      slug: string;
+      title: string;
+      destination: {
+        slug: string;
+        name: string;
+      };
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      durationDays: number;
+      upcomingDepartures: number;
+      activeBookings: number;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AdminTourListDto_Output: {
+      items: components["schemas"]["AdminTourSummary_Output"][];
+    };
+    AdminCreateTourDto: {
+      destinationSlug: string;
+      title: string;
+      titleBn?: string | null;
+      summary: string;
+      description: string;
+      durationDays: number;
+      durationNights: number;
+      meetingPoint: string;
+      groupSizeMax: number;
+      highlights: string[];
+      includes: string[];
+      excludes: string[];
+      vatBps: number;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      slug: string;
+    };
+    AdminDeparture_Output: {
+      id: string;
+      /** Format: date-time */
+      departsAt: string;
+      /** Format: date-time */
+      returnsAt: string;
+      capacity: number;
+      held: number;
+      sold: number;
+      priceAdult: components["schemas"]["Money_Output"];
+      priceChild: components["schemas"]["Money_Output"];
+      /** @enum {string} */
+      status: "SCHEDULED" | "CLOSED" | "CANCELLED";
+    };
+    AdminTourDetailDto_Output: {
+      id: string;
+      slug: string;
+      title: string;
+      destination: {
+        slug: string;
+        name: string;
+      };
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      durationDays: number;
+      upcomingDepartures: number;
+      activeBookings: number;
+      /** Format: date-time */
+      updatedAt: string;
+      titleBn: string | null;
+      summary: string;
+      description: string;
+      durationNights: number;
+      meetingPoint: string;
+      groupSizeMax: number;
+      highlights: string[];
+      includes: string[];
+      excludes: string[];
+      vatBps: number;
+      departures: components["schemas"]["AdminDeparture_Output"][];
+    };
+    AdminTourInputDto: {
+      destinationSlug: string;
+      title: string;
+      titleBn?: string | null;
+      summary: string;
+      description: string;
+      durationDays: number;
+      durationNights: number;
+      meetingPoint: string;
+      groupSizeMax: number;
+      highlights: string[];
+      includes: string[];
+      excludes: string[];
+      vatBps: number;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+    };
+    AdminCreateDepartureDto: {
+      /** Format: date-time */
+      departsAt: string;
+      /** Format: date-time */
+      returnsAt: string;
+      capacity: number;
+      priceAdult: components["schemas"]["Money"];
+      priceChild: components["schemas"]["Money"];
+    };
+    AdminDepartureResultDto_Output: {
+      departure: components["schemas"]["AdminDeparture_Output"];
+    };
+    AdminUpdateDepartureDto: {
+      capacity?: number;
+      priceAdult?: components["schemas"]["Money"];
+      priceChild?: components["schemas"]["Money"];
+      /** @enum {string} */
+      status?: "SCHEDULED" | "CLOSED" | "CANCELLED";
+    };
+    AdminCustomer_Output: {
+      id: string;
+      email: string;
+      fullName: string;
+      phone: string | null;
+      /** @enum {string} */
+      status: "ACTIVE" | "DISABLED";
+      bookingCount: number;
+      lastLoginAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    AdminCustomerListDto_Output: {
+      items: components["schemas"]["AdminCustomer_Output"][];
+      nextCursor: string | null;
+    };
+    AdminCustomerDetailDto_Output: {
+      id: string;
+      email: string;
+      fullName: string;
+      phone: string | null;
+      /** @enum {string} */
+      status: "ACTIVE" | "DISABLED";
+      bookingCount: number;
+      lastLoginAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      lifetimeValue: components["schemas"]["Money_Output"];
+      bookings: components["schemas"]["BookingSummary_Output"][];
     };
   };
   responses: never;
@@ -1535,6 +2069,9 @@ export interface operations {
           | "REFUNDED";
         productType?: "HOTEL" | "TOUR";
         q?: string;
+        customerId?: string;
+        hotel?: string;
+        tour?: string;
         cursor?: string;
         limit?: number;
       };
@@ -1893,6 +2430,442 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AdminPaymentListResponseDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_destinations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminDestinationListDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createDestination: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateDestinationDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminDestinationResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateDestination: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminDestinationInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminDestinationResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_hotels: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHotelListDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createHotel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateHotelDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHotelDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_hotel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHotelDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateHotel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminHotelInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHotelDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createRoom: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminRoomInputDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminRoomResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateRoom: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminRoomInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminRoomResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_calendar: {
+    parameters: {
+      query: {
+        from: string;
+        days?: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminRoomCalendarDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCalendarUpdateDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminCalendarUpdateResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_tours: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTourListDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createTour: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateTourDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTourDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_tour: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTourDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateTour: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminTourInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminTourDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createDeparture: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateDepartureDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminDepartureResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_updateDeparture: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminUpdateDepartureDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminDepartureResultDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_customerList: {
+    parameters: {
+      query?: {
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminCustomerListDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_customer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminCustomerDetailDto_Output"];
         };
       };
     };

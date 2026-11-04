@@ -1,0 +1,69 @@
+# Roadmap and completion checklist
+
+_Last updated: 2026-11-04._ One list of everything in scope
+(`requirements/PRODUCT_REQUIREMENTS.md`), worked through phase by phase.
+Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
+⏳ next · ⛔ blocked (named dependency) · ⬜ not started.
+
+## Phase 1 — Discovery and documentation ✅
+
+- ✅ Audit, proposal, CLAUDE.md, full documentation set, ADR-0001 … ADR-0007.
+
+## Phase 2 — Design system and front-end shells ✅
+
+- ✅ Monorepo, design tokens (#FF852F), UI package, homepage, admin design, CI.
+
+## Phase 3 — Backend foundation and live admin ✅
+
+- ✅ Contracts, Prisma schema + migrations, NestJS API, auth, RBAC, CSRF, audit.
+- ✅ Admin staff sign-in, dashboard, bookings, staff and roles, audit log.
+- ✅ Generated API client; MySQL integration tests in CI; pull-based CD.
+
+## Phase 4 — Search and booking with holds ✅
+
+- ✅ Hotel search, property page, tours, departure picker, quotes.
+- ✅ Booking creation with row locks, idempotency, price revalidation, 15-minute holds.
+- ✅ Customer register / sign in / sign out, My trips, cancel unpaid hold, hold expiry.
+
+## Phase 5 — Payments, confirmation, documents 🔶
+
+- ✅ Payment module, provider port, simulator, server-side verification,
+  confirmation with hold conversion, refund-required flagging, reconciliation.
+- ⛔ SSLCOMMERZ switched on — needs sandbox credentials
+  (`operations/SSLCOMMERZ_INTEGRATION.md`).
+- ⬜ Booking voucher and invoice (printable pages for confirmed bookings).
+- ⬜ Cancellation request for confirmed bookings + staff decision + refund workflow.
+- ⬜ Password reset and email verification (needs an email sender).
+- ⬜ Transactional email (confirmation, payment, cancellation) via the outbox.
+- ⬜ Traveller profiles and account profile editing.
+
+## Phase 6 — Operations admin 🔶
+
+- ✅ Destinations, hotels, room types, inventory and rate calendar (bulk, weekday rules).
+- ✅ Tours and departures with seat safety (close / reopen / cancel rules).
+- ✅ Customers list and detail; booking ↔ customer ↔ hotel/tour ↔ audit links;
+  dashboard → catalog links; scoped booking lists.
+- ⬜ Coupons and promotions (server-side discount rules, usage limits).
+- ⬜ Reports (bookings, revenue, occupancy exports in CSV).
+- ⬜ Content (homepage sections, CMS pages) and media uploads with credits.
+
+## Phase 7 — Partner portals ⬜
+
+- ⬜ Supplier portal: hotel/operator owners manage their own inventory and see reservations.
+- ⬜ B2B agent portal: agent accounts, agent rates, commission, statements.
+- ⬜ Refunds console for finance (`refund:approve`).
+
+## Phase 8 — Third-party supply ⛔
+
+- ⛔ Flights (search, fare rules, revalidation, ticketing) — needs a GDS or consolidator contract.
+- ⛔ Third-party hotels — needs a bedbank contract.
+- ⬜ Visa services — needs the secure document storage design first.
+
+## Cross-cutting (before real customers)
+
+- 🔶 HTTPS: self-signed on :8443 ready (owner runs `enable-https.sh`); trusted
+  certificate needs a domain.
+- ⬜ Playwright end-to-end + axe accessibility checks in CI.
+- ⬜ Worker process with Redis/Valkey (outbox, emails, distributed rate limits).
+- ⬜ Monitoring (Prometheus, Grafana, Loki) and restore drill for backups.
+- ⬜ Staging instance; remove demo data; Bangla localisation (next-intl).

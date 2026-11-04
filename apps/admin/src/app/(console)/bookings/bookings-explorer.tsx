@@ -20,6 +20,12 @@ export function BookingsExplorer({ page }: { page: Page }) {
   const [q, setQ] = useState(params.get("q") ?? "");
   const status = params.get("status") as BookingStatus | null;
   const kind = params.get("productType");
+  // Scopes set by links from a customer, hotel or tour page.
+  const scope = [
+    params.get("customerId") && { key: "customerId", label: "One customer" },
+    params.get("hotel") && { key: "hotel", label: `Hotel: ${params.get("hotel")}` },
+    params.get("tour") && { key: "tour", label: `Tour: ${params.get("tour")}` },
+  ].filter(Boolean) as { key: string; label: string }[];
 
   function go(changes: Record<string, string | null>) {
     const next = new URLSearchParams(params.toString());
@@ -94,6 +100,22 @@ export function BookingsExplorer({ page }: { page: Page }) {
           ))}
         </div>
       </div>
+      {scope.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule bg-primary-soft/50 px-4 py-2.5 text-[0.8rem] md:px-6">
+          <span className="font-semibold">Showing:</span>
+          {scope.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => go({ [s.key]: null })}
+              className="inline-flex items-center gap-1 rounded-full border border-primary bg-card px-2.5 py-1 font-semibold"
+              aria-label={`Remove filter ${s.label}`}
+            >
+              {s.label} <Icon name="x" className="size-3.5" />
+            </button>
+          ))}
+        </div>
+      )}
       <div
         className="flex flex-wrap gap-2 border-b border-rule px-4 py-3 md:px-6"
         role="group"

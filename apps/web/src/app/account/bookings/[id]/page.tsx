@@ -86,8 +86,16 @@ export default async function TripPage({
           <h1 className="mt-1 font-display text-[clamp(2rem,3.6vw,2.8rem)] font-medium leading-tight">
             {b.productName}
           </h1>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <BookingStatusBadge status={b.status} />
+            {b.product.slug && (
+              <Link
+                href={`/${b.productType === "HOTEL" ? "stays" : "tours"}/${b.product.slug}`}
+                className="text-[0.88rem] font-semibold text-primary-ink"
+              >
+                View the {b.productType === "HOTEL" ? "property" : "tour"} →
+              </Link>
+            )}
           </div>
         </div>
 

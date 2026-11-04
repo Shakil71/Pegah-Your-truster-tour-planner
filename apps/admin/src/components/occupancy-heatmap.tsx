@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { sequentialPrimary } from "@pegah/design-tokens";
 
@@ -13,10 +14,13 @@ function colorFor(v: number) {
 export function OccupancyHeatmap({
   properties,
   grid,
+  hrefs,
   days,
 }: {
   properties: string[];
   grid: (number | null)[][];
+  /** Optional link per property (e.g. its catalog page). */
+  hrefs?: string[];
   days: string[];
 }) {
   const [hover, setHover] = useState<{ p: number; d: number } | null>(null);
@@ -65,7 +69,13 @@ export function OccupancyHeatmap({
             {properties.map((name, p) => (
               <tr key={name}>
                 <th scope="row" className="truncate pr-3 text-left text-[0.8rem] font-medium">
-                  {name}
+                  {hrefs?.[p] ? (
+                    <Link href={hrefs[p]} className="hover:underline">
+                      {name}
+                    </Link>
+                  ) : (
+                    name
+                  )}
                 </th>
                 {days.map((d, di) => {
                   const v = grid[p]?.[di] ?? null;

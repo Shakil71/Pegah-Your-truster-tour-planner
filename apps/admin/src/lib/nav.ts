@@ -19,19 +19,40 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     title: "Operations",
     items: [
       { href: "/bookings", label: "Bookings", icon: "ticket", permission: "booking:read" },
-      { href: "/customers", label: "Customers", icon: "users", phase: "Phase 6" },
-      { href: "/inventory", label: "Hotel inventory", icon: "building", phase: "Phase 6" },
-      { href: "/tours", label: "Tours", icon: "route", phase: "Phase 6" },
+      { href: "/customers", label: "Customers", icon: "users", permission: "customer:read" },
       { href: "/payments", label: "Payments", icon: "card", permission: "payment:read" },
-      { href: "/refunds", label: "Refunds", icon: "refund", phase: "Phase 5" },
+      { href: "/refunds", label: "Refunds", icon: "refund", phase: "Phase 7" },
+    ],
+  },
+  {
+    title: "Catalog",
+    items: [
+      {
+        href: "/catalog/hotels",
+        label: "Hotels and rooms",
+        icon: "building",
+        permission: "catalog:read",
+      },
+      {
+        href: "/catalog/tours",
+        label: "Tours and departures",
+        icon: "route",
+        permission: "catalog:read",
+      },
+      {
+        href: "/catalog/destinations",
+        label: "Destinations",
+        icon: "pin",
+        permission: "catalog:read",
+      },
     ],
   },
   {
     title: "Growth",
     items: [
-      { href: "/promotions", label: "Promotions", icon: "tag", phase: "Phase 6" },
-      { href: "/content", label: "Content", icon: "layout", phase: "Phase 6" },
-      { href: "/reports", label: "Reports", icon: "chart", phase: "Phase 6" },
+      { href: "/promotions", label: "Promotions", icon: "tag", phase: "Phase 7" },
+      { href: "/content", label: "Content", icon: "layout", phase: "Phase 7" },
+      { href: "/reports", label: "Reports", icon: "chart", phase: "Phase 7" },
     ],
   },
   {
@@ -46,7 +67,7 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { href: "/staff", label: "Staff and roles", icon: "key", permission: "user:manage" },
       { href: "/audit", label: "Audit log", icon: "log", permission: "audit:read" },
-      { href: "/settings", label: "Settings", icon: "settings", phase: "Phase 6" },
+      { href: "/settings", label: "Settings", icon: "settings", phase: "Phase 7" },
     ],
   },
 ];

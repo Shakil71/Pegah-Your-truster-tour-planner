@@ -127,6 +127,11 @@ export function createFakeDb(): FakeDb {
           items: [],
           guests: [],
           payments: [],
+          user: {
+            publicId: "01JBX00000000000000000CSTM",
+            fullName: "Test Traveller",
+            email: "traveller@pegah.test",
+          },
         };
       },
       findMany: async ({ where, take }: { where: Record<string, unknown>; take: number }) =>

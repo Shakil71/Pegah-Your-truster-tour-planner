@@ -33,6 +33,9 @@ export class BookingQueryService {
         { contactEmail: { startsWith: query.q.toLowerCase() } },
       ];
     }
+    if (query.customerId) where.user = { publicId: query.customerId };
+    if (query.hotel) where.items = { some: { hotelRoom: { hotel: { slug: query.hotel } } } };
+    if (query.tour) where.items = { some: { tourSchedule: { tour: { slug: query.tour } } } };
     return this.page(where, query.cursor, query.limit);
   }
 
@@ -55,12 +58,20 @@ export class BookingQueryService {
       where: { publicId, ...(ownerUserId !== undefined ? { userId: ownerUserId } : {}) },
       include: {
         history: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
-        items: { orderBy: { id: "asc" } },
+        items: {
+          orderBy: { id: "asc" },
+          include: {
+            hotelRoom: { select: { hotel: { select: { slug: true } } } },
+            tourSchedule: { select: { publicId: true, tour: { select: { slug: true } } } },
+          },
+        },
+        user: { select: { publicId: true, fullName: true, email: true } },
         guests: { orderBy: [{ isLead: "desc" }, { id: "asc" }] },
         payments: { orderBy: { id: "desc" } },
       },
     });
     if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
+    const first = booking.items[0];
     return {
       ...toBookingSummary(booking),
       contactEmail: booking.contactEmail,
@@ -104,6 +115,16 @@ export class BookingQueryService {
         booking.status === "PENDING_PAYMENT" &&
         booking.holdExpiresAt !== null &&
         booking.holdExpiresAt.getTime() - Date.now() > 60_000,
+      customer: {
+        id: booking.user.publicId,
+        fullName: booking.user.fullName,
+        email: booking.user.email,
+      },
+      product: {
+        type: booking.productType,
+        slug: first?.hotelRoom?.hotel.slug ?? first?.tourSchedule?.tour.slug ?? "",
+        departureId: first?.tourSchedule?.publicId ?? null,
+      },
     };
   }
 

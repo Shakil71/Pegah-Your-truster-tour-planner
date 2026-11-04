@@ -15,7 +15,7 @@ const FILTERS = [
   ["user.", "Operator CLI"],
 ] as const;
 
-type Search = { action?: string; cursor?: string };
+type Search = { action?: string; targetId?: string; cursor?: string };
 
 export default async function AuditPage({ searchParams }: { searchParams: Promise<Search> }) {
   const session = await requireStaff();
@@ -30,6 +30,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
       params: {
         query: {
           action: action || undefined,
+          targetId: sp.targetId?.slice(0, 40) || undefined,
           cursor: sp.cursor?.slice(0, 200) || undefined,
           limit: 50,
         },

@@ -54,7 +54,7 @@ export function Departures({ items }: { items: Departure[] }) {
                 <div className="min-w-0">
                   <div className="flex items-baseline justify-between gap-2">
                     <Link
-                      href="/bookings?productType=TOUR"
+                      href={`/catalog/tours/${d.tourSlug}`}
                       className="truncate text-[0.86rem] font-semibold hover:underline"
                     >
                       {d.tourTitle}

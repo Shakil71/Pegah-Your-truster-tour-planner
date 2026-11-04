@@ -65,6 +65,11 @@ export const AdminBookingListQuerySchema = z.object({
   status: BookingStatusSchema.optional(),
   productType: ProductTypeSchema.optional(),
   q: z.string().trim().max(80).optional(),
+  /** Bookings of one customer (public id). */
+  customerId: PublicIdSchema.optional(),
+  /** Bookings of one hotel or tour (slug). */
+  hotel: z.string().max(80).optional(),
+  tour: z.string().max(80).optional(),
   cursor: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(25),
 });
@@ -265,5 +270,13 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
   payments: z.array(PaymentViewSchema),
   /** True when online payment is enabled and this booking can be paid now. */
   canPay: z.boolean(),
+  /** The account that made the booking. */
+  customer: z.object({ id: PublicIdSchema, fullName: z.string(), email: z.string() }),
+  /** What was booked, for linking to the hotel/tour (and departure). */
+  product: z.object({
+    type: ProductTypeSchema,
+    slug: z.string(),
+    departureId: PublicIdSchema.nullable(),
+  }),
 });
 export type BookingDetail = z.infer<typeof BookingDetailSchema>;

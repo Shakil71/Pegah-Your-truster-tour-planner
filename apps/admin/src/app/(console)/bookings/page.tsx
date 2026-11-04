@@ -5,7 +5,17 @@ import { BookingsExplorer } from "./bookings-explorer";
 
 export const metadata: Metadata = { title: "Bookings" };
 
-type Search = { status?: string; productType?: string; q?: string; cursor?: string };
+type Search = {
+  status?: string;
+  productType?: string;
+  q?: string;
+  cursor?: string;
+  customerId?: string;
+  hotel?: string;
+  tour?: string;
+};
+const ULID = /^[0-9A-HJKMNP-TV-Z]{26}$/;
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export default async function BookingsPage({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
@@ -22,6 +32,9 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
           status,
           productType,
           q: sp.q?.slice(0, 80) || undefined,
+          customerId: sp.customerId && ULID.test(sp.customerId) ? sp.customerId : undefined,
+          hotel: sp.hotel && SLUG.test(sp.hotel) ? sp.hotel : undefined,
+          tour: sp.tour && SLUG.test(sp.tour) ? sp.tour : undefined,
           cursor: sp.cursor?.slice(0, 200) || undefined,
           limit: 25,
         },

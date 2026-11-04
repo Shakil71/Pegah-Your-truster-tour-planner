@@ -36,9 +36,44 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
           <StatusPill status={b.status} />
         </div>
         <p className="mt-1 text-ink-2">
-          {b.productName} · {b.productType === "HOTEL" ? "Stay" : "Tour"} · created{" "}
-          {dhakaDateTime(b.createdAt)}
+          {b.productType === "HOTEL" ? "Stay" : "Tour"} · created {dhakaDateTime(b.createdAt)}
         </p>
+        {/* Everything this booking touches, one click away. */}
+        <nav aria-label="Related" className="mt-3 flex flex-wrap gap-2">
+          {[
+            ...(session.user.permissions.includes("customer:read")
+              ? [
+                  {
+                    href: `/customers/${b.customer.id}`,
+                    icon: "user" as const,
+                    label: b.customer.fullName,
+                  },
+                ]
+              : []),
+            ...(b.product.slug && session.user.permissions.includes("catalog:read")
+              ? [
+                  {
+                    href: `/catalog/${b.productType === "HOTEL" ? "hotels" : "tours"}/${b.product.slug}`,
+                    icon: (b.productType === "HOTEL" ? "building" : "route") as
+                      | "building"
+                      | "route",
+                    label: b.productName,
+                  },
+                ]
+              : []),
+            ...(session.user.permissions.includes("audit:read")
+              ? [{ href: `/audit?targetId=${b.id}`, icon: "log" as const, label: "Audit trail" }]
+              : []),
+          ].map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className="inline-flex items-center gap-1.5 rounded-full border border-rule bg-card px-3 py-1.5 text-[0.8rem] font-semibold hover:border-ink"
+            >
+              <Icon name={l.icon} className="size-3.5" /> {l.label}
+            </Link>
+          ))}
+        </nav>
         {b.holdExpiresAt && (
           <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-warn-soft px-3 py-1.5 text-[0.82rem] font-semibold text-warn">
             <Icon name="clock" className="size-4" />

@@ -96,6 +96,25 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Operations admin (ADR-0023)
+
+| Method   | Path                                              | Permission                      | Purpose                                  |
+| -------- | ------------------------------------------------- | ------------------------------- | ---------------------------------------- |
+| GET/POST | /admin/destinations                               | catalog:read/manage             | List / create destinations               |
+| PUT      | /admin/destinations/{slug}                        | catalog:manage                  | Edit a destination                       |
+| GET/POST | /admin/hotels                                     | catalog:read/manage             | List / create hotels                     |
+| GET/PUT  | /admin/hotels/{slug}                              | catalog:read/manage             | Hotel with rooms / edit                  |
+| POST     | /admin/hotels/{slug}/rooms, PUT /admin/rooms/{id} | catalog:manage                  | Room types                               |
+| GET/PUT  | /admin/rooms/{id}/calendar                        | catalog:read / inventory:manage | Per-night inventory and rates; bulk edit |
+| GET/POST | /admin/tours                                      | catalog:read/manage             | List / create tours                      |
+| GET/PUT  | /admin/tours/{slug}                               | catalog:read/manage             | Tour with departures / edit              |
+| POST     | /admin/tours/{slug}/departures                    | inventory:manage                | Add a departure                          |
+| PATCH    | /admin/departures/{id}                            | inventory:manage                | Capacity, prices, close/reopen/cancel    |
+| GET      | /admin/customers, /admin/customers/{id}           | customer:read                   | Customers and their bookings             |
+
+`GET /admin/bookings` also filters by `customerId`, `hotel` and `tour`.
+Booking detail includes `customer` and `product` for linking.
+
 ## Payments (ADR-0022)
 
 | Method | Path                                 | Auth                | Purpose                                                   |

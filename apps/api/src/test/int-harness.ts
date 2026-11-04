@@ -11,7 +11,9 @@ import { createApp } from "../app.factory";
 import { newPublicId } from "../common/ids";
 import { addDays, dhakaToday } from "../common/time";
 import { loadConfig } from "../config/config";
+import { PasswordService } from "../auth/password.service";
 import { PRISMA } from "../prisma/prisma.service";
+import { ROLE_DEFAULTS } from "../rbac/role-defaults";
 
 export const ADMIN_URL = process.env.PEGAH_IT_DATABASE_URL;
 export const ORIGIN = "http://localhost:3000";
@@ -28,7 +30,7 @@ export interface Harness {
   roomId: string;
   departureId: string;
   call: (
-    method: "GET" | "POST" | "PATCH",
+    method: "GET" | "POST" | "PATCH" | "PUT",
     url: string,
     opts?: {
       session?: Session;
@@ -38,6 +40,10 @@ export interface Harness {
     },
   ) => ReturnType<NestFastifyApplication["inject"]>;
   register: (email: string) => Promise<Session>;
+  /** Creates a staff user with one system role and signs them in. */
+  staff: (
+    role: "owner" | "admin" | "operations" | "finance" | "content" | "support",
+  ) => Promise<Session>;
   close: () => Promise<void>;
 }
 
@@ -181,9 +187,53 @@ export async function createHarness(env: Record<string, string> = {}): Promise<H
     };
   };
 
+  for (const [key, def] of Object.entries(ROLE_DEFAULTS)) {
+    await db.role.create({
+      data: {
+        key,
+        name: def.name,
+        description: def.description,
+        isSystem: true,
+        permissions: {
+          create: def.permissions.map((p) => ({
+            permission: {
+              connectOrCreate: { where: { key: p }, create: { key: p, description: p } },
+            },
+          })),
+        },
+      },
+    });
+  }
+  const passwordHash = await app.get(PasswordService).hash("staff-password-123");
+  const staff: Harness["staff"] = async (role) => {
+    const email = `${role}-${randomBytes(3).toString("hex")}@pegah.test`;
+    const roleRow = await db.role.findUniqueOrThrow({ where: { key: role } });
+    await db.user.create({
+      data: {
+        publicId: newPublicId(),
+        email,
+        fullName: `${role} person`,
+        passwordHash,
+        kind: "STAFF",
+        roles: { create: [{ roleId: roleRow.id }] },
+      },
+    });
+    const res = await call("POST", "/staff/auth/login", {
+      body: { email, password: "staff-password-123" },
+    });
+    expect(res.statusCode).toBe(200);
+    const raw = res.headers["set-cookie"];
+    const list = (Array.isArray(raw) ? raw : [raw]) as string[];
+    return {
+      cookie: list.find((c) => c.startsWith("pg_staff_sid="))!.split(";")[0]!,
+      csrf: res.json().csrfToken as string,
+    };
+  };
+
   return {
     app,
     db,
+    staff,
     roomId: room.publicId,
     departureId: schedule.publicId,
     call,

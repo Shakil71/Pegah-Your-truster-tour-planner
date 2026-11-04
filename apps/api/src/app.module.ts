@@ -23,6 +23,9 @@ import {
 } from "./booking/booking.controllers";
 import { HoldExpiryService } from "./booking/hold-expiry.service";
 import { QuoteService } from "./booking/quote.service";
+import { CatalogAdminController } from "./catalog-admin/catalog-admin.controller";
+import { CatalogAdminService } from "./catalog-admin/catalog-admin.service";
+import { CustomerAdminService } from "./catalog-admin/customer-admin.service";
 import { CatalogController } from "./catalog/catalog.controller";
 import { CatalogService } from "./catalog/catalog.service";
 import { ProblemFilter } from "./common/problem";
@@ -72,6 +75,7 @@ export class AppModule {
         PaymentCallbacksController,
         SimulatorController,
         AdminPaymentsController,
+        CatalogAdminController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -93,6 +97,8 @@ export class AppModule {
         AuditQueryService,
         paymentProvider,
         PaymentService,
+        CatalogAdminService,
+        CustomerAdminService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },

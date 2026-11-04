@@ -4,6 +4,29 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 6 operations admin, modules connected (2026-11-04)
+
+- API (`/api/v1/admin`): destinations, hotels, room types, room calendar
+  (GET + bulk PUT with weekday rules), tours, departures (create, capacity,
+  prices, close/reopen/cancel), customers list and detail (ADR-0023).
+- Safety: inventory never below rooms held or sold; departure capacity never
+  below seats taken; departures with bookings cannot be cancelled; past dates
+  locked; every change audited.
+- Connections: booking detail gains `customer` and `product`; booking list
+  filters `customerId`, `hotel`, `tour`; hotel/tour lists show active bookings.
+- Admin: Catalog section (destinations, hotels and rooms, room calendar with
+  bulk editor, tours and departures), Customers, related-links bar on bookings,
+  removable scope chips, dashboard links to hotels and tours.
+- Web: trip page links back to the property or tour.
+- Tests: 5 MySQL integration suites for Phase 6; guard against duplicate DTO
+  class names; 42-step end-to-end smoke run.
+- `docs/ROADMAP.md`: one checklist for every phase and item.
+
+### Fixed
+
+- Admin and public DTO classes shared names (HotelDetailDto, TourDetailDto),
+  so one OpenAPI schema overwrote the other; admin DTOs are now prefixed.
+
 ### Added — Payment module, SSLCOMMERZ ready but switched off (2026-11-04)
 
 - `payments` and `payment_events` tables (additive migration

@@ -160,6 +160,7 @@ export default async function DashboardPage() {
           <OccupancyHeatmap
             properties={summary.occupancy.hotels.map((h) => h.name)}
             grid={summary.occupancy.hotels.map((h) => h.values)}
+            hrefs={summary.occupancy.hotels.map((h) => `/catalog/hotels/${h.slug}`)}
             days={dayLabels}
           />
         ) : (
