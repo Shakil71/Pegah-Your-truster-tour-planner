@@ -49,19 +49,19 @@ tests are the next step.
    sample data to the API (`packages/api-client` generated from
    `apps/api/openapi.json`).
 3. Phase 4: booking creation with inventory holds and idempotency keys.
-4. Server inspected 2026-11-04 (Oracle Linux 9.8, shared with another project; see DEPLOYMENT.md). Next: MySQL 8.4 install plan and sudo scope, both need owner approval.
-5. Self-hosted GitHub runner: not registered — the repository is public, so fork pull requests could run code on the server. Make the repo private (or use a deploy-only workflow on protected `main` with environment approval) first.
+4. Server bootstrap and CD prepared in `infra/` (ADR-0016). Owner runs the bootstrap once; then tag `v0.3.0` deploys automatically.
+5. No self-hosted runner: pull-based deploy agent instead, because the repository is public (ADR-0016).
 
 ## Blockers
 
-| Blocker                           | Blocks                                     | Owner                                 |
-| --------------------------------- | ------------------------------------------ | ------------------------------------- |
-| No local Redis                    | Redis-backed rate limits, worker (Phase 4) | Owner: approve portable Valkey or WSL |
-| MySQL 8.4 not installed on server | API deployment                             | Owner: approve install (needs sudo)   |
-| Root password exposed in chat     | Server security                            | Owner: rotate, disable root SSH       |
-| No flight supplier contract       | Flights                                    | Owner                                 |
-| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)              | Owner                                 |
-| Domain not chosen                 | TLS, email DNS, production cookie origin   | Owner                                 |
+| Blocker                           | Blocks                                     | Owner                                                                   |
+| --------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
+| No local Redis                    | Redis-backed rate limits, worker (Phase 4) | Owner: approve portable Valkey or WSL                                   |
+| Server bootstrap not run yet      | MySQL 8.4, services, first deploy          | Owner: run `sudo bash /home/pegah/pegah-infra/server/bootstrap-root.sh` |
+| Root password exposed in chat     | Server security                            | Owner: rotate, disable root SSH                                         |
+| No flight supplier contract       | Flights                                    | Owner                                                                   |
+| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)              | Owner                                                                   |
+| Domain not chosen                 | TLS, email DNS, production cookie origin   | Owner                                                                   |
 
 ## Known issues
 

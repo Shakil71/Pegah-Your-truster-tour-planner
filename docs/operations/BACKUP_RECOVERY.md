@@ -1,6 +1,11 @@
 # Backup and Recovery
 
-Status: **planned**. No backups are configured.
+Status: **daily logical backups implemented** (`infra/backup/mysql-backup.sh`,
+`pegah-backup.timer`, 03:00 Asia/Dhaka, 14 days, files
+`/databackup/mysql-backups/pegah-<UTC>.sql.gz` + `.sha256`). Weekly/monthly
+tiers, binlogs/PITR, off-host copies and restore drills below are still
+planned. **Risk:** `/databackup` is a partition of the same physical disk as
+the OS, so an off-host copy is required before real customer data exists.
 
 ## Layout
 

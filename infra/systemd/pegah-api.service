@@ -1,0 +1,28 @@
+[Unit]
+Description=Pegah API (NestJS on Fastify)
+After=network-online.target mysqld.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pegah
+Group=pegah
+WorkingDirectory=/opt/pegah/current/apps/api
+EnvironmentFile=/opt/pegah/shared/env/api.env
+ExecStart=/usr/bin/node --enable-source-maps dist/main.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

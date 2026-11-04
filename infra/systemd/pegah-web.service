@@ -1,0 +1,29 @@
+[Unit]
+Description=Pegah web (Next.js)
+After=network-online.target pegah-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pegah
+Group=pegah
+WorkingDirectory=/opt/pegah/current/apps/web
+EnvironmentFile=/opt/pegah/shared/env/web.env
+ExecStart=/usr/bin/node /opt/pegah/current/node_modules/next/dist/bin/next start --port 3100 --hostname 127.0.0.1
+Restart=on-failure
+RestartSec=5
+# Next.js writes its image cache under .next/cache inside the release.
+ReadWritePaths=/opt/pegah/releases
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

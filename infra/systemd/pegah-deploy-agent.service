@@ -1,0 +1,12 @@
+[Unit]
+Description=Pegah pull-based deploy agent (deploys new v* tags whose CI passed)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pegah
+Group=pegah
+ExecStart=/opt/pegah/bin/deploy-agent.sh
+TimeoutStartSec=40min
+# No NoNewPrivileges here: deploy.sh uses the narrow sudoers rule to restart units.

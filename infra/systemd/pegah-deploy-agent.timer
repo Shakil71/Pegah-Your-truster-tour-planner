@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for new Pegah release tags every 2 minutes
+
+[Timer]
+OnActiveSec=1min
+OnBootSec=2min
+OnUnitInactiveSec=2min
+
+[Install]
+WantedBy=timers.target

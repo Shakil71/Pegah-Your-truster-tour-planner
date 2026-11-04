@@ -153,3 +153,19 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Accepted for now:** registration answers 409 for an existing email
   (enumeration) until email verification exists; rate limits are in-memory
   per process until Redis arrives (ADR-0008).
+
+## ADR-0016 — Pull-based continuous deployment on a shared server
+
+- **Status:** Accepted (2026-11-04)
+- **Context:** The production host (Oracle Linux 9.8) is shared with another
+  project, sits on a private network, and the repository is public. A
+  self-hosted GitHub runner would expose the server to fork pull requests.
+- **Decision:** A systemd timer on the server (`pegah-deploy-agent`) polls for
+  `v*` tags and deploys a tag only after GitHub CI for that commit succeeded.
+  Pushing the tag is the manual production approval. Releases are atomic
+  symlink switches with automatic rollback on failed health checks.
+- **Isolation from the other tenant:** own ports (3100/3101/4100, public
+  :8180), own nginx site file, own MySQL server and users, own Unix user with
+  sudo limited to restarting Pegah units. Redis is not used until Phase 4.
+- **Revisit:** if the repository becomes private, a runner with a protected
+  `production` environment is an alternative.

@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the Pegah MySQL backup nightly at 03:00 Asia/Dhaka
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Asia/Dhaka
+Persistent=true
+RandomizedDelaySec=10m
+
+[Install]
+WantedBy=timers.target

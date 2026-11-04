@@ -122,14 +122,46 @@ First-time database steps (each needs explicit approval on the server):
    (password from a hidden prompt; never on the command line).
 4. Never run `seed:sample` in production (it refuses).
 
-## Release procedure (planned)
+## Server setup (infra/, ADR-0016)
 
-1. CI builds a release tarball on a tag.
-2. Manual approval on the protected `production` environment.
-3. Upload to a new `releases/` directory; run `prisma migrate deploy`.
-4. Switch the `current` symlink; restart Pegah units only.
-5. Health check `/api/v1/health/ready` and the homepage.
-6. On failure, switch the symlink back and restart.
+Everything that touches the server lives in `infra/`:
+
+| Path                             | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `infra/server/bootstrap-root.sh` | One-time, idempotent root setup run by the owner: MySQL 8.4 LTS (official EL9 repo) with datadir `/databackup/mysql-data` (SELinux `mysqld_db_t`), 127.0.0.1 only, MySQL root via `auth_socket` (no password exists); DB users `pegah_migrate` (DDL), `pegah_app` (DML), `pegah_backup` (read); env files in `/opt/pegah/shared/env` (0600); systemd units; nginx site on :8180; firewalld 8180/tcp; SELinux port label; sudoers |
+| `infra/systemd/`                 | `pegah-api` (4100), `pegah-web` (3100), `pegah-admin` (3101), `pegah-backup.timer` (03:00 Dhaka), `pegah-deploy-agent.timer` (every 2 min); all hardened (`ProtectSystem=strict`, `NoNewPrivileges`, …)                                                                                                                                                                                                                          |
+| `infra/nginx/pegah.conf`         | :8180 → web, `/api/` → API. Admin is not exposed (SSH tunnel only) until it has a login screen                                                                                                                                                                                                                                                                                                                                   |
+| `infra/sudoers/pegah-deploy`     | `pegah` may only `systemctl restart` the three Pegah units                                                                                                                                                                                                                                                                                                                                                                       |
+| `infra/deploy/deploy.sh`         | Clone tag → `npm ci` → build → `prisma migrate deploy` → `seed:rbac` → switch `current` → restart → health checks → automatic rollback on failure; keeps 5 releases                                                                                                                                                                                                                                                              |
+| `infra/deploy/deploy-agent.sh`   | Pull-based CD: deploys the newest `v*` tag once GitHub CI for that commit has succeeded                                                                                                                                                                                                                                                                                                                                          |
+| `infra/backup/mysql-backup.sh`   | Nightly `mysqldump --single-transaction`, gzip + sha256, 14-day retention                                                                                                                                                                                                                                                                                                                                                        |
+
+Owner runs once, after reading the script:
+
+```bash
+sudo bash /home/pegah/pegah-infra/server/bootstrap-root.sh
+```
+
+## Release procedure (CI/CD)
+
+1. Work merges to `develop`, then `main`; GitHub Actions CI runs on every push
+   (format, lint, typecheck, tests, build, OpenAPI drift).
+2. **Approval = tag.** The owner (or Claude with the owner's explicit approval)
+   pushes a semantic version tag on `main`, e.g. `v0.3.0`.
+3. Within 2 minutes `pegah-deploy-agent` sees the tag, checks that the CI job
+   for that exact commit succeeded, and runs `deploy.sh`. A failed CI marks the
+   tag as rejected; it is never deployed.
+4. Health checks: `/api/v1/health/ready`, web `/`, admin `/`. On failure the
+   previous release is restored automatically.
+5. History: `/opt/pegah/shared/state/deploy-history`; logs:
+   `journalctl -u pegah-deploy-agent`.
+
+Why pull-based (ADR-0016): the repository is public, so a self-hosted GitHub
+runner on this server would let fork pull requests attempt to run code on it;
+and the server sits on a private network GitHub cannot reach. The agent needs
+no inbound access, no runner token and no GitHub credentials.
+
+Manual deploy or redeploy: `/opt/pegah/bin/deploy.sh v0.3.0` as `pegah`.
 
 ## SELinux and firewall (require approval)
 

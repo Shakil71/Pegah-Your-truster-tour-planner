@@ -35,6 +35,9 @@ jobs:
       # No database in CI (no containers by policy): unit and HTTP-level tests
       # use an in-memory fake; prisma generate needs no connection.
 
+      - name: Infra shell scripts syntax
+        run: for f in infra/*/*.sh; do bash -n "$f"; done
+
       - name: Format
         run: npm run format:check
 
