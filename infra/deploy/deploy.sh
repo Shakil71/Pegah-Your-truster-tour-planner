@@ -101,7 +101,7 @@ restart_all
 
 if check http://127.0.0.1:4100/api/v1/health/ready &&
   check http://127.0.0.1:3100/ &&
-  check http://127.0.0.1:3101/; then
+  check http://127.0.0.1:3101/admin; then
   log "Healthy"
   gh_status success "Live: ${SHA:0:7} $(printf '%s' "$SUBJECT" | tr -d '"\\' | cut -c1-80)"
   echo "$SHA $REF $BUILT_AT $(( $(date +%s) - STARTED ))s $SUBJECT" >>"$STATE/deploy-history"

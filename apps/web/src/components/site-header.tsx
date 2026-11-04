@@ -21,12 +21,15 @@ export function SiteHeader() {
         solid ? "bg-card text-ink shadow-[0_1px_0_var(--pg-rule)]" : "text-white",
       )}
     >
-      <div className="mx-auto flex h-[72px] max-w-[1280px] items-center gap-8">
-        <Link href="/" aria-label="Pegah home" className="no-underline">
-          <Logo className="text-[1.8rem]" />
-        </Link>
+      {/* Three columns so the menu sits in the true centre, whatever the widths of the logo and actions. */}
+      <div className="mx-auto grid h-[72px] max-w-[1280px] grid-cols-[1fr_auto] items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
+        <div className="justify-self-start">
+          <Link href="/" aria-label="Pegah home" className="no-underline">
+            <Logo className="text-[1.8rem]" />
+          </Link>
+        </div>
         <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex gap-6 text-[0.94rem] font-medium">
+          <ul className="flex gap-8 text-[0.94rem] font-medium">
             {nav.map((item) => (
               <li key={item.href}>
                 <a
@@ -44,7 +47,7 @@ export function SiteHeader() {
             </li>
           </ul>
         </nav>
-        <div className="ml-auto flex items-center gap-4 text-sm">
+        <div className="flex items-center gap-4 justify-self-end text-sm">
           <span className="tabular hidden md:inline">৳ BDT · EN</span>
           <button
             type="button"

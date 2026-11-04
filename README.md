@@ -31,7 +31,7 @@ Requires Node.js ≥ 20.9 (CI uses 22).
 ```bash
 npm ci
 npm run dev:web     # http://localhost:3000
-npm run dev:admin   # http://localhost:3001
+npm run dev:admin   # http://localhost:3001/admin (also via http://localhost:3000/admin)
 ```
 
 The API needs MySQL 8.4. Copy `apps/api/.env.example` to `apps/api/.env`,
