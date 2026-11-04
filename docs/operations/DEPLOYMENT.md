@@ -172,3 +172,17 @@ Manual deploy or redeploy: `/opt/pegah/bin/deploy.sh v0.3.0` as `pegah`.
 - `setsebool -P httpd_can_network_connect 1` for Nginx upstreams.
 - File contexts for `/databackup/mysql-data` (`mysqld_db_t`).
 - firewalld: open 80/443 only.
+
+### Deployments visible on GitHub (optional)
+
+Create a fine-grained personal access token limited to this repository with
+only **Deployments: Read and write**, then on the server as `pegah`:
+
+```bash
+install -m 0600 /dev/null /opt/pegah/shared/env/github.env
+nano /opt/pegah/shared/env/github.env   # GITHUB_DEPLOY_TOKEN=github_pat_…
+```
+
+Each deploy then appears on GitHub under **Deployments → production**
+(in progress → active, or failed) with a link to the site. Without the file,
+deploys work exactly the same.

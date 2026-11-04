@@ -38,6 +38,36 @@ SHA="$(git -C "$RELEASE" rev-parse HEAD)"
 SUBJECT="$(git -C "$RELEASE" log -1 --format=%s)"
 log "Commit $SHA — $SUBJECT"
 
+# ── GitHub Deployments (optional) ─────────────────────────────────────────────
+# With a fine-grained token (this repo only, "Deployments: read and write")
+# in $ENV_DIR/github.env as GITHUB_DEPLOY_TOKEN=..., every deploy shows up in
+# GitHub under Deployments → production. Without it, deploys work the same.
+# The token is never printed.
+REPO_API="https://api.github.com/repos/Shakil71/Pegah-Your-truster-tour-planner"
+SITE_URL="http://27.147.147.228:8180"
+GITHUB_DEPLOY_TOKEN=""
+[[ -r "$ENV_DIR/github.env" ]] &&
+  GITHUB_DEPLOY_TOKEN="$(sed -nE 's/^GITHUB_DEPLOY_TOKEN=(.+)$/\1/p' "$ENV_DIR/github.env")"
+DEPLOYMENT_ID=""
+gh_post() { # path json → prints response; never fails the deploy
+  [[ -n "$GITHUB_DEPLOY_TOKEN" ]] || return 0
+  curl -fsS --max-time 15 -X POST \
+    -H "Authorization: Bearer $GITHUB_DEPLOY_TOKEN" \
+    -H "Accept: application/vnd.github+json" \
+    "$REPO_API/$1" -d "$2" 2>/dev/null || true
+}
+gh_status() { # state description
+  [[ -n "$DEPLOYMENT_ID" ]] || return 0
+  gh_post "deployments/$DEPLOYMENT_ID/statuses" \
+    "{\"state\":\"$1\",\"description\":\"$2\",\"environment\":\"production\",\"environment_url\":\"$SITE_URL\",\"auto_inactive\":true}" >/dev/null
+}
+DEPLOYMENT_ID="$(gh_post deployments \
+  "{\"ref\":\"$SHA\",\"environment\":\"production\",\"auto_merge\":false,\"required_contexts\":[],\"description\":\"Pull-based deploy on the Pegah server\"}" |
+  node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).id??"")}catch{console.log("")}})')"
+gh_status in_progress "Building ${SHA:0:7} on the server"
+# Any failure from here on is reported to GitHub before the script exits.
+trap 'code=$?; [[ $code -eq 0 ]] || gh_status failure "Deploy failed (exit $code); previous release kept"' EXIT
+
 cd "$RELEASE"
 BUILT_AT="$(date -u +%FT%TZ)"
 printf '{"commit":"%s","builtAt":"%s","ref":"%s"}\n' "$SHA" "$BUILT_AT" "$REF" >build-info.json
@@ -73,6 +103,7 @@ if check http://127.0.0.1:4100/api/v1/health/ready &&
   check http://127.0.0.1:3100/ &&
   check http://127.0.0.1:3101/; then
   log "Healthy"
+  gh_status success "Live: ${SHA:0:7} $(printf '%s' "$SUBJECT" | tr -d '"\\' | cut -c1-80)"
   echo "$SHA $REF $BUILT_AT $(( $(date +%s) - STARTED ))s $SUBJECT" >>"$STATE/deploy-history"
   echo "$SHA" >"$STATE/deployed-sha"
 else
