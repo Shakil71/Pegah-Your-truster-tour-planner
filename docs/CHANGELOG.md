@@ -4,6 +4,22 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 5 completion (2026-11-04)
+
+- Cancellation request → staff decision (refund capped at the amount paid,
+  sold inventory released) → finance marks refund paid → REFUNDED (ADR-0024).
+- Outbox dispatcher and email service (none / log / SMTP with TLS), templates
+  for hold, confirmation, cancellation, rejection and refund; email log per booking.
+- Password change (signs out other devices) and password reset (single-use,
+  30-minute, hashed token, no account probing).
+- Profile editing and saved travellers (suggested at checkout).
+- Voucher and tax invoice page for confirmed bookings; trip page shows
+  voucher, cancellation request and refunds.
+- Admin: cancellation decision form, refunds and emails on bookings, Refunds page.
+- Migration `20261106090000_phase5_completion` (refunds, traveller_profiles,
+  password_reset_tokens, email_messages).
+- Tests: 7 MySQL integration tests, template tests; 54-step smoke run.
+
 ### Added — Phase 6 operations admin, modules connected (2026-11-04)
 
 - API (`/api/v1/admin`): destinations, hotels, room types, room calendar

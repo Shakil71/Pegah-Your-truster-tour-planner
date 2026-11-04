@@ -188,6 +188,24 @@ Each deploy then appears on GitHub under **Deployments → production**
 (in progress → active, or failed) with a link to the site. Without the file,
 deploys work exactly the same.
 
+### Email (ADR-0024)
+
+Off until SMTP credentials exist (messages are recorded as SKIPPED and staff
+see them on each booking). To switch on, add to `/opt/pegah/shared/env/api.env`:
+
+```ini
+EMAIL_TRANSPORT=smtp
+EMAIL_FROM=Pegah <bookings@your-domain>
+SMTP_HOST=<provider host>
+SMTP_PORT=587
+SMTP_USER=<user>
+SMTP_PASSWORD=<password>
+PUBLIC_BASE_URL=https://<public host>
+```
+
+then `sudo -n /usr/bin/systemctl restart pegah-api.service`. Send from a domain
+with SPF and DKIM set up, or mail will land in spam.
+
 ### Online payments (ADR-0022)
 
 Switched off (`PAYMENT_PROVIDER` unset). To switch SSLCOMMERZ on, follow

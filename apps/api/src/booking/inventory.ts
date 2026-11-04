@@ -36,16 +36,18 @@ export async function lockTourSchedule(tx: Tx, scheduleId: bigint): Promise<void
 }
 
 /**
- * Releases every ACTIVE hold of a booking: decrements `held` on the locked
- * inventory/departure rows and marks the holds RELEASED. Idempotent — a
- * second call finds no ACTIVE holds and does nothing.
+ * Puts a booking's inventory back on sale: ACTIVE holds decrement `held`,
+ * CONVERTED holds (a confirmed booking being cancelled) decrement `sold`.
+ * Rows are locked first; holds become RELEASED. Idempotent — a second call
+ * finds nothing left to release.
  */
 export async function releaseActiveHolds(tx: Tx, bookingId: bigint, now: Date): Promise<number> {
   const holds = await tx.inventoryHold.findMany({
-    where: { bookingId, status: "ACTIVE" },
+    where: { bookingId, status: { in: ["ACTIVE", "CONVERTED"] } },
     orderBy: [{ stayDate: "asc" }, { id: "asc" }],
   });
   if (holds.length === 0) return 0;
+  const field = (h: { status: string }) => (h.status === "CONVERTED" ? "sold" : "held");
 
   const roomHolds = holds.filter((h) => h.hotelRoomId !== null && h.stayDate !== null);
   const roomIds = [...new Set(roomHolds.map((h) => h.hotelRoomId!))].sort((a, b) =>
@@ -60,7 +62,7 @@ export async function releaseActiveHolds(tx: Tx, bookingId: bigint, now: Date): 
   for (const h of roomHolds) {
     await tx.roomInventory.update({
       where: { roomId_stayDate: { roomId: h.hotelRoomId!, stayDate: h.stayDate! } },
-      data: { held: { decrement: h.quantity } },
+      data: { [field(h)]: { decrement: h.quantity } },
     });
   }
 
@@ -71,12 +73,12 @@ export async function releaseActiveHolds(tx: Tx, bookingId: bigint, now: Date): 
     await lockTourSchedule(tx, h.tourScheduleId!);
     await tx.tourSchedule.update({
       where: { id: h.tourScheduleId! },
-      data: { held: { decrement: h.quantity } },
+      data: { [field(h)]: { decrement: h.quantity } },
     });
   }
 
   const released = await tx.inventoryHold.updateMany({
-    where: { bookingId, status: "ACTIVE" },
+    where: { bookingId, status: { in: ["ACTIVE", "CONVERTED"] } },
     data: { status: "RELEASED", releasedAt: now },
   });
   return released.count;

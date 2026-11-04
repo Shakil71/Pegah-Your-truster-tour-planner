@@ -6,6 +6,7 @@ import { BookingStatusBadge } from "@/components/shop/booking-status";
 import { PageShell } from "@/components/shop/page-shell";
 import { requireCustomer, serverApi } from "@/lib/api-server";
 import { calendarDate, dhakaDateTime, money } from "@/lib/format";
+import { CancellationRequest } from "./cancellation-request";
 import { HoldPanel } from "./hold-panel";
 
 const PAYMENT_LABEL: Record<string, string> = {
@@ -35,6 +36,7 @@ export default async function TripPage({
   });
   if (response.status === 404 || !b) notFound();
   const sp = await searchParams;
+  const todayIso = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(new Date());
   const justHeld = sp.new === "1" && b.status === "PENDING_PAYMENT";
   // The banner follows the booking's real status, not just the query string.
   const paymentNote =
@@ -96,8 +98,50 @@ export default async function TripPage({
                 View the {b.productType === "HOTEL" ? "property" : "tour"} →
               </Link>
             )}
+            {(b.status === "CONFIRMED" || b.status === "COMPLETED") && (
+              <Link
+                href={`/account/bookings/${b.id}/voucher`}
+                className="rounded-full bg-primary px-4 py-1.5 text-[0.86rem] font-semibold text-on-primary"
+              >
+                Voucher and invoice
+              </Link>
+            )}
           </div>
         </div>
+
+        {b.status === "CONFIRMED" && b.startDate > todayIso && (
+          <CancellationRequest
+            bookingId={b.id}
+            policy={b.product.cancellationPolicy}
+            csrfToken={session.csrfToken}
+          />
+        )}
+        {b.status === "CANCELLATION_REQUESTED" && (
+          <p
+            role="status"
+            className="rounded-[14px] bg-warn-soft px-4 py-3 text-[0.95rem] text-warn"
+          >
+            We received your cancellation request. Our team will email you the decision. Your
+            booking stays valid until then.
+          </p>
+        )}
+        {b.refunds.length > 0 && (
+          <section className="panel p-5 md:p-6">
+            <h2 className="text-[1rem] font-semibold">Refunds</h2>
+            <ul className="mt-2 grid gap-1.5 text-[0.9rem]">
+              {b.refunds.map((r) => (
+                <li key={r.id} className="flex justify-between gap-3">
+                  <span>
+                    {r.status === "PAID"
+                      ? `Sent ${r.paidAt ? dhakaDateTime(r.paidAt) : ""}`
+                      : "Approved, being processed"}
+                  </span>
+                  <span className="tabular font-semibold">{money(r.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {paymentNote && (
           <p

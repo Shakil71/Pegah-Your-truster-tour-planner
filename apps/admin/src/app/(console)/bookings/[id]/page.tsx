@@ -6,6 +6,7 @@ import { PaymentPill } from "@/components/payment-pill";
 import { StatusPill, statusMeta } from "@/components/status-pill";
 import { requireStaff, serverApi } from "@/lib/api-server";
 import { calendarDate, dhakaDateTime, money } from "@/lib/format";
+import { CancellationDecision } from "./cancellation-decision";
 import { StatusChangeForm } from "./status-change-form";
 
 export const metadata: Metadata = { title: "Booking" };
@@ -237,6 +238,72 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
               </ul>
             )}
           </section>
+
+          {canChange && b.status === "CANCELLATION_REQUESTED" && (
+            <CancellationDecision
+              bookingId={b.id}
+              paid={{
+                amountMinor:
+                  b.payments
+                    .filter((p) => p.status === "SUCCEEDED")
+                    .reduce((a, p) => a + p.amount.amountMinor, 0) || b.total.amountMinor,
+                currency: b.total.currency,
+              }}
+              policy={b.product.cancellationPolicy}
+              csrfToken={session.csrfToken}
+            />
+          )}
+
+          {b.refunds.length > 0 && (
+            <section className="panel p-5 md:p-6" aria-labelledby="ref-h">
+              <h2 id="ref-h" className="text-[0.95rem] font-semibold">
+                Refunds
+              </h2>
+              <ul className="mt-3 grid gap-2 text-[0.86rem]">
+                {b.refunds.map((r) => (
+                  <li key={r.id} className="flex justify-between gap-3">
+                    <span>
+                      {r.status === "PAID"
+                        ? `Paid ${r.paidAt ? dhakaDateTime(r.paidAt) : ""} · ${r.providerRef ?? ""}`
+                        : "Pending (finance)"}
+                    </span>
+                    <span className="tabular font-semibold">{money(r.amount)}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/refunds"
+                className="mt-3 inline-block text-[0.82rem] font-semibold text-primary-ink hover:underline"
+              >
+                Open refunds
+              </Link>
+            </section>
+          )}
+
+          {b.emails && (
+            <section className="panel p-5 md:p-6" aria-labelledby="mail-h">
+              <h2 id="mail-h" className="text-[0.95rem] font-semibold">
+                Emails to the customer
+              </h2>
+              {b.emails.length === 0 ? (
+                <p className="mt-2 text-[0.86rem] text-ink-2">None yet.</p>
+              ) : (
+                <ul className="mt-3 grid gap-2 text-[0.82rem]">
+                  {b.emails.map((e, i) => (
+                    <li key={`${e.at}-${i}`}>
+                      <p className="font-semibold">{e.subject}</p>
+                      <p className="text-ink-3">
+                        {e.status === "SKIPPED"
+                          ? "not sent (email not configured)"
+                          : e.status.toLowerCase()}{" "}
+                        · {dhakaDateTime(e.at)}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
 
           {canChange && (
             <StatusChangeForm

@@ -25,17 +25,17 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Booking creation with row locks, idempotency, price revalidation, 15-minute holds.
 - ✅ Customer register / sign in / sign out, My trips, cancel unpaid hold, hold expiry.
 
-## Phase 5 — Payments, confirmation, documents 🔶
+## Phase 5 — Payments, confirmation, documents ✅ (switch-ons pending: SSLCOMMERZ, SMTP)
 
 - ✅ Payment module, provider port, simulator, server-side verification,
   confirmation with hold conversion, refund-required flagging, reconciliation.
 - ⛔ SSLCOMMERZ switched on — needs sandbox credentials
   (`operations/SSLCOMMERZ_INTEGRATION.md`).
-- ⬜ Booking voucher and invoice (printable pages for confirmed bookings).
-- ⬜ Cancellation request for confirmed bookings + staff decision + refund workflow.
-- ⬜ Password reset and email verification (needs an email sender).
-- ⬜ Transactional email (confirmation, payment, cancellation) via the outbox.
-- ⬜ Traveller profiles and account profile editing.
+- ✅ Booking voucher and invoice (printable, confirmed bookings only).
+- ✅ Cancellation request, staff decision, refund workflow (money returned in the provider panel).
+- ✅ Password reset and password change. ⬜ Email verification at sign-up.
+- ✅ Transactional email via the outbox. ⛔ Real sending needs SMTP credentials.
+- ✅ Traveller profiles and account profile editing.
 
 ## Phase 6 — Operations admin 🔶
 

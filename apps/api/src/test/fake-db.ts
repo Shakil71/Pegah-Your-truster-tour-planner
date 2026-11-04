@@ -127,6 +127,7 @@ export function createFakeDb(): FakeDb {
           items: [],
           guests: [],
           payments: [],
+          refunds: [],
           user: {
             publicId: "01JBX00000000000000000CSTM",
             fullName: "Test Traveller",

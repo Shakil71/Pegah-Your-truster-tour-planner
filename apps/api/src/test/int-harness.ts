@@ -30,7 +30,7 @@ export interface Harness {
   roomId: string;
   departureId: string;
   call: (
-    method: "GET" | "POST" | "PATCH" | "PUT",
+    method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE",
     url: string,
     opts?: {
       session?: Session;
@@ -76,6 +76,7 @@ export async function createHarness(env: Record<string, string> = {}): Promise<H
     SESSION_SECRET: randomBytes(32).toString("base64url"),
     APP_ORIGINS: ORIGIN,
     HOLD_SWEEP_SECONDS: "0",
+    OUTBOX_POLL_SECONDS: "0",
     ...env,
   });
   const app = await createApp({ config, quiet: true });

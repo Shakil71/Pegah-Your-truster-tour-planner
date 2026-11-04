@@ -184,7 +184,7 @@ describe.skipIf(!ADMIN_URL)("operations admin against MySQL 8.4", () => {
     // Booking detail links to the customer and the product.
     const detail = await h.call("GET", `/admin/bookings/${id}`, { session: ops });
     expect(detail.json().customer).toMatchObject({ email: "alice@example.com" });
-    expect(detail.json().product).toEqual({
+    expect(detail.json().product).toMatchObject({
       type: "HOTEL",
       slug: "ridge-cottages",
       departureId: null,
@@ -274,7 +274,7 @@ describe.skipIf(!ADMIN_URL)("operations admin against MySQL 8.4", () => {
     });
     expect(b.statusCode).toBe(201);
     const bookingDetail = await h.call("GET", `/admin/bookings/${b.json().id}`, { session: ops });
-    expect(bookingDetail.json().product).toEqual({
+    expect(bookingDetail.json().product).toMatchObject({
       type: "TOUR",
       slug: "sajek-sunrise-trip",
       departureId,

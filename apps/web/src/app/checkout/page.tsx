@@ -54,6 +54,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   }
 
   const q = quote?.data;
+  const saved = (await api.GET("/api/v1/me/travellers")).data?.items ?? [];
   const problem = quote?.error as { detail?: string } | undefined;
 
   return (
@@ -104,6 +105,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               adultCount={q.adults}
               childCount={q.children}
               csrfToken={session.csrfToken}
+              savedTravellers={saved.map((t) => ({ fullName: t.fullName, ageGroup: t.ageGroup }))}
               customer={{
                 name: session.user.fullName,
                 email: session.user.email,

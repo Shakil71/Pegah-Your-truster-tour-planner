@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -124,6 +125,14 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
           error={errors.password?.message}
           {...register("password")}
         />
+        {mode === "login" && (
+          <Link
+            href="/forgot-password"
+            className="justify-self-start text-[0.86rem] font-semibold text-primary-ink"
+          >
+            Forgot your password?
+          </Link>
+        )}
         {error && <FormAlert>{error}</FormAlert>}
         <button
           type="submit"

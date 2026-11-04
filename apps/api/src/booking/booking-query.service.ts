@@ -61,13 +61,29 @@ export class BookingQueryService {
         items: {
           orderBy: { id: "asc" },
           include: {
-            hotelRoom: { select: { hotel: { select: { slug: true } } } },
-            tourSchedule: { select: { publicId: true, tour: { select: { slug: true } } } },
+            hotelRoom: {
+              select: {
+                hotel: {
+                  select: {
+                    slug: true,
+                    addressLine: true,
+                    checkInTime: true,
+                    checkOutTime: true,
+                    cancellationPolicy: true,
+                  },
+                },
+              },
+            },
+            tourSchedule: {
+              select: { publicId: true, tour: { select: { slug: true, meetingPoint: true } } },
+            },
           },
         },
         user: { select: { publicId: true, fullName: true, email: true } },
         guests: { orderBy: [{ isLead: "desc" }, { id: "asc" }] },
         payments: { orderBy: { id: "desc" } },
+        refunds: { orderBy: { id: "desc" } },
+        ...(actor === "STAFF" ? { emails: { orderBy: { id: "desc" as const }, take: 30 } } : {}),
       },
     });
     if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
@@ -124,7 +140,40 @@ export class BookingQueryService {
         type: booking.productType,
         slug: first?.hotelRoom?.hotel.slug ?? first?.tourSchedule?.tour.slug ?? "",
         departureId: first?.tourSchedule?.publicId ?? null,
+        location:
+          first?.hotelRoom?.hotel.addressLine ?? first?.tourSchedule?.tour.meetingPoint ?? null,
+        checkInTime: first?.hotelRoom?.hotel.checkInTime ?? null,
+        checkOutTime: first?.hotelRoom?.hotel.checkOutTime ?? null,
+        cancellationPolicy: first?.hotelRoom?.hotel.cancellationPolicy ?? null,
       },
+      refunds: booking.refunds.map((r) => ({
+        id: r.publicId,
+        amount: toMoney(r.amountMinor, r.currency),
+        status: r.status,
+        reason: r.reason,
+        providerRef: r.providerRef,
+        createdAt: r.createdAt.toISOString(),
+        paidAt: r.paidAt?.toISOString() ?? null,
+      })),
+      ...("emails" in booking && Array.isArray(booking.emails)
+        ? {
+            emails: (
+              booking.emails as {
+                template: string;
+                toAddress: string;
+                subject: string;
+                status: "QUEUED" | "SENT" | "FAILED" | "SKIPPED";
+                createdAt: Date;
+              }[]
+            ).map((e) => ({
+              template: e.template,
+              to: e.toAddress,
+              subject: e.subject,
+              status: e.status,
+              at: e.createdAt.toISOString(),
+            })),
+          }
+        : {}),
     };
   }
 

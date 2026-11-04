@@ -74,6 +74,19 @@ export const EnvSchema = z.object({
     .default("non-physical-goods"),
   /** Extra hold time granted once, when the customer opens the payment page. */
   PAYMENT_HOLD_EXTENSION_MINUTES: z.coerce.number().int().min(0).max(60).default(20),
+
+  // ── Email (ADR-0024). Off by default: messages are recorded as SKIPPED.
+  /** none = record only; log = print recipient/subject (development); smtp = send. */
+  EMAIL_TRANSPORT: z.enum(["none", "log", "smtp"]).default("none"),
+  EMAIL_FROM: z.string().max(200).default("Pegah <no-reply@localhost>"),
+  SMTP_HOST: z.string().max(200).optional(),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
+  /** true = implicit TLS (465); false = STARTTLS on 587 (required, never plain). */
+  SMTP_SECURE: booleanString,
+  SMTP_USER: z.string().max(200).optional(),
+  SMTP_PASSWORD: z.string().max(200).optional(),
+  /** Outbox dispatcher interval in seconds; 0 disables it (tests). */
+  OUTBOX_POLL_SECONDS: z.coerce.number().int().min(0).max(3600).default(10),
 });
 
 export type AppConfig = z.infer<typeof EnvSchema>;
@@ -102,6 +115,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   }
   if (config.PAYMENT_PROVIDER !== "none" && !config.PUBLIC_BASE_URL) {
     throw new Error("PUBLIC_BASE_URL is required when PAYMENT_PROVIDER is set");
+  }
+  if (
+    config.EMAIL_TRANSPORT === "smtp" &&
+    (!config.SMTP_HOST || !config.SMTP_USER || !config.SMTP_PASSWORD)
+  ) {
+    throw new Error(
+      "SMTP_HOST, SMTP_USER and SMTP_PASSWORD are required when EMAIL_TRANSPORT=smtp",
+    );
   }
   if (config.PAYMENT_PROVIDER === "sslcommerz") {
     if (!config.SSLCOMMERZ_STORE_ID || !config.SSLCOMMERZ_STORE_PASSWORD) {

@@ -2,6 +2,13 @@ import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
+import {
+  AccountController,
+  AdminRefundsController,
+  PasswordResetController,
+} from "./account/account.controllers";
+import { AccountService } from "./account/account.service";
+import { CancellationService } from "./account/cancellation.service";
 import { AdminController } from "./admin/admin.controllers";
 import { AuditQueryService } from "./admin/audit-query.service";
 import { DashboardService } from "./admin/dashboard.service";
@@ -30,6 +37,8 @@ import { CatalogController } from "./catalog/catalog.controller";
 import { CatalogService } from "./catalog/catalog.service";
 import { ProblemFilter } from "./common/problem";
 import { APP_CONFIG, type AppConfig } from "./config/config";
+import { EmailService } from "./email/email.service";
+import { OutboxDispatcher } from "./email/outbox-dispatcher.service";
 import { HealthController } from "./health/health.controller";
 import { IdempotencyService } from "./idempotency/idempotency.service";
 import {
@@ -76,6 +85,9 @@ export class AppModule {
         SimulatorController,
         AdminPaymentsController,
         CatalogAdminController,
+        AccountController,
+        PasswordResetController,
+        AdminRefundsController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -99,6 +111,10 @@ export class AppModule {
         PaymentService,
         CatalogAdminService,
         CustomerAdminService,
+        EmailService,
+        OutboxDispatcher,
+        AccountService,
+        CancellationService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },

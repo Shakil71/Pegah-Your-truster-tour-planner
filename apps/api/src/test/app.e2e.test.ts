@@ -16,6 +16,7 @@ const config = loadConfig({
   APP_ORIGINS: "http://localhost:3000,http://localhost:3001",
   OPENAPI_ENABLED: "true",
   HOLD_SWEEP_SECONDS: "0",
+  OUTBOX_POLL_SECONDS: "0",
 });
 
 let app: NestFastifyApplication;

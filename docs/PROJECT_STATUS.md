@@ -17,6 +17,9 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Phase 5 completion: cancellations and refunds, email outbox (off until SMTP),
+  password reset/change, profile, saved travellers, vouchers (ADR-0024).
+
 - Phase 6 (core): catalog, inventory calendar, tours/departures, customers,
   and cross-module links in admin and web (ADR-0023). Remaining Phase 6 items
   (promotions, reports, content) are tracked in `docs/ROADMAP.md`.

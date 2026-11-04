@@ -96,6 +96,21 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Account, cancellations and refunds (ADR-0024)
+
+| Method     | Path                                       | Auth                           | Purpose                                  |
+| ---------- | ------------------------------------------ | ------------------------------ | ---------------------------------------- |
+| GET/PUT    | /me/profile                                | customer (+CSRF)               | Profile                                  |
+| POST       | /me/password                               | customer + CSRF                | Change password; signs out other devices |
+| GET/POST   | /me/travellers                             | customer (+CSRF)               | Saved travellers                         |
+| PUT/DELETE | /me/travellers/{id}                        | customer + CSRF                | Edit / remove a saved traveller          |
+| POST       | /me/bookings/{id}/cancellation-request     | customer + CSRF                | Ask to cancel a confirmed booking        |
+| POST       | /auth/password-reset/request               | public (5/min)                 | Always 202; emails a single-use link     |
+| POST       | /auth/password-reset/confirm               | public (10/min)                | Set a new password; revokes sessions     |
+| POST       | /admin/bookings/{id}/cancellation-decision | booking:override_status + CSRF | Approve (with refund) or reject          |
+| GET        | /admin/refunds                             | payment:read                   | Refunds to pay / paid                    |
+| POST       | /admin/refunds/{id}/paid                   | refund:approve + CSRF          | Record the provider/bank reference       |
+
 ## Operations admin (ADR-0023)
 
 | Method   | Path                                              | Permission                      | Purpose                                  |

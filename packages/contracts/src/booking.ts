@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BdPhoneSchema, EmailSchema } from "./auth";
+import { EmailLogItemSchema, RefundViewSchema } from "./account";
 import { PaymentViewSchema } from "./payment";
 import {
   CalendarDateSchema,
@@ -277,6 +278,14 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
     type: ProductTypeSchema,
     slug: z.string(),
     departureId: PublicIdSchema.nullable(),
+    /** Hotel address or tour meeting point (voucher). */
+    location: nullableText(255),
+    checkInTime: nullableText(5),
+    checkOutTime: nullableText(5),
+    cancellationPolicy: nullableText(500),
   }),
+  refunds: z.array(RefundViewSchema),
+  /** Transactional emails for this booking (staff views only). */
+  emails: z.array(EmailLogItemSchema).optional(),
 });
 export type BookingDetail = z.infer<typeof BookingDetailSchema>;

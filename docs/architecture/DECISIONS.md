@@ -373,3 +373,28 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
     class names, because Swagger silently merges same-named schemas.
 - **Consequence:** public catalog responses are browser-cached (search 30 s,
   pages up to 5 min), so edits appear on the website within that window.
+
+## ADR-0024 — Cancellations, refunds, email outbox, account self-service
+
+- **Status:** Accepted (2026-11-04)
+- **Cancellation and refunds:** customers request cancellation of a confirmed
+  booking before the start date (`CONFIRMED → CANCELLATION_REQUESTED`). Staff
+  approve (`→ CANCELLED`, sold inventory released, optional refund →
+  `REFUND_PENDING` + `refunds` row) or reject (`→ CONFIRMED`). The refund is
+  capped at what was paid. Finance (`refund:approve`) records the provider or
+  bank reference; the booking becomes `REFUNDED` when no refund is pending.
+  Money is returned outside Pegah (provider panel) until a refund API is wired.
+- **Email:** business transactions write `outbox_events`; a dispatcher in the
+  API process (`OUTBOX_POLL_SECONDS`, `FOR UPDATE SKIP LOCKED`, exponential
+  retry, max 5 attempts) renders templates and sends them. `EMAIL_TRANSPORT`
+  is `none` by default (recorded as SKIPPED), `log` for development, or
+  `smtp` (STARTTLS or implicit TLS only). Every message is logged in
+  `email_messages` without its body; staff see the log on each booking.
+- **Password reset:** single-use token, 30 minutes, only its SHA-256 stored,
+  sent directly (never written to the outbox), always `202` so accounts
+  cannot be probed; success revokes every session. Password change revokes
+  other sessions.
+- **Saved travellers:** names, age group, optional date of birth and
+  nationality; no identity documents. Offered as suggestions at checkout.
+- **Vouchers:** the voucher/invoice page renders only for CONFIRMED or
+  COMPLETED bookings.

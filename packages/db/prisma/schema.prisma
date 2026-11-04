@@ -42,10 +42,12 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.DateTime(3)
 
-  roles        UserRole[] @relation("UserRoles")
-  rolesGranted UserRole[] @relation("RoleGrants")
+  roles        UserRole[]           @relation("UserRoles")
+  rolesGranted UserRole[]           @relation("RoleGrants")
   sessions     Session[]
   bookings     Booking[]
+  travellers   TravellerProfile[]
+  resetTokens  PasswordResetToken[]
 
   @@map("users")
 }
@@ -390,12 +392,14 @@ model Booking {
   createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
-  user    User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
-  items   BookingItem[]
-  guests  BookingGuest[]
-  holds   InventoryHold[]
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items    BookingItem[]
+  guests   BookingGuest[]
+  holds    InventoryHold[]
   history  BookingStatusHistory[]
   payments Payment[]
+  refunds  Refund[]
+  emails   EmailMessage[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -583,6 +587,106 @@ model PaymentEvent {
   @@unique([provider, eventKey])
   @@index([paymentId])
   @@map("payment_events")
+}
+
+// ─── Refunds ─────────────────────────────────────────────────────────────────
+
+enum RefundStatus {
+  /// Approved by staff; money not returned yet.
+  PENDING
+  /// Returned to the customer (provider reference recorded).
+  PAID
+}
+
+/// Money owed back to a customer after an approved cancellation.
+/// CHECK (amount_minor > 0) is enforced in migration SQL.
+model Refund {
+  id           BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId     String       @unique @map("public_id") @db.Char(26)
+  bookingId    BigInt       @map("booking_id") @db.UnsignedBigInt
+  amountMinor  BigInt       @map("amount_minor")
+  currency     String       @default("BDT") @db.Char(3)
+  status       RefundStatus @default(PENDING)
+  reason       String       @db.VarChar(500)
+  /// Provider or bank reference recorded when the refund is paid.
+  providerRef  String?      @map("provider_ref") @db.VarChar(120)
+  approvedById BigInt       @map("approved_by_id") @db.UnsignedBigInt
+  paidById     BigInt?      @map("paid_by_id") @db.UnsignedBigInt
+  paidAt       DateTime?    @map("paid_at") @db.DateTime(3)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.DateTime(3)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+  @@index([status, createdAt])
+  @@map("refunds")
+}
+
+// ─── Customer profile ────────────────────────────────────────────────────────
+
+/// Saved travellers a customer can pick at checkout. No identity documents.
+model TravellerProfile {
+  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId    String        @unique @map("public_id") @db.Char(26)
+  userId      BigInt        @map("user_id") @db.UnsignedBigInt
+  fullName    String        @map("full_name") @db.VarChar(120)
+  ageGroup    GuestAgeGroup @default(ADULT) @map("age_group")
+  dateOfBirth DateTime?     @map("date_of_birth") @db.Date
+  nationality String?       @db.Char(2)
+  createdAt   DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("traveller_profiles")
+}
+
+/// Single-use password reset. Only the SHA-256 of the token is stored.
+model PasswordResetToken {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  userId    BigInt    @map("user_id") @db.UnsignedBigInt
+  expiresAt DateTime  @map("expires_at") @db.DateTime(3)
+  usedAt    DateTime? @map("used_at") @db.DateTime(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.DateTime(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// ─── Email ───────────────────────────────────────────────────────────────────
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+  /// No email transport configured: recorded but not sent.
+  SKIPPED
+}
+
+/// Every transactional email: what was sent to whom and the outcome.
+/// Bodies are not stored (they may contain links that act as credentials).
+model EmailMessage {
+  id         BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  bookingId  BigInt?     @map("booking_id") @db.UnsignedBigInt
+  toAddress  String      @map("to_address") @db.VarChar(254)
+  template   String      @db.VarChar(60)
+  subject    String      @db.VarChar(200)
+  status     EmailStatus @default(QUEUED)
+  providerId String?     @map("provider_id") @db.VarChar(200)
+  error      String?     @db.VarChar(500)
+  sentAt     DateTime?   @map("sent_at") @db.DateTime(3)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.DateTime(3)
+
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([status, createdAt])
+  @@map("email_messages")
 }
 
 // ─── Reliability ─────────────────────────────────────────────────────────────

@@ -42,6 +42,7 @@ export function CheckoutForm({
   adultCount: adults,
   childCount: children,
   csrfToken,
+  savedTravellers,
   customer,
 }: {
   request: Request;
@@ -49,6 +50,8 @@ export function CheckoutForm({
   adultCount: number;
   childCount: number;
   csrfToken: string;
+  /** Saved travellers offered as name suggestions. */
+  savedTravellers: { fullName: string; ageGroup: "ADULT" | "CHILD" }[];
   customer: { name: string; email: string; phone: string };
 }) {
   const router = useRouter();
@@ -154,11 +157,27 @@ export function CheckoutForm({
                   : `Child ${i - adults + 1}`
             }
             autoComplete={i === 0 ? "name" : "off"}
+            list={i < adults ? "saved-adults" : "saved-children"}
             error={errors.guests?.[i]?.fullName?.message}
             {...register(`guests.${i}.fullName` as const)}
           />
         ))}
       </section>
+
+      <datalist id="saved-adults">
+        {savedTravellers
+          .filter((t) => t.ageGroup === "ADULT")
+          .map((t) => (
+            <option key={t.fullName} value={t.fullName} />
+          ))}
+      </datalist>
+      <datalist id="saved-children">
+        {savedTravellers
+          .filter((t) => t.ageGroup === "CHILD")
+          .map((t) => (
+            <option key={t.fullName} value={t.fullName} />
+          ))}
+      </datalist>
 
       <label className="flex items-start gap-3 text-[0.9rem]">
         <input

@@ -139,6 +139,7 @@ describe.skipIf(!ADMIN_URL)("booking engine against MySQL 8.4", () => {
       SESSION_SECRET: randomBytes(32).toString("base64url"),
       APP_ORIGINS: ORIGIN,
       HOLD_SWEEP_SECONDS: "0",
+      OUTBOX_POLL_SECONDS: "0",
       BOOKING_HOLD_MINUTES: "15",
     });
     app = await createApp({ config, quiet: true });

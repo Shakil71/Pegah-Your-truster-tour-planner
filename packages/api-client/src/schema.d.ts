@@ -708,6 +708,166 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/profile": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AccountController_profile"];
+    put: operations["AccountController_updateProfile"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AccountController_changePassword"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/travellers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AccountController_travellers"];
+    put?: never;
+    post: operations["AccountController_addTraveller"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/travellers/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AccountController_updateTraveller"];
+    post?: never;
+    delete: operations["AccountController_deleteTraveller"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/bookings/{id}/cancellation-request": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AccountController_requestCancellation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/password-reset/request": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PasswordResetController_request"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/password-reset/confirm": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PasswordResetController_confirm"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/bookings/{id}/cancellation-decision": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminRefundsController_decide"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/refunds": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminRefundsController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/refunds/{id}/paid": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminRefundsController_markPaid"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1038,6 +1198,26 @@ export interface components {
       createdAt: string;
       succeededAt: string | null;
     };
+    Refund_Output: {
+      id: string;
+      amount: components["schemas"]["Money_Output"];
+      /** @enum {string} */
+      status: "PENDING" | "PAID";
+      reason: string;
+      providerRef: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      paidAt: string | null;
+    };
+    EmailLogItem_Output: {
+      template: string;
+      to: string;
+      subject: string;
+      /** @enum {string} */
+      status: "QUEUED" | "SENT" | "FAILED" | "SKIPPED";
+      /** Format: date-time */
+      at: string;
+    };
     BookingDetailDto_Output: {
       id: string;
       reference: string;
@@ -1101,7 +1281,13 @@ export interface components {
         type: "HOTEL" | "TOUR";
         slug: string;
         departureId: string | null;
+        location: string | null;
+        checkInTime: string | null;
+        checkOutTime: string | null;
+        cancellationPolicy: string | null;
       };
+      refunds: components["schemas"]["Refund_Output"][];
+      emails?: components["schemas"]["EmailLogItem_Output"][];
     };
     BookingStatusTransitionRequestDto: {
       /** @enum {string} */
@@ -1705,6 +1891,80 @@ export interface components {
       createdAt: string;
       lifetimeValue: components["schemas"]["Money_Output"];
       bookings: components["schemas"]["BookingSummary_Output"][];
+    };
+    ProfileDto_Output: {
+      id: string;
+      email: string;
+      fullName: string;
+      phone: string | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    UpdateProfileDto: {
+      fullName: string;
+      phone: string | null;
+    };
+    ChangePasswordDto: {
+      currentPassword: string;
+      newPassword: string;
+    };
+    Traveller_Output: {
+      fullName: string;
+      /** @enum {string} */
+      ageGroup: "ADULT" | "CHILD";
+      dateOfBirth: string | null;
+      nationality: string | null;
+      id: string;
+    };
+    TravellerListDto_Output: {
+      items: components["schemas"]["Traveller_Output"][];
+    };
+    TravellerInputDto: {
+      fullName: string;
+      /** @enum {string} */
+      ageGroup: "ADULT" | "CHILD";
+      dateOfBirth: string | null;
+      nationality: string | null;
+    };
+    TravellerResultDto_Output: {
+      traveller: components["schemas"]["Traveller_Output"];
+    };
+    CancellationRequestDto: {
+      reason: string;
+    };
+    PasswordResetRequestDto: {
+      email: string;
+    };
+    PasswordResetConfirmDto: {
+      token: string;
+      newPassword: string;
+    };
+    CancellationDecisionDto: {
+      approve: boolean;
+      refund?: components["schemas"]["Money"];
+      reason: string;
+      /** @constant */
+      expectedStatus: "CANCELLATION_REQUESTED";
+    };
+    AdminRefundListDto_Output: {
+      items: {
+        id: string;
+        amount: components["schemas"]["Money_Output"];
+        /** @enum {string} */
+        status: "PENDING" | "PAID";
+        reason: string;
+        providerRef: string | null;
+        /** Format: date-time */
+        createdAt: string;
+        paidAt: string | null;
+        bookingId: string;
+        bookingReference: string;
+        customerName: string;
+      }[];
+      nextCursor: string | null;
+    };
+    MarkRefundPaidDto: {
+      providerRef: string;
     };
   };
   responses: never;
@@ -2867,6 +3127,293 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AdminCustomerDetailDto_Output"];
         };
+      };
+    };
+  };
+  AccountController_profile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProfileDto_Output"];
+        };
+      };
+    };
+  };
+  AccountController_updateProfile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProfileDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProfileDto_Output"];
+        };
+      };
+    };
+  };
+  AccountController_changePassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChangePasswordDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AccountController_travellers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TravellerListDto_Output"];
+        };
+      };
+    };
+  };
+  AccountController_addTraveller: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TravellerInputDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TravellerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AccountController_updateTraveller: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TravellerInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TravellerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AccountController_deleteTraveller: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AccountController_requestCancellation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CancellationRequestDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingDetailDto_Output"];
+        };
+      };
+    };
+  };
+  PasswordResetController_request: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordResetRequestDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PasswordResetController_confirm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordResetConfirmDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminRefundsController_decide: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CancellationDecisionDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingDetailDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRefundsController_list: {
+    parameters: {
+      query?: {
+        status?: "PENDING" | "PAID";
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminRefundListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRefundsController_markPaid: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MarkRefundPaidDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

@@ -21,7 +21,7 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
       { href: "/bookings", label: "Bookings", icon: "ticket", permission: "booking:read" },
       { href: "/customers", label: "Customers", icon: "users", permission: "customer:read" },
       { href: "/payments", label: "Payments", icon: "card", permission: "payment:read" },
-      { href: "/refunds", label: "Refunds", icon: "refund", phase: "Phase 7" },
+      { href: "/refunds", label: "Refunds", icon: "refund", permission: "payment:read" },
     ],
   },
   {
