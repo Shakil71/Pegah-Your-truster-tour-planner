@@ -12,7 +12,7 @@ deployment will happen without explicit owner approval.
 | Access  | Non-root deploy user with SSH key (to be created by the owner)  |
 | Runtime | Native Node.js under systemd; Nginx; MySQL 8.4; Redis or Valkey |
 
-## Step 1 — read-only inspection (not yet done)
+## Step 1 — read-only inspection (done 2026-11-04, as non-root `pegah`)
 
 ```bash
 cat /etc/redhat-release; uname -r; nproc; free -h
@@ -25,7 +25,38 @@ dnf module list nodejs mysql redis 2>/dev/null; dnf repolist
 getenforce; firewall-cmd --list-all
 ```
 
-Record the output here before planning any installation.
+Results (key-based SSH as `pegah`, no sudo; firewall rules and sshd config
+were not readable without root):
+
+| Item                | Finding                                                                                                                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| OS                  | **Oracle Linux 9.8** (EL9, RHEL-compatible), UEK kernel 5.15                                                                                                                                     |
+| Hardware            | 15 vCPU, 38 GiB RAM, VMware guest                                                                                                                                                                |
+| Disks               | `/` 200 G (6 % used), `/var` 50 G, `/home` 20 G, `/tmp` 50 G; **`/databackup` = separate 50 G XFS partition (sda5), empty, root-owned**                                                          |
+| SELinux / firewalld | Enforcing / active                                                                                                                                                                               |
+| Node.js             | v22.23.2 (npm 10.9.8) already installed                                                                                                                                                          |
+| Redis               | 7.2.16 running on 127.0.0.1:6379 (shared)                                                                                                                                                        |
+| MySQL               | **Not installed**                                                                                                                                                                                |
+| Web server          | nginx running (ports 80, 8090)                                                                                                                                                                   |
+| Other tenants       | **Shared server:** another project (`Sellora-AI`) runs here with its own GitHub Actions runner service, PostgreSQL on 127.0.0.1:5432, an app on 127.0.0.1:3000 and something on **0.0.0.0:4000** |
+| Other listeners     | 22, 111 (rpcbind), 9090 (Cockpit), 4330/44321 (PCP), 631 (CUPS, local)                                                                                                                           |
+| Extras              | GNOME desktop (gdm) running; Podman installed (not used by Pegah)                                                                                                                                |
+
+Consequences for Pegah:
+
+- Ports 3000 and 4000 are taken. Pegah uses **web 127.0.0.1:3100, admin
+  127.0.0.1:3101, API 127.0.0.1:4100** behind nginx.
+- Redis is shared: Pegah gets its own ACL user and the `pg:` key prefix
+  (never `FLUSHALL`; never touch other keys).
+- MySQL 8.4 LTS must be installed (MySQL community EL9 repo or Oracle Linux
+  AppStream, decided after `dnf` checks with sudo), with its datadir on
+  `/databackup/mysql-data` and SELinux context `mysqld_db_t`. 50 G is ample
+  for slice 1; backups should eventually go to a different disk or host,
+  because a backup on the same physical disk does not survive disk loss.
+- Pending owner actions: rotate the root password (exposed in chat twice),
+  set `PermitRootLogin no` after confirming key access, lock or strengthen the
+  `pegah` password (key login is used; password was shared in chat), review
+  why something listens on 0.0.0.0:4000, consider disabling the GUI.
 
 ## Layout
 
@@ -42,9 +73,9 @@ Record the output here before planning any installation.
 
 | Unit                 | Listens        | Notes            |
 | -------------------- | -------------- | ---------------- |
-| pegah-web.service    | 127.0.0.1:3000 | Next.js          |
-| pegah-admin.service  | 127.0.0.1:3001 | Next.js          |
-| pegah-api.service    | 127.0.0.1:4000 | NestJS           |
+| pegah-web.service    | 127.0.0.1:3100 | Next.js          |
+| pegah-admin.service  | 127.0.0.1:3101 | Next.js          |
+| pegah-api.service    | 127.0.0.1:4100 | NestJS           |
 | pegah-worker.service | —              | BullMQ consumers |
 
 Hardening: `User=pegah`, `NoNewPrivileges=yes`, `ProtectSystem=strict`,

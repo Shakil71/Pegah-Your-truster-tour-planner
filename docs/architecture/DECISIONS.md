@@ -53,17 +53,18 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 
 ## ADR-0008 — Redis or Valkey depending on RHEL release
 
-- **Status:** Proposed
-- **Context:** RHEL 10 ships Valkey instead of Redis; BullMQ speaks the same protocol.
-- **Decision pending:** server RHEL version (see PROJECT_STATUS blockers).
+- **Status:** Accepted (2026-11-04)
+- **Context:** The server runs Oracle Linux 9.8 (EL9), where Redis 7.2 is the
+  distribution package and is already running for another tenant.
+- **Decision:** Use the existing Redis 7.2 with a dedicated ACL user for Pegah
+  and the `pg:` key prefix. Valkey is reconsidered on an EL10 upgrade
+  (protocol-compatible with BullMQ).
 
 ## ADR-0009 — Node.js version
 
-- **Status:** Proposed
-- **Decision pending:** newest LTS available on the target RHEL; pin in `.nvmrc` and `engines`.
-- **Interim:** `engines.node >=20.9.0` (Next.js minimum). CI uses Node 22. The
-  workstation has Node 26, which builds successfully but prints a Node
-  deprecation warning from Next.js (`module.register`).
+- **Status:** Accepted (2026-11-04)
+- **Decision:** Node.js 22 LTS — the server already has v22.23.2 and CI uses 22. `.nvmrc` pins 22 and `engines.node` is `>=22.12.0` (also Prisma 7's
+  floor). The workstation's Node 26 is fine for development.
 
 ## ADR-0010 — Primary colour #FF852F
 

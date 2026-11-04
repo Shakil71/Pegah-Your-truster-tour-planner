@@ -56,3 +56,6 @@ overrides, staff logins) write append-only `audit_events`.
   It was not used or stored. Owner advised to rotate it, disable root SSH login
   and switch to key-based access for a non-root deploy user. **Open** until
   the owner confirms rotation.
+- 2026-11-04 (later): the root password was shared in chat a second time with
+  a request to log in. It was not used or stored; key-based access for a
+  non-root `pegah` user was proposed instead. Still **open**.

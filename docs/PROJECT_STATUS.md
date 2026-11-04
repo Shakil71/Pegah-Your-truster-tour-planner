@@ -49,18 +49,19 @@ tests are the next step.
    sample data to the API (`packages/api-client` generated from
    `apps/api/openapi.json`).
 3. Phase 4: booking creation with inventory holds and idempotency keys.
-4. Owner runs the read-only server inspection (ADR-0008/0009).
+4. Server inspected 2026-11-04 (Oracle Linux 9.8, shared with another project; see DEPLOYMENT.md). Next: MySQL 8.4 install plan and sudo scope, both need owner approval.
+5. Self-hosted GitHub runner: not registered — the repository is public, so fork pull requests could run code on the server. Make the repo private (or use a deploy-only workflow on protected `main` with environment approval) first.
 
 ## Blockers
 
-| Blocker                           | Blocks                                        | Owner                                 |
-| --------------------------------- | --------------------------------------------- | ------------------------------------- |
-| No local Redis                    | Redis-backed rate limits, worker (Phase 4)    | Owner: approve portable Valkey or WSL |
-| RHEL version unknown              | Node/MySQL/Redis version lock (ADR-0008/0009) | Owner: run inspection                 |
-| Root password exposed in chat     | Server security                               | Owner: rotate, disable root SSH       |
-| No flight supplier contract       | Flights                                       | Owner                                 |
-| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)                 | Owner                                 |
-| Domain not chosen                 | TLS, email DNS, production cookie origin      | Owner                                 |
+| Blocker                           | Blocks                                     | Owner                                 |
+| --------------------------------- | ------------------------------------------ | ------------------------------------- |
+| No local Redis                    | Redis-backed rate limits, worker (Phase 4) | Owner: approve portable Valkey or WSL |
+| MySQL 8.4 not installed on server | API deployment                             | Owner: approve install (needs sudo)   |
+| Root password exposed in chat     | Server security                            | Owner: rotate, disable root SSH       |
+| No flight supplier contract       | Flights                                    | Owner                                 |
+| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)              | Owner                                 |
+| Domain not chosen                 | TLS, email DNS, production cookie origin   | Owner                                 |
 
 ## Known issues
 
