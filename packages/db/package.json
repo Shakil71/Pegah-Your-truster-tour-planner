@@ -18,7 +18,7 @@
   "scripts": {
     "generate": "prisma generate",
     "build": "prisma generate && tsc -p tsconfig.build.json",
-    "typecheck": "prisma generate && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",

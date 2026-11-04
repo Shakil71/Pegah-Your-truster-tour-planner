@@ -58,6 +58,10 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ### Fixed
 
+- CI race: `@pegah/db` build and typecheck both ran `prisma generate` in
+  parallel, so a typecheck could read a half-written client. Typecheck now
+  reuses the build output and turbo runs it after the build.
+
 - The OpenAPI document described nullable strings as arrays (since Phase 3);
   contracts now use `nullableText()` (ADR-0020).
 - The booking detail field `guests` (count) collided with the traveller list;
