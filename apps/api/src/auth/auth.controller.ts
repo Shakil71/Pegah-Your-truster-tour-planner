@@ -1,15 +1,18 @@
 import { Body, Controller, Get, HttpCode, Inject, Post, Req, Res } from "@nestjs/common";
 import { ApiCookieAuth, ApiTags } from "@nestjs/swagger";
 import { Throttle } from "@nestjs/throttler";
-import type { SessionKind, SessionResponse } from "@pegah/contracts";
+import { ChangePasswordSchema, type SessionKind, type SessionResponse } from "@pegah/contracts";
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { ZodResponse } from "nestjs-zod";
+import { createZodDto, ZodResponse } from "nestjs-zod";
+import { AccountService } from "../account/account.service";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { LoginRequestDto, RegisterRequestDto, SessionResponseDto } from "./auth.dto";
 import { AuthService, type IssuedSession } from "./auth.service";
 import type { AuthContext } from "./auth.types";
 import { CurrentAuth, Public, Staff } from "./decorators";
 import { SessionService, type SessionMeta } from "./session.service";
+
+class StaffChangePasswordDto extends createZodDto(ChangePasswordSchema) {}
 
 function sessionMeta(request: FastifyRequest): SessionMeta {
   const ua = request.headers["user-agent"];
@@ -116,8 +119,22 @@ export class StaffAuthController extends SessionCookieController {
     @Inject(AuthService) auth: AuthService,
     @Inject(SessionService) sessions: SessionService,
     @Inject(APP_CONFIG) config: AppConfig,
+    @Inject(AccountService) private readonly account: AccountService,
   ) {
     super(auth, sessions, config);
+  }
+
+  /** Staff change their own password; every other session of theirs is signed out. */
+  @ApiCookieAuth("staff")
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post("password")
+  @HttpCode(204)
+  async changePassword(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: StaffChangePasswordDto,
+    @Req() request: FastifyRequest,
+  ) {
+    await this.account.changePassword(auth, body, request.ip ?? null);
   }
 
   @Public()

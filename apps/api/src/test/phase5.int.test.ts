@@ -307,4 +307,32 @@ describe.skipIf(!ADMIN_URL)("Phase 5 completion against MySQL 8.4", () => {
       204,
     );
   });
+
+  it("lets staff change their own password and signs out their other sessions", async () => {
+    const other = await h.staff("support");
+    const me = await h.call("GET", "/staff/auth/session", { session: other });
+    const email = me.json().user.email as string;
+    const second = await h.call("POST", "/staff/auth/login", {
+      body: { email, password: "staff-password-123" },
+    });
+    const secondCookie = [second.headers["set-cookie"]]
+      .flat()
+      .map(String)
+      .find((c) => c.startsWith("pg_staff_sid="))!
+      .split(";")[0]!;
+    const changed = await h.call("POST", "/staff/auth/password", {
+      session: other,
+      body: { currentPassword: "staff-password-123", newPassword: "staff-new-passphrase" },
+    });
+    expect(changed.statusCode).toBe(204);
+    expect((await h.call("GET", "/staff/auth/session", { session: other })).statusCode).toBe(200);
+    expect(
+      (await h.call("GET", "/staff/auth/session", { headers: { cookie: secondCookie } }))
+        .statusCode,
+    ).toBe(401);
+    const relog = await h.call("POST", "/staff/auth/login", {
+      body: { email, password: "staff-new-passphrase" },
+    });
+    expect(relog.statusCode).toBe(200);
+  });
 });

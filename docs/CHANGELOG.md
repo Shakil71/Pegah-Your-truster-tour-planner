@@ -4,6 +4,11 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Staff password change (2026-11-04)
+
+- `POST /staff/auth/password` and an admin **My account** page (click your name
+  in the header). Changing the password signs out your other devices.
+
 ### Added — Phase 6 completion: promotions, reports, content (2026-11-04)
 
 - Promotions: admin CRUD, codes at checkout (server re-pricing), discount on the

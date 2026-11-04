@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Icon, cx } from "@pegah/ui";
@@ -81,7 +82,11 @@ export function AdminShell({ children, today }: { children: ReactNode; today: st
             </form>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-[0.84rem] text-ink-2 sm:inline">{today} · Dhaka</span>
-              <div className="flex items-center gap-2.5 rounded-full border border-rule bg-card py-1 pl-1 pr-3.5">
+              <Link
+                href="/account"
+                aria-label="My account"
+                className="flex items-center gap-2.5 rounded-full border border-rule bg-card py-1 pl-1 pr-3.5 hover:border-ink"
+              >
                 <span className="grid size-9 place-items-center rounded-full bg-primary font-display text-[0.95rem] font-semibold text-on-primary">
                   {initials}
                 </span>
@@ -91,7 +96,7 @@ export function AdminShell({ children, today }: { children: ReactNode; today: st
                     {user.roles.map((r) => ROLE_LABELS[r] ?? r).join(", ")}
                   </span>
                 </span>
-              </div>
+              </Link>
               <button
                 type="button"
                 onClick={signOut}

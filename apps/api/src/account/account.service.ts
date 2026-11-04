@@ -88,7 +88,7 @@ export class AccountService {
       });
       await this.audit.record(
         {
-          actorType: "CUSTOMER",
+          actorType: auth.kind === "STAFF" ? "STAFF" : "CUSTOMER",
           actorUserId: user.id,
           action: "account.password_changed",
           targetType: "user",

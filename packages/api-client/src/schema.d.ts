@@ -100,6 +100,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/staff/auth/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["StaffAuthController_changePassword"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/staff/auth/login": {
     parameters: {
       query?: never;
@@ -1034,6 +1050,10 @@ export interface components {
     LoginRequestDto: {
       email: string;
       password: string;
+    };
+    StaffChangePasswordDto: {
+      currentPassword: string;
+      newPassword: string;
     };
     DestinationSummary_Output: {
       slug: string;
@@ -2379,6 +2399,27 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["SessionResponseDto_Output"];
         };
+      };
+    };
+  };
+  StaffAuthController_changePassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StaffChangePasswordDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

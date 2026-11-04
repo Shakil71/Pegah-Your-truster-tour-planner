@@ -138,6 +138,33 @@
         "tags": ["auth"]
       }
     },
+    "/api/v1/staff/auth/password": {
+      "post": {
+        "operationId": "StaffAuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["staff-auth"]
+      }
+    },
     "/api/v1/staff/auth/login": {
       "post": {
         "operationId": "StaffAuthController_login",
@@ -2939,6 +2966,22 @@
           }
         },
         "required": ["email", "password"]
+      },
+      "StaffChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": ["currentPassword", "newPassword"]
       },
       "DestinationSummary_Output": {
         "type": "object",
