@@ -15,12 +15,12 @@ export function PageShell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Honest pre-launch notice shown wherever a booking could be made. */
+/** Honest booking notice shown wherever a booking could be made. True whether payment is live or not. */
 export function PaymentNotice() {
   return (
     <p className="rounded-[14px] border border-dashed border-primary/60 bg-primary-soft px-4 py-3 text-[0.86rem] text-ink">
-      <b>Pre-launch:</b> you can hold a room or seat for 15 minutes, but online payment opens in the
-      next release. A held booking is <b>not confirmed</b> and is released automatically if unpaid.
+      <b>How holding works:</b> we keep the room or seats for you for 15 minutes. A booking is{" "}
+      <b>confirmed only after your payment is verified</b>; unpaid holds are released automatically.
     </p>
   );
 }

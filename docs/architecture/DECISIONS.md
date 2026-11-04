@@ -321,3 +321,31 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Safety:** payment is not live, so demo bookings stop at `PENDING_PAYMENT`
   and expire; nothing can be confirmed.
 - **Revisit:** run `--remove` before launch (tracked in PROJECT_STATUS).
+
+## ADR-0022 — Payment module with a provider port; SSLCOMMERZ built but switched off
+
+- **Status:** Accepted (2026-11-04)
+- **Context:** The owner has no SSLCOMMERZ account yet and wants everything
+  ready so it can be switched on later. CLAUDE.md forbids unverified supplier
+  integrations in use, fake confirmations, raw card data, and holding a
+  transaction across an external call.
+- **Decision:**
+  - `payments` and `payment_events` tables (additive migration). A
+    `PaymentProvider` port with adapters for SSLCOMMERZ (v4 hosted checkout)
+    and a simulator. `PAYMENT_PROVIDER=none` is the default everywhere.
+  - Every outcome is verified server-to-server (validation API by `val_id`,
+    or lookup by `tran_id`) and must match the booking's amount and currency
+    in integer paisa. Only then does the state machine move the booking
+    `PENDING_PAYMENT → PAYMENT_PROCESSING → CONFIRMED`, converting held
+    inventory to sold in the same transaction.
+  - Risky or mismatched payments go to `MANUAL_REVIEW`; payments arriving
+    after the booking left `PENDING_PAYMENT` become `REFUND_REQUIRED`.
+  - The hold sweeper reconciles open payments with the provider before
+    expiring a booking. The first payment attempt extends the hold once
+    (`PAYMENT_HOLD_EXTENSION_MINUTES`, 20).
+  - The simulator is refused when `NODE_ENV=production`; live SSLCOMMERZ is
+    refused without `SSLCOMMERZ_LIVE_APPROVED=true`.
+- **Verification status:** the SSLCOMMERZ adapter is unit-tested against the
+  documented request/response shapes only. It must pass the sandbox checklist
+  in `docs/operations/SSLCOMMERZ_INTEGRATION.md` before customers use it.
+- **Revisit:** refunds through the API, confirmation emails via the worker.

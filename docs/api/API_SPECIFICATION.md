@@ -1,6 +1,6 @@
 # API Specification
 
-Status: **implemented through Phase 4** (payments are Phase 5). The generated OpenAPI document is
+Status: **implemented through Phase 4, plus the payment module** (switched off until a provider is configured, ADR-0022). The generated OpenAPI document is
 authoritative: `apps/api/openapi.json` (committed, drift-checked in CI) and
 `GET /api/v1/docs/openapi.json` when `OPENAPI_ENABLED=true` (never in
 production). This file summarises conventions and the endpoint inventory.
@@ -96,10 +96,23 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
-## Planned (Phase 5)
+## Payments (ADR-0022)
 
-| Method | Path                           | Purpose                   |
-| ------ | ------------------------------ | ------------------------- |
-| POST   | /bookings/{id}/payment-session | Start hosted payment      |
-| POST   | /webhooks/payments/sslcommerz  | Verified payment callback |
-| POST   | /bookings/{id}/cancellation    | Request cancellation      |
+| Method | Path                                 | Auth                | Purpose                                                   |
+| ------ | ------------------------------------ | ------------------- | --------------------------------------------------------- |
+| POST   | /me/bookings/{id}/payment-session    | customer + CSRF     | Open a hosted payment page; returns `redirectUrl`         |
+| POST   | /payments/sslcommerz/ipn             | provider (verified) | IPN; always 200 once recorded                             |
+| POST   | /payments/sslcommerz/return/{result} | provider (verified) | Browser return; 303 to `/account/bookings/{id}?payment=…` |
+| GET    | /admin/payments                      | `payment:read`      | Payment attempts, newest first                            |
+
+Callbacks are excluded from the OpenAPI document. They carry no session or
+CSRF token (cross-site form POSTs); authenticity comes from re-verifying every
+outcome with the provider server-to-server. `503 payments-unavailable` while
+`PAYMENT_PROVIDER=none`. Switch-on guide: `docs/operations/SSLCOMMERZ_INTEGRATION.md`.
+
+## Planned
+
+| Method | Path                        | Purpose              |
+| ------ | --------------------------- | -------------------- |
+| POST   | /admin/payments/{id}/refund | Refund via the API   |
+| POST   | /bookings/{id}/cancellation | Request cancellation |

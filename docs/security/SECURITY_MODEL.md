@@ -71,3 +71,14 @@ overrides, staff logins) write append-only `audit_events`.
   and cancel only their own bookings (others return 404).
 - Sign-in requires HTTPS (Secure `__Host-` cookies). The pre-launch server uses
   a self-signed certificate on :8443 (ADR-0019); no setting was weakened.
+
+## Payments (ADR-0022)
+
+- Hosted payment pages only; Pegah never sees card numbers. Callback payloads
+  are stored as a whitelist of fields (no card data).
+- Callbacks are untrusted input: every outcome is re-verified with the provider
+  server-to-server and must match the booking amount and currency exactly.
+- The store password lives only in `api.env` (0600), is redacted from request
+  logs and never included in error messages.
+- The development simulator cannot be enabled in production; live mode needs
+  `SSLCOMMERZ_LIVE_APPROVED=true`.

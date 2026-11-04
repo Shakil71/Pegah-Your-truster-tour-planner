@@ -3,6 +3,7 @@ import type { AdminBookingListQuery, BookingDetail, BookingSummary } from "@pega
 import type { Prisma } from "@pegah/db";
 import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
+import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { allowedTransitions, type BookingActor } from "./booking-state-machine";
 import { decodeCursor, encodeCursor, toBookingSummary } from "./booking.mappers";
@@ -15,7 +16,10 @@ export interface BookingPage {
 
 @Injectable()
 export class BookingQueryService {
-  constructor(@Inject(PRISMA) private readonly db: Db) {}
+  constructor(
+    @Inject(PRISMA) private readonly db: Db,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
+  ) {}
 
   /** Staff listing. Callers must hold booking:read (checked by the guard). */
   async listAll(query: AdminBookingListQuery): Promise<BookingPage> {
@@ -53,6 +57,7 @@ export class BookingQueryService {
         history: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
         items: { orderBy: { id: "asc" } },
         guests: { orderBy: [{ isLead: "desc" }, { id: "asc" }] },
+        payments: { orderBy: { id: "desc" } },
       },
     });
     if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
@@ -84,6 +89,21 @@ export class BookingQueryService {
         at: h.createdAt.toISOString(),
       })),
       allowedTransitions: allowedTransitions(booking.status, actor),
+      payments: booking.payments.map((p) => ({
+        id: p.publicId,
+        provider: p.provider,
+        status: p.status,
+        amount: toMoney(p.amountMinor, p.currency),
+        method: p.method,
+        failureReason: p.failureReason,
+        createdAt: p.createdAt.toISOString(),
+        succeededAt: p.succeededAt?.toISOString() ?? null,
+      })),
+      canPay:
+        this.config.PAYMENT_PROVIDER !== "none" &&
+        booking.status === "PENDING_PAYMENT" &&
+        booking.holdExpiresAt !== null &&
+        booking.holdExpiresAt.getTime() - Date.now() > 60_000,
     };
   }
 

@@ -58,6 +58,22 @@ export const EnvSchema = z.object({
   BOOKING_HOLD_MINUTES: z.coerce.number().int().min(5).max(60).default(15),
   /** Interval of the hold-expiry sweeper in seconds; 0 disables it (tests). */
   HOLD_SWEEP_SECONDS: z.coerce.number().int().min(0).max(3600).default(60),
+
+  // ── Payments (ADR-0022). Off by default; see docs/operations/SSLCOMMERZ_INTEGRATION.md.
+  /** none = online payment disabled; simulator = local/test only (refused in production). */
+  PAYMENT_PROVIDER: z.enum(["none", "sslcommerz", "simulator"]).default("none"),
+  /** Customer-facing origin for payment return URLs, e.g. https://pegah.example. */
+  PUBLIC_BASE_URL: z.url().optional(),
+  SSLCOMMERZ_STORE_ID: z.string().min(1).max(64).optional(),
+  SSLCOMMERZ_STORE_PASSWORD: z.string().min(1).max(128).optional(),
+  SSLCOMMERZ_MODE: z.enum(["sandbox", "live"]).default("sandbox"),
+  /** Set to true only after the sandbox checklist passed and the owner approved going live. */
+  SSLCOMMERZ_LIVE_APPROVED: booleanString,
+  SSLCOMMERZ_PRODUCT_PROFILE: z
+    .enum(["general", "non-physical-goods", "travel-vertical"])
+    .default("non-physical-goods"),
+  /** Extra hold time granted once, when the customer opens the payment page. */
+  PAYMENT_HOLD_EXTENSION_MINUTES: z.coerce.number().int().min(0).max(60).default(20),
 });
 
 export type AppConfig = z.infer<typeof EnvSchema>;
@@ -77,6 +93,25 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (config.NODE_ENV === "production") {
     if (!config.COOKIE_SECURE) throw new Error("COOKIE_SECURE must be true in production");
     if (config.OPENAPI_ENABLED) throw new Error("OPENAPI_ENABLED must be false in production");
+    if (config.PAYMENT_PROVIDER === "simulator") {
+      throw new Error("PAYMENT_PROVIDER=simulator is for development and tests only");
+    }
+    if (config.PAYMENT_PROVIDER !== "none" && !config.PUBLIC_BASE_URL?.startsWith("https://")) {
+      throw new Error("PUBLIC_BASE_URL must be an https:// URL when payments are enabled");
+    }
+  }
+  if (config.PAYMENT_PROVIDER !== "none" && !config.PUBLIC_BASE_URL) {
+    throw new Error("PUBLIC_BASE_URL is required when PAYMENT_PROVIDER is set");
+  }
+  if (config.PAYMENT_PROVIDER === "sslcommerz") {
+    if (!config.SSLCOMMERZ_STORE_ID || !config.SSLCOMMERZ_STORE_PASSWORD) {
+      throw new Error("SSLCOMMERZ_STORE_ID and SSLCOMMERZ_STORE_PASSWORD are required");
+    }
+    if (config.SSLCOMMERZ_MODE === "live" && !config.SSLCOMMERZ_LIVE_APPROVED) {
+      throw new Error(
+        "SSLCOMMERZ_MODE=live requires SSLCOMMERZ_LIVE_APPROVED=true (owner approval)",
+      );
+    }
   }
   return config;
 }

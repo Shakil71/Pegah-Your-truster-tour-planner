@@ -188,6 +188,11 @@ Each deploy then appears on GitHub under **Deployments → production**
 (in progress → active, or failed) with a link to the site. Without the file,
 deploys work exactly the same.
 
+### Online payments (ADR-0022)
+
+Switched off (`PAYMENT_PROVIDER` unset). To switch SSLCOMMERZ on, follow
+[SSLCOMMERZ_INTEGRATION.md](SSLCOMMERZ_INTEGRATION.md).
+
 ### HTTPS (ADR-0019) — run once
 
 Sign-in cookies are `Secure`, so the site must be served over HTTPS. As root:

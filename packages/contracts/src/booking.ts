@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BdPhoneSchema, EmailSchema } from "./auth";
+import { PaymentViewSchema } from "./payment";
 import {
   CalendarDateSchema,
   InstantSchema,
@@ -260,5 +261,9 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
   travellers: z.array(BookingGuestViewSchema),
   history: z.array(BookingStatusChangeSchema),
   allowedTransitions: z.array(BookingStatusSchema),
+  /** Payment attempts, newest first. */
+  payments: z.array(PaymentViewSchema),
+  /** True when online payment is enabled and this booking can be paid now. */
+  canPay: z.boolean(),
 });
 export type BookingDetail = z.infer<typeof BookingDetailSchema>;

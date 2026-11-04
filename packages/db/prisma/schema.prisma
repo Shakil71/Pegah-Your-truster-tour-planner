@@ -394,7 +394,8 @@ model Booking {
   items   BookingItem[]
   guests  BookingGuest[]
   holds   InventoryHold[]
-  history BookingStatusHistory[]
+  history  BookingStatusHistory[]
+  payments Payment[]
 
   @@index([userId, createdAt])
   @@index([status, createdAt])
@@ -507,6 +508,81 @@ model BookingStatusHistory {
 
   @@index([bookingId, createdAt])
   @@map("booking_status_history")
+}
+
+// ─── Payments ────────────────────────────────────────────────────────────────
+
+enum PaymentStatus {
+  /// Row created; the provider session has not been opened yet.
+  INITIATED
+  /// Customer sent to the provider's hosted page; outcome unknown.
+  PENDING
+  /// Verified with the provider (server-to-server); amount and currency matched.
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  /// Verified paid, but the booking could not be confirmed (hold expired,
+  /// cancelled, amount mismatch): staff must refund or resolve it.
+  REFUND_REQUIRED
+}
+
+/// One attempt to pay for a booking through a hosted payment page. No card
+/// data is ever stored: only provider references and outcomes.
+/// CHECK (amount_minor > 0) is enforced in migration SQL.
+model Payment {
+  id              BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId        String        @unique @map("public_id") @db.Char(26)
+  bookingId       BigInt        @map("booking_id") @db.UnsignedBigInt
+  provider        String        @db.VarChar(30)
+  /// Our transaction id sent to the provider (SSLCOMMERZ tran_id).
+  providerTxnId   String        @map("provider_txn_id") @db.VarChar(64)
+  providerSession String?       @map("provider_session") @db.VarChar(128)
+  /// Provider validation id (SSLCOMMERZ val_id) once known.
+  providerValId   String?       @map("provider_val_id") @db.VarChar(64)
+  bankTxnId       String?       @map("bank_txn_id") @db.VarChar(80)
+  amountMinor     BigInt        @map("amount_minor")
+  currency        String        @default("BDT") @db.Char(3)
+  status          PaymentStatus @default(INITIATED)
+  failureReason   String?       @map("failure_reason") @db.VarChar(255)
+  /// Provider risk flag (SSLCOMMERZ risk_level); non-zero sends the booking to review.
+  riskLevel       Int?          @map("risk_level") @db.UnsignedTinyInt
+  /// Card scheme or wallet name only (e.g. VISA, bKash), never card numbers.
+  method          String?       @db.VarChar(60)
+  succeededAt     DateTime?     @map("succeeded_at") @db.DateTime(3)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  booking Booking        @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  events  PaymentEvent[]
+
+  @@unique([provider, providerTxnId])
+  @@index([bookingId])
+  @@index([status, createdAt])
+  @@map("payments")
+}
+
+/// Every callback received from a provider (IPN, browser return), stored
+/// before processing and de-duplicated by (provider, event_key).
+model PaymentEvent {
+  id          BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  paymentId   BigInt?   @map("payment_id") @db.UnsignedBigInt
+  provider    String    @db.VarChar(30)
+  /// Provider event identity, e.g. "ipn:<val_id>:<status>".
+  eventKey    String    @map("event_key") @db.VarChar(160)
+  kind        String    @db.VarChar(40)
+  /// Whitelisted fields only (no card numbers, no secrets).
+  payload     Json
+  /// Signature check result (null when the provider sent no signature).
+  signatureOk Boolean?  @map("signature_ok")
+  processedAt DateTime? @map("processed_at") @db.DateTime(3)
+  outcome     String?   @db.VarChar(80)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.DateTime(3)
+
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@unique([provider, eventKey])
+  @@index([paymentId])
+  @@map("payment_events")
 }
 
 // ─── Reliability ─────────────────────────────────────────────────────────────

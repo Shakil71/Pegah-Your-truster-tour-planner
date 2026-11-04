@@ -43,4 +43,41 @@ describe("loadConfig", () => {
       loadConfig({ ...base, NODE_ENV: "production", COOKIE_SECURE: "true" }).COOKIE_SECURE,
     ).toBe(true);
   });
+
+  it("keeps payments off by default and guards every way of turning them on", () => {
+    expect(loadConfig({ ...base }).PAYMENT_PROVIDER).toBe("none");
+    const prod = { ...base, NODE_ENV: "production", COOKIE_SECURE: "true" };
+    expect(() => loadConfig({ ...prod, PAYMENT_PROVIDER: "simulator" })).toThrow(/simulator/);
+    expect(() =>
+      loadConfig({
+        ...prod,
+        PAYMENT_PROVIDER: "sslcommerz",
+        PUBLIC_BASE_URL: "http://plain.example",
+        SSLCOMMERZ_STORE_ID: "x",
+        SSLCOMMERZ_STORE_PASSWORD: "y",
+      }),
+    ).toThrow(/https/);
+    expect(() =>
+      loadConfig({ ...base, PAYMENT_PROVIDER: "sslcommerz", PUBLIC_BASE_URL: "https://a.example" }),
+    ).toThrow(/STORE_ID/);
+    expect(() =>
+      loadConfig({
+        ...base,
+        PAYMENT_PROVIDER: "sslcommerz",
+        PUBLIC_BASE_URL: "https://a.example",
+        SSLCOMMERZ_STORE_ID: "x",
+        SSLCOMMERZ_STORE_PASSWORD: "y",
+        SSLCOMMERZ_MODE: "live",
+      }),
+    ).toThrow(/LIVE_APPROVED/);
+    expect(
+      loadConfig({
+        ...base,
+        PAYMENT_PROVIDER: "sslcommerz",
+        PUBLIC_BASE_URL: "https://a.example",
+        SSLCOMMERZ_STORE_ID: "x",
+        SSLCOMMERZ_STORE_PASSWORD: "y",
+      }).SSLCOMMERZ_MODE,
+    ).toBe("sandbox");
+  });
 });

@@ -4,7 +4,7 @@ import { AuditService } from "../audit/audit.service";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { canTransition, type BookingActor } from "./booking-state-machine";
-import { releaseActiveHolds, type Tx } from "./inventory";
+import { convertActiveHolds, releaseActiveHolds, type Tx } from "./inventory";
 
 export interface TransitionCommand {
   bookingPublicId: string;
@@ -18,7 +18,12 @@ export interface TransitionCommand {
 }
 
 /** Statuses that end a booking without a sale: any held inventory goes back on sale. */
-const RELEASES_HOLDS: ReadonlySet<BookingStatus> = new Set(["EXPIRED", "CANCELLED", "FAILED"]);
+const RELEASES_HOLDS: ReadonlySet<BookingStatus> = new Set([
+  "EXPIRED",
+  "CANCELLED",
+  "FAILED",
+  "REFUND_PENDING",
+]);
 
 /**
  * The only code path that changes an existing booking's status. It validates
@@ -70,7 +75,7 @@ export class BookingStatusService {
       where: { id: booking.id, status: from },
       data: {
         status: cmd.to,
-        ...(RELEASES_HOLDS.has(cmd.to) ? { holdExpiresAt: null } : {}),
+        ...(RELEASES_HOLDS.has(cmd.to) || cmd.to === "CONFIRMED" ? { holdExpiresAt: null } : {}),
       },
     });
     if (updated.count !== 1) {
@@ -89,8 +94,10 @@ export class BookingStatusService {
     });
 
     const released = RELEASES_HOLDS.has(cmd.to) ? await releaseActiveHolds(tx, booking.id, now) : 0;
+    // A confirmed booking owns its inventory: held units become sold.
+    const converted = cmd.to === "CONFIRMED" ? await convertActiveHolds(tx, booking.id) : 0;
 
-    if (cmd.actor.type === "STAFF" || cmd.actor.type === "CUSTOMER") {
+    if (cmd.actor.type !== "SYSTEM") {
       await this.audit.record(
         {
           actorType: cmd.actor.type,
@@ -99,7 +106,13 @@ export class BookingStatusService {
           targetType: "booking",
           targetId: cmd.bookingPublicId,
           ipAddress: cmd.ipAddress ?? null,
-          metadata: { from, to: cmd.to, reason: cmd.reason, holdsReleased: released },
+          metadata: {
+            from,
+            to: cmd.to,
+            reason: cmd.reason,
+            holdsReleased: released,
+            holdsConverted: converted,
+          },
         },
         tx,
       );

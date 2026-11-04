@@ -116,7 +116,7 @@ jobs:
         run: npm run build -w @pegah/db
 
       - name: Integration tests
-        run: npx vitest run apps/api/src/test/booking.int.test.ts
+        run: npx vitest run apps/api/src/test/ --exclude "**/app.e2e.test.ts"
 
       - name: MySQL error log
         if: failure()

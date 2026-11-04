@@ -29,6 +29,14 @@ import { ProblemFilter } from "./common/problem";
 import { APP_CONFIG, type AppConfig } from "./config/config";
 import { HealthController } from "./health/health.controller";
 import { IdempotencyService } from "./idempotency/idempotency.service";
+import {
+  AdminPaymentsController,
+  MyPaymentsController,
+  PaymentCallbacksController,
+  SimulatorController,
+} from "./payments/payment.controllers";
+import { PaymentService } from "./payments/payment.service";
+import { paymentProvider } from "./payments/provider.factory";
 import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
 
 export interface AppModuleOptions {
@@ -60,6 +68,10 @@ export class AppModule {
         BookingsController,
         QuotesController,
         AdminController,
+        MyPaymentsController,
+        PaymentCallbacksController,
+        SimulatorController,
+        AdminPaymentsController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -79,6 +91,8 @@ export class AppModule {
         DashboardService,
         StaffService,
         AuditQueryService,
+        paymentProvider,
+        PaymentService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },

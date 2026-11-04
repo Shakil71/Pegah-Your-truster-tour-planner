@@ -8,7 +8,12 @@ _Last updated: 2026-11-04_
 on live API data behind staff sign-in. Customers can search stays and tours,
 see server-computed prices, sign in, and hold a room or seats for 15 minutes
 with an idempotent, lock-protected booking. Payment is Phase 5, so no booking
-can become CONFIRMED yet, and the UI says so everywhere.
+can become CONFIRMED until a payment provider is switched on.
+
+**Payment module (Phase 5 foundation) is built and switched off.** SSLCOMMERZ
+is implemented behind a provider port and verified with a simulator end to
+end; it needs sandbox credentials and the checklist in
+`docs/operations/SSLCOMMERZ_INTEGRATION.md` before use (ADR-0022).
 
 ## Completed
 
@@ -31,6 +36,10 @@ can become CONFIRMED yet, and the UI says so everywhere.
   - Web: stay results, property page, tours, departure picker, checkout,
     sign in / create account, My trips with hold countdown and cancel.
   - Demo catalog seed, labelled and removable (ADR-0021).
+- Phase 5 foundation: payments/payment_events tables, provider port,
+  SSLCOMMERZ adapter (unverified, off), simulator, server-side verification,
+  confirmation with hold conversion, refund-required flagging, reconciliation,
+  Pay now / Payments UI (ADR-0022).
 - Infra: pull-based CD from `main` (ADR-0016/0017); HTTPS script for :8443
   (ADR-0019); the deploy agent requires both CI jobs to pass.
 
@@ -41,8 +50,9 @@ can become CONFIRMED yet, and the UI says so everywhere.
 2. **Owner:** create your own staff account on the server
    (`staff:create`, command in DEPLOYMENT.md). The password is typed into a
    hidden prompt and never shared in chat.
-3. Phase 5: SSLCOMMERZ sandbox payment (blocked on sandbox credentials),
-   webhook verification, confirmation, vouchers and email.
+3. Switch on SSLCOMMERZ when credentials exist: follow
+   `docs/operations/SSLCOMMERZ_INTEGRATION.md` (sandbox checklist first).
+   Then: refunds via API, vouchers and confirmation email.
 4. Move the hold sweeper and outbox to `apps/worker` once Redis/Valkey exists
    for Pegah (ADR-0018).
 5. Browser automation: Playwright + axe in CI for the booking flow.

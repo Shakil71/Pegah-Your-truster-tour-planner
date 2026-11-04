@@ -468,6 +468,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/bookings/{id}/payment-session": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyPaymentsController_start"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/payments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminPaymentsController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -786,6 +818,18 @@ export interface components {
       /** Format: date-time */
       at: string;
     };
+    Payment_Output: {
+      id: string;
+      provider: string;
+      /** @enum {string} */
+      status: "INITIATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELLED" | "REFUND_REQUIRED";
+      amount: components["schemas"]["Money_Output"];
+      method: string | null;
+      failureReason: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      succeededAt: string | null;
+    };
     BookingDetailDto_Output: {
       id: string;
       reference: string;
@@ -837,6 +881,8 @@ export interface components {
         | "REFUND_PENDING"
         | "REFUNDED"
       )[];
+      payments: components["schemas"]["Payment_Output"][];
+      canPay: boolean;
     };
     BookingStatusTransitionRequestDto: {
       /** @enum {string} */
@@ -1096,6 +1142,34 @@ export interface components {
     };
     AuditListResponseDto_Output: {
       items: components["schemas"]["AuditEvent_Output"][];
+      nextCursor: string | null;
+    };
+    PaymentSessionResponseDto_Output: {
+      paymentId: string;
+      provider: string;
+      /** @enum {string} */
+      mode: "sandbox" | "live" | "simulator";
+      /** Format: uri */
+      redirectUrl: string;
+    };
+    AdminPaymentListResponseDto_Output: {
+      items: {
+        id: string;
+        provider: string;
+        /** @enum {string} */
+        status: "INITIATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELLED" | "REFUND_REQUIRED";
+        amount: components["schemas"]["Money_Output"];
+        method: string | null;
+        failureReason: string | null;
+        /** Format: date-time */
+        createdAt: string;
+        succeededAt: string | null;
+        bookingId: string;
+        bookingReference: string;
+        providerTxnId: string;
+        bankTxnId: string | null;
+        riskLevel: number | null;
+      }[];
       nextCursor: string | null;
     };
   };
@@ -1775,6 +1849,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AuditListResponseDto_Output"];
+        };
+      };
+    };
+  };
+  MyPaymentsController_start: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentSessionResponseDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPaymentsController_list: {
+    parameters: {
+      query?: {
+        status?: "INITIATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELLED" | "REFUND_REQUIRED";
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPaymentListResponseDto_Output"];
         };
       };
     };

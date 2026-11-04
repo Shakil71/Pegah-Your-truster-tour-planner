@@ -81,3 +81,40 @@ export async function releaseActiveHolds(tx: Tx, bookingId: bigint, now: Date): 
   });
   return released.count;
 }
+
+/**
+ * Turns every ACTIVE hold of a booking into a sale (held → sold) when it is
+ * confirmed. Same lock order as creation and release. Idempotent.
+ */
+export async function convertActiveHolds(tx: Tx, bookingId: bigint): Promise<number> {
+  const holds = await tx.inventoryHold.findMany({
+    where: { bookingId, status: "ACTIVE" },
+    orderBy: [{ stayDate: "asc" }, { id: "asc" }],
+  });
+  if (holds.length === 0) return 0;
+  for (const h of holds) {
+    if (h.hotelRoomId !== null && h.stayDate !== null) {
+      await lockRoomNights(
+        tx,
+        h.hotelRoomId,
+        h.stayDate,
+        new Date(h.stayDate.getTime() + 86_400_000),
+      );
+      await tx.roomInventory.update({
+        where: { roomId_stayDate: { roomId: h.hotelRoomId, stayDate: h.stayDate } },
+        data: { held: { decrement: h.quantity }, sold: { increment: h.quantity } },
+      });
+    } else if (h.tourScheduleId !== null) {
+      await lockTourSchedule(tx, h.tourScheduleId);
+      await tx.tourSchedule.update({
+        where: { id: h.tourScheduleId },
+        data: { held: { decrement: h.quantity }, sold: { increment: h.quantity } },
+      });
+    }
+  }
+  const converted = await tx.inventoryHold.updateMany({
+    where: { bookingId, status: "ACTIVE" },
+    data: { status: "CONVERTED" },
+  });
+  return converted.count;
+}

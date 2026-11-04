@@ -65,6 +65,8 @@ export async function createApp({
   });
 
   await app.register(fastifyCookie);
+  // Payment callbacks arrive as application/x-www-form-urlencoded; Nest's Fastify
+  // adapter already registers that parser.
   await app.register(fastifyHelmet, {
     // JSON API: nothing to render, so the strictest CSP is fine.
     contentSecurityPolicy: {

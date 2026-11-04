@@ -126,6 +126,7 @@ export function createFakeDb(): FakeDb {
           history: state.history.filter((h) => h.bookingId === b.id),
           items: [],
           guests: [],
+          payments: [],
         };
       },
       findMany: async ({ where, take }: { where: Record<string, unknown>; take: number }) =>

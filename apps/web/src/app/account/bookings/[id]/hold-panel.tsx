@@ -9,20 +9,24 @@ function remaining(until: string): number {
   return Math.max(0, Math.floor((Date.parse(until) - Date.now()) / 1000));
 }
 
-/** Countdown for a held booking, plus cancel. Payment arrives in the next release. */
+/** Countdown for a held booking, pay (when online payment is enabled) and cancel. */
 export function HoldPanel({
   bookingId,
   holdExpiresAt,
   csrfToken,
+  canPay,
 }: {
   bookingId: string;
   holdExpiresAt: string;
   csrfToken: string;
+  /** Server says online payment is enabled and this booking can be paid now. */
+  canPay: boolean;
 }) {
   const router = useRouter();
   // Server and client clocks differ by a few seconds; the text opts out of hydration checks.
   const [left, setLeft] = useState<number>(() => remaining(holdExpiresAt));
   const [busy, setBusy] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,6 +39,26 @@ export function HoldPanel({
     }, 1000);
     return () => clearInterval(t);
   }, [holdExpiresAt, router]);
+
+  async function pay() {
+    setPaying(true);
+    setError(null);
+    const {
+      data,
+      error: problem,
+      response,
+    } = await browserApi.POST("/api/v1/me/bookings/{id}/payment-session", {
+      params: { path: { id: bookingId } },
+      headers: csrf(csrfToken),
+    });
+    if (!response.ok || !data) {
+      setPaying(false);
+      setError(problemMessage(problem));
+      return;
+    }
+    // Card details are entered only on the provider's page, never on Pegah.
+    window.location.assign(data.redirectUrl);
+  }
 
   async function cancel() {
     if (!window.confirm("Cancel this hold and release the room or seats?")) return;
@@ -77,16 +101,20 @@ export function HoldPanel({
           <p className="mt-2 max-w-[48ch] text-white/75">
             {left === 0
               ? "The hold has ended. The room or seats go back on sale within a minute."
-              : "Online payment opens in the next release. Until then this hold is not a confirmed booking and is released automatically when the timer ends."}
+              : canPay
+                ? "Pay to confirm. Your card or wallet details are entered on the secure payment page, never on Pegah. Unpaid holds are released when the timer ends."
+                : "Online payment opens soon. Until then this hold is not a confirmed booking and is released automatically when the timer ends."}
           </p>
         </div>
         <div className="grid gap-2">
           <button
             type="button"
-            disabled
-            className="inline-flex h-11 items-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary opacity-50"
+            onClick={pay}
+            disabled={!canPay || paying || left === 0}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-50"
           >
-            <Icon name="card" className="size-[18px]" /> Pay now · coming soon
+            <Icon name="card" className="size-[18px]" />
+            {canPay ? (paying ? "Opening payment…" : "Pay now") : "Pay now · coming soon"}
           </button>
           <button
             type="button"

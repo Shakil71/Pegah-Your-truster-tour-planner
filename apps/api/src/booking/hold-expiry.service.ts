@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nest
 import { HttpException } from "@nestjs/common";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
+import { PaymentService } from "../payments/payment.service";
 import { BookingStatusService } from "./booking-status.service";
 
 const BATCH = 50;
@@ -21,6 +22,7 @@ export class HoldExpiryService implements OnModuleInit, OnModuleDestroy {
   constructor(
     @Inject(PRISMA) private readonly db: Db,
     @Inject(BookingStatusService) private readonly status: BookingStatusService,
+    @Inject(PaymentService) private readonly payments: PaymentService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -55,10 +57,13 @@ export class HoldExpiryService implements OnModuleInit, OnModuleDestroy {
       where: { status: "PENDING_PAYMENT", holdExpiresAt: { lte: now } },
       orderBy: { holdExpiresAt: "asc" },
       take: BATCH,
-      select: { publicId: true },
+      select: { id: true, publicId: true },
     });
     let expired = 0;
     for (const b of due) {
+      // A payment may have succeeded without its callback reaching us: ask the
+      // provider first, so a paid booking is confirmed instead of expired.
+      await this.payments.reconcileBooking(b.id, now);
       try {
         await this.status.transition(
           {

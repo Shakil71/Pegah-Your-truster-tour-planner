@@ -22,7 +22,7 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
       { href: "/customers", label: "Customers", icon: "users", phase: "Phase 6" },
       { href: "/inventory", label: "Hotel inventory", icon: "building", phase: "Phase 6" },
       { href: "/tours", label: "Tours", icon: "route", phase: "Phase 6" },
-      { href: "/payments", label: "Payments", icon: "card", phase: "Phase 5" },
+      { href: "/payments", label: "Payments", icon: "card", permission: "payment:read" },
       { href: "/refunds", label: "Refunds", icon: "refund", phase: "Phase 5" },
     ],
   },

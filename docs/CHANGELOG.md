@@ -4,6 +4,25 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Payment module, SSLCOMMERZ ready but switched off (2026-11-04)
+
+- `payments` and `payment_events` tables (additive migration
+  `20261105090000_payments`, CHECK amount > 0).
+- `PaymentProvider` port with an SSLCOMMERZ v4 adapter (session, validation,
+  lookup by `tran_id`, callback signature) and a development-only simulator.
+  `PAYMENT_PROVIDER=none` by default; live mode needs explicit approval (ADR-0022).
+- API: `POST /me/bookings/{id}/payment-session`, SSLCOMMERZ IPN and return
+  endpoints, `GET /admin/payments`; booking detail gains `payments` and `canPay`.
+- Verified payments confirm bookings through the state machine and turn held
+  inventory into sold; mismatches go to manual review; late payments are
+  flagged `REFUND_REQUIRED`; the hold sweeper reconciles before expiring.
+- Web: working "Pay now" when payments are enabled, payment result banner,
+  payment history. Admin: Payments page and payments on booking detail.
+- Tests: 9 adapter unit tests, config guards, a contract-convention guard, and
+  7 MySQL integration tests for the full payment flow.
+- `docs/operations/SSLCOMMERZ_INTEGRATION.md`: step-by-step switch-on guide
+  and sandbox checklist.
+
 ### Added — Phase 4 booking engine and customer flow (2026-11-04)
 
 - API: `POST /bookings` (hotel and tour) with an inventory hold, `Idempotency-Key`,

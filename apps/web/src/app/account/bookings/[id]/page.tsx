@@ -8,6 +8,15 @@ import { requireCustomer, serverApi } from "@/lib/api-server";
 import { calendarDate, dhakaDateTime, money } from "@/lib/format";
 import { HoldPanel } from "./hold-panel";
 
+const PAYMENT_LABEL: Record<string, string> = {
+  INITIATED: "started",
+  PENDING: "waiting",
+  SUCCEEDED: "paid",
+  FAILED: "failed",
+  CANCELLED: "cancelled",
+  REFUND_REQUIRED: "being refunded",
+};
+
 export const metadata: Metadata = { title: "Trip details", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
@@ -16,7 +25,7 @@ export default async function TripPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; payment?: string }>;
 }) {
   const { id } = await params;
   const session = await requireCustomer(`/account/bookings/${id}`);
@@ -25,7 +34,33 @@ export default async function TripPage({
     params: { path: { id } },
   });
   if (response.status === 404 || !b) notFound();
-  const justHeld = (await searchParams).new === "1" && b.status === "PENDING_PAYMENT";
+  const sp = await searchParams;
+  const justHeld = sp.new === "1" && b.status === "PENDING_PAYMENT";
+  // The banner follows the booking's real status, not just the query string.
+  const paymentNote =
+    sp.payment === undefined
+      ? null
+      : b.status === "CONFIRMED"
+        ? { tone: "good", text: "Payment received. Your booking is confirmed." }
+        : sp.payment === "failed"
+          ? {
+              tone: "critical",
+              text: "The payment did not go through. You can try again while the hold lasts.",
+            }
+          : sp.payment === "cancelled"
+            ? {
+                tone: "warn",
+                text: "Payment cancelled. Your hold is still active until the timer ends.",
+              }
+            : sp.payment === "review" || b.status === "MANUAL_REVIEW"
+              ? {
+                  tone: "warn",
+                  text: "We received a payment that needs a quick check by our team. We will contact you shortly.",
+                }
+              : {
+                  tone: "warn",
+                  text: "We are waiting for the payment provider to confirm. Refresh in a minute.",
+                };
 
   return (
     <PageShell>
@@ -56,11 +91,27 @@ export default async function TripPage({
           </div>
         </div>
 
+        {paymentNote && (
+          <p
+            role="status"
+            className={`rounded-[14px] px-4 py-3 text-[0.95rem] ${
+              paymentNote.tone === "good"
+                ? "bg-good-soft text-good"
+                : paymentNote.tone === "critical"
+                  ? "bg-critical-soft text-critical"
+                  : "bg-warn-soft text-warn"
+            }`}
+          >
+            {paymentNote.text}
+          </p>
+        )}
+
         {b.status === "PENDING_PAYMENT" && b.holdExpiresAt && (
           <HoldPanel
             bookingId={b.id}
             holdExpiresAt={b.holdExpiresAt}
             csrfToken={session.csrfToken}
+            canPay={b.canPay}
           />
         )}
 
@@ -130,6 +181,24 @@ export default async function TripPage({
                 </div>
               </dl>
             </section>
+            {b.payments.length > 0 && (
+              <section className="panel p-5 md:p-6">
+                <h2 className="text-[1rem] font-semibold">Payments</h2>
+                <ul className="mt-3 grid gap-2 text-[0.88rem]">
+                  {b.payments.map((pay) => (
+                    <li key={pay.id} className="flex justify-between gap-3">
+                      <span>
+                        {dhakaDateTime(pay.createdAt)}
+                        {pay.method ? ` · ${pay.method}` : ""}
+                      </span>
+                      <span className="font-semibold">
+                        {money(pay.amount)} · {PAYMENT_LABEL[pay.status]}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
             <section className="panel p-5 md:p-6">
               <h2 className="text-[1rem] font-semibold">History</h2>
               <ol className="mt-3 grid gap-3 text-[0.86rem]">

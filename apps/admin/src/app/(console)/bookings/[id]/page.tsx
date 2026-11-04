@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon } from "@pegah/ui";
+import { PaymentPill } from "@/components/payment-pill";
 import { StatusPill, statusMeta } from "@/components/status-pill";
 import { requireStaff, serverApi } from "@/lib/api-server";
 import { calendarDate, dhakaDateTime, money } from "@/lib/format";
@@ -173,6 +174,33 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
                 <dd>{money(b.price.total)}</dd>
               </div>
             </dl>
+          </section>
+
+          <section className="panel p-5 md:p-6" aria-labelledby="pay-h">
+            <h2 id="pay-h" className="text-[0.95rem] font-semibold">
+              Payments
+            </h2>
+            {b.payments.length === 0 ? (
+              <p className="mt-2 text-[0.86rem] text-ink-2">No payment attempts yet.</p>
+            ) : (
+              <ul className="mt-3 grid gap-3">
+                {b.payments.map((p) => (
+                  <li key={p.id} className="grid gap-1 text-[0.86rem]">
+                    <span className="flex flex-wrap items-center justify-between gap-2">
+                      <PaymentPill status={p.status} />
+                      <span className="tabular font-semibold">{money(p.amount)}</span>
+                    </span>
+                    <span className="text-[0.76rem] text-ink-3">
+                      {p.provider}
+                      {p.method ? ` · ${p.method}` : ""} · {dhakaDateTime(p.createdAt)}
+                    </span>
+                    {p.failureReason && (
+                      <span className="text-[0.78rem] text-ink-2">{p.failureReason}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           {canChange && (
