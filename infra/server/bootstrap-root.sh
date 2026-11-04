@@ -34,7 +34,7 @@ id "$APP_USER" >/dev/null 2>&1 || die "User $APP_USER does not exist."
 [[ "$(getenforce)" == "Enforcing" ]] || die "SELinux must be Enforcing; this script will not change that."
 mountpoint -q /databackup || die "/databackup is not a mounted filesystem."
 
-rand() { openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c "${1:-32}"; }
+rand() { local s; s="$(openssl rand -base64 96 | tr -dc 'A-Za-z0-9')"; printf '%s' "${s:0:${1:-32}}"; }
 
 # ── 1. Directories ────────────────────────────────────────────────────────────
 log "Directories"
@@ -46,19 +46,47 @@ usermod -aG systemd-journal "$APP_USER"   # read its own service logs
 
 # ── 2. MySQL 8.4 LTS ──────────────────────────────────────────────────────────
 log "MySQL 8.4 packages"
-dnf -y install policycoreutils-python-utils openssl >/dev/null
+dnf -y install policycoreutils-python-utils openssl dnf-plugins-core >/dev/null
 if ! rpm -q mysql84-community-release >/dev/null 2>&1; then
   dnf -y install "$MYSQL_RELEASE_RPM"
 fi
+# The release package enables the 9.7 LTS series by default; Pegah's fixed
+# stack is 8.4 LTS, so pin the repositories to 8.4.
+dnf config-manager --set-disabled 'mysql-9.7-lts-community' 'mysql-tools-9.7-lts-community' >/dev/null
+dnf config-manager --set-enabled 'mysql-8.4-lts-community' 'mysql-tools-8.4-lts-community' >/dev/null
 # The distribution's MySQL 8.0 module must not shadow the community packages.
 dnf -y module disable mysql >/dev/null 2>&1 || true
+
+installed_series() { rpm -q --qf '%{VERSION}' mysql-community-server 2>/dev/null | cut -d. -f1,2; }
+
+if rpm -q mysql-community-server >/dev/null 2>&1 && [[ "$(installed_series)" != "8.4" ]]; then
+  log "Found MySQL $(installed_series); moving to 8.4 LTS"
+  # Only an empty, freshly initialised server may be replaced. Any user table
+  # means real data: stop and let a human decide.
+  if systemctl is-active -q mysqld; then
+    user_tables="$(mysql -uroot -N -e "SELECT COUNT(*) FROM information_schema.tables
+      WHERE table_schema NOT IN ('mysql','sys','information_schema','performance_schema')")"
+    [[ "$user_tables" == "0" ]] || die "MySQL $(installed_series) holds $user_tables user tables; refusing to replace it."
+    systemctl stop mysqld
+  fi
+  # Data files written by a newer series cannot be opened by 8.4. Keep them
+  # (moved, never deleted) in restore-staging.
+  if [[ -d "$DATADIR/mysql" ]]; then
+    aside="/databackup/restore-staging/mysql-data-$(installed_series)-$(date -u +%Y%m%dT%H%M%SZ)"
+    mv "$DATADIR" "$aside"
+    echo "previous datadir moved to $aside"
+  fi
+  dnf -y downgrade 'mysql-community-*'
+fi
+
 if ! rpm -q mysql-community-server >/dev/null 2>&1; then
   dnf -y install mysql-community-server
 fi
+[[ "$(installed_series)" == "8.4" ]] || die "Expected MySQL 8.4, found $(installed_series)."
 mysqld --version
 
 log "MySQL datadir on $DATADIR (SELinux mysqld_db_t)"
-semanage fcontext -l | grep -qF "${DATADIR}(/.*)?" ||
+semanage fcontext -l | grep -F "${DATADIR}(/.*)?" >/dev/null ||
   semanage fcontext -a -t mysqld_db_t "${DATADIR}(/.*)?"
 install -d -m 0750 -o mysql -g mysql "$DATADIR"
 restorecon -R "$DATADIR"
@@ -133,10 +161,19 @@ write_env() { # file content — only if the file does not exist yet
 }
 
 # Reuse existing passwords on re-runs; otherwise generate new ones.
-existing() { [[ -f "$1" ]] && sed -nE "s#^${2}=mysql://[^:]+:([^@]+)@.*#\1#p" "$1" | head -1; }
+# (Must return success when the file is missing, or `set -e` aborts the script.)
+existing() {
+  [[ -f "$1" ]] || return 0
+  # (sed prints the first match and quits: no early-closing pipe under pipefail.)
+  sed -nE "/^${2}=mysql:/{s#^${2}=mysql://[^:]+:([^@]+)@.*#\1#p;q}" "$1"
+}
+existing_backup() {
+  [[ -f "$ENV_DIR/backup.cnf" ]] || return 0
+  sed -nE 's/^password=(.*)/\1/p' "$ENV_DIR/backup.cnf"
+}
 MIGRATE_PW="$(existing "$ENV_DIR/migrate.env" DATABASE_URL)"; MIGRATE_PW="${MIGRATE_PW:-$(rand 32)}"
 APP_PW="$(existing "$ENV_DIR/api.env" DATABASE_URL)"; APP_PW="${APP_PW:-$(rand 32)}"
-BACKUP_PW="$( [[ -f "$ENV_DIR/backup.cnf" ]] && sed -nE 's/^password=(.*)/\1/p' "$ENV_DIR/backup.cnf" )"; BACKUP_PW="${BACKUP_PW:-$(rand 32)}"
+BACKUP_PW="$(existing_backup)"; BACKUP_PW="${BACKUP_PW:-$(rand 32)}"
 
 ensure_user pegah_migrate "$MIGRATE_PW" \
   "GRANT ALL PRIVILEGES ON pegah.* TO 'pegah_migrate'@'127.0.0.1';"
@@ -191,7 +228,7 @@ systemctl enable --now pegah-backup.timer pegah-deploy-agent.timer
 
 # ── 5–6. nginx, SELinux port, firewalld ───────────────────────────────────────
 log "nginx site on :$PUBLIC_PORT"
-if ! semanage port -l | grep -E "^http_port_t\s" | grep -qw "$PUBLIC_PORT"; then
+if ! semanage port -l | grep -E "^http_port_t\s" | grep -w "$PUBLIC_PORT" >/dev/null; then
   semanage port -a -t http_port_t -p tcp "$PUBLIC_PORT" 2>/dev/null ||
     semanage port -m -t http_port_t -p tcp "$PUBLIC_PORT"
 fi
