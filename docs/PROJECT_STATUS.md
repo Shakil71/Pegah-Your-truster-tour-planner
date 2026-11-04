@@ -4,12 +4,13 @@ _Last updated: 2026-11-04_
 
 ## Current phase
 
-**Phase 3 (backend foundation) — implemented, not yet run against a real
-database.** `apps/api` (NestJS + Fastify), `packages/contracts` (Zod) and
+**Phase 3 (backend foundation) — implemented and verified against MySQL 8.4.13
+locally.** `apps/api` (NestJS + Fastify), `packages/contracts` (Zod) and
 `packages/db` (Prisma schema + initial migration) exist with auth, RBAC,
 catalog reads, hotel search with server-side pricing, the booking state
-machine and audit logging. All checks pass with an in-memory database fake;
-the MySQL integration run is blocked on a local database (see Blockers).
+machine and audit logging. All checks pass; the migration, seeds and the full API flow were run against a
+real local MySQL 8.4.13 (portable, 127.0.0.1 only). Automated DB integration
+tests are the next step.
 
 ## Completed
 
@@ -43,26 +44,23 @@ the MySQL integration run is blocked on a local database (see Blockers).
 
 ## Next recommended actions
 
-1. Owner approves a local MySQL 8.4 for development (portable ZIP already
-   downloaded and checksum-verified, or WSL), then: apply the migration, run
-   `seed:rbac` and `seed:sample`, and run the API against it.
-2. Add DB integration tests (concurrent holds, CHECK constraints, ownership).
-3. Admin app: staff login screen and switch the dashboard/bookings pages from
+1. Add automated DB integration tests (concurrent holds, CHECK constraints, ownership).
+2. Admin app: staff login screen and switch the dashboard/bookings pages from
    sample data to the API (`packages/api-client` generated from
    `apps/api/openapi.json`).
-4. Phase 4: booking creation with inventory holds and idempotency keys.
-5. Owner runs the read-only server inspection (ADR-0008/0009).
+3. Phase 4: booking creation with inventory holds and idempotency keys.
+4. Owner runs the read-only server inspection (ADR-0008/0009).
 
 ## Blockers
 
-| Blocker                           | Blocks                                        | Owner                                |
-| --------------------------------- | --------------------------------------------- | ------------------------------------ |
-| No local MySQL / Redis            | DB integration tests, running the API locally | Owner: approve portable MySQL or WSL |
-| RHEL version unknown              | Node/MySQL/Redis version lock (ADR-0008/0009) | Owner: run inspection                |
-| Root password exposed in chat     | Server security                               | Owner: rotate, disable root SSH      |
-| No flight supplier contract       | Flights                                       | Owner                                |
-| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)                 | Owner                                |
-| Domain not chosen                 | TLS, email DNS, production cookie origin      | Owner                                |
+| Blocker                           | Blocks                                        | Owner                                 |
+| --------------------------------- | --------------------------------------------- | ------------------------------------- |
+| No local Redis                    | Redis-backed rate limits, worker (Phase 4)    | Owner: approve portable Valkey or WSL |
+| RHEL version unknown              | Node/MySQL/Redis version lock (ADR-0008/0009) | Owner: run inspection                 |
+| Root password exposed in chat     | Server security                               | Owner: rotate, disable root SSH       |
+| No flight supplier contract       | Flights                                       | Owner                                 |
+| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)                 | Owner                                 |
+| Domain not chosen                 | TLS, email DNS, production cookie origin      | Owner                                 |
 
 ## Known issues
 
@@ -83,21 +81,22 @@ the MySQL integration run is blocked on a local database (see Blockers).
 
 ## Latest validation results (2026-11-04, local, Node 26.13)
 
-| Check                                      | Result                                                                                                              |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `vitest run`                               | 69/69 passed (shared 17; API unit 31; API HTTP-level 21 against an in-memory DB fake)                               |
-| `turbo run lint typecheck build`           | 15/15 tasks passed (web, admin, api, contracts, db, ui, shared, tokens)                                             |
-| Prettier `--check .`                       | Passed                                                                                                              |
-| `prisma generate` / offline `migrate diff` | Passed; 22 tables, 25 foreign keys                                                                                  |
-| OpenAPI export                             | 20 paths written to `apps/api/openapi.json`                                                                         |
-| API HTTP smoke test (compiled, no DB)      | live 200; ready 503 in 2.0 s; catalog 503 problem; protected routes 401; foreign Origin 403; Helmet headers present |
-| Migration applied to MySQL 8.4             | **Not run** — no local database; running a downloaded MySQL binary needs owner approval                             |
-| DB integration tests                       | **Not written yet** — need a database                                                                               |
-| axe / Lighthouse / Playwright              | Not run yet — no browser automation set up                                                                          |
-| GitHub Actions CI                          | Runs on push                                                                                                        |
+| Check                                      | Result                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vitest run`                               | 69/69 passed (shared 17; API unit 31; API HTTP-level 21 against an in-memory DB fake)                                                                                                                                                                                                                 |
+| `turbo run lint typecheck build`           | 15/15 tasks passed (web, admin, api, contracts, db, ui, shared, tokens)                                                                                                                                                                                                                               |
+| Prettier `--check .`                       | Passed                                                                                                                                                                                                                                                                                                |
+| `prisma generate` / offline `migrate diff` | Passed; 22 tables, 25 foreign keys                                                                                                                                                                                                                                                                    |
+| OpenAPI export                             | 20 paths written to `apps/api/openapi.json`                                                                                                                                                                                                                                                           |
+| API HTTP smoke test (compiled, no DB)      | live 200; ready 503 in 2.0 s; catalog 503 problem; protected routes 401; foreign Origin 403; Helmet headers present                                                                                                                                                                                   |
+| Migration applied to MySQL 8.4.13          | `prisma migrate deploy` passed: 22 tables + 5 CHECK constraints; seeds idempotent                                                                                                                                                                                                                     |
+| API against real MySQL                     | Hotel search prices verified by hand (৳17,000 + 10% SC + 15% VAT = ৳21,505); occupancy filter; past dates 400; register/duplicate 409/CSRF 403/logout 204→401; staff login with 12 owner permissions; MANUAL_REVIEW→CONFIRMED with history + audit; stale 409; illegal 422; customer sees own booking |
+| DB-level protections                       | Overbooking and inconsistent totals rejected by CHECK (ERROR 3819); app user cannot DROP (ERROR 1142); sessions store 64-char hashes; passwords `$argon2id$`                                                                                                                                          |
+| Automated DB integration tests             | Not written yet (manual run above)                                                                                                                                                                                                                                                                    |
+| axe / Lighthouse / Playwright              | Not run yet — no browser automation set up                                                                                                                                                                                                                                                            |
+| GitHub Actions CI                          | Run 41774980145 on `develop` (3c1cbf8): success                                                                                                                                                                                                                                                       |
 
 ## Approvals required
 
-- Local MySQL 8.4 for development (portable, scratchpad, 127.0.0.1 only) or WSL.
 - Feedback on the running homepage and admin dashboard.
 - Read-only server inspection (owner runs it, or approves non-root SSH key).
