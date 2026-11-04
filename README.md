@@ -4,9 +4,10 @@ Pegah is a travel booking platform for Bangladesh: hotels, tours, flights and
 visa services, priced in BDT, with an architecture ready for international
 expansion.
 
-> **Status:** Phase 2. The homepage and admin dashboard are built in Next.js
-> with **sample data**. There is no backend, database or payment integration
-> yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+> **Status:** Phase 3. The homepage and admin dashboard (sample data) are
+> built in Next.js; the API, contracts and database schema exist and are
+> tested against an in-memory fake, but have not yet run against MySQL. No
+> payment integration yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 ## Repository layout
 
@@ -14,6 +15,9 @@ expansion.
 | ------------------------------------------------ | -------------------------------------------------------------------------------------- |
 | [apps/web](apps/web)                             | Customer site (Next.js App Router), port 3000                                          |
 | [apps/admin](apps/admin)                         | Staff back office (Next.js), port 3001                                                 |
+| [apps/api](apps/api)                             | REST API (NestJS + Fastify), port 4000, `/api/v1`                                      |
+| [packages/contracts](packages/contracts)         | Zod request/response contracts (single source of API shapes)                           |
+| [packages/db](packages/db)                       | Prisma schema, migrations and client factory (API and worker only)                     |
 | [packages/design-tokens](packages/design-tokens) | Kantha tokens: CSS variables, Tailwind v4 theme, TS values                             |
 | [packages/ui](packages/ui)                       | Shared components: icons, logo, stitch, button styles                                  |
 | [packages/shared](packages/shared)               | Tested presentation utilities: money, Asia/Dhaka dates, six seasons                    |
@@ -28,6 +32,18 @@ Requires Node.js ≥ 20.9 (CI uses 22).
 npm ci
 npm run dev:web     # http://localhost:3000
 npm run dev:admin   # http://localhost:3001
+```
+
+The API needs MySQL 8.4. Copy `apps/api/.env.example` to `apps/api/.env`,
+fill in `DATABASE_URL` and `SESSION_SECRET`, then:
+
+```bash
+npm run build -w @pegah/contracts -w @pegah/db
+DATABASE_URL=... npm run migrate:deploy -w @pegah/db
+npm run build -w @pegah/api
+DATABASE_URL=... npm run seed:rbac -w @pegah/api
+DATABASE_URL=... npm run seed:sample -w @pegah/api   # development only
+npm run dev -w @pegah/api                             # http://localhost:4000/api/v1
 ```
 
 ## Checks
@@ -46,8 +62,8 @@ pull requests.
 ## Stack
 
 Next.js 16 · React 19 · TypeScript 5.9 (strict) · Tailwind CSS 4 · Radix UI ·
-Vitest · Turborepo. Planned: NestJS (Fastify), MySQL 8.4 + Prisma, Redis +
-BullMQ, native RHEL with systemd and Nginx. No containers.
+NestJS 11 (Fastify) · Zod 4 · Prisma 7 + MySQL 8.4 · Vitest · Turborepo.
+Planned: Redis + BullMQ, native RHEL with systemd and Nginx. No containers.
 Details: [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md).
 
 ## Contributing

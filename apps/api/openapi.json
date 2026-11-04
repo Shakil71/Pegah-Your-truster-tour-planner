@@ -1,0 +1,1874 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/health/live": {
+      "get": {
+        "operationId": "HealthController_live",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["health"]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "operationId": "HealthController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "503 when a dependency is down",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["health"]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created and signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/session": {
+      "get": {
+        "operationId": "AuthController_session",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/staff/auth/login": {
+      "post": {
+        "operationId": "StaffAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["staff-auth"]
+      }
+    },
+    "/api/v1/staff/auth/logout": {
+      "post": {
+        "operationId": "StaffAuthController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["staff-auth"]
+      }
+    },
+    "/api/v1/staff/auth/session": {
+      "get": {
+        "operationId": "StaffAuthController_session",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["staff-auth"]
+      }
+    },
+    "/api/v1/destinations": {
+      "get": {
+        "operationId": "CatalogController_destinations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationListResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/destinations/{slug}": {
+      "get": {
+        "operationId": "CatalogController_destination",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DestinationDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/hotels/search": {
+      "get": {
+        "operationId": "CatalogController_search",
+        "parameters": [
+          {
+            "name": "destination",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "checkIn",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "checkOut",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "adults",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 36,
+              "default": 2,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "children",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 0,
+              "maximum": 18,
+              "default": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "rooms",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 9,
+              "default": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HotelSearchResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/hotels/{slug}": {
+      "get": {
+        "operationId": "CatalogController_hotel",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HotelDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/tours": {
+      "get": {
+        "operationId": "CatalogController_tours",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourListResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/tours/{slug}": {
+      "get": {
+        "operationId": "CatalogController_tour",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TourDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["catalog"]
+      }
+    },
+    "/api/v1/admin/bookings": {
+      "get": {
+        "operationId": "AdminBookingsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PENDING_AVAILABILITY",
+                "PENDING_PAYMENT",
+                "PAYMENT_PROCESSING",
+                "CONFIRMED",
+                "COMPLETED",
+                "FAILED",
+                "EXPIRED",
+                "MANUAL_REVIEW",
+                "CANCELLATION_REQUESTED",
+                "CANCELLED",
+                "REFUND_PENDING",
+                "REFUNDED"
+              ]
+            }
+          },
+          {
+            "name": "productType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["HOTEL", "TOUR"]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingListResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-bookings"]
+      }
+    },
+    "/api/v1/admin/bookings/{id}": {
+      "get": {
+        "operationId": "AdminBookingsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-bookings"]
+      }
+    },
+    "/api/v1/admin/bookings/{id}/status": {
+      "post": {
+        "operationId": "AdminBookingsController_changeStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingStatusTransitionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-bookings"]
+      }
+    },
+    "/api/v1/me/bookings": {
+      "get": {
+        "operationId": "MyBookingsController_list",
+        "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingListResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["my-bookings"]
+      }
+    },
+    "/api/v1/me/bookings/{id}": {
+      "get": {
+        "operationId": "MyBookingsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["my-bookings"]
+      }
+    }
+  },
+  "info": {
+    "title": "Pegah API",
+    "description": "Pegah travel platform API. Money is integer minor units with a currency; timestamps are ISO 8601 UTC; errors are RFC 9457 problem details.",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "customer": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "pg_sid"
+      },
+      "staff": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "pg_staff_sid"
+      }
+    },
+    "schemas": {
+      "HealthResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok", "degraded", "down"]
+          },
+          "checks": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": ["up", "down"]
+            }
+          },
+          "version": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "checks", "version", "time"],
+        "additionalProperties": false
+      },
+      "RegisterRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          },
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+8801[3-9]\\d{8}$"
+          }
+        },
+        "required": ["email", "password", "fullName"]
+      },
+      "SessionUser_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "phone": {
+            "type": ["string", "null"]
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["CUSTOMER", "STAFF"]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "dashboard:read",
+                "booking:read",
+                "booking:manage",
+                "booking:override_status",
+                "catalog:read",
+                "catalog:manage",
+                "inventory:manage",
+                "customer:read",
+                "payment:read",
+                "refund:approve",
+                "user:manage",
+                "audit:read"
+              ]
+            }
+          }
+        },
+        "required": ["id", "email", "fullName", "phone", "kind", "roles", "permissions"],
+        "additionalProperties": false
+      },
+      "SessionResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/SessionUser_Output"
+          },
+          "csrfToken": {
+            "type": "string"
+          }
+        },
+        "required": ["user", "csrfToken"],
+        "additionalProperties": false
+      },
+      "LoginRequestDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "DestinationSummary_Output": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameBn": {
+            "type": ["string", "null"]
+          },
+          "region": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "hotelCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "tourCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "nameBn",
+          "region",
+          "summary",
+          "hero",
+          "hotelCount",
+          "tourCount"
+        ],
+        "additionalProperties": false
+      },
+      "Media_Output": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "alt": {
+            "type": "string"
+          },
+          "credit": {
+            "type": ["string", "null"]
+          },
+          "width": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "height": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          }
+        },
+        "required": ["url", "alt", "credit", "width", "height"],
+        "additionalProperties": false
+      },
+      "DestinationListResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DestinationSummary_Output"
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "HotelSummary_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameBn": {
+            "type": ["string", "null"]
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["slug", "name"],
+            "additionalProperties": false
+          },
+          "starRating": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "nameBn",
+          "destination",
+          "starRating",
+          "summary",
+          "hero"
+        ],
+        "additionalProperties": false
+      },
+      "TourSummary_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "titleBn": {
+            "type": ["string", "null"]
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["slug", "name"],
+            "additionalProperties": false
+          },
+          "durationDays": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "durationNights": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "fromPrice": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "nextDepartureAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "titleBn",
+          "destination",
+          "durationDays",
+          "durationNights",
+          "summary",
+          "hero",
+          "fromPrice",
+          "nextDepartureAt"
+        ],
+        "additionalProperties": false
+      },
+      "Money_Output": {
+        "type": "object",
+        "properties": {
+          "amountMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "currency": {
+            "type": "string",
+            "enum": ["BDT", "USD"]
+          }
+        },
+        "required": ["amountMinor", "currency"],
+        "additionalProperties": false
+      },
+      "DestinationDetailDto_Output": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameBn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "region": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "hotelCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "tourCount": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "hotels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HotelSummary_Output"
+            }
+          },
+          "tours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourSummary_Output"
+            }
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "nameBn",
+          "region",
+          "summary",
+          "hero",
+          "hotelCount",
+          "tourCount",
+          "hotels",
+          "tours"
+        ],
+        "additionalProperties": false
+      },
+      "HotelOffer_Output": {
+        "type": "object",
+        "properties": {
+          "hotel": {
+            "$ref": "#/components/schemas/HotelSummary_Output"
+          },
+          "room": {
+            "$ref": "#/components/schemas/Room_Output"
+          },
+          "roomsLeft": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "price": {
+            "$ref": "#/components/schemas/StayPrice_Output"
+          }
+        },
+        "required": ["hotel", "room", "roomsLeft", "price"],
+        "additionalProperties": false
+      },
+      "Room_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "maxAdults": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "maxChildren": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bedType": {
+            "type": "string"
+          },
+          "sizeSqm": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          }
+        },
+        "required": ["id", "name", "description", "maxAdults", "maxChildren", "bedType", "sizeSqm"],
+        "additionalProperties": false
+      },
+      "StayPrice_Output": {
+        "type": "object",
+        "properties": {
+          "nights": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "rooms": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "base": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "serviceCharge": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "vat": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "perNightFrom": {
+            "$ref": "#/components/schemas/Money_Output"
+          }
+        },
+        "required": ["nights", "rooms", "base", "serviceCharge", "vat", "total", "perNightFrom"],
+        "additionalProperties": false
+      },
+      "HotelSearchResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "object",
+            "properties": {
+              "destination": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "checkIn": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              "checkOut": {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              "adults": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "children": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "rooms": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["destination", "checkIn", "checkOut", "adults", "children", "rooms"],
+            "additionalProperties": false
+          },
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HotelOffer_Output"
+            }
+          },
+          "pricedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["query", "offers", "pricedAt"],
+        "additionalProperties": false
+      },
+      "HotelDetailDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nameBn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["slug", "name"],
+            "additionalProperties": false
+          },
+          "starRating": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "description": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "checkInTime": {
+            "type": "string"
+          },
+          "checkOutTime": {
+            "type": "string"
+          },
+          "cancellationPolicy": {
+            "type": "string"
+          },
+          "rooms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Room_Output"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "nameBn",
+          "destination",
+          "starRating",
+          "summary",
+          "hero",
+          "description",
+          "addressLine",
+          "checkInTime",
+          "checkOutTime",
+          "cancellationPolicy",
+          "rooms"
+        ],
+        "additionalProperties": false
+      },
+      "TourListResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourSummary_Output"
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "TourDeparture_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "departsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "returnsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "seatsLeft": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "priceAdult": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "priceChild": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["SCHEDULED", "CLOSED", "CANCELLED"]
+          }
+        },
+        "required": [
+          "id",
+          "departsAt",
+          "returnsAt",
+          "seatsLeft",
+          "priceAdult",
+          "priceChild",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "TourDetailDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "titleBn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "destination": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["slug", "name"],
+            "additionalProperties": false
+          },
+          "durationDays": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "durationNights": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "summary": {
+            "type": "string"
+          },
+          "hero": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "fromPrice": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "nextDepartureAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "meetingPoint": {
+            "type": "string"
+          },
+          "groupSizeMax": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "includes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "excludes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "departures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourDeparture_Output"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "title",
+          "titleBn",
+          "destination",
+          "durationDays",
+          "durationNights",
+          "summary",
+          "hero",
+          "fromPrice",
+          "nextDepartureAt",
+          "description",
+          "meetingPoint",
+          "groupSizeMax",
+          "highlights",
+          "includes",
+          "excludes",
+          "departures"
+        ],
+        "additionalProperties": false
+      },
+      "BookingSummary_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED"
+            ]
+          },
+          "productType": {
+            "type": "string",
+            "enum": ["HOTEL", "TOUR"]
+          },
+          "productName": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+            "nullable": true
+          },
+          "guests": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "contactName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "status",
+          "productType",
+          "productName",
+          "startDate",
+          "endDate",
+          "guests",
+          "total",
+          "contactName",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "BookingListResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingSummary_Output"
+            }
+          },
+          "nextCursor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["items", "nextCursor"],
+        "additionalProperties": false
+      },
+      "BookingStatusChange_Output": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED",
+              null
+            ],
+            "nullable": true
+          },
+          "to": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED"
+            ]
+          },
+          "actorType": {
+            "type": "string",
+            "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]
+          },
+          "reason": {
+            "type": ["string", "null"]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": ["from", "to", "actorType", "reason", "at"],
+        "additionalProperties": false
+      },
+      "BookingDetailDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED"
+            ]
+          },
+          "productType": {
+            "type": "string",
+            "enum": ["HOTEL", "TOUR"]
+          },
+          "productName": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+            "nullable": true
+          },
+          "guests": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "contactName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookingStatusChange_Output"
+            }
+          },
+          "allowedTransitions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "PENDING_AVAILABILITY",
+                "PENDING_PAYMENT",
+                "PAYMENT_PROCESSING",
+                "CONFIRMED",
+                "COMPLETED",
+                "FAILED",
+                "EXPIRED",
+                "MANUAL_REVIEW",
+                "CANCELLATION_REQUESTED",
+                "CANCELLED",
+                "REFUND_PENDING",
+                "REFUNDED"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "status",
+          "productType",
+          "productName",
+          "startDate",
+          "endDate",
+          "guests",
+          "total",
+          "contactName",
+          "createdAt",
+          "history",
+          "allowedTransitions"
+        ],
+        "additionalProperties": false
+      },
+      "BookingStatusTransitionRequestDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500
+          },
+          "expectedStatus": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PENDING_AVAILABILITY",
+              "PENDING_PAYMENT",
+              "PAYMENT_PROCESSING",
+              "CONFIRMED",
+              "COMPLETED",
+              "FAILED",
+              "EXPIRED",
+              "MANUAL_REVIEW",
+              "CANCELLATION_REQUESTED",
+              "CANCELLED",
+              "REFUND_PENDING",
+              "REFUNDED"
+            ]
+          }
+        },
+        "required": ["to", "reason", "expectedStatus"]
+      }
+    }
+  }
+}

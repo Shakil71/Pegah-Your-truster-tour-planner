@@ -1,6 +1,18 @@
 # Security Model
 
-Status: **planned**. Controls below are requirements; none are implemented yet.
+Status: **partly implemented (Phase 3, ADR-0015).** Implemented in `apps/api`:
+Argon2id hashing with timing-equalised failures; server-side sessions storing
+only token hashes; separate customer/staff cookies and timeouts; HMAC CSRF
+tokens; Origin allow-list; global permission guard; ownership-scoped customer
+queries (404 for others' bookings); Zod validation of every input and output;
+RFC 9457 errors without internals; Helmet headers (CSP `default-src 'none'`,
+HSTS when secure, no-referrer, nosniff); strict CORS allow-list; 100 KB body
+limit; per-route rate limits (in-memory until Redis); log redaction of
+cookies, authorization and CSRF headers; audit events for staff logins,
+staff creation and manual booking status changes; `seed:sample` refuses to
+run in production; production config refuses insecure cookies or public
+OpenAPI. Not yet: Redis-backed limits, email verification, password reset,
+staff 2FA, CodeQL/gitleaks in CI, field encryption for identity documents.
 
 ## Authentication and sessions
 

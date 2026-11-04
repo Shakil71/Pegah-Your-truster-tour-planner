@@ -1,6 +1,11 @@
 # Test Strategy
 
-Status: **planned**. No tests exist yet because no application code exists.
+Status: **partly implemented.** 69 Vitest tests: `packages/shared` (17),
+API pure logic (pricing, state machine, hotel availability, Dhaka dates,
+config) and HTTP-level tests that boot the real Nest/Fastify app against an
+in-memory database fake (`apps/api/src/test`). CI has no database because
+containers are not allowed; integration tests against real MySQL 8.4 run
+locally/on staging once a database is available (see PROJECT_STATUS).
 
 | Level         | Tool                                  | Scope                                                                                                          | When                                 |
 | ------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------ |

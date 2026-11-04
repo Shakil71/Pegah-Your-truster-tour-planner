@@ -4,6 +4,27 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 3 backend foundation (2026-11-04)
+
+- `packages/contracts`: Zod schemas for money, problem details, pagination,
+  permissions, staff roles, auth, bookings, catalog and health.
+- `packages/db`: Prisma 7 schema (22 tables) and initial MySQL migration with
+  CHECK constraints against overbooking and inconsistent totals.
+- `apps/api` (NestJS 11 + Fastify): health probes; customer and staff auth
+  (Argon2id, hashed server-side sessions, HMAC CSRF, Origin allow-list);
+  permission guard; catalog, hotel search with server-computed prices, tours;
+  customer and admin booking reads; booking state machine with history and
+  audit; RFC 9457 errors; Helmet; strict CORS; rate limits; OpenAPI export.
+- Operator CLIs: `seed:rbac`, `staff:create`, `seed:sample`.
+- 52 new tests (pricing, state machine, availability, dates, config, HTTP).
+- CI: OpenAPI drift check. ADR-0013, ADR-0014, ADR-0015.
+
+### Security
+
+- Fastify forced to 5.12.7 (high advisory in 5.11.3 pinned by
+  `@nestjs/platform-fastify`); js-yaml 5.4.3 under `@nestjs/swagger`;
+  Vitest 4.1.12 (critical tinypool advisory in 3.x); Turborepo 2.11.10.
+
 ### Added — Phase 2 code (2026-11-04)
 
 - npm-workspaces + Turborepo monorepo with pinned toolchain (ADR-0011).

@@ -1,0 +1,69 @@
+import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
+import { AuditService } from "./audit/audit.service";
+import { AuthController, StaffAuthController } from "./auth/auth.controller";
+import { AuthGuard } from "./auth/auth.guard";
+import { AuthService } from "./auth/auth.service";
+import { PasswordService } from "./auth/password.service";
+import { SessionService } from "./auth/session.service";
+import { BookingQueryService } from "./booking/booking-query.service";
+import { BookingStatusService } from "./booking/booking-status.service";
+import { AdminBookingsController, MyBookingsController } from "./booking/booking.controllers";
+import { CatalogController } from "./catalog/catalog.controller";
+import { CatalogService } from "./catalog/catalog.service";
+import { ProblemFilter } from "./common/problem";
+import { APP_CONFIG, type AppConfig } from "./config/config";
+import { HealthController } from "./health/health.controller";
+import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
+
+export interface AppModuleOptions {
+  config: AppConfig;
+  /** Tests replace the Prisma provider with an in-memory fake. */
+  prisma?: Provider;
+}
+
+@Global()
+@Module({})
+export class AppModule {
+  static register({ config, prisma }: AppModuleOptions): DynamicModule {
+    return {
+      module: AppModule,
+      imports: [
+        // Per-process, in-memory limits for now. Moves to a Redis store with
+        // the worker phase so limits hold across API instances (ADR-0008).
+        ThrottlerModule.forRoot({
+          throttlers: [{ name: "default", ttl: 60_000, limit: 300 }],
+        }),
+      ],
+      controllers: [
+        HealthController,
+        AuthController,
+        StaffAuthController,
+        CatalogController,
+        AdminBookingsController,
+        MyBookingsController,
+      ],
+      providers: [
+        { provide: APP_CONFIG, useValue: config },
+        prisma ?? prismaProvider,
+        PrismaLifecycle,
+        AuditService,
+        PasswordService,
+        SessionService,
+        AuthService,
+        CatalogService,
+        BookingQueryService,
+        BookingStatusService,
+        // Order matters: rate limit first, then authentication/authorization.
+        { provide: APP_GUARD, useClass: ThrottlerGuard },
+        { provide: APP_GUARD, useClass: AuthGuard },
+        { provide: APP_PIPE, useClass: ZodValidationPipe },
+        { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
+        { provide: APP_FILTER, useClass: ProblemFilter },
+      ],
+      exports: [APP_CONFIG],
+    };
+  }
+}

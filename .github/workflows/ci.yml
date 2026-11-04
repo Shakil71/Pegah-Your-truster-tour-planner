@@ -32,6 +32,9 @@ jobs:
 
       - run: npm ci
 
+      # No database in CI (no containers by policy): unit and HTTP-level tests
+      # use an in-memory fake; prisma generate needs no connection.
+
       - name: Format
         run: npm run format:check
 
@@ -43,3 +46,11 @@ jobs:
 
       - name: Build
         run: npx turbo run build
+
+      # The committed OpenAPI document must match what the code generates, so
+      # API contracts and clients can never drift silently.
+      - name: OpenAPI drift check
+        run: |
+          npm run openapi -w @pegah/api
+          npx prettier --write apps/api/openapi.json
+          git diff --exit-code -- apps/api/openapi.json

@@ -1,9 +1,10 @@
 # System Architecture
 
-Status: **partly implemented.** Built: `apps/web`, `apps/admin`,
-`packages/design-tokens`, `packages/ui`, `packages/shared` (presentation
-utilities only, ADR-0012). Planned: `apps/api`, `apps/worker`,
-`packages/contracts`, `packages/api-client`, `packages/db`, `packages/config`.
+Status: **partly implemented.** Built: `apps/web`, `apps/admin`, `apps/api`
+(auth, RBAC, catalog reads, hotel search, booking status, audit),
+`packages/contracts`, `packages/db`, `packages/design-tokens`,
+`packages/ui`, `packages/shared` (presentation utilities only, ADR-0012).
+Planned: `apps/worker`, `packages/api-client`, `packages/config`.
 
 ## 1. Shape
 
@@ -54,7 +55,7 @@ packages/contracts (Zod)
    └─► api OpenAPI document ─► packages/api-client (generated)
 ```
 
-CI regenerates the client and fails if it differs from the committed one.
+CI regenerates `apps/api/openapi.json` from the code and fails if it differs from the committed file. `packages/api-client` will be generated from that file when the web apps start calling the API.
 
 ## 4. Request path
 
@@ -74,7 +75,14 @@ refunds, balances or inventory. Every key must be registered here before use.
 | `pg:v1:ratelimit:{route}:{ip}`     | auth    | window         | expiry                           | auth routes fail closed; other routes fail open with an alert |
 | `bull:{queue}:*`                   | worker  | BullMQ managed | BullMQ                           | outbox retries                                                |
 
-(Planned keys; update when implemented.)
+(Planned keys; none is in use yet because Redis is not installed.)
+
+**HTTP caching in use (Phase 3):** public catalog reads send
+`Cache-Control: public` — destinations and hotels 300 s, tours 120 s, hotel
+search 30 s — with `stale-while-revalidate` of the same length. Owner:
+catalog. Invalidation: expiry only. Search prices are labelled indicative
+(`pricedAt`) and are always recomputed under a row lock before a hold.
+Session, auth and admin responses send `Cache-Control: no-store`.
 
 ## 6. Background jobs (planned)
 

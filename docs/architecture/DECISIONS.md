@@ -95,3 +95,60 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Decision:** `packages/shared` holds pure, tested presentation helpers
   (money formatting, Asia/Dhaka calendar, six seasons). It contains no
   pricing or booking rules; those stay in `apps/api` (ADR-0001).
+
+## ADR-0013 — API toolchain: NestJS 11 on Fastify with nestjs-zod
+
+- **Status:** Accepted (2026-11-04)
+- **Decision:** NestJS 11.2.7 + `@nestjs/platform-fastify` 11.2.7,
+  `@nestjs/swagger` 11.4.7, `nestjs-zod` 5.5.0, Zod 4.6.7, `@nestjs/throttler`
+  6.7.1, `@fastify/cookie` 11.1.3, `@fastify/helmet` 13.2.0, argon2 0.45.1.
+- **Why not NestJS 12:** `nestjs-zod` (mandated in `CLAUDE.md`) declares peer
+  support only up to NestJS 11. Revisit when it supports 12.
+- **Security overrides:** `@nestjs/platform-fastify` 11.2.7 pins Fastify
+  5.11.3, which has a high advisory (schema validation bypass, X-Forwarded
+  spoofing under trustProxy, fixed in 5.12.1). The root `overrides` force
+  Fastify 5.12.7. `js-yaml` under `@nestjs/swagger` is overridden to 5.4.3.
+- **No Swagger UI:** `@fastify/static` (and its vulnerable `glob`) is not
+  installed; the OpenAPI JSON is served at `/api/v1/docs/openapi.json` outside
+  production and committed as `apps/api/openapi.json`.
+- **Build:** `tsc` (decorator metadata) for the API; Vitest uses SWC for the
+  same reason. Vitest upgraded 3.2 → 4.1.12 and Turborepo 2.5 → 2.11.10 to
+  clear critical/moderate dev-tool advisories.
+- **Accepted residual risk:** `deepmerge` 4.3.1 (low, no patched release) via
+  `nestjs-zod`, used only while building the OpenAPI document; dev-only
+  `minimatch` advisories via ESLint 9.
+- **Quirk:** top-level request/response schemas must not carry
+  `.meta({ id })` (nestjs-zod 5 then emits duplicate component names); only
+  nested, reused schemas get ids.
+
+## ADR-0014 — Prisma 7 with the MariaDB driver adapter
+
+- **Status:** Accepted (2026-11-04)
+- **Decision:** Prisma 7.10.1 with the `prisma-client` generator (CommonJS
+  output into `packages/db/src/generated`, gitignored) and
+  `@prisma/adapter-mariadb`, which speaks the MySQL 8.4 protocol. Prisma 7
+  requires a driver adapter; there is no MySQL-specific one.
+- **Migrations:** the initial migration was generated offline with
+  `prisma migrate diff --from-empty` and extended by hand with CHECK
+  constraints (`held + sold <= total`, booking total = parts). Production
+  applies migrations with `prisma migrate deploy` only.
+- **Collation:** Prisma emits `utf8mb4_unicode_ci`; we keep it for every
+  table so future generated migrations stay consistent.
+
+## ADR-0015 — Session, CSRF and RBAC design
+
+- **Status:** Accepted (2026-11-04)
+- **Sessions:** 256-bit random token in an HttpOnly, SameSite=Lax cookie
+  (`__Host-` prefixed and Secure when `COOKIE_SECURE=true`); only its SHA-256
+  is stored. Separate cookies and session kinds for customers (`pg_sid`,
+  14 days absolute / 3 days idle) and staff (`pg_staff_sid`, 12 h / 30 min).
+- **CSRF:** token = HMAC-SHA256(`SESSION_SECRET`, session token hash),
+  returned by login and `GET /auth/session`, required in `X-CSRF-Token` on
+  every cookie-authenticated mutation. Plus an Origin allow-list on all
+  state-changing requests.
+- **RBAC:** permission keys live in `packages/contracts`; default role grants
+  live in `apps/api/src/rbac/role-defaults.ts` and are written by
+  `seed:rbac`. One global guard checks origin → session → CSRF → permissions.
+- **Accepted for now:** registration answers 409 for an existing email
+  (enumeration) until email verification exists; rate limits are in-memory
+  per process until Redis arrives (ADR-0008).

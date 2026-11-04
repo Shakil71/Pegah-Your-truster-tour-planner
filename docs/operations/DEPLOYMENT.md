@@ -50,6 +50,47 @@ Record the output here before planning any installation.
 Hardening: `User=pegah`, `NoNewPrivileges=yes`, `ProtectSystem=strict`,
 `ReadWritePaths=/opt/pegah/shared/uploads /var/log/pegah`, `PrivateTmp=yes`.
 
+## API service (Phase 3)
+
+`/opt/pegah/shared/env/api.env` (0600, owner `pegah`) holds the variables
+listed in `apps/api/.env.example`; production requires `COOKIE_SECURE=true`,
+`OPENAPI_ENABLED=false`, `TRUST_PROXY_HOPS=1` (Nginx) and a
+least-privilege MySQL user (SELECT/INSERT/UPDATE/DELETE on the app schema;
+a separate migration user holds DDL rights).
+
+```ini
+# /etc/systemd/system/pegah-api.service (draft; install only with approval)
+[Unit]
+Description=Pegah API
+After=network-online.target mysqld.service
+Wants=network-online.target
+
+[Service]
+User=pegah
+Group=pegah
+WorkingDirectory=/opt/pegah/current/apps/api
+EnvironmentFile=/opt/pegah/shared/env/api.env
+ExecStart=/usr/bin/node dist/main.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/log/pegah
+
+[Install]
+WantedBy=multi-user.target
+```
+
+First-time database steps (each needs explicit approval on the server):
+
+1. `npm run migrate:deploy -w @pegah/db` with the migration user's URL.
+2. `npm run seed:rbac -w @pegah/api` (idempotent).
+3. `npm run staff:create -w @pegah/api -- --email … --name "…" --role owner`
+   (password from a hidden prompt; never on the command line).
+4. Never run `seed:sample` in production (it refuses).
+
 ## Release procedure (planned)
 
 1. CI builds a release tarball on a tag.
