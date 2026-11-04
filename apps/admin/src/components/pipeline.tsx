@@ -1,12 +1,12 @@
 import Link from "next/link";
-import type { BookingStatus } from "@/data/sample";
+import type { BookingStatus } from "@pegah/contracts";
 import { StatusPill } from "./status-pill";
 
 /** Where live bookings sit in the lifecycle. Bars are neutral; the pill carries state. */
 export function Pipeline({ rows }: { rows: Array<{ status: BookingStatus; count: number }> }) {
-  const max = Math.max(...rows.map((r) => r.count));
+  const max = Math.max(1, ...rows.map((r) => r.count));
   const attention = rows
-    .filter((r) => r.status === "MANUAL_REVIEW" || r.status === "REFUND_PENDING")
+    .filter((r) => ["MANUAL_REVIEW", "REFUND_PENDING", "CANCELLATION_REQUESTED"].includes(r.status))
     .reduce((a, r) => a + r.count, 0);
   return (
     <section
@@ -28,6 +28,9 @@ export function Pipeline({ rows }: { rows: Array<{ status: BookingStatus; count:
       <p className="mt-1 text-[0.78rem] text-ink-3">
         Live bookings by state · {attention} need staff action
       </p>
+      {rows.length === 0 && (
+        <p className="mt-5 flex-1 text-[0.86rem] text-ink-2">No bookings yet.</p>
+      )}
       <ul className="mt-5 grid flex-1 content-start gap-3.5">
         {rows.map((r) => (
           <li

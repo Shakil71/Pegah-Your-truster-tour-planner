@@ -5,13 +5,14 @@ import {
   MoneySchema,
   PublicIdSchema,
   SlugSchema,
+  nullableText,
 } from "./common";
 
 export const MediaSchema = z
   .object({
     url: z.string(),
     alt: z.string(),
-    credit: z.string().nullable(),
+    credit: nullableText(),
     width: z.number().int().nullable(),
     height: z.number().int().nullable(),
   })
@@ -21,7 +22,7 @@ export const DestinationSummarySchema = z
   .object({
     slug: SlugSchema,
     name: z.string(),
-    nameBn: z.string().nullable(),
+    nameBn: nullableText(),
     region: z.string(),
     summary: z.string(),
     hero: MediaSchema.nullable(),
@@ -50,7 +51,7 @@ export const HotelSummarySchema = z
     id: PublicIdSchema,
     slug: SlugSchema,
     name: z.string(),
-    nameBn: z.string().nullable(),
+    nameBn: nullableText(),
     destination: z.object({ slug: SlugSchema, name: z.string() }),
     starRating: z.number().int().nullable(),
     summary: z.string(),
@@ -60,7 +61,7 @@ export const HotelSummarySchema = z
 export type HotelSummary = z.infer<typeof HotelSummarySchema>;
 
 export const HotelDetailSchema = HotelSummarySchema.extend({
-  description: z.string().nullable(),
+  description: nullableText(),
   addressLine: z.string(),
   checkInTime: z.string(),
   checkOutTime: z.string(),
@@ -143,7 +144,7 @@ export const TourSummarySchema = z
     id: PublicIdSchema,
     slug: SlugSchema,
     title: z.string(),
-    titleBn: z.string().nullable(),
+    titleBn: nullableText(),
     destination: z.object({ slug: SlugSchema, name: z.string() }),
     durationDays: z.number().int(),
     durationNights: z.number().int(),
@@ -173,3 +174,36 @@ export const DestinationDetailSchema = DestinationSummarySchema.extend({
   tours: z.array(TourSummarySchema),
 });
 export type DestinationDetail = z.infer<typeof DestinationDetailSchema>;
+
+export const HotelOffersQuerySchema = z
+  .object({
+    checkIn: CalendarDateSchema,
+    checkOut: CalendarDateSchema,
+    adults: z.coerce.number().int().min(1).max(36).default(2),
+    children: z.coerce.number().int().min(0).max(18).default(0),
+    rooms: z.coerce.number().int().min(1).max(9).default(1),
+  })
+  .refine((q) => q.checkOut > q.checkIn, {
+    message: "Check-out must be after check-in",
+    path: ["checkOut"],
+  });
+export type HotelOffersQuery = z.infer<typeof HotelOffersQuerySchema>;
+
+export const HotelRoomOfferSchema = z
+  .object({
+    room: RoomSchema,
+    available: z.boolean(),
+    roomsLeft: z.number().int().nullable(),
+    /** Why the room cannot be booked for this stay (null when available). */
+    reason: z.enum(["occupancy", "no-inventory", "sold-out", "no-rate", "currency"]).nullable(),
+    price: StayPriceSchema.nullable(),
+  })
+  .meta({ id: "HotelRoomOffer" });
+export type HotelRoomOffer = z.infer<typeof HotelRoomOfferSchema>;
+
+/** Every active room of one hotel priced for a stay (property page). */
+export const HotelOffersResponseSchema = z.object({
+  rooms: z.array(HotelRoomOfferSchema),
+  pricedAt: InstantSchema,
+});
+export type HotelOffersResponse = z.infer<typeof HotelOffersResponseSchema>;

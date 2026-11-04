@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PublicIdSchema } from "./common";
+import { PublicIdSchema, nullableText } from "./common";
 import { PermissionSchema } from "./permissions";
 
 /** Email is normalised (trimmed, lower-cased) before it reaches the API logic. */
@@ -40,7 +40,7 @@ export const SessionUserSchema = z
     id: PublicIdSchema,
     email: z.string(),
     fullName: z.string(),
-    phone: z.string().nullable(),
+    phone: nullableText(),
     kind: SessionKindSchema,
     roles: z.array(z.string()),
     permissions: z.array(PermissionSchema),

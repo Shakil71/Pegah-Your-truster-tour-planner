@@ -10,8 +10,13 @@ const adminOrigin =
   process.env.ADMIN_INTERNAL_URL ??
   (process.env.NODE_ENV === "production" ? "http://127.0.0.1:3101" : "http://127.0.0.1:3001");
 
+/** Local development only: in production Nginx routes /api to the API before Next.js. */
+const apiOrigin =
+  process.env.API_INTERNAL_URL ??
+  (process.env.NODE_ENV === "production" ? "http://127.0.0.1:4100" : "http://127.0.0.1:4000");
+
 const nextConfig: NextConfig = {
-  transpilePackages: ["@pegah/ui", "@pegah/shared", "@pegah/design-tokens"],
+  transpilePackages: ["@pegah/ui", "@pegah/shared", "@pegah/design-tokens", "@pegah/api-client"],
   images: {
     formats: ["image/avif", "image/webp"],
   },
@@ -23,6 +28,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/admin", destination: `${adminOrigin}/admin` },
       { source: "/admin/:path*", destination: `${adminOrigin}/admin/:path*` },
+      { source: "/api/:path*", destination: `${apiOrigin}/api/:path*` },
     ];
   },
 };

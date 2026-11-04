@@ -54,6 +54,10 @@ export const EnvSchema = z.object({
   ARGON2_MEMORY_KIB: z.coerce.number().int().min(19456).default(19456),
   ARGON2_TIME_COST: z.coerce.number().int().min(2).default(2),
   ARGON2_PARALLELISM: z.coerce.number().int().min(1).default(1),
+  /** How long a new booking holds inventory while awaiting payment. */
+  BOOKING_HOLD_MINUTES: z.coerce.number().int().min(5).max(60).default(15),
+  /** Interval of the hold-expiry sweeper in seconds; 0 disables it (tests). */
+  HOLD_SWEEP_SECONDS: z.coerce.number().int().min(0).max(3600).default(60),
 });
 
 export type AppConfig = z.infer<typeof EnvSchema>;

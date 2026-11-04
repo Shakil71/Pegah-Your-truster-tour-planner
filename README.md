@@ -4,10 +4,10 @@ Pegah is a travel booking platform for Bangladesh: hotels, tours, flights and
 visa services, priced in BDT, with an architecture ready for international
 expansion.
 
-> **Status:** Phase 3. The homepage and admin dashboard (sample data) are
-> built in Next.js; the API, contracts and database schema exist and are
-> tested against an in-memory fake, but have not yet run against MySQL. No
-> payment integration yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+> **Status:** Phases 3 and 4. Admin runs on live data behind staff sign-in;
+> customers can search, see server-computed prices and hold rooms or tour
+> seats (idempotent, lock-protected). Payments arrive in Phase 5, so nothing is
+> confirmed yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 ## Repository layout
 
@@ -17,6 +17,7 @@ expansion.
 | [apps/admin](apps/admin)                         | Staff back office (Next.js), port 3001                                                 |
 | [apps/api](apps/api)                             | REST API (NestJS + Fastify), port 4000, `/api/v1`                                      |
 | [packages/contracts](packages/contracts)         | Zod request/response contracts (single source of API shapes)                           |
+| [packages/api-client](packages/api-client)       | Typed API client generated from `apps/api/openapi.json`                                |
 | [packages/db](packages/db)                       | Prisma schema, migrations and client factory (API and worker only)                     |
 | [packages/design-tokens](packages/design-tokens) | Kantha tokens: CSS variables, Tailwind v4 theme, TS values                             |
 | [packages/ui](packages/ui)                       | Shared components: icons, logo, stitch, button styles                                  |

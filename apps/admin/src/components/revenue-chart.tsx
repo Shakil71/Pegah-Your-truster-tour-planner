@@ -10,7 +10,7 @@ const W = 760,
   R = 16,
   T = 18,
   B = 34;
-const RANGES = [7, 30, 90] as const;
+const RANGES = [7, 14, 30] as const;
 
 function niceMax(v: number) {
   const p = 10 ** Math.floor(Math.log10(v));
@@ -33,13 +33,14 @@ export function RevenueChart({ daily, endDate }: { daily: number[]; endDate: str
     });
   }, [data, endDate]);
 
-  const max = niceMax(Math.max(...data));
+  // An empty period still draws a readable axis (৳0 – ৳1,000).
+  const max = niceMax(Math.max(1000, ...data));
   const x = (i: number) => L + (i * (W - L - R)) / (data.length - 1);
   const y = (v: number) => T + (1 - v / max) * (H - T - B);
   const line = data.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
   const area = `${line}L${x(data.length - 1)},${y(0)}L${x(0)},${y(0)}Z`;
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
-  const xEvery = range === 7 ? 1 : range === 30 ? 5 : 15;
+  const xEvery = range === 7 ? 1 : range === 14 ? 2 : 5;
   const total = data.reduce((a, b) => a + b, 0);
   const fmtDay = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 
@@ -73,12 +74,14 @@ export function RevenueChart({ daily, endDate }: { daily: number[]; endDate: str
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2 id="rev-h" className="text-[0.95rem] font-semibold">
-            Gross booking value
+            Booking value
           </h2>
           <p className="tabular mt-1 font-display text-[1.9rem] font-medium leading-none">
             {taka(total)}
           </p>
-          <p className="mt-1 text-[0.78rem] text-ink-3">Last {range} days · daily, incl. VAT</p>
+          <p className="mt-1 text-[0.78rem] text-ink-3">
+            Last {range} days · held and confirmed, incl. VAT · not revenue until paid
+          </p>
         </div>
         <div
           className="flex rounded-full border border-rule bg-paper p-1"
@@ -111,7 +114,7 @@ export function RevenueChart({ daily, endDate }: { daily: number[]; endDate: str
           viewBox={`0 0 ${W} ${H}`}
           className="h-auto w-full touch-none select-none outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded-md"
           role="img"
-          aria-label={`Daily gross booking value for the last ${range} days, total ${taka(total)}. Use left and right arrows to read each day.`}
+          aria-label={`Daily booking value for the last ${range} days, total ${taka(total)}. Use left and right arrows to read each day.`}
           tabIndex={0}
           onPointerMove={onMove}
           onPointerLeave={() => setHover(null)}
@@ -212,7 +215,7 @@ export function RevenueChart({ daily, endDate }: { daily: number[]; endDate: str
             <thead className="sticky top-0 bg-paper">
               <tr>
                 <th className="px-3 py-1.5 font-semibold">Date</th>
-                <th className="px-3 py-1.5 text-right font-semibold">Gross value</th>
+                <th className="px-3 py-1.5 text-right font-semibold">Booking value</th>
               </tr>
             </thead>
             <tbody>

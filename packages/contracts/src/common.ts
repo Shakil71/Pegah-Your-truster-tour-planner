@@ -16,6 +16,14 @@ export const MoneySchema = z
   .meta({ id: "Money" });
 export type Money = z.infer<typeof MoneySchema>;
 
+/**
+ * Nullable free text. Always use this instead of a bare `nullableText()`:
+ * the explicit bound makes the JSON Schema an `anyOf`, which the OpenAPI
+ * generator handles correctly (a bare one is emitted as `type: [string, null]`
+ * and mis-read as an array, corrupting the generated client types).
+ */
+export const nullableText = (max = 10_000) => z.string().max(max).nullable();
+
 /** Public identifiers are ULIDs (26 Crockford base32 characters). */
 export const PublicIdSchema = z
   .string()
@@ -42,7 +50,7 @@ export type PaginationQuery = z.infer<typeof PaginationQuerySchema>;
 export function paginated<T extends z.ZodType>(item: T) {
   return z.object({
     items: z.array(item),
-    nextCursor: z.string().nullable(),
+    nextCursor: nullableText(),
   });
 }
 

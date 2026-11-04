@@ -68,3 +68,9 @@
     scroll-behavior: auto !important;
   }
 }
+
+@utility panel {
+  background: var(--pg-card);
+  border: 1px solid var(--pg-rule);
+  border-radius: var(--radius-card);
+}

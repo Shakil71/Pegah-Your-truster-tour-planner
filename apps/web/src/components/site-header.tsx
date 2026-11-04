@@ -1,18 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Icon, Logo, cx } from "@pegah/ui";
+import { browserApi } from "@/lib/api-browser";
 import { useScrolledPast } from "@/lib/use-browser";
 
 const nav = [
-  { href: "#stays", label: "Stays" },
-  { href: "#tours", label: "Tours" },
-  { href: "#explore", label: "Destinations" },
+  { href: "/stays", label: "Stays" },
+  { href: "/tours", label: "Tours" },
+  { href: "/#explore", label: "Destinations" },
 ];
 
-/** Transparent over the hero photo, solid once the page scrolls. */
-export function SiteHeader() {
-  const solid = useScrolledPast(40);
+/** Transparent over the hero photo (home), solid once the page scrolls or on inner pages. */
+export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) {
+  const scrolled = useScrolledPast(40);
+  const solid = alwaysSolid || scrolled;
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    void browserApi.GET("/api/v1/auth/session").then(({ data }) => {
+      if (live && data) setName(data.user.fullName.split(" ")[0] ?? null);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   return (
     <header
@@ -32,12 +46,12 @@ export function SiteHeader() {
           <ul className="flex gap-8 text-[0.94rem] font-medium">
             {nav.map((item) => (
               <li key={item.href}>
-                <a
+                <Link
                   href={item.href}
-                  className="border-b-2 border-transparent py-1.5 hover:border-current"
+                  className="border-b-2 border-transparent py-1.5 no-underline hover:border-current"
                 >
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
             <li>
@@ -49,16 +63,16 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-4 justify-self-end text-sm">
           <span className="tabular hidden md:inline">৳ BDT · EN</span>
-          <button
-            type="button"
+          <Link
+            href={name ? "/account/bookings" : "/login"}
             className={cx(
-              "inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-current px-4 py-[7px] font-semibold transition-colors",
+              "inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-current px-4 py-[7px] font-semibold no-underline transition-colors",
               solid ? "hover:bg-ink hover:text-card" : "hover:bg-white hover:text-night",
             )}
           >
             <Icon name="user" className="size-4" />
-            Sign in
-          </button>
+            {name ? `${name} · My trips` : "Sign in"}
+          </Link>
         </div>
       </div>
     </header>

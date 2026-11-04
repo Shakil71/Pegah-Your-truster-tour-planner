@@ -2,6 +2,7 @@
 
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { dhakaDate } from "@pegah/shared";
 import { Icon, buttonClass, type IconName } from "@pegah/ui";
@@ -67,6 +68,7 @@ const tabClass =
   "relative inline-flex cursor-pointer items-center gap-2 rounded-t-control px-4 pb-3.5 pt-3 text-[0.95rem] font-semibold text-ink-2 hover:text-ink data-[state=active]:text-ink data-[state=active]:after:absolute data-[state=active]:after:inset-x-4 data-[state=active]:after:bottom-0 data-[state=active]:after:h-0.5 data-[state=active]:after:content-[''] data-[state=active]:after:stitch-x";
 
 export function SearchPanel() {
+  const router = useRouter();
   const initial = useMemo(() => defaultDates(), []);
   const [where, setWhere] = useState("Srimangal, Sylhet");
   const [checkIn, setCheckIn] = useState(initial.checkIn);
@@ -148,8 +150,17 @@ export function SearchPanel() {
             onSubmit={(e) => {
               e.preventDefault();
               setStatus(
-                `Prototype: the live site would show stays in ${where} for ${nights} ${nights === 1 ? "night" : "nights"} with live prices.`,
+                `Searching stays in ${where} for ${nights} ${nights === 1 ? "night" : "nights"}…`,
               );
+              const q = new URLSearchParams({
+                where,
+                checkIn,
+                checkOut,
+                adults: String(guests.adults),
+                children: String(guests.children),
+                rooms: String(guests.rooms),
+              });
+              router.push(`/stays?${q.toString()}`);
             }}
           >
             <Field icon="pin" label="Where to?" htmlFor="q-where" wide>
@@ -262,9 +273,8 @@ export function SearchPanel() {
             className="grid grid-cols-2 gap-2.5 border-t border-rule p-3.5 lg:grid-cols-[2fr_1.1fr_1.1fr_1.3fr_auto]"
             onSubmit={(e) => {
               e.preventDefault();
-              setStatus(
-                `Prototype: the live site would list ${tourStyle.toLowerCase()} tours for ${tourWhere}.`,
-              );
+              setStatus(`Finding tours in ${tourWhere}…`);
+              router.push(`/tours?${new URLSearchParams({ where: tourWhere }).toString()}`);
             }}
           >
             <Field icon="pin" label="Destination" htmlFor="t-where" wide>

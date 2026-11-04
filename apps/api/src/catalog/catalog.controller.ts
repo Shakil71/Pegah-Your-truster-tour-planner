@@ -4,6 +4,8 @@ import {
   DestinationDetailSchema,
   DestinationListResponseSchema,
   HotelDetailSchema,
+  HotelOffersQuerySchema,
+  HotelOffersResponseSchema,
   HotelSearchQuerySchema,
   HotelSearchResponseSchema,
   SlugSchema,
@@ -19,6 +21,8 @@ import { CatalogService } from "./catalog.service";
 class DestinationListResponseDto extends createZodDto(DestinationListResponseSchema) {}
 class DestinationDetailDto extends createZodDto(DestinationDetailSchema) {}
 class HotelDetailDto extends createZodDto(HotelDetailSchema) {}
+class HotelOffersQueryDto extends createZodDto(HotelOffersQuerySchema) {}
+class HotelOffersResponseDto extends createZodDto(HotelOffersResponseSchema) {}
 class HotelSearchQueryDto extends createZodDto(HotelSearchQuerySchema) {}
 class HotelSearchResponseDto extends createZodDto(HotelSearchResponseSchema) {}
 class TourListResponseDto extends createZodDto(TourListResponseSchema) {}
@@ -73,6 +77,17 @@ export class CatalogController {
   hotel(@Param("slug") slug: string, @Res({ passthrough: true }) reply: FastifyReply) {
     cacheFor(reply, 300);
     return this.catalog.hotel(slugOr404(slug, "hotel"));
+  }
+
+  @Get("hotels/:slug/offers")
+  @ZodResponse({ status: 200, type: HotelOffersResponseDto })
+  offers(
+    @Param("slug") slug: string,
+    @Query() query: HotelOffersQueryDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    cacheFor(reply, 30);
+    return this.catalog.hotelOffers(slugOr404(slug, "hotel"), query);
   }
 
   @Get("tours")

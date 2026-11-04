@@ -1,11 +1,39 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Icon, cx } from "@pegah/ui";
+import { browserApi, csrf } from "@/lib/api-browser";
 import { Sidebar } from "./sidebar";
+import { useStaff } from "./staff-context";
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: "Owner",
+  admin: "Administrator",
+  operations: "Operations",
+  finance: "Finance",
+  content: "Content",
+  support: "Support",
+};
 
 export function AdminShell({ children, today }: { children: ReactNode; today: string }) {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const router = useRouter();
+  const { user, csrfToken } = useStaff();
+  const initials = user.fullName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  async function signOut() {
+    setSigningOut(true);
+    await browserApi.POST("/api/v1/staff/auth/logout", { headers: csrf(csrfToken) });
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <div className="min-h-dvh">
@@ -30,40 +58,48 @@ export function AdminShell({ children, today }: { children: ReactNode; today: st
             >
               <Icon name="menu" />
             </button>
-            <label className="relative hidden max-w-[420px] flex-1 md:block">
-              <span className="sr-only">Search bookings, guests, properties</span>
+            <form
+              action="/admin/bookings"
+              role="search"
+              className="relative hidden max-w-[420px] flex-1 md:block"
+            >
+              <label htmlFor="global-search" className="sr-only">
+                Search bookings by reference, guest name or email
+              </label>
               <Icon
                 name="search"
                 className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-ink-3"
               />
               <input
+                id="global-search"
                 type="search"
-                placeholder="Search bookings, guests, properties"
-                className="h-11 w-full rounded-control border border-rule bg-card pl-11 pr-16 text-[0.9rem] outline-none transition-colors placeholder:text-ink-3 focus:border-ink"
+                name="q"
+                maxLength={80}
+                placeholder="Reference, guest name or email"
+                className="h-11 w-full rounded-control border border-rule bg-card pl-11 pr-4 text-[0.9rem] outline-none transition-colors placeholder:text-ink-3 focus:border-ink"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-rule px-1.5 py-0.5 text-[0.7rem] text-ink-3">
-                Ctrl K
-              </kbd>
-            </label>
+            </form>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-[0.84rem] text-ink-2 sm:inline">{today} · Dhaka</span>
-              <button
-                type="button"
-                aria-label="Notifications, 3 unread"
-                className="relative grid size-11 place-items-center rounded-full border border-rule bg-card hover:border-ink"
-              >
-                <Icon name="bell" />
-                <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-primary ring-2 ring-card" />
-              </button>
               <div className="flex items-center gap-2.5 rounded-full border border-rule bg-card py-1 pl-1 pr-3.5">
-                <span className="grid size-9 place-items-center rounded-full bg-[conic-gradient(from_200deg,var(--pg-primary),#ffb07a,var(--pg-primary))] font-display text-[0.95rem] font-semibold text-on-primary">
-                  S
+                <span className="grid size-9 place-items-center rounded-full bg-primary font-display text-[0.95rem] font-semibold text-on-primary">
+                  {initials}
                 </span>
                 <span className="hidden leading-tight sm:block">
-                  <span className="block text-[0.84rem] font-semibold">Shakil</span>
-                  <span className="block text-[0.7rem] text-ink-3">Owner</span>
+                  <span className="block text-[0.84rem] font-semibold">{user.fullName}</span>
+                  <span className="block text-[0.7rem] text-ink-3">
+                    {user.roles.map((r) => ROLE_LABELS[r] ?? r).join(", ")}
+                  </span>
                 </span>
               </div>
+              <button
+                type="button"
+                onClick={signOut}
+                disabled={signingOut}
+                className="h-11 rounded-full border border-rule bg-card px-4 text-[0.84rem] font-semibold hover:border-ink disabled:opacity-50"
+              >
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
             </div>
           </div>
         </header>

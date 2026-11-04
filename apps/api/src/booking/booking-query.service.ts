@@ -1,10 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { AdminBookingListQuery, BookingDetail, BookingSummary } from "@pegah/contracts";
 import type { Prisma } from "@pegah/db";
+import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { allowedTransitions, type BookingActor } from "./booking-state-machine";
 import { decodeCursor, encodeCursor, toBookingSummary } from "./booking.mappers";
+import { breakdown } from "./offer";
 
 export interface BookingPage {
   items: BookingSummary[];
@@ -47,11 +49,33 @@ export class BookingQueryService {
     const booking = await this.db.booking.findFirst({
       // For customers, a booking that is not theirs is indistinguishable from a missing one.
       where: { publicId, ...(ownerUserId !== undefined ? { userId: ownerUserId } : {}) },
-      include: { history: { orderBy: { createdAt: "asc" } } },
+      include: {
+        history: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        items: { orderBy: { id: "asc" } },
+        guests: { orderBy: [{ isLead: "desc" }, { id: "asc" }] },
+      },
     });
     if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
     return {
       ...toBookingSummary(booking),
+      contactEmail: booking.contactEmail,
+      contactPhone: booking.contactPhone,
+      holdExpiresAt:
+        booking.status === "PENDING_PAYMENT" && booking.holdExpiresAt
+          ? booking.holdExpiresAt.toISOString()
+          : null,
+      price: breakdown(booking, booking.currency),
+      items: booking.items.map((i) => ({
+        type: i.itemType,
+        description: i.description,
+        quantity: i.quantity,
+        amount: toMoney(i.amountMinor, i.currency),
+      })),
+      travellers: booking.guests.map((g) => ({
+        fullName: g.fullName,
+        ageGroup: g.ageGroup,
+        isLead: g.isLead,
+      })),
       history: booking.history.map((h) => ({
         from: h.fromStatus,
         to: h.toStatus,

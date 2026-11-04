@@ -1,0 +1,19 @@
+{
+  "name": "@pegah/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed HTTP client for the Pegah API, generated from apps/api/openapi.json. Never edit src/schema.d.ts by hand.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "openapi-typescript ../../apps/api/openapi.json -o src/schema.d.ts && prettier --write src/schema.d.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openapi-fetch": "0.17.0"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0"
+  }
+}

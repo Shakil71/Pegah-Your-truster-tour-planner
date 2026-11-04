@@ -97,6 +97,7 @@ export function buildOpenApi(app: NestFastifyApplication): OpenAPIObject {
         "Pegah travel platform API. Money is integer minor units with a currency; " +
           "timestamps are ISO 8601 UTC; errors are RFC 9457 problem details.",
       )
+      .setOpenAPIVersion("3.1.0")
       .setVersion("0.1.0")
       .addCookieAuth("pg_sid", { type: "apiKey", in: "cookie" }, "customer")
       .addCookieAuth("pg_staff_sid", { type: "apiKey", in: "cookie" }, "staff")

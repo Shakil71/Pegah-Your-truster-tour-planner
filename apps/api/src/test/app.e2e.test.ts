@@ -15,6 +15,7 @@ const config = loadConfig({
   SESSION_SECRET: randomBytes(32).toString("base64url"),
   APP_ORIGINS: "http://localhost:3000,http://localhost:3001",
   OPENAPI_ENABLED: "true",
+  HOLD_SWEEP_SECONDS: "0",
 });
 
 let app: NestFastifyApplication;

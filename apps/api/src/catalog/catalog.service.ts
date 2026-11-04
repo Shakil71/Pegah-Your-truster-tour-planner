@@ -3,6 +3,8 @@ import type {
   DestinationDetail,
   DestinationSummary,
   HotelDetail,
+  HotelOffersQuery,
+  HotelOffersResponse,
   HotelOffer,
   HotelSearchQuery,
   HotelSearchResponse,
@@ -12,14 +14,13 @@ import type {
 import type { Prisma } from "@pegah/db";
 import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
-import { addDays, dhakaToday, nightsBetween, parseCalendarDate, stayNights } from "../common/time";
+import { parseStay } from "../common/stay-dates";
+import { stayNights } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { stringList, toHotelSummary, toMedia } from "./catalog.mappers";
 import { evaluateRoom } from "./hotel-search";
 
-const MAX_NIGHTS = 30;
-const MAX_DAYS_AHEAD = 365;
 const MEDIA_SELECT = {
   select: { storageKey: true, altText: true, credit: true, width: true, height: true },
 } as const;
@@ -145,34 +146,7 @@ export class CatalogService {
    * re-reads inventory and rates under a row lock before holding anything.
    */
   async searchHotels(q: HotelSearchQuery, now: Date = new Date()): Promise<HotelSearchResponse> {
-    const checkIn = parseCalendarDate(q.checkIn);
-    const checkOut = parseCalendarDate(q.checkOut);
-    const today = dhakaToday(now);
-    const nights = nightsBetween(checkIn, checkOut);
-    if (checkIn < today) {
-      throw new ProblemException(
-        400,
-        "invalid-dates",
-        "Invalid dates",
-        "Check-in cannot be in the past.",
-      );
-    }
-    if (checkIn > addDays(today, MAX_DAYS_AHEAD)) {
-      throw new ProblemException(
-        400,
-        "invalid-dates",
-        "Invalid dates",
-        "Check-in is too far ahead.",
-      );
-    }
-    if (nights < 1 || nights > MAX_NIGHTS) {
-      throw new ProblemException(
-        400,
-        "invalid-dates",
-        "Invalid dates",
-        `Stays must be between 1 and ${MAX_NIGHTS} nights.`,
-      );
-    }
+    const { checkIn, checkOut } = parseStay(q.checkIn, q.checkOut, now);
 
     const destination = await this.db.destination.findFirst({
       where: { slug: q.destination, status: "PUBLISHED" },
@@ -255,6 +229,76 @@ export class CatalogService {
       offers,
       pricedAt: now.toISOString(),
     };
+  }
+
+  /** Every active room of a hotel priced for one stay (property page). Indicative only. */
+  async hotelOffers(
+    slug: string,
+    q: HotelOffersQuery,
+    now: Date = new Date(),
+  ): Promise<HotelOffersResponse> {
+    const stay = parseStay(q.checkIn, q.checkOut, now);
+    const range = { gte: stay.checkIn, lt: stay.checkOut };
+    const hotel = await this.db.hotel.findFirst({
+      where: { slug, status: "PUBLISHED", destination: { status: "PUBLISHED" } },
+      include: {
+        rooms: {
+          where: { isActive: true },
+          orderBy: { maxAdults: "asc" },
+          include: {
+            inventory: { where: { stayDate: range } },
+            rates: { where: { stayDate: range } },
+          },
+        },
+      },
+    });
+    if (!hotel) throw new ProblemException(404, "hotel-not-found", "Hotel not found");
+    const nights = stayNights(stay.checkIn, stay.checkOut);
+    const money = (v: bigint) => toMoney(v, hotel.currency);
+    const rooms = hotel.rooms.map((room) => {
+      const r = evaluateRoom(room, {
+        nights,
+        rooms: q.rooms,
+        adults: q.adults,
+        children: q.children,
+        currency: hotel.currency,
+        serviceChargeBps: hotel.serviceChargeBps,
+        vatBps: hotel.vatBps,
+      });
+      return {
+        room: {
+          id: room.publicId,
+          name: room.name,
+          description: room.description,
+          maxAdults: room.maxAdults,
+          maxChildren: room.maxChildren,
+          bedType: room.bedType,
+          sizeSqm: room.sizeSqm,
+        },
+        available: r.ok,
+        roomsLeft: r.ok ? r.roomsLeft : null,
+        reason: r.ok ? null : r.reason,
+        price: r.ok
+          ? {
+              nights: r.price.nights,
+              rooms: r.price.rooms,
+              base: money(r.price.baseMinor),
+              serviceCharge: money(r.price.serviceChargeMinor),
+              vat: money(r.price.vatMinor),
+              total: money(r.price.totalMinor),
+              perNightFrom: money(r.price.perNightFromMinor),
+            }
+          : null,
+      };
+    });
+    rooms.sort((a, b) =>
+      a.available === b.available
+        ? (a.price?.total.amountMinor ?? 0) - (b.price?.total.amountMinor ?? 0)
+        : a.available
+          ? -1
+          : 1,
+    );
+    return { rooms, pricedAt: now.toISOString() };
   }
 
   async listTours(now: Date = new Date()): Promise<TourSummary[]> {

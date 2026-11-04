@@ -4,100 +4,90 @@ _Last updated: 2026-11-04_
 
 ## Current phase
 
-**Phase 3 (backend foundation) — implemented and verified against MySQL 8.4.13
-locally.** `apps/api` (NestJS + Fastify), `packages/contracts` (Zod) and
-`packages/db` (Prisma schema + initial migration) exist with auth, RBAC,
-catalog reads, hotel search with server-side pricing, the booking state
-machine and audit logging. All checks pass; the migration, seeds and the full API flow were run against a
-real local MySQL 8.4.13 (portable, 127.0.0.1 only). Automated DB integration
-tests are the next step.
+**Phases 3 and 4 are implemented and verified locally.** The back office runs
+on live API data behind staff sign-in. Customers can search stays and tours,
+see server-computed prices, sign in, and hold a room or seats for 15 minutes
+with an idempotent, lock-protected booking. Payment is Phase 5, so no booking
+can become CONFIRMED yet, and the UI says so everywhere.
 
 ## Completed
 
-- Phase 1: repository audit, environment assessment, approved proposal,
-  `CLAUDE.md`, full documentation set, ADR-0001 … ADR-0007.
-- Phase 2: monorepo, design tokens (primary `#FF852F`, ADR-0010), `packages/ui`,
-  `packages/shared`, `apps/web` homepage, `apps/admin` dashboard with sample
-  data, GitHub Actions CI.
-- Phase 3:
-  - `packages/contracts`: money, problem details, pagination, permissions,
-    staff roles, auth, booking, catalog and health schemas (ADR-0002).
-  - `packages/db`: Prisma 7 schema for identity, catalog, inventory, rates,
-    tours, bookings, holds, status history, idempotency keys, outbox and audit;
-    initial migration with CHECK constraints (ADR-0014).
-  - `apps/api`: config validation, RFC 9457 errors, Helmet, strict CORS, rate
-    limits, health probes, customer and staff auth with Argon2id and
-    hashed server-side sessions, HMAC CSRF, permission guard (ADR-0015),
-    catalog endpoints, hotel search, customer and admin booking reads,
-    state-machine status changes with history and audit in one transaction,
-    OpenAPI export.
-  - Operator CLIs: `seed:rbac`, `staff:create` (hidden password prompt),
-    `seed:sample` (refuses production).
-  - CI: OpenAPI drift check added.
-  - Security upgrades: Fastify 5.12.7 override, js-yaml override, Vitest
-    4.1.12, Turborepo 2.11.10 (ADR-0013).
-
-## In progress
-
-- Phase 2 design for remaining pages: search results, property page, tour
-  page, checkout, account.
+- Phase 1: audit, environment assessment, approved proposal, `CLAUDE.md`,
+  documentation set, ADR-0001 … ADR-0007.
+- Phase 2: monorepo, design tokens (`#FF852F`, ADR-0010), `packages/ui`,
+  `packages/shared`, homepage, admin design, CI.
+- Phase 3 (backend foundation and admin connection):
+  - Contracts, Prisma schema and migration, NestJS API with auth, RBAC, CSRF,
+    catalog, search, booking state machine, audit (ADR-0013 … ADR-0015).
+  - Admin: staff sign-in; dashboard, bookings list, booking detail with an
+    audited status change, Staff and roles, Audit log, all on live data.
+  - API: dashboard summary, staff management (owner-only owner grants,
+    last-owner protection, disable revokes sessions), audit log read.
+  - `packages/api-client` generated from OpenAPI (ADR-0020).
+  - MySQL 8.4 integration tests, local and in CI (no containers).
+- Phase 4 (booking engine and customer flow):
+  - `POST /bookings` with holds, `Idempotency-Key`, row locks, price
+    revalidation; quotes; hotel offers; customer cancel; hold expiry (ADR-0018).
+  - Web: stay results, property page, tours, departure picker, checkout,
+    sign in / create account, My trips with hold countdown and cancel.
+  - Demo catalog seed, labelled and removable (ADR-0021).
+- Infra: pull-based CD from `main` (ADR-0016/0017); HTTPS script for :8443
+  (ADR-0019); the deploy agent requires both CI jobs to pass.
 
 ## Next recommended actions
 
-1. Add automated DB integration tests (concurrent holds, CHECK constraints, ownership).
-2. Admin app: staff login screen and switch the dashboard/bookings pages from
-   sample data to the API (`packages/api-client` generated from
-   `apps/api/openapi.json`).
-3. Phase 4: booking creation with inventory holds and idempotency keys.
-4. Server bootstrap and CD prepared in `infra/` (ADR-0016). Owner runs the bootstrap once; then tag `v0.3.0` deploys automatically.
-5. No self-hosted runner: pull-based deploy agent instead, because the repository is public (ADR-0016).
+1. **Owner:** run `sudo bash /home/pegah/pegah-infra/server/enable-https.sh`
+   once (HTTPS on :8443; sign-in needs it).
+2. **Owner:** create your own staff account on the server
+   (`staff:create`, command in DEPLOYMENT.md). The password is typed into a
+   hidden prompt and never shared in chat.
+3. Phase 5: SSLCOMMERZ sandbox payment (blocked on sandbox credentials),
+   webhook verification, confirmation, vouchers and email.
+4. Move the hold sweeper and outbox to `apps/worker` once Redis/Valkey exists
+   for Pegah (ADR-0018).
+5. Browser automation: Playwright + axe in CI for the booking flow.
+6. Before launch: `seed-sample.js --demo --remove`, real domain + certificate,
+   staging instance (ADR-0017).
 
 ## Blockers
 
-| Blocker                           | Blocks                                     | Owner                                                                   |
-| --------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------- |
-| No local Redis                    | Redis-backed rate limits, worker (Phase 4) | Owner: approve portable Valkey or WSL                                   |
-| Server bootstrap not run yet      | MySQL 8.4, services, first deploy          | Owner: run `sudo bash /home/pegah/pegah-infra/server/bootstrap-root.sh` |
-| Root password exposed in chat     | Server security                            | Owner: rotate, disable root SSH                                         |
-| No flight supplier contract       | Flights                                    | Owner                                                                   |
-| No SSLCOMMERZ sandbox credentials | Payment integration (Phase 5)              | Owner                                                                   |
-| Domain not chosen                 | TLS, email DNS, production cookie origin   | Owner                                                                   |
+| Blocker                           | Blocks                                 | Owner                                |
+| --------------------------------- | -------------------------------------- | ------------------------------------ |
+| HTTPS script not run yet          | Sign-in on the server (Secure cookies) | Owner: run `enable-https.sh` as root |
+| No Redis/Valkey for Pegah         | Worker, distributed rate limits        | Owner: approve a Pegah-only Valkey   |
+| Root password exposed in chat     | Server security                        | Owner: rotate, `PermitRootLogin no`  |
+| `pegah` password shared in chat   | Server security                        | Owner: `passwd -l pegah` (keys only) |
+| No SSLCOMMERZ sandbox credentials | Payments (Phase 5)                     | Owner                                |
+| No flight supplier contract       | Flights                                | Owner                                |
+| Domain not chosen                 | Trusted TLS, email DNS, cookie origin  | Owner                                |
 
 ## Known issues
 
-- Node.js is installed at `C:\Program Files\nodejs` but VS Code's terminal
-  PATH does not include it until VS Code is restarted.
-- Node 26 prints a `module.register` deprecation warning during `next build`;
-  harmless, and CI uses Node 22.
-- Admin app still shows sample data and has no login screen; it must not be
-  exposed publicly. The API's staff auth is ready for it.
-- Rate limits are in-memory per process until Redis is available.
-- Registration reveals whether an email is registered (409) until email
-  verification exists (ADR-0015).
-- `npm audit --omit=dev`: 2 low (`deepmerge` via `nestjs-zod`, no fix
-  released). Dev-only: moderate `minimatch` advisories via ESLint 9.
-- npm 11 holds back install scripts (esbuild, @swc/core, argon2, prisma);
-  everything used works with the shipped prebuilt binaries.
+- The server certificate is self-signed: browsers warn once per device.
+- Demo listings are on the pre-launch server by owner approval (ADR-0021).
+- Listing photos are licensed stock matched by destination until the media
+  pipeline exists (no uploads yet).
+- Rate limits are in-memory per API process until Redis exists.
+- Registration reveals whether an email exists (409) until email verification.
+- `npm audit --omit=dev`: 2 low (`deepmerge` via `nestjs-zod`).
+- Node 26 prints a `module.register` deprecation warning locally; CI uses 22.
 - Repository name contains the typo "truster".
 
 ## Latest validation results (2026-11-04, local, Node 26.13)
 
-| Check                                      | Result                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vitest run`                               | 69/69 passed (shared 17; API unit 31; API HTTP-level 21 against an in-memory DB fake)                                                                                                                                                                                                                 |
-| `turbo run lint typecheck build`           | 15/15 tasks passed (web, admin, api, contracts, db, ui, shared, tokens)                                                                                                                                                                                                                               |
-| Prettier `--check .`                       | Passed                                                                                                                                                                                                                                                                                                |
-| `prisma generate` / offline `migrate diff` | Passed; 22 tables, 25 foreign keys                                                                                                                                                                                                                                                                    |
-| OpenAPI export                             | 20 paths written to `apps/api/openapi.json`                                                                                                                                                                                                                                                           |
-| API HTTP smoke test (compiled, no DB)      | live 200; ready 503 in 2.0 s; catalog 503 problem; protected routes 401; foreign Origin 403; Helmet headers present                                                                                                                                                                                   |
-| Migration applied to MySQL 8.4.13          | `prisma migrate deploy` passed: 22 tables + 5 CHECK constraints; seeds idempotent                                                                                                                                                                                                                     |
-| API against real MySQL                     | Hotel search prices verified by hand (৳17,000 + 10% SC + 15% VAT = ৳21,505); occupancy filter; past dates 400; register/duplicate 409/CSRF 403/logout 204→401; staff login with 12 owner permissions; MANUAL_REVIEW→CONFIRMED with history + audit; stale 409; illegal 422; customer sees own booking |
-| DB-level protections                       | Overbooking and inconsistent totals rejected by CHECK (ERROR 3819); app user cannot DROP (ERROR 1142); sessions store 64-char hashes; passwords `$argon2id$`                                                                                                                                          |
-| Automated DB integration tests             | Not written yet (manual run above)                                                                                                                                                                                                                                                                    |
-| axe / Lighthouse / Playwright              | Not run yet — no browser automation set up                                                                                                                                                                                                                                                            |
-| GitHub Actions CI                          | Run 41774980145 on `develop` (3c1cbf8): success                                                                                                                                                                                                                                                       |
+| Check                                   | Result                                                                                                                                                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm test` (unit + HTTP on fake DB)     | 77 passed (integration suite skipped without a DB URL)                                                                                                                                               |
+| MySQL 8.4.13 integration tests          | 9/9 passed: last-room race (one 201, one 409), idempotent replay/reuse/missing key, price change, party validation, cancel and expiry release holds, CHECK constraint, dashboard, staff rules, audit |
+| `turbo run lint typecheck`              | 13/13 tasks passed                                                                                                                                                                                   |
+| `turbo run build`                       | Passed (web, admin, api, packages)                                                                                                                                                                   |
+| Prettier `--check`                      | Passed                                                                                                                                                                                               |
+| OpenAPI export                          | 29 paths; nullable fields now correct                                                                                                                                                                |
+| End-to-end smoke (web origin, real API) | 22/22: pages, sign-in gate, register, results, property, checkout, hold, replay, My trips (never "Confirmed"), cancel, staff login, all admin pages, dashboard shows the booking                     |
+| axe / Lighthouse / Playwright           | Not run yet                                                                                                                                                                                          |
+| GitHub Actions                          | Pending this push                                                                                                                                                                                    |
 
 ## Approvals required
 
-- Feedback on the running homepage and admin dashboard.
-- Read-only server inspection (owner runs it, or approves non-root SSH key).
+- Run `enable-https.sh` on the server (root).
+- Before real customers: remove demo data, choose a domain, add staging.

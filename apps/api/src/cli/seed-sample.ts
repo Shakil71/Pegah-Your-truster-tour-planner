@@ -1,26 +1,34 @@
 /**
- * Development-only sample catalog: destinations, hotels with rooms, 90 days
- * of inventory and rates, and tours with departures. Every record is clearly
- * sample data; it refuses to run in production.
- *   npm run seed:sample -w @pegah/api
+ * Demo catalog: destinations, hotels with rooms, 120 days of inventory and
+ * rates, and tours with weekly departures. Every hotel and tour is labelled
+ * "(Demo)" and its slug starts with "demo-", so it can never be mistaken for a
+ * real listing and can be removed in one command.
+ *
+ *   npm run seed:sample -w @pegah/api                      # development
+ *   NODE_ENV=production … seed-sample.js --demo            # pre-launch server (owner-approved)
+ *   … seed-sample.js --demo --remove                       # delete all demo listings and their bookings
+ *
+ * Payment is not live, so no demo booking can ever become CONFIRMED.
  */
 import { addDays, dhakaToday } from "../common/time";
 import { newPublicId } from "../common/ids";
 import { cliDb, run } from "./cli-db";
 
-if (process.env.NODE_ENV === "production") {
-  console.error("seed:sample is for development databases only.");
+const flag = (name: string) => process.argv.includes(`--${name}`);
+if (process.env.NODE_ENV === "production" && !flag("demo")) {
+  console.error("Refusing to seed a production database without --demo (owner approval required).");
   process.exit(2);
 }
 
 const db = cliDb();
-const DAYS = 90;
+const DAYS = 120;
+const DEMO = " (Demo)";
 const taka = (t: number) => BigInt(t) * 100n;
 
 const destinations = [
   {
-    slug: "sreemangal",
-    name: "Sreemangal",
+    slug: "srimangal",
+    name: "Srimangal",
     nameBn: "শ্রীমঙ্গল",
     region: "Sylhet",
     summary: "Tea gardens, the Lawachara rain forest and the famous seven-layer tea.",
@@ -50,9 +58,9 @@ const destinations = [
 
 const hotels = [
   {
-    dest: "sreemangal",
-    slug: "sample-tea-garden-resort",
-    name: "Tea Garden Resort (sample)",
+    dest: "srimangal",
+    slug: "demo-tea-garden-resort",
+    name: "Tea Garden Resort",
     stars: 4,
     sc: 1000,
     vat: 1500,
@@ -78,9 +86,9 @@ const hotels = [
     ],
   },
   {
-    dest: "sreemangal",
-    slug: "sample-lawachara-eco-lodge",
-    name: "Lawachara Eco Lodge (sample)",
+    dest: "srimangal",
+    slug: "demo-lawachara-eco-lodge",
+    name: "Lawachara Eco Lodge",
     stars: 3,
     sc: 0,
     vat: 1500,
@@ -98,8 +106,8 @@ const hotels = [
   },
   {
     dest: "coxs-bazar",
-    slug: "sample-marine-drive-hotel",
-    name: "Marine Drive Hotel (sample)",
+    slug: "demo-marine-drive-hotel",
+    name: "Marine Drive Hotel",
     stars: 5,
     sc: 1000,
     vat: 1500,
@@ -126,8 +134,8 @@ const hotels = [
   },
   {
     dest: "bandarban",
-    slug: "sample-nilgiri-hill-stay",
-    name: "Nilgiri Hill Stay (sample)",
+    slug: "demo-nilgiri-hill-stay",
+    name: "Nilgiri Hill Stay",
     stars: 3,
     sc: 500,
     vat: 1500,
@@ -148,8 +156,8 @@ const hotels = [
 const tours = [
   {
     dest: "sundarbans",
-    slug: "sample-sundarbans-river-cruise",
-    title: "Sundarbans River Cruise (sample)",
+    slug: "demo-sundarbans-river-cruise",
+    title: "Sundarbans River Cruise",
     days: 3,
     nights: 2,
     meeting: "Khulna launch ghat",
@@ -163,8 +171,8 @@ const tours = [
   },
   {
     dest: "bandarban",
-    slug: "sample-bandarban-hill-trek",
-    title: "Bandarban Hill Trek (sample)",
+    slug: "demo-bandarban-hill-trek",
+    title: "Bandarban Hill Trek",
     days: 4,
     nights: 3,
     meeting: "Bandarban bus stand",
@@ -178,7 +186,62 @@ const tours = [
   },
 ];
 
+/** Deletes every demo hotel/tour, their inventory, and any bookings made against them. */
+async function removeDemo(): Promise<void> {
+  const demoHotels = await db.hotel.findMany({
+    where: { slug: { startsWith: "demo-" } },
+    select: { id: true },
+  });
+  const demoTours = await db.tour.findMany({
+    where: { slug: { startsWith: "demo-" } },
+    select: { id: true },
+  });
+  const rooms = await db.hotelRoom.findMany({
+    where: { hotelId: { in: demoHotels.map((h) => h.id) } },
+    select: { id: true },
+  });
+  const schedules = await db.tourSchedule.findMany({
+    where: { tourId: { in: demoTours.map((t) => t.id) } },
+    select: { id: true },
+  });
+  const roomIds = rooms.map((r) => r.id);
+  const scheduleIds = schedules.map((s) => s.id);
+  const bookingIds = (
+    await db.bookingItem.findMany({
+      where: { OR: [{ hotelRoomId: { in: roomIds } }, { tourScheduleId: { in: scheduleIds } }] },
+      select: { bookingId: true },
+    })
+  ).map((i) => i.bookingId);
+  await db.$transaction(async (tx) => {
+    const byBooking = { bookingId: { in: bookingIds } };
+    await tx.inventoryHold.deleteMany({ where: byBooking });
+    await tx.bookingItem.deleteMany({ where: byBooking });
+    await tx.bookingGuest.deleteMany({ where: byBooking });
+    await tx.bookingStatusHistory.deleteMany({ where: byBooking });
+    await tx.booking.deleteMany({ where: { id: { in: bookingIds } } });
+    await tx.roomInventory.deleteMany({ where: { roomId: { in: roomIds } } });
+    await tx.roomRate.deleteMany({ where: { roomId: { in: roomIds } } });
+    await tx.hotelRoom.deleteMany({ where: { id: { in: roomIds } } });
+    await tx.hotel.deleteMany({ where: { id: { in: demoHotels.map((h) => h.id) } } });
+    await tx.tourSchedule.deleteMany({ where: { id: { in: scheduleIds } } });
+    await tx.tour.deleteMany({ where: { id: { in: demoTours.map((t) => t.id) } } });
+    // Destinations stay if anything real uses them; otherwise they go back to draft.
+    await tx.destination.updateMany({
+      where: {
+        slug: { in: destinations.map((d) => d.slug) },
+        hotels: { none: {} },
+        tours: { none: {} },
+      },
+      data: { status: "DRAFT" },
+    });
+  });
+  console.warn(
+    `Removed demo data: ${demoHotels.length} hotels, ${demoTours.length} tours, ${bookingIds.length} bookings.`,
+  );
+}
+
 void run(async () => {
+  if (flag("remove")) return removeDemo();
   const today = dhakaToday();
   const destIds = new Map<string, bigint>();
   for (const [i, d] of destinations.entries()) {
@@ -196,12 +259,15 @@ void run(async () => {
       create: {
         publicId: newPublicId(),
         slug: h.slug,
-        name: h.name,
+        name: h.name + DEMO,
         destinationId: destIds.get(h.dest)!,
         starRating: h.stars,
-        addressLine: "Sample address — not a real property",
-        summary: "Sample property for development. Not bookable.",
-        cancellationPolicy: "Free cancellation until 3 days before check-in (sample policy).",
+        addressLine: "Demo listing — not a real property",
+        summary:
+          "A demo stay for trying Pegah before launch. Holds work; nothing is ever confirmed.",
+        description:
+          "This property is demo data. It shows how search, prices with service charge and VAT, and 15-minute holds work. It will be removed before launch.",
+        cancellationPolicy: "Free cancellation until 3 days before check-in (demo policy).",
         serviceChargeBps: h.sc,
         vatBps: h.vat,
         status: "PUBLISHED",
@@ -215,7 +281,7 @@ void run(async () => {
           publicId: newPublicId(),
           hotelId: hotel.id,
           name: r.name,
-          description: `${r.name} (sample)`,
+          description: `${r.name} (demo room)`,
           maxAdults: r.adults,
           maxChildren: r.children,
           bedType: r.bed,
@@ -249,9 +315,11 @@ void run(async () => {
         publicId: newPublicId(),
         slug: t.slug,
         destinationId: destIds.get(t.dest)!,
-        title: t.title,
-        summary: "Sample tour for development. Not bookable.",
-        description: "Sample itinerary.",
+        title: t.title + DEMO,
+        summary:
+          "A demo tour for trying Pegah before launch. Holds work; nothing is ever confirmed.",
+        description:
+          "This tour is demo data. It shows departures, seat counts and 15-minute holds. It will be removed before launch.",
         durationDays: t.days,
         durationNights: t.nights,
         meetingPoint: t.meeting,
@@ -269,7 +337,7 @@ void run(async () => {
       // Weekly Thursday departures at 07:00 Dhaka (01:00 UTC).
       const firstThu = addDays(today, (4 - today.getUTCDay() + 7) % 7 || 7);
       await db.tourSchedule.createMany({
-        data: Array.from({ length: 8 }, (_, w) => {
+        data: Array.from({ length: 16 }, (_, w) => {
           const departsAt = new Date(addDays(firstThu, w * 7).getTime() + 60 * 60_000);
           return {
             publicId: newPublicId(),
@@ -285,6 +353,6 @@ void run(async () => {
     }
   }
   console.warn(
-    `Sample catalog ready: ${destinations.length} destinations, ${hotels.length} hotels, ${tours.length} tours.`,
+    `Demo catalog ready: ${destinations.length} destinations, ${hotels.length} hotels, ${tours.length} tours.`,
   );
 }, db);

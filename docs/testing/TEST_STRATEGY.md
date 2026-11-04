@@ -30,3 +30,14 @@ locally/on staging once a database is available (see PROJECT_STATUS).
 
 Only report a check as passing if it was executed. If a check cannot run, record
 why in `docs/PROJECT_STATUS.md`.
+
+## Database integration tests (Phase 3/4)
+
+`apps/api/src/test/booking.int.test.ts` runs against a real MySQL 8.4 server
+when `PEGAH_IT_DATABASE_URL` points at a user that may create `pegah_it_*`
+databases. Each run creates a fresh database, applies the real migrations,
+and drops it afterwards. CI starts Oracle's MySQL 8.4.13 tarball as a plain
+process (job "Database integration (MySQL 8.4)"; no containers). Covered: the
+concurrent last-room race, idempotent replay and key reuse, price change,
+party validation, hold release on cancel and expiry, the CHECK constraint,
+the dashboard, staff-management rules and the audit log.

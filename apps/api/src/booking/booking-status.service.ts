@@ -4,6 +4,7 @@ import { AuditService } from "../audit/audit.service";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { canTransition, type BookingActor } from "./booking-state-machine";
+import { releaseActiveHolds, type Tx } from "./inventory";
 
 export interface TransitionCommand {
   bookingPublicId: string;
@@ -12,12 +13,18 @@ export interface TransitionCommand {
   actor: { type: BookingActor; userId: bigint | null };
   reason: string | null;
   ipAddress?: string | null;
+  /** For customers: the booking must belong to this user (otherwise 404). */
+  ownerUserId?: bigint;
 }
 
+/** Statuses that end a booking without a sale: any held inventory goes back on sale. */
+const RELEASES_HOLDS: ReadonlySet<BookingStatus> = new Set(["EXPIRED", "CANCELLED", "FAILED"]);
+
 /**
- * The only code path that changes a booking's status. It validates the edge
- * against the state machine, guards against concurrent changes, and writes
- * the history row (and an audit event for staff) in the same transaction.
+ * The only code path that changes an existing booking's status. It validates
+ * the edge against the state machine, guards against concurrent changes, and
+ * writes the history row, hold release and (for staff and customers) an audit
+ * event in the same transaction.
  */
 @Injectable()
 export class BookingStatusService {
@@ -26,66 +33,76 @@ export class BookingStatusService {
     @Inject(AuditService) private readonly audit: AuditService,
   ) {}
 
-  async transition(cmd: TransitionCommand): Promise<void> {
-    await this.db.$transaction(async (tx) => {
-      const booking = await tx.booking.findUnique({
-        where: { publicId: cmd.bookingPublicId },
-        select: { id: true, status: true },
-      });
-      if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
-      const from = booking.status;
+  async transition(cmd: TransitionCommand, now: Date = new Date()): Promise<void> {
+    await this.db.$transaction((tx) => this.transitionInTx(tx, cmd, now));
+  }
 
-      if (from !== cmd.expectedStatus) {
-        throw new ProblemException(
-          409,
-          "booking-status-changed",
-          "Booking status changed",
-          `The booking is now ${from}. Reload and try again.`,
-        );
-      }
-      if (!canTransition(from, cmd.to, cmd.actor.type)) {
-        throw new ProblemException(
-          422,
-          "illegal-transition",
-          "Transition not allowed",
-          `A booking cannot move from ${from} to ${cmd.to}.`,
-        );
-      }
+  async transitionInTx(tx: Tx, cmd: TransitionCommand, now: Date = new Date()): Promise<void> {
+    const booking = await tx.booking.findFirst({
+      where: {
+        publicId: cmd.bookingPublicId,
+        ...(cmd.ownerUserId !== undefined ? { userId: cmd.ownerUserId } : {}),
+      },
+      select: { id: true, status: true },
+    });
+    if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
+    const from = booking.status;
 
-      // Compare-and-set: succeeds only if nobody changed the status meanwhile.
-      const updated = await tx.booking.updateMany({
-        where: { id: booking.id, status: from },
-        data: { status: cmd.to },
-      });
-      if (updated.count !== 1) {
-        throw new ProblemException(409, "booking-status-changed", "Booking status changed");
-      }
+    if (from !== cmd.expectedStatus) {
+      throw new ProblemException(
+        409,
+        "booking-status-changed",
+        "Booking status changed",
+        `The booking is now ${from}. Reload and try again.`,
+      );
+    }
+    if (!canTransition(from, cmd.to, cmd.actor.type)) {
+      throw new ProblemException(
+        422,
+        "illegal-transition",
+        "Transition not allowed",
+        `A booking cannot move from ${from} to ${cmd.to}.`,
+      );
+    }
 
-      await tx.bookingStatusHistory.create({
-        data: {
-          bookingId: booking.id,
-          fromStatus: from,
-          toStatus: cmd.to,
+    // Compare-and-set: succeeds only if nobody changed the status meanwhile.
+    const updated = await tx.booking.updateMany({
+      where: { id: booking.id, status: from },
+      data: {
+        status: cmd.to,
+        ...(RELEASES_HOLDS.has(cmd.to) ? { holdExpiresAt: null } : {}),
+      },
+    });
+    if (updated.count !== 1) {
+      throw new ProblemException(409, "booking-status-changed", "Booking status changed");
+    }
+
+    await tx.bookingStatusHistory.create({
+      data: {
+        bookingId: booking.id,
+        fromStatus: from,
+        toStatus: cmd.to,
+        actorType: cmd.actor.type,
+        actorUserId: cmd.actor.userId,
+        reason: cmd.reason,
+      },
+    });
+
+    const released = RELEASES_HOLDS.has(cmd.to) ? await releaseActiveHolds(tx, booking.id, now) : 0;
+
+    if (cmd.actor.type === "STAFF" || cmd.actor.type === "CUSTOMER") {
+      await this.audit.record(
+        {
           actorType: cmd.actor.type,
           actorUserId: cmd.actor.userId,
-          reason: cmd.reason,
+          action: "booking.status_changed",
+          targetType: "booking",
+          targetId: cmd.bookingPublicId,
+          ipAddress: cmd.ipAddress ?? null,
+          metadata: { from, to: cmd.to, reason: cmd.reason, holdsReleased: released },
         },
-      });
-
-      if (cmd.actor.type === "STAFF") {
-        await this.audit.record(
-          {
-            actorType: "STAFF",
-            actorUserId: cmd.actor.userId,
-            action: "booking.status_changed",
-            targetType: "booking",
-            targetId: cmd.bookingPublicId,
-            ipAddress: cmd.ipAddress ?? null,
-            metadata: { from, to: cmd.to, reason: cmd.reason },
-          },
-          tx,
-        );
-      }
-    });
+        tx,
+      );
+    }
   }
 }

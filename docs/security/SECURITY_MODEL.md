@@ -59,3 +59,15 @@ overrides, staff logins) write append-only `audit_events`.
 - 2026-11-04 (later): the root password was shared in chat a second time with
   a request to log in. It was not used or stored; key-based access for a
   non-root `pegah` user was proposed instead. Still **open**.
+
+## Staff management and booking safety (Phases 3–4)
+
+- Only an owner can grant or remove the owner role or change an owner; nobody
+  can disable themselves or drop their own roles; at least one active owner
+  must remain; disabling a person revokes their sessions at once. All changes
+  are audited.
+- Booking creation needs a customer session, CSRF, an allowed Origin and an
+  `Idempotency-Key`; prices are recomputed under row locks; customers can see
+  and cancel only their own bookings (others return 404).
+- Sign-in requires HTTPS (Secure `__Host-` cookies). The pre-launch server uses
+  a self-signed certificate on :8443 (ADR-0019); no setting was weakened.

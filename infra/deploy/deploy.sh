@@ -44,7 +44,7 @@ log "Commit $SHA — $SUBJECT"
 # GitHub under Deployments → production. Without it, deploys work the same.
 # The token is never printed.
 REPO_API="https://api.github.com/repos/Shakil71/Pegah-Your-truster-tour-planner"
-SITE_URL="http://27.147.147.228:8180"
+SITE_URL="https://27.147.147.228:8443"
 GITHUB_DEPLOY_TOKEN=""
 [[ -r "$ENV_DIR/github.env" ]] &&
   GITHUB_DEPLOY_TOKEN="$(sed -nE 's/^GITHUB_DEPLOY_TOKEN=(.+)$/\1/p' "$ENV_DIR/github.env")"

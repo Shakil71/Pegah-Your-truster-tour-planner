@@ -5,14 +5,16 @@
 #
 # Rule (ADR-0017): the head of `main` is deployed when
 #   1. it differs from the deployed commit and has not failed before, and
-#   2. the GitHub Actions CI job for that exact commit succeeded.
+#   2. every required GitHub Actions CI job for that exact commit succeeded.
 # Pushing to `main` (owner-approved) is the production approval.
 set -euo pipefail
 
 REPO="Shakil71/Pegah-Your-truster-tour-planner"
 BRANCH=main
 STATE=/opt/pegah/shared/state
-CI_JOB_NAME="Format, lint, typecheck, test, build"
+# Every job listed here must succeed (check-run names separated by "|", kept in
+# sync with .github/workflows/ci.yml).
+CI_JOBS="Format, lint, typecheck, test, build|Database integration (MySQL 8.4)"
 
 sha="$(git ls-remote "https://github.com/$REPO.git" "refs/heads/$BRANCH" | cut -f1)"
 [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Could not read $BRANCH head"; exit 0; }
@@ -25,11 +27,14 @@ verdict="$(curl -fsS -H 'Accept: application/vnd.github+json' \
   "https://api.github.com/repos/$REPO/commits/$sha/check-runs?per_page=100" |
   node -e '
     let s = ""; process.stdin.on("data", d => s += d).on("end", () => {
-      const runs = (JSON.parse(s).check_runs || []).filter(r => r.name === process.argv[1]);
-      if (runs.length === 0) return console.log("pending");
-      if (runs.some(r => r.status !== "completed")) return console.log("pending");
-      console.log(runs.every(r => r.conclusion === "success") ? "success" : "failure");
-    });' "$CI_JOB_NAME")"
+      const all = JSON.parse(s).check_runs || [];
+      const verdicts = process.argv[1].split("|").map((name) => {
+        const runs = all.filter((r) => r.name === name);
+        if (runs.length === 0 || runs.some((r) => r.status !== "completed")) return "pending";
+        return runs.every((r) => r.conclusion === "success") ? "success" : "failure";
+      });
+      console.log(verdicts.includes("failure") ? "failure" : verdicts.includes("pending") ? "pending" : "success");
+    });' "$CI_JOBS")"
 
 case "$verdict" in
   pending) echo "$BRANCH ${sha:0:7}: CI not finished yet" ;;

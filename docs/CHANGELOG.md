@@ -4,6 +4,46 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 4 booking engine and customer flow (2026-11-04)
+
+- API: `POST /bookings` (hotel and tour) with an inventory hold, `Idempotency-Key`,
+  row locks, server-side price revalidation (`409 price-changed`) and
+  `409 not-available`; `GET /quotes/hotel`, `GET /quotes/tour`;
+  `GET /hotels/{slug}/offers`; `POST /me/bookings/{id}/cancel`; hold-expiry
+  sweeper; holds released on expiry, cancellation or failure (ADR-0018).
+- Booking detail now carries the price breakdown, items, travellers, contact
+  and hold expiry.
+- Web: stay results, property page with priced rooms, tour list with a
+  departure picker, checkout with traveller details, sign in / create account,
+  and My trips with a live hold countdown and cancel. The homepage search now
+  opens real results.
+- Demo catalog seed for the pre-launch server, removable in one command (ADR-0021).
+
+### Added — Phase 3 completion (2026-11-04)
+
+- Admin: staff sign-in screen; every console page needs a staff session. The
+  dashboard, bookings list (server filters, keyset pages), booking detail with
+  an audited status-change form, Staff and roles, and Audit log all use live
+  API data. The sample data file is gone.
+- API: `GET /admin/dashboard`, `GET/POST /admin/staff`, `PATCH /admin/staff/{id}`
+  (only owners grant the owner role, no self-demotion, last-owner protection,
+  disabling revokes sessions), `GET /admin/audit`.
+- `packages/api-client` generated from the OpenAPI document (ADR-0020); shared
+  accessible form fields and a Zod resolver in `packages/ui`.
+- Tests: 9 MySQL 8.4 integration tests (concurrent last-room race, idempotent
+  replay, price change, cancel/expiry release, CHECK constraint, staff rules)
+  plus a CI job that runs them on the official MySQL 8.4.13 tarball (no
+  containers); 8 new unit tests.
+- HTTPS on :8443 with a self-signed certificate (`infra/server/enable-https.sh`,
+  ADR-0019); the deploy agent now waits for both CI jobs.
+
+### Fixed
+
+- The OpenAPI document described nullable strings as arrays (since Phase 3);
+  contracts now use `nullableText()` (ADR-0020).
+- The booking detail field `guests` (count) collided with the traveller list;
+  the list is now `travellers`.
+
 ### Added — Phase 3 backend foundation (2026-11-04)
 
 - `packages/contracts`: Zod schemas for money, problem details, pagination,

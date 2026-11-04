@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { CalendarDateSchema, InstantSchema, MoneySchema, PublicIdSchema } from "./common";
+import { BdPhoneSchema, EmailSchema } from "./auth";
+import {
+  CalendarDateSchema,
+  InstantSchema,
+  MoneySchema,
+  PublicIdSchema,
+  nullableText,
+} from "./common";
 
 /**
  * Booking lifecycle (docs/database/DATABASE_DESIGN.md). The allowed
@@ -48,7 +55,7 @@ export const BookingStatusChangeSchema = z
     from: BookingStatusSchema.nullable(),
     to: BookingStatusSchema,
     actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]),
-    reason: z.string().nullable(),
+    reason: nullableText(),
     at: InstantSchema,
   })
   .meta({ id: "BookingStatusChange" });
@@ -64,7 +71,7 @@ export type AdminBookingListQuery = z.infer<typeof AdminBookingListQuerySchema>;
 
 export const BookingListResponseSchema = z.object({
   items: z.array(BookingSummarySchema),
-  nextCursor: z.string().nullable(),
+  nextCursor: nullableText(),
 });
 
 export const BookingStatusTransitionRequestSchema = z.object({
@@ -76,7 +83,181 @@ export const BookingStatusTransitionRequestSchema = z.object({
 });
 export type BookingStatusTransitionRequest = z.infer<typeof BookingStatusTransitionRequestSchema>;
 
+// ─── Phase 4: quotes and booking creation ───────────────────────────────────
+
+/** Server-computed price of a booking or quote. */
+export const PriceBreakdownSchema = z
+  .object({
+    base: MoneySchema,
+    serviceCharge: MoneySchema,
+    vat: MoneySchema,
+    total: MoneySchema,
+  })
+  .meta({ id: "PriceBreakdown" });
+export type PriceBreakdown = z.infer<typeof PriceBreakdownSchema>;
+
+export const GuestAgeGroupSchema = z.enum(["ADULT", "CHILD"]);
+
+export const BookingContactSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: EmailSchema,
+  phone: BdPhoneSchema,
+});
+export type BookingContact = z.infer<typeof BookingContactSchema>;
+
+export const GuestInputSchema = z.object({
+  fullName: z.string().trim().min(2).max(120),
+  ageGroup: GuestAgeGroupSchema,
+});
+export type GuestInput = z.infer<typeof GuestInputSchema>;
+
+const partyRefine = <T extends { adults: number; children: number; guests: GuestInput[] }>(
+  value: T,
+  ctx: z.RefinementCtx,
+) => {
+  const adults = value.guests.filter((g) => g.ageGroup === "ADULT").length;
+  const children = value.guests.length - adults;
+  if (adults !== value.adults || children !== value.children) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["guests"],
+      message: "List every traveller once: adult and child counts must match the party.",
+    });
+  }
+  if (value.guests[0]?.ageGroup !== "ADULT") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["guests", 0],
+      message: "The first traveller is the lead guest and must be an adult.",
+    });
+  }
+};
+
+export const HotelQuoteQuerySchema = z
+  .object({
+    roomId: PublicIdSchema,
+    checkIn: CalendarDateSchema,
+    checkOut: CalendarDateSchema,
+    adults: z.coerce.number().int().min(1).max(36).default(2),
+    children: z.coerce.number().int().min(0).max(18).default(0),
+    rooms: z.coerce.number().int().min(1).max(9).default(1),
+  })
+  .refine((q) => q.checkOut > q.checkIn, {
+    message: "Check-out must be after check-in",
+    path: ["checkOut"],
+  });
+export type HotelQuoteQuery = z.infer<typeof HotelQuoteQuerySchema>;
+
+export const TourQuoteQuerySchema = z.object({
+  departureId: PublicIdSchema,
+  adults: z.coerce.number().int().min(1).max(30).default(2),
+  children: z.coerce.number().int().min(0).max(30).default(0),
+});
+export type TourQuoteQuery = z.infer<typeof TourQuoteQuerySchema>;
+
+/**
+ * What a booking would cost right now. Indicative: booking creation re-reads
+ * inventory and rates under a row lock and rejects the request with
+ * `409 price-changed` if the total differs from `expectedTotal`.
+ */
+export const QuoteSchema = z.object({
+  product: ProductTypeSchema,
+  productName: z.string(),
+  productSlug: z.string(),
+  /** Room type name, or the departure label for tours. */
+  optionName: z.string(),
+  startDate: CalendarDateSchema,
+  endDate: CalendarDateSchema.nullable(),
+  nights: z.number().int().nullable(),
+  rooms: z.number().int().nullable(),
+  adults: z.number().int(),
+  children: z.number().int(),
+  available: z.boolean(),
+  /** Rooms or seats still free (null when unavailable for another reason). */
+  left: z.number().int().nullable(),
+  unavailableReason: z
+    .enum(["occupancy", "no-inventory", "sold-out", "no-rate", "currency", "closed", "departed"])
+    .nullable(),
+  price: PriceBreakdownSchema.nullable(),
+  cancellationPolicy: nullableText(),
+  pricedAt: InstantSchema,
+});
+export type Quote = z.infer<typeof QuoteSchema>;
+
+export const CreateHotelBookingRequestSchema = z
+  .object({
+    product: z.literal("HOTEL"),
+    roomId: PublicIdSchema,
+    checkIn: CalendarDateSchema,
+    checkOut: CalendarDateSchema,
+    rooms: z.number().int().min(1).max(9),
+    adults: z.number().int().min(1).max(36),
+    children: z.number().int().min(0).max(18),
+    contact: BookingContactSchema,
+    guests: z.array(GuestInputSchema).min(1).max(54),
+    /** The total the customer was shown; a mismatch answers 409 price-changed. */
+    expectedTotal: MoneySchema,
+  })
+  .superRefine((v, ctx) => {
+    if (v.checkOut <= v.checkIn) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["checkOut"],
+        message: "Check-out must be after check-in",
+      });
+    }
+    partyRefine(v, ctx);
+  });
+
+export const CreateTourBookingRequestSchema = z
+  .object({
+    product: z.literal("TOUR"),
+    departureId: PublicIdSchema,
+    adults: z.number().int().min(1).max(30),
+    children: z.number().int().min(0).max(30),
+    contact: BookingContactSchema,
+    guests: z.array(GuestInputSchema).min(1).max(60),
+    expectedTotal: MoneySchema,
+  })
+  .superRefine(partyRefine);
+
+/** POST /bookings — requires a customer session, CSRF and an `Idempotency-Key` header. */
+export const CreateBookingRequestSchema = z.discriminatedUnion("product", [
+  CreateHotelBookingRequestSchema,
+  CreateTourBookingRequestSchema,
+]);
+export type CreateBookingRequest = z.infer<typeof CreateBookingRequestSchema>;
+
+export const IDEMPOTENCY_HEADER = "idempotency-key";
+/** Client-generated, 16–128 visible ASCII characters (a UUID is ideal). */
+export const IdempotencyKeySchema = z.string().regex(/^[\x21-\x7E]{16,128}$/);
+
+export const CancelBookingRequestSchema = z.object({
+  reason: z.string().trim().max(500).optional(),
+});
+
+export const BookingItemViewSchema = z
+  .object({
+    type: z.enum(["HOTEL_ROOM", "TOUR_SEAT"]),
+    description: z.string(),
+    quantity: z.number().int(),
+    amount: MoneySchema,
+  })
+  .meta({ id: "BookingItem" });
+
+export const BookingGuestViewSchema = z
+  .object({ fullName: z.string(), ageGroup: GuestAgeGroupSchema, isLead: z.boolean() })
+  .meta({ id: "BookingGuest" });
+
 export const BookingDetailSchema = BookingSummarySchema.extend({
+  contactEmail: z.string(),
+  contactPhone: z.string(),
+  /** While PENDING_PAYMENT, inventory is held until this instant. */
+  holdExpiresAt: InstantSchema.nullable(),
+  price: PriceBreakdownSchema,
+  items: z.array(BookingItemViewSchema),
+  /** Named travellers; the lead guest comes first. (`guests` is the head count.) */
+  travellers: z.array(BookingGuestViewSchema),
   history: z.array(BookingStatusChangeSchema),
   allowedTransitions: z.array(BookingStatusSchema),
 });

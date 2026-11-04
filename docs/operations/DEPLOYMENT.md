@@ -120,7 +120,7 @@ First-time database steps (each needs explicit approval on the server):
 2. `npm run seed:rbac -w @pegah/api` (idempotent).
 3. `npm run staff:create -w @pegah/api -- --email … --name "…" --role owner`
    (password from a hidden prompt; never on the command line).
-4. Never run `seed:sample` in production (it refuses).
+4. `seed:sample` refuses production unless `--demo` is given (ADR-0021).
 
 ## Server setup (infra/, ADR-0016)
 
@@ -145,13 +145,14 @@ sudo bash /home/pegah/pegah-infra/server/bootstrap-root.sh
 ## Release procedure (CI/CD)
 
 1. Work merges to `develop`, then `main`; GitHub Actions CI runs on every push
-   (infra script syntax, format, lint, typecheck, tests, build, OpenAPI drift).
+   (infra script syntax, format, lint, typecheck, tests, build, OpenAPI and
+   client drift) plus a MySQL 8.4 integration job.
 2. **Push to `main` = production approval** (ADR-0017). Within 2 minutes
-   `pegah-deploy-agent` sees the new head, waits until the CI job for that exact
-   commit has succeeded, and runs `deploy.sh <sha>`. A failed CI marks the
+   `pegah-deploy-agent` sees the new head, waits until the CI jobs for that exact
+   commit have **both** succeeded, and runs `deploy.sh <sha>`. A failed CI marks the
    commit as rejected; it is never deployed.
 3. A deploy takes roughly 5–10 minutes (clone, `npm ci`, build, migrate).
-4. Health checks: `/api/v1/health/ready`, web `/`, admin `/`. On failure the
+4. Health checks: `/api/v1/health/ready`, web `/`, admin `/admin`. On failure the
    previous release is restored automatically.
 5. **See what is live:** web footer and admin sidebar show
    `Build <sha> · <time>`; `GET /api/v1/health/live` returns `commit` and
@@ -171,7 +172,7 @@ Manual deploy or redeploy: `/opt/pegah/bin/deploy.sh v0.3.0` as `pegah`.
 
 - `setsebool -P httpd_can_network_connect 1` for Nginx upstreams.
 - File contexts for `/databackup/mysql-data` (`mysqld_db_t`).
-- firewalld: open 80/443 only.
+- firewalld: 8180 (redirect) and 8443 (HTTPS), opened by `enable-https.sh`.
 
 ### Deployments visible on GitHub (optional)
 
@@ -187,8 +188,39 @@ Each deploy then appears on GitHub under **Deployments → production**
 (in progress → active, or failed) with a link to the site. Without the file,
 deploys work exactly the same.
 
+### HTTPS (ADR-0019) — run once
+
+Sign-in cookies are `Secure`, so the site must be served over HTTPS. As root:
+
+```bash
+sudo bash /home/pegah/pegah-infra/server/enable-https.sh
+```
+
+It creates a self-signed certificate for 192.168.197.100 and 27.147.147.228,
+serves `https://<ip>:8443`, redirects `http://<ip>:8180` there, labels both
+ports `http_port_t`, opens them in firewalld, sets `APP_ORIGINS` to the HTTPS
+origins and restarts the API. It prints the certificate fingerprint: compare
+it with the one your browser shows before accepting the warning.
+
 ### Admin panel access
 
-`http://<server>:8180/admin`. **It is public and shows sample data only**; it
-has no login yet and is not connected to the API. Staff login must be in place
-before it shows any real data (PROJECT_STATUS next actions).
+`https://<server>:8443/admin` → staff sign-in. Create the first owner account
+on the server as `pegah` (the password is typed into a hidden prompt; never
+put it on the command line or in chat):
+
+```bash
+cd /opt/pegah/current
+set -a; . /opt/pegah/shared/env/api.env; set +a
+node apps/api/dist/cli/create-staff.js --email you@example.com --name "Your Name" --role owner
+```
+
+Further staff are added from **Staff and roles** in the admin.
+
+### Demo catalog (ADR-0021, owner-approved)
+
+```bash
+cd /opt/pegah/current
+set -a; . /opt/pegah/shared/env/api.env; set +a
+node apps/api/dist/cli/seed-sample.js --demo            # add / refresh demo listings
+node apps/api/dist/cli/seed-sample.js --demo --remove   # delete them before launch
+```

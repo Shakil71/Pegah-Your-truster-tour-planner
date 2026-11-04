@@ -2,20 +2,33 @@ import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { ZodSerializerInterceptor, ZodValidationPipe } from "nestjs-zod";
+import { AdminController } from "./admin/admin.controllers";
+import { AuditQueryService } from "./admin/audit-query.service";
+import { DashboardService } from "./admin/dashboard.service";
+import { StaffService } from "./admin/staff.service";
 import { AuditService } from "./audit/audit.service";
 import { AuthController, StaffAuthController } from "./auth/auth.controller";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuthService } from "./auth/auth.service";
 import { PasswordService } from "./auth/password.service";
 import { SessionService } from "./auth/session.service";
+import { BookingCreateService } from "./booking/booking-create.service";
 import { BookingQueryService } from "./booking/booking-query.service";
 import { BookingStatusService } from "./booking/booking-status.service";
-import { AdminBookingsController, MyBookingsController } from "./booking/booking.controllers";
+import {
+  AdminBookingsController,
+  BookingsController,
+  MyBookingsController,
+  QuotesController,
+} from "./booking/booking.controllers";
+import { HoldExpiryService } from "./booking/hold-expiry.service";
+import { QuoteService } from "./booking/quote.service";
 import { CatalogController } from "./catalog/catalog.controller";
 import { CatalogService } from "./catalog/catalog.service";
 import { ProblemFilter } from "./common/problem";
 import { APP_CONFIG, type AppConfig } from "./config/config";
 import { HealthController } from "./health/health.controller";
+import { IdempotencyService } from "./idempotency/idempotency.service";
 import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
 
 export interface AppModuleOptions {
@@ -44,6 +57,9 @@ export class AppModule {
         CatalogController,
         AdminBookingsController,
         MyBookingsController,
+        BookingsController,
+        QuotesController,
+        AdminController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -56,6 +72,13 @@ export class AppModule {
         CatalogService,
         BookingQueryService,
         BookingStatusService,
+        BookingCreateService,
+        QuoteService,
+        HoldExpiryService,
+        IdempotencyService,
+        DashboardService,
+        StaffService,
+        AuditQueryService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },

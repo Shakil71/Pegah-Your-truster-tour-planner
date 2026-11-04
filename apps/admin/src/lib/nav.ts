@@ -4,22 +4,26 @@ export type NavItem = {
   href: string;
   label: string;
   icon: IconName;
-  badge?: number;
   phase?: string;
+  /** Hidden for staff without this permission (the API enforces it regardless). */
+  permission?: string;
 };
 
 /** Admin modules from PRODUCT_REQUIREMENTS §Admin. `phase` marks modules not built yet. */
 export const navGroups: Array<{ title: string; items: NavItem[] }> = [
-  { title: "Overview", items: [{ href: "/", label: "Dashboard", icon: "grid" }] },
+  {
+    title: "Overview",
+    items: [{ href: "/", label: "Dashboard", icon: "grid", permission: "dashboard:read" }],
+  },
   {
     title: "Operations",
     items: [
-      { href: "/bookings", label: "Bookings", icon: "ticket", badge: 9 },
+      { href: "/bookings", label: "Bookings", icon: "ticket", permission: "booking:read" },
       { href: "/customers", label: "Customers", icon: "users", phase: "Phase 6" },
       { href: "/inventory", label: "Hotel inventory", icon: "building", phase: "Phase 6" },
       { href: "/tours", label: "Tours", icon: "route", phase: "Phase 6" },
       { href: "/payments", label: "Payments", icon: "card", phase: "Phase 5" },
-      { href: "/refunds", label: "Refunds", icon: "refund", badge: 7, phase: "Phase 5" },
+      { href: "/refunds", label: "Refunds", icon: "refund", phase: "Phase 5" },
     ],
   },
   {
@@ -40,8 +44,8 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "System",
     items: [
-      { href: "/staff", label: "Staff and roles", icon: "key", phase: "Phase 3" },
-      { href: "/audit", label: "Audit log", icon: "log", phase: "Phase 3" },
+      { href: "/staff", label: "Staff and roles", icon: "key", permission: "user:manage" },
+      { href: "/audit", label: "Audit log", icon: "log", permission: "audit:read" },
       { href: "/settings", label: "Settings", icon: "settings", phase: "Phase 6" },
     ],
   },

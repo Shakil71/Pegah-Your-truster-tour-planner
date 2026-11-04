@@ -1,6 +1,6 @@
 # API Specification
 
-Status: **partly implemented (Phase 3).** The generated OpenAPI document is
+Status: **implemented through Phase 4** (payments are Phase 5). The generated OpenAPI document is
 authoritative: `apps/api/openapi.json` (committed, drift-checked in CI) and
 `GET /api/v1/docs/openapi.json` when `OPENAPI_ENABLED=true` (never in
 production). This file summarises conventions and the endpoint inventory.
@@ -18,8 +18,11 @@ production). This file summarises conventions and the endpoint inventory.
   `503 /problems/service-unavailable`.
 - Pagination: keyset, `?cursor=&limit=`; `limit` max 100; `nextCursor` is
   `null` on the last page.
-- Mutations that create bookings or payments will require an
-  `Idempotency-Key` header (table exists; endpoints arrive in Phase 4).
+- `POST /bookings` requires an `Idempotency-Key` header (16–128 visible
+  characters). Same key + same body replays the stored response with
+  `Idempotent-Replayed: true`; same key + different body is `422
+idempotency-key-reused`; a concurrent duplicate is `409
+idempotency-in-progress`. Keys live 24 hours (ADR-0018).
 - Money: `{ "amountMinor": 1250000, "currency": "BDT" }` — integer paisa.
   Totals are computed only by the server.
 - Timestamps: ISO 8601 UTC. Calendar dates (`checkIn`): `YYYY-MM-DD` in the
@@ -28,7 +31,7 @@ production). This file summarises conventions and the endpoint inventory.
   production). Mutations need `X-CSRF-Token` (from login or
   `GET /auth/session`) and an allowed `Origin` (ADR-0015).
 - Rate limits: 300 requests/min per IP overall; register 5/min, login 10/min,
-  staff login 5/min. Exceeding returns `429`.
+  staff login 5/min, booking creation 20/min. Exceeding returns `429`.
 
 ## Implemented endpoints
 
@@ -53,6 +56,15 @@ production). This file summarises conventions and the endpoint inventory.
 | GET    | /admin/bookings             | `booking:read`                                    | Filter by status, product, reference/name/email   |
 | GET    | /admin/bookings/{id}        | `booking:read`                                    | Detail with status history and allowed next steps |
 | POST   | /admin/bookings/{id}/status | `booking:read` + `booking:override_status` + CSRF | State-machine transition with reason (audited)    |
+| GET    | /hotels/{slug}/offers       | public                                            | Every active room priced for one stay             |
+| GET    | /quotes/hotel, /quotes/tour | public                                            | Indicative price and availability for checkout    |
+| POST   | /bookings                   | customer + CSRF + Idempotency-Key                 | Create booking and hold inventory (15 min)        |
+| POST   | /me/bookings/{id}/cancel    | customer + CSRF                                   | Cancel an unpaid booking; releases the hold       |
+| GET    | /admin/dashboard            | `dashboard:read`                                  | KPIs, day series, occupancy, departures, activity |
+| GET    | /admin/staff                | `user:manage`                                     | Staff accounts and roles                          |
+| POST   | /admin/staff                | `user:manage` + CSRF                              | Create staff (owner role: owners only; audited)   |
+| PATCH  | /admin/staff/{id}           | `user:manage` + CSRF                              | Change roles or disable (audited)                 |
+| GET    | /admin/audit                | `audit:read`                                      | Audit log, newest first, keyset pages             |
 
 ### Hotel search rules
 
@@ -73,11 +85,21 @@ the operator loaded it, the API answers `409 booking-status-changed`. Edges
 not allowed for staff answer `422 illegal-transition`. Nobody can move a
 booking straight to `CONFIRMED`; staff can confirm only from `MANUAL_REVIEW`.
 
-## Planned (Phases 4–5)
+### Booking creation (ADR-0018)
 
-| Method | Path                           | Purpose                                        |
-| ------ | ------------------------------ | ---------------------------------------------- |
-| POST   | /bookings                      | Create booking and inventory hold (idempotent) |
-| POST   | /bookings/{id}/payment-session | Start hosted payment                           |
-| POST   | /webhooks/payments/sslcommerz  | Verified payment callback                      |
-| POST   | /bookings/{id}/cancellation    | Request cancellation                           |
+The body is `CreateBookingRequest`: `product` `HOTEL` (`roomId`, `checkIn`,
+`checkOut`, `rooms`) or `TOUR` (`departureId`), plus `adults`, `children`,
+`contact` (name, email, `+8801…` phone), `guests` (one per traveller, lead
+adult first) and `expectedTotal` (the quoted total). The server locks the rows,
+recomputes the price and answers `409 price-changed` if it differs,
+`409 not-available` if it sold out, otherwise `201` with the booking in
+`PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
+the inventory goes back on sale.
+
+## Planned (Phase 5)
+
+| Method | Path                           | Purpose                   |
+| ------ | ------------------------------ | ------------------------- |
+| POST   | /bookings/{id}/payment-session | Start hosted payment      |
+| POST   | /webhooks/payments/sslcommerz  | Verified payment callback |
+| POST   | /bookings/{id}/cancellation    | Request cancellation      |

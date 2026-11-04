@@ -5,7 +5,8 @@ type Props = {
   label: string;
   value: number;
   format: "money" | "count" | "percent";
-  delta: number;
+  /** Change vs the previous period in percent; null when there is no baseline. */
+  delta: number | null;
   spark: number[];
   hint: string;
   /** True when a decrease is good news (e.g. refunds pending). */
@@ -47,7 +48,7 @@ function Sparkline({ data }: { data: number[] }) {
 }
 
 export function KpiCard({ label, value, format, delta, spark, hint, invert, index }: Props) {
-  const good = invert ? delta < 0 : delta > 0;
+  const good = delta !== null && (invert ? delta < 0 : delta > 0);
   const shown =
     format === "money"
       ? takaCompact(value)
@@ -67,17 +68,23 @@ export function KpiCard({ label, value, format, delta, spark, hint, invert, inde
         <Sparkline data={spark} />
       </div>
       <p className="mt-3 flex items-center gap-2 text-[0.78rem]">
-        <span
-          className={cx(
-            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
-            good ? "bg-good-soft text-good" : "bg-critical-soft text-critical",
-          )}
-        >
-          <Icon name={delta >= 0 ? "trendUp" : "trendDown"} className="size-3.5" />
-          {delta > 0 ? "+" : ""}
-          {delta.toFixed(1)}%
-        </span>
-        <span className="text-ink-3">{hint} vs previous</span>
+        {delta === null ? (
+          <span className="text-ink-3">{hint}</span>
+        ) : (
+          <>
+            <span
+              className={cx(
+                "inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold",
+                good ? "bg-good-soft text-good" : "bg-critical-soft text-critical",
+              )}
+            >
+              <Icon name={delta >= 0 ? "trendUp" : "trendDown"} className="size-3.5" />
+              {delta > 0 ? "+" : ""}
+              {delta.toFixed(1)}%
+            </span>
+            <span className="text-ink-3">{hint} vs previous</span>
+          </>
+        )}
       </p>
     </article>
   );

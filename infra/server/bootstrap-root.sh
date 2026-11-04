@@ -14,14 +14,13 @@
 #   3. Database `pegah` with three least-privilege users; random passwords are
 #      written only to 0600 env files owned by `pegah`.
 #   4. systemd units (api, web, admin, backup timer, deploy agent timer).
-#   5. nginx site on port 8180 (public site + /api); admin stays on localhost.
-#   6. firewalld: open 8180/tcp. SELinux: label 8180 as http_port_t.
+#   5–6. HTTPS via enable-https.sh: self-signed certificate, nginx on 8443
+#        (8180 redirects), SELinux http_port_t labels, firewalld ports.
 #   7. sudoers: `pegah` may restart only the Pegah units.
 set -euo pipefail
 
 INFRA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_USER=pegah
-PUBLIC_PORT=8180
 MYSQL_RELEASE_RPM="https://repo.mysql.com/mysql84-community-release-el9-4.noarch.rpm"
 DATADIR=/databackup/mysql-data
 ENV_DIR=/opt/pegah/shared/env
@@ -195,7 +194,7 @@ PORT=4100
 LOG_LEVEL=info
 DATABASE_URL=mysql://pegah_app:${APP_PW}@127.0.0.1:3306/pegah?${DB_PARAMS}
 SESSION_SECRET=$(rand 64)
-APP_ORIGINS=http://192.168.197.100:${PUBLIC_PORT},http://27.147.147.228:${PUBLIC_PORT}
+APP_ORIGINS=https://192.168.197.100:8443,https://27.147.147.228:8443
 COOKIE_SECURE=true
 TRUST_PROXY_HOPS=1
 OPENAPI_ENABLED=false
@@ -227,24 +226,9 @@ systemctl daemon-reload
 systemctl enable pegah-api.service pegah-web.service pegah-admin.service >/dev/null
 systemctl enable --now pegah-backup.timer pegah-deploy-agent.timer
 
-# ── 5–6. nginx, SELinux port, firewalld ───────────────────────────────────────
-log "nginx site on :$PUBLIC_PORT"
-if ! semanage port -l | grep -E "^http_port_t\s" | grep -w "$PUBLIC_PORT" >/dev/null; then
-  semanage port -a -t http_port_t -p tcp "$PUBLIC_PORT" 2>/dev/null ||
-    semanage port -m -t http_port_t -p tcp "$PUBLIC_PORT"
-fi
-install -m 0644 "$INFRA_DIR/nginx/pegah.conf" /etc/nginx/conf.d/pegah.conf
-# Never leave a broken config behind: other sites share this nginx.
-if ! nginx -t; then
-  rm -f /etc/nginx/conf.d/pegah.conf
-  die "nginx config test failed; pegah.conf removed, nginx untouched."
-fi
-systemctl reload nginx
-
-log "firewalld"
-firewall-cmd --permanent --add-port="${PUBLIC_PORT}/tcp" >/dev/null
-firewall-cmd --reload >/dev/null
-firewall-cmd --list-ports
+# ── 5–6. HTTPS, nginx, SELinux ports, firewalld ─────────────────────────────
+log "HTTPS and nginx (enable-https.sh)"
+bash "$INFRA_DIR/server/enable-https.sh"
 
 # ── 7. sudoers ────────────────────────────────────────────────────────────────
 log "sudoers (restart Pegah units only)"
@@ -255,6 +239,6 @@ log "Done"
 cat <<MSG
 MySQL 8.4 is running on 127.0.0.1:3306 with data in $DATADIR.
 Secrets are in $ENV_DIR (0600, owner $APP_USER); nothing secret was printed.
-The site will answer on http://<server>:$PUBLIC_PORT after the first deploy.
-Deploys happen when a v* tag is pushed and its CI run succeeded.
+The site will answer on https://<server>:8443 after the first deploy.
+Deploys happen when a CI-green commit reaches main (ADR-0017).
 MSG

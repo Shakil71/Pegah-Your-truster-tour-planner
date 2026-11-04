@@ -16,7 +16,7 @@ export function OccupancyHeatmap({
   days,
 }: {
   properties: string[];
-  grid: number[][];
+  grid: (number | null)[][];
   days: string[];
 }) {
   const [hover, setHover] = useState<{ p: number; d: number } | null>(null);
@@ -36,7 +36,9 @@ export function OccupancyHeatmap({
           <p className="mt-1 text-[0.78rem] text-ink-3">Rooms sold or held ÷ rooms available</p>
         </div>
         <p className="tabular h-5 text-[0.8rem] text-ink-2" aria-live="polite">
-          {hover && hv !== undefined ? `${properties[hover.p]} · ${days[hover.d]} · ${hv}%` : ""}
+          {hover && hv !== undefined
+            ? `${properties[hover.p]} · ${days[hover.d]} · ${hv === null ? "not on sale" : `${hv}%`}`
+            : ""}
         </p>
       </div>
 
@@ -66,18 +68,22 @@ export function OccupancyHeatmap({
                   {name}
                 </th>
                 {days.map((d, di) => {
-                  const v = grid[p]?.[di] ?? 0;
+                  const v = grid[p]?.[di] ?? null;
                   const on = hover?.p === p && hover?.d === di;
                   return (
                     <td key={d} className="p-0">
                       <button
                         type="button"
-                        aria-label={`${name}, ${d}: ${v}% occupied`}
+                        aria-label={
+                          v === null
+                            ? `${name}, ${d}: not on sale`
+                            : `${name}, ${d}: ${v}% occupied`
+                        }
                         onMouseEnter={() => setHover({ p, d: di })}
                         onFocus={() => setHover({ p, d: di })}
                         onBlur={() => setHover(null)}
                         className={`block h-8 w-full cursor-default rounded-[6px] transition-transform ${on ? "scale-110 ring-2 ring-ink" : ""}`}
-                        style={{ background: colorFor(v) }}
+                        style={{ background: v === null ? "var(--pg-paper-2)" : colorFor(v) }}
                       />
                     </td>
                   );

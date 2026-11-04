@@ -5,9 +5,14 @@ import { usePathname } from "next/navigation";
 import { Icon, Logo, cx } from "@pegah/ui";
 import { buildInfo } from "@/lib/build-info";
 import { navGroups } from "@/lib/nav";
+import { useStaff } from "./staff-context";
 
 export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () => void }) {
   const path = usePathname();
+  const { can } = useStaff();
+  const groups = navGroups
+    .map((g) => ({ ...g, items: g.items.filter((i) => !i.permission || can(i.permission)) }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <aside
@@ -26,7 +31,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
         </span>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 pb-6 [scrollbar-width:thin]">
-        {navGroups.map((g) => (
+        {groups.map((g) => (
           <div key={g.title} className="mt-5 first:mt-1">
             <p className="px-3 pb-2 text-[0.64rem] font-bold uppercase tracking-[0.16em] text-white/40">
               {g.title}
@@ -61,11 +66,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
                         )}
                       />
                       <span className="flex-1">{item.label}</span>
-                      {item.badge ? (
-                        <span className="tabular rounded-full bg-primary px-1.5 py-px text-[0.68rem] font-bold text-on-primary">
-                          {item.badge}
-                        </span>
-                      ) : item.phase ? (
+                      {item.phase ? (
                         <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-white/30">
                           {item.phase.replace("Phase ", "P")}
                         </span>
@@ -84,9 +85,11 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
             <span className="animate-ping-soft absolute inline-flex size-full rounded-full bg-primary" />
             <span className="relative inline-flex size-2 rounded-full bg-primary" />
           </span>
-          Sandbox environment
+          Live API · pre-launch
         </p>
-        <p className="mt-1 text-white/60">Sample data. The admin API is not connected yet.</p>
+        <p className="mt-1 text-white/60">
+          Real bookings and holds. Payments arrive in Phase 5, so nothing is confirmed yet.
+        </p>
         <p className="tabular mt-2 text-[0.72rem] text-white/45">
           Build {buildInfo.sha} · {buildInfo.builtAtLabel}
         </p>

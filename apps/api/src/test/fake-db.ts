@@ -121,7 +121,12 @@ export function createFakeDb(): FakeDb {
       findFirst: async ({ where }: { where: Record<string, unknown> }) => {
         const b = state.bookings.find((x) => matches(x, where));
         if (!b) return null;
-        return { ...b, history: state.history.filter((h) => h.bookingId === b.id) };
+        return {
+          ...b,
+          history: state.history.filter((h) => h.bookingId === b.id),
+          items: [],
+          guests: [],
+        };
       },
       findMany: async ({ where, take }: { where: Record<string, unknown>; take: number }) =>
         state.bookings
@@ -133,6 +138,10 @@ export function createFakeDb(): FakeDb {
         rows.forEach((r) => Object.assign(r, data));
         return { count: rows.length };
       },
+    },
+    inventoryHold: {
+      findMany: async () => [],
+      updateMany: async () => ({ count: 0 }),
     },
     bookingStatusHistory: {
       create: async ({ data }: { data: Record<string, unknown> }) => {
@@ -162,8 +171,14 @@ export function addBooking(db: FakeDb, overrides: Record<string, unknown>): Row 
     endDate: new Date("2026-12-12T00:00:00Z"),
     guestCount: 2,
     currency: "BDT",
+    baseMinor: 3_400_000n,
+    serviceChargeMinor: 340_000n,
+    vatMinor: 561_000n,
     totalMinor: 4_301_000n,
     contactName: "Test Traveller",
+    contactEmail: "traveller@pegah.test",
+    contactPhone: "+8801711000000",
+    holdExpiresAt: null,
     createdAt: new Date("2026-11-01T10:00:00Z"),
     ...overrides,
   };
