@@ -19,6 +19,13 @@
   --color-primary-ink: var(--pg-primary-ink);
   --color-on-primary: var(--pg-on-primary);
   --color-thread: var(--pg-thread);
+  --color-thread-ink: var(--pg-thread-ink);
+  --color-on-night: var(--pg-on-night);
+  --color-on-night-2: var(--pg-on-night-2);
+  --color-fixed-ink: var(--pg-fixed-ink);
+  --color-fixed-accent: var(--pg-fixed-accent);
+  --color-fixed-good: var(--pg-fixed-good);
+  --color-fixed-heart: var(--pg-fixed-heart);
   --color-good: var(--pg-good);
   --color-good-soft: var(--pg-good-soft);
   --color-warn: var(--pg-warn);

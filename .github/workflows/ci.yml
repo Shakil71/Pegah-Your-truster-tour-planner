@@ -44,6 +44,9 @@ jobs:
       - name: Lint and typecheck
         run: npx turbo run lint typecheck
 
+      - name: End-to-end suite typecheck
+        run: npx tsc -p e2e/tsconfig.json
+
       - name: Unit tests
         run: npm test
 
@@ -78,39 +81,7 @@ jobs:
 
       - run: npm ci
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/mysql-dl
-          key: mysql-${{ env.MYSQL_VERSION }}-linux-glibc2.28-minimal
-
-      - name: Start MySQL ${{ env.MYSQL_VERSION }}
-        run: |
-          sudo apt-get install -y --no-install-recommends libaio1t64 libnuma1
-          # MySQL links libaio.so.1; Ubuntu 24.04 ships it as libaio.so.1t64.
-          sudo ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
-          f=~/mysql-dl/mysql.tar.xz
-          if [ ! -f "$f" ]; then
-            mkdir -p ~/mysql-dl
-            curl -fsSL -o "$f" "https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${MYSQL_VERSION}-linux-glibc2.28-x86_64-minimal.tar.xz" ||
-              curl -fsSL -o "$f" "https://cdn.mysql.com/archives/mysql-8.4/mysql-${MYSQL_VERSION}-linux-glibc2.28-x86_64-minimal.tar.xz"
-          fi
-          echo "${MYSQL_SHA256}  $f" | sha256sum -c -
-          mkdir -p ~/mysql && tar -xJf "$f" -C ~/mysql --strip-components=1
-          data="$RUNNER_TEMP/mysql-data"
-          ~/mysql/bin/mysqld --no-defaults --initialize-insecure --datadir="$data" --user="$(whoami)"
-          ~/mysql/bin/mysqld --no-defaults --datadir="$data" --user="$(whoami)" \
-            --port=3307 --bind-address=127.0.0.1 --mysqlx=OFF \
-            --socket="$RUNNER_TEMP/mysql.sock" --log-error="$RUNNER_TEMP/mysqld.err" &
-          for _ in $(seq 1 60); do
-            ~/mysql/bin/mysqladmin --no-defaults -uroot -h127.0.0.1 -P3307 ping >/dev/null 2>&1 && break
-            sleep 1
-          done
-          pw="$(openssl rand -hex 16)"
-          echo "::add-mask::$pw"
-          ~/mysql/bin/mysql --no-defaults -uroot -h127.0.0.1 -P3307 -e \
-            "CREATE USER 'pegah_it'@'127.0.0.1' IDENTIFIED BY '$pw';
-             GRANT ALL PRIVILEGES ON \`pegah\_it\_%\`.* TO 'pegah_it'@'127.0.0.1';"
-          echo "PEGAH_IT_DATABASE_URL=mysql://pegah_it:$pw@127.0.0.1:3307/?allowPublicKeyRetrieval=true" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/setup-mysql
 
       - name: Build database package
         run: npm run build -w @pegah/db
@@ -121,3 +92,49 @@ jobs:
       - name: MySQL error log
         if: failure()
         run: tail -n 100 "$RUNNER_TEMP/mysqld.err" || true
+
+  e2e:
+    # The whole stack (API, website, console) against real MySQL 8.4, driven by
+    # Playwright in Chromium, with an axe WCAG 2.1 AA scan on every key page.
+    name: End-to-end and accessibility (Playwright + axe)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      MYSQL_VERSION: 8.4.13
+      MYSQL_SHA256: 5dfbb764f731df40ef9e4f5d69aed32bdac8ba1af20bd96b7d40a942d83d4ed2
+      # Server-side rendering and the /api, /admin rewrites reach the local stack.
+      API_INTERNAL_URL: http://127.0.0.1:4000
+      ADMIN_INTERNAL_URL: http://127.0.0.1:3001
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: ./.github/actions/setup-mysql
+
+      - name: Build
+        run: npx turbo run build --force
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare database
+        run: npm run e2e:prepare
+
+      - name: End-to-end tests
+        run: npm run e2e
+
+      - name: Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

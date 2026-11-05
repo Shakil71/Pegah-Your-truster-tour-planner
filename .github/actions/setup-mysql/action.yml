@@ -1,0 +1,42 @@
+name: Start MySQL 8.4 (no containers)
+description: >
+  Downloads Oracle's MySQL 8.4 LTS tarball (checksum-verified, cached), starts
+  it as a plain process on 127.0.0.1:3307 and exports PEGAH_IT_DATABASE_URL for
+  a user limited to `pegah_it_%` databases with a random password.
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: ~/mysql-dl
+        key: mysql-${{ env.MYSQL_VERSION }}-linux-glibc2.28-minimal
+
+    - name: Start MySQL ${{ env.MYSQL_VERSION }}
+      shell: bash
+      run: |
+        sudo apt-get install -y --no-install-recommends libaio1t64 libnuma1
+        # MySQL links libaio.so.1; Ubuntu 24.04 ships it as libaio.so.1t64.
+        sudo ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+        f=~/mysql-dl/mysql.tar.xz
+        if [ ! -f "$f" ]; then
+          mkdir -p ~/mysql-dl
+          curl -fsSL -o "$f" "https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-${MYSQL_VERSION}-linux-glibc2.28-x86_64-minimal.tar.xz" ||
+            curl -fsSL -o "$f" "https://cdn.mysql.com/archives/mysql-8.4/mysql-${MYSQL_VERSION}-linux-glibc2.28-x86_64-minimal.tar.xz"
+        fi
+        echo "${MYSQL_SHA256}  $f" | sha256sum -c -
+        mkdir -p ~/mysql && tar -xJf "$f" -C ~/mysql --strip-components=1
+        data="$RUNNER_TEMP/mysql-data"
+        ~/mysql/bin/mysqld --no-defaults --initialize-insecure --datadir="$data" --user="$(whoami)"
+        ~/mysql/bin/mysqld --no-defaults --datadir="$data" --user="$(whoami)" \
+          --port=3307 --bind-address=127.0.0.1 --mysqlx=OFF \
+          --socket="$RUNNER_TEMP/mysql.sock" --log-error="$RUNNER_TEMP/mysqld.err" &
+        for _ in $(seq 1 60); do
+          ~/mysql/bin/mysqladmin --no-defaults -uroot -h127.0.0.1 -P3307 ping >/dev/null 2>&1 && break
+          sleep 1
+        done
+        pw="$(openssl rand -hex 16)"
+        echo "::add-mask::$pw"
+        ~/mysql/bin/mysql --no-defaults -uroot -h127.0.0.1 -P3307 -e \
+          "CREATE USER 'pegah_it'@'127.0.0.1' IDENTIFIED BY '$pw';
+           GRANT ALL PRIVILEGES ON \`pegah\_it\_%\`.* TO 'pegah_it'@'127.0.0.1';"
+        echo "PEGAH_IT_DATABASE_URL=mysql://pegah_it:$pw@127.0.0.1:3307/?allowPublicKeyRetrieval=true" >> "$GITHUB_ENV"

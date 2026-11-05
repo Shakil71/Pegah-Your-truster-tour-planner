@@ -32,7 +32,7 @@ export function SectionHead({
 
 export function SampleNote({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-6 inline-flex rounded-full border border-dashed border-thread px-2.5 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-thread">
+    <p className="mt-6 inline-flex rounded-full border border-dashed border-thread px-2.5 py-0.5 text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-thread-ink">
       {children}
     </p>
   );

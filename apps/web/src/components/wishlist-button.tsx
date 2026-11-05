@@ -14,7 +14,7 @@ export function WishlistButton({ label }: { label: string }) {
       onClick={() => setSaved((s) => !s)}
       className={cx(
         "absolute right-3 top-3 z-[2] grid size-[38px] cursor-pointer place-items-center rounded-full bg-white/95 transition-colors",
-        saved ? "text-[#d9461a]" : "text-[#1c2452]",
+        saved ? "text-fixed-heart" : "text-fixed-ink",
       )}
     >
       <svg

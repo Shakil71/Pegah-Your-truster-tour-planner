@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Generated Prisma client
 packages/db/src/generated/
+
+# End-to-end run state (contains a generated test password)
+e2e/.state/

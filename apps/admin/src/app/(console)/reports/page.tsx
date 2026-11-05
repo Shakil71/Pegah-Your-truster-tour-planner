@@ -159,7 +159,13 @@ export default async function ReportsPage({
         <h2 id="day-h" className="px-5 pt-5 text-[0.95rem] font-semibold md:px-6">
           By day
         </h2>
-        <div className="mt-3 max-h-[420px] overflow-y-auto">
+        {/* Focusable so keyboard users can scroll the table (WCAG 2.1.1). */}
+        <div
+          className="mt-3 max-h-[420px] overflow-y-auto focus-visible:outline-2"
+          tabIndex={0}
+          role="region"
+          aria-labelledby="day-h"
+        >
           <table className="w-full text-left text-[0.84rem]">
             <thead className="sticky top-0 bg-card">
               <tr className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">

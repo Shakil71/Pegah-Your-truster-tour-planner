@@ -4,6 +4,8 @@
  * light surfaces, so:
  *   - filled controls use --pg-primary with --pg-on-primary (indigo) text (6.1:1)
  *   - orange text on light surfaces uses --pg-primary-ink (#B5520F, 5.0:1)
+ *   - gold thread text uses --pg-thread-ink (#7D5D1C, 5.1:1 or more); --pg-thread
+ *     is for rules and decoration only (3.6:1)
  */
 :root {
   --pg-paper: #f4f5f9;
@@ -11,7 +13,7 @@
   --pg-card: #ffffff;
   --pg-ink: #1c2452;
   --pg-ink-2: #4f5679;
-  --pg-ink-3: #636988;
+  --pg-ink-3: #5a6080;
   --pg-rule: #d8dbe8;
   --pg-night: #0f1330;
   --pg-night-2: #171c42;
@@ -23,6 +25,7 @@
   --pg-on-primary: #1c2452;
 
   --pg-thread: #a8822f;
+  --pg-thread-ink: #7d5d1c;
 
   --pg-good: #1f7a4d;
   --pg-good-soft: #e3f3ea;
@@ -32,6 +35,15 @@
   --pg-critical-soft: #fde6e4;
   --pg-info: #3949ab;
   --pg-info-soft: #e7eafb;
+
+  /* Fixed colours: do not change with the theme. For text on photos, white
+   * chips and always-dark panels. */
+  --pg-on-night: #e7e9f4;
+  --pg-on-night-2: #c9cde4;
+  --pg-fixed-ink: #1c2452;
+  --pg-fixed-accent: #a64a0c;
+  --pg-fixed-good: #1c5b3a;
+  --pg-fixed-heart: #d9461a;
 
   --pg-shadow: 0 24px 60px -28px rgb(15 19 48 / 0.5);
   --pg-shadow-sm: 0 6px 20px -12px rgb(15 19 48 / 0.35);
@@ -50,6 +62,8 @@
     --pg-night-2: #10153a;
     --pg-primary-soft: #3a2414;
     --pg-primary-ink: #ffa365;
+    --pg-thread-ink: #d4b26a;
+    --pg-thread-ink: #d4b26a;
     --pg-good: #6fd3a0;
     --pg-good-soft: #143222;
     --pg-warn: #f0bf5a;

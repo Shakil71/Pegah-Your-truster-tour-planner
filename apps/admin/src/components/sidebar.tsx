@@ -17,7 +17,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
   return (
     <aside
       className={cx(
-        "fixed inset-y-0 left-0 z-40 flex w-[264px] flex-col bg-night text-[#c9cde4] transition-transform duration-300 ease-pegah lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-40 flex w-[264px] flex-col bg-night text-on-night-2 transition-transform duration-300 ease-pegah lg:translate-x-0",
         open ? "translate-x-0" : "-translate-x-full",
       )}
       aria-label="Admin navigation"
@@ -33,7 +33,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
       <nav className="flex-1 overflow-y-auto px-3 pb-6 [scrollbar-width:thin]">
         {groups.map((g) => (
           <div key={g.title} className="mt-5 first:mt-1">
-            <p className="px-3 pb-2 text-[0.64rem] font-bold uppercase tracking-[0.16em] text-white/40">
+            <p className="px-3 pb-2 text-[0.64rem] font-bold uppercase tracking-[0.16em] text-white/65">
               {g.title}
             </p>
             <ul className="grid gap-0.5">
@@ -90,7 +90,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
         <p className="mt-1 text-white/60">
           Real bookings and holds. Payments arrive in Phase 5, so nothing is confirmed yet.
         </p>
-        <p className="tabular mt-2 text-[0.72rem] text-white/45">
+        <p className="tabular mt-2 text-[0.72rem] text-white/65">
           Build {buildInfo.sha} · {buildInfo.builtAtLabel}
         </p>
       </div>

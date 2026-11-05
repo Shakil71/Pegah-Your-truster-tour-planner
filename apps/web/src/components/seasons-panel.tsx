@@ -12,7 +12,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
 
   return (
     <section className="px-[max(16px,env(safe-area-inset-left,0px))] pt-28" aria-labelledby="sea-h">
-      <div className="mx-auto grid max-w-[1280px] overflow-hidden rounded-card bg-night text-[#eef0f8] lg:grid-cols-[1.1fr_1fr] lg:gap-12">
+      <div className="mx-auto grid max-w-[1280px] overflow-hidden rounded-card bg-night text-white lg:grid-cols-[1.1fr_1fr] lg:gap-12">
         <div className="relative min-h-[300px] lg:min-h-[480px]">
           {RITUS.map((r) => (
             <Image
@@ -51,7 +51,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
                 className={cx(
                   "relative grid cursor-pointer gap-px rounded-control border border-dashed px-3 pb-2.5 pt-3 text-left transition-colors",
                   r.key === active
-                    ? "border-solid border-[#eef0f8] bg-[#eef0f8] text-[#1c2452]"
+                    ? "border-solid border-on-night bg-on-night text-fixed-ink"
                     : "border-white/25 bg-white/5 hover:bg-white/10",
                 )}
               >
@@ -59,7 +59,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
                   <span
                     className={cx(
                       "absolute right-2.5 top-2 text-[0.58rem] font-bold uppercase tracking-[0.12em]",
-                      r.key === active ? "text-[#b5520f]" : "text-primary",
+                      r.key === active ? "text-fixed-accent" : "text-primary",
                     )}
                   >
                     Now
@@ -73,7 +73,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
               </button>
             ))}
           </div>
-          <p aria-live="polite" className="m-0 min-h-[3.3em] text-[#eef0f8]/85">
+          <p aria-live="polite" className="m-0 min-h-[3.3em] text-white/85">
             {guide.note}
           </p>
           <div className="flex flex-wrap gap-2">

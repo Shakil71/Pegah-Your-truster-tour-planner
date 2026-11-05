@@ -32,22 +32,26 @@ photography carries the colour.
 
 ### Colour
 
-| Token                                | Light          | Dark           | Use                                                |
-| ------------------------------------ | -------------- | -------------- | -------------------------------------------------- |
-| `--paper`                            | `#f3f4f8`      | `#10142b`      | Page background                                    |
-| `--paper-2`                          | `#e8eaf2`      | `#171c3a`      | Hover, image placeholder                           |
-| `--card`                             | `#ffffff`      | `#1b2145`      | Search panel, cards                                |
-| `--ink`                              | `#1c2452`      | `#e9ebf5`      | Text, primary buttons                              |
-| `--ink-2`                            | `#4a5178`      | `#aab0cf`      | Secondary text                                     |
-| `--pg-primary`                       | `#ff852f`      | `#ff852f`      | Primary actions, stitch lines, badges, chart marks |
-| `--pg-ink-3`                         | `#636988`      | `#8d94b8`      | Captions (≥ 4.5:1 on card and paper)               |
-| `--pg-thread`                        | `#a8822f`      | `#a8822f`      | "Sample" and "soon" markers                        |
-| `--pg-rule`                          | `#d8dbe8`      | `#2b3263`      | Hairlines, dashed field separators                 |
-| `--pg-good / warn / critical / info` | see tokens.css | see tokens.css | Booking status only, always with icon + label      |
+| Token                                    | Light          | Dark           | Use                                                |
+| ---------------------------------------- | -------------- | -------------- | -------------------------------------------------- |
+| `--paper`                                | `#f3f4f8`      | `#10142b`      | Page background                                    |
+| `--paper-2`                              | `#e8eaf2`      | `#171c3a`      | Hover, image placeholder                           |
+| `--card`                                 | `#ffffff`      | `#1b2145`      | Search panel, cards                                |
+| `--ink`                                  | `#1c2452`      | `#e9ebf5`      | Text, primary buttons                              |
+| `--ink-2`                                | `#4a5178`      | `#aab0cf`      | Secondary text                                     |
+| `--pg-primary`                           | `#ff852f`      | `#ff852f`      | Primary actions, stitch lines, badges, chart marks |
+| `--pg-ink-3`                             | `#5a6080`      | `#8d94b8`      | Captions (≥ 4.5:1 on card, paper and paper-2)      |
+| `--pg-thread`                            | `#a8822f`      | `#a8822f`      | Borders and decoration only (3.6:1)                |
+| `--pg-thread-ink`                        | `#7d5d1c`      | `#d4b26a`      | "Sample" and "soon" marker text (≥ 5.1:1)          |
+| `--pg-on-night`, `--pg-on-night-2`       | fixed          | fixed          | Text on always-dark panels (footer, sidebar)       |
+| `--pg-fixed-ink / accent / good / heart` | fixed          | fixed          | Text on white chips over photos; never theme-swap  |
+| `--pg-rule`                              | `#d8dbe8`      | `#2b3263`      | Hairlines, dashed field separators                 |
+| `--pg-good / warn / critical / info`     | see tokens.css | see tokens.css | Booking status only, always with icon + label      |
 
 Rules: no gradients except photo scrims and the admin greeting glow. No raw
-hex in components except over photographs, where colours are fixed for
-legibility in both themes. Occupancy heatmaps use `sequentialPrimary` from
+hex in components: surfaces that must not change with the theme (photos,
+always-dark panels) use the fixed tokens above. Every page is scanned with axe
+(WCAG 2.1 AA) in the end-to-end suite. Occupancy heatmaps use `sequentialPrimary` from
 `@pegah/design-tokens` (single hue, light → dark).
 
 ### Typography

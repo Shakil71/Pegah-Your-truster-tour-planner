@@ -210,7 +210,12 @@ export function RevenueChart({ daily, endDate }: { daily: number[]; endDate: str
 
       <details className="mt-2 text-[0.8rem] text-ink-2">
         <summary className="cursor-pointer">View as table</summary>
-        <div className="mt-2 max-h-48 overflow-auto rounded-md border border-rule">
+        <div
+          className="mt-2 max-h-48 overflow-auto rounded-md border border-rule"
+          tabIndex={0}
+          role="region"
+          aria-label="Revenue by day"
+        >
           <table className="tabular w-full text-left">
             <thead className="sticky top-0 bg-paper">
               <tr>

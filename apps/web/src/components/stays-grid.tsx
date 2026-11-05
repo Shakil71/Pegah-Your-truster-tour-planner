@@ -42,7 +42,7 @@ export function StaysGrid() {
                 />
                 <WishlistButton label={s.name} />
                 {s.freeCancellation && (
-                  <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[0.74rem] font-bold text-[#1c5b3a]">
+                  <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[0.74rem] font-bold text-fixed-good">
                     Free cancellation
                   </span>
                 )}

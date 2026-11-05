@@ -37,7 +37,7 @@ const columns: { title: string; links: { label: string; href: string | null }[] 
 
 export function SiteFooter() {
   return (
-    <footer className="bg-night px-[max(16px,env(safe-area-inset-left,0px))] pb-8 pt-[72px] text-[#e7e9f4]">
+    <footer className="bg-night px-[max(16px,env(safe-area-inset-left,0px))] pb-8 pt-[72px] text-on-night">
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))]">
           <div className="col-span-2 md:col-span-1">

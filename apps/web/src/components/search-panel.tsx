@@ -131,14 +131,14 @@ export function SearchPanel() {
           <Tabs.Trigger value="flights" className={tabClass}>
             <Icon name="plane" />
             Flights
-            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread">
+            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
               soon
             </small>
           </Tabs.Trigger>
           <Tabs.Trigger value="visa" className={tabClass}>
             <Icon name="doc" />
             Visa
-            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread">
+            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
               soon
             </small>
           </Tabs.Trigger>

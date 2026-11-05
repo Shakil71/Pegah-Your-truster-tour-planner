@@ -70,11 +70,11 @@ export function ToursSection() {
                       setDep(i);
                       setHoldMsg("");
                     }}
-                    className={`tabular cursor-pointer rounded-full border-[1.5px] px-3.5 py-1.5 text-[0.85rem] ${i === dep ? "border-white bg-white text-[#1c2452]" : "border-dashed border-white/60"}`}
+                    className={`tabular cursor-pointer rounded-full border-[1.5px] px-3.5 py-1.5 text-[0.85rem] ${i === dep ? "border-white bg-white text-fixed-ink" : "border-dashed border-white/60"}`}
                   >
                     {d.date}
                     <span
-                      className={`ml-1.5 font-bold ${i === dep ? "text-[#b5520f]" : "text-primary"}`}
+                      className={`ml-1.5 font-bold ${i === dep ? "text-fixed-accent" : "text-primary"}`}
                     >
                       {d.seatsLeft} left
                     </span>

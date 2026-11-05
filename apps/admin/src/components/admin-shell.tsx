@@ -84,10 +84,14 @@ export function AdminShell({ children, today }: { children: ReactNode; today: st
               <span className="hidden text-[0.84rem] text-ink-2 sm:inline">{today} · Dhaka</span>
               <Link
                 href="/account"
-                aria-label="My account"
+                title="My account"
                 className="flex items-center gap-2.5 rounded-full border border-rule bg-card py-1 pl-1 pr-3.5 hover:border-ink"
               >
-                <span className="grid size-9 place-items-center rounded-full bg-primary font-display text-[0.95rem] font-semibold text-on-primary">
+                <span className="sr-only">My account: </span>
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 place-items-center rounded-full bg-primary font-display text-[0.95rem] font-semibold text-on-primary"
+                >
                   {initials}
                 </span>
                 <span className="hidden leading-tight sm:block">

@@ -14,7 +14,7 @@ BRANCH=main
 STATE=/opt/pegah/shared/state
 # Every job listed here must succeed (check-run names separated by "|", kept in
 # sync with .github/workflows/ci.yml).
-CI_JOBS="Format, lint, typecheck, test, build|Database integration (MySQL 8.4)"
+CI_JOBS="Format, lint, typecheck, test, build|Database integration (MySQL 8.4)|End-to-end and accessibility (Playwright + axe)"
 
 sha="$(git ls-remote "https://github.com/$REPO.git" "refs/heads/$BRANCH" | cut -f1)"
 [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Could not read $BRANCH head"; exit 0; }
