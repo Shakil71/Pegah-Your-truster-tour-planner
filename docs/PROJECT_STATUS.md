@@ -17,6 +17,10 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Cross-cutting: worker process, Redis rate limits, metrics and monitoring
+  setup (ADR-0027). Owner action: run the two setup scripts
+  (`docs/operations/MONITORING.md`).
+
 - Cross-cutting: Playwright end-to-end + axe accessibility suite in CI.
 
 - Phase 7: partner portals: supplier inventory and reservations, agent

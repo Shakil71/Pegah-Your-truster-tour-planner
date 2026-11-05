@@ -449,3 +449,32 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   once), manages users and assigns hotels and tours. All actions are audited.
 - **Payouts** are settled outside the platform for now; the statement is the
   reconciliation record.
+
+## ADR-0027 — Worker process, Redis rate limits and monitoring
+
+- **Status:** Accepted (2026-11-05)
+- **Worker:** `pegah-worker` runs the same API codebase from a second
+  entrypoint (`apps/api/dist/worker.js`) without an HTTP listener, so business
+  rules stay in one place instead of a separate `apps/worker` package. It runs
+  the hold sweeper (with payment reconciliation) and the email outbox. The API
+  stops running them when `RUN_BACKGROUND_JOBS=false` (set by the setup
+  script); until then the API keeps running them, so nothing breaks before the
+  owner installs the worker. Both jobs are already safe with several processes
+  (state-machine compare-and-set, `SKIP LOCKED`).
+- **No BullMQ yet:** the transactional outbox in MySQL is already durable and
+  retried. BullMQ is added when a job needs delays or fan-out (PDF rendering).
+- **Redis:** the existing Redis 7.2 on the server (RHEL package), not a new
+  Valkey install. Pegah gets its own ACL user restricted to `pegah:*` keys and
+  the commands it needs. First use: rate limits shared by all processes
+  (`pegah:v1:ratelimit:*`, fixed window, one Lua script). If Redis is
+  unreachable, limits fall back to the per-process store: still enforced,
+  never switched off, with a warning and a metric. Redis is never the source of
+  truth for bookings, payments, refunds or inventory.
+- **Metrics:** `prom-client` on loopback-only ports (API 9464, worker 9465);
+  request latency labelled by route pattern only. Business gauges (holds,
+  manual review, refunds required, outbox, failed emails) come from the process
+  running the jobs, so they are reported once.
+- **Monitoring stack:** official, checksum-pinned Prometheus 3.13.5 (long-term
+  line) and node_exporter 1.12.1 under `/opt`, and the RHEL Grafana package,
+  all on 127.0.0.1 with SELinux enforcing and no firewall changes; access via an
+  SSH tunnel. Loki is deferred until there is a second server.

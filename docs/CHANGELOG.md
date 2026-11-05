@@ -4,6 +4,16 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Worker, Redis rate limits, monitoring (2026-11-05)
+
+- `pegah-worker` process (same codebase, `dist/worker.js`) for hold expiry,
+  payment reconciliation and the email outbox; `RUN_BACKGROUND_JOBS` switch.
+- Shared rate limits in Redis (`REDIS_URL`) with a per-process fallback.
+- Prometheus metrics on loopback ports; Prometheus, node_exporter and Grafana
+  setup script with a Pegah dashboard and alert rules (ADR-0027).
+- Root scripts `infra/server/enable-worker-redis.sh` and
+  `infra/server/enable-monitoring.sh`; deploys restart the worker once installed.
+
 ### Added — Console Settings page (2026-11-05)
 
 - `GET /admin/settings` (`settings:read`, owner and admin) and a read-only

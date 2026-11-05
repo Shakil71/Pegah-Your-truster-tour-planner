@@ -1,3 +1,5 @@
+import { MetricsService } from "./metrics/metrics.service";
+import { RedisThrottlerStorage } from "./rbac/redis-throttler.storage";
 import { AdminSettingsController } from "./admin/settings.controller";
 import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
@@ -67,13 +69,17 @@ export interface AppModuleOptions {
 @Module({})
 export class AppModule {
   static register({ config, prisma }: AppModuleOptions): DynamicModule {
+    const rateLimitStorage = config.REDIS_URL
+      ? new RedisThrottlerStorage(config.REDIS_URL)
+      : undefined;
     return {
       module: AppModule,
       imports: [
-        // Per-process, in-memory limits for now. Moves to a Redis store with
-        // the worker phase so limits hold across API instances (ADR-0008).
+        // Shared limits in Redis when REDIS_URL is set (ADR-0027), so they hold
+        // across processes; otherwise per-process in-memory limits.
         ThrottlerModule.forRoot({
           throttlers: [{ name: "default", ttl: 60_000, limit: 300 }],
+          ...(rateLimitStorage ? { storage: rateLimitStorage } : {}),
         }),
       ],
       controllers: [
@@ -103,6 +109,11 @@ export class AppModule {
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
+        MetricsService,
+        // Registered so Nest closes the Redis connection on shutdown.
+        ...(rateLimitStorage
+          ? [{ provide: RedisThrottlerStorage, useValue: rateLimitStorage }]
+          : []),
         prisma ?? prismaProvider,
         PrismaLifecycle,
         AuditService,

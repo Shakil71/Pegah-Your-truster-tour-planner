@@ -31,7 +31,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   onModuleInit(): void {
-    if (this.config.OUTBOX_POLL_SECONDS === 0) return;
+    if (!this.config.RUN_BACKGROUND_JOBS || this.config.OUTBOX_POLL_SECONDS === 0) return;
     this.timer = setInterval(() => void this.tick(), this.config.OUTBOX_POLL_SECONDS * 1000);
     this.timer.unref();
   }

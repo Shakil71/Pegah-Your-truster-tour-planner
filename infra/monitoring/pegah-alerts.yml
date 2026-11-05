@@ -1,0 +1,41 @@
+# Alert rules, visible in Grafana and at Prometheus /alerts. No notification
+# channel is configured yet (needs an owner-approved email or chat target).
+groups:
+  - name: pegah
+    rules:
+      - alert: PegahProcessDown
+        expr: up{job=~"pegah-api|pegah-worker"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.job }} is not answering metrics scrapes"
+      - alert: PegahApiErrors
+        expr: sum(rate(pegah_http_request_duration_seconds_count{status="5xx"}[5m])) > 0.1
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "API is returning server errors"
+      - alert: PegahApiSlow
+        expr: histogram_quantile(0.95, sum by (le) (rate(pegah_http_request_duration_seconds_bucket[5m]))) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "95th percentile API latency above 1 s"
+      - alert: PegahRefundRequired
+        expr: pegah_payments_refund_required > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $value }} payment(s) must be refunded (see Admin → Payments)"
+      - alert: PegahOutboxStuck
+        expr: pegah_outbox_pending > 50 or pegah_outbox_failed > 0
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "Outbox events are piling up or failing"
+      - alert: PegahDiskFilling
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.15
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "Less than 15% disk space left on /"

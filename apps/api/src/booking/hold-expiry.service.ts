@@ -9,9 +9,10 @@ const BATCH = 50;
 
 /**
  * Expires unpaid bookings whose hold has run out and puts their inventory back
- * on sale. Runs inside the API process on a timer until the dedicated worker
- * exists (ADR-0018). Safe with several API instances: each expiry is a
- * compare-and-set through the state machine, so only one instance wins.
+ * on sale. Runs on a timer in the process with RUN_BACKGROUND_JOBS=true: the
+ * pegah-worker process in production, the API itself until the worker is
+ * installed (ADR-0018, ADR-0027). Safe with several processes: each expiry is a
+ * compare-and-set through the state machine, so only one process wins.
  */
 @Injectable()
 export class HoldExpiryService implements OnModuleInit, OnModuleDestroy {
@@ -28,7 +29,7 @@ export class HoldExpiryService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit(): void {
     const seconds = this.config.HOLD_SWEEP_SECONDS;
-    if (seconds === 0) return;
+    if (!this.config.RUN_BACKGROUND_JOBS || seconds === 0) return;
     this.timer = setInterval(() => void this.tick(), seconds * 1000);
     this.timer.unref();
   }

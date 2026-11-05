@@ -18,6 +18,8 @@ ENV_DIR=$ROOT/shared/env
 STATE=$ROOT/shared/state
 KEEP_RELEASES=5
 UNITS=(pegah-api.service pegah-web.service pegah-admin.service)
+# The worker unit exists once the owner ran server/enable-worker-redis.sh (ADR-0027).
+if systemctl cat pegah-worker.service >/dev/null 2>&1; then UNITS+=(pegah-worker.service); fi
 
 [[ "$(id -un)" == "pegah" ]] || { echo "Run as pegah" >&2; exit 1; }
 [[ "$REF" =~ ^([0-9a-f]{40}|v[0-9]+\.[0-9]+\.[0-9]+)$ ]] ||
@@ -101,7 +103,10 @@ log "Switching current → $RELEASE"
 switch_to "$RELEASE"
 restart_all
 
+worker_ok() { [[ ! " ${UNITS[*]} " =~ " pegah-worker.service " ]] || { sleep 3; systemctl is-active --quiet pegah-worker.service; }; }
+
 if check http://127.0.0.1:4100/api/v1/health/ready &&
+  worker_ok &&
   check http://127.0.0.1:3100/ &&
   check http://127.0.0.1:3101/admin; then
   log "Healthy"

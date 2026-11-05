@@ -211,6 +211,11 @@ with SPF and DKIM set up, or mail will land in spam.
 Switched off (`PAYMENT_PROVIDER` unset). To switch SSLCOMMERZ on, follow
 [SSLCOMMERZ_INTEGRATION.md](SSLCOMMERZ_INTEGRATION.md).
 
+### Worker, Redis and monitoring (ADR-0027) — run once
+
+See `docs/operations/MONITORING.md`: `enable-worker-redis.sh`, then
+`enable-monitoring.sh`, both as root from `/opt/pegah/current/infra/server/`.
+
 ### HTTPS (ADR-0019) — run once
 
 Sign-in cookies are `Secure`, so the site must be served over HTTPS. As root:

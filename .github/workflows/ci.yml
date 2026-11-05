@@ -83,11 +83,18 @@ jobs:
 
       - uses: ./.github/actions/setup-mysql
 
+      - name: Start Redis (Ubuntu package, plain process)
+        run: |
+          sudo apt-get install -y --no-install-recommends redis-server
+          sudo systemctl start redis-server
+          redis-cli ping
+          echo "PEGAH_IT_REDIS_URL=redis://127.0.0.1:6379/0" >> "$GITHUB_ENV"
+
       - name: Build database package
         run: npm run build -w @pegah/db
 
       - name: Integration tests
-        run: npx vitest run apps/api/src/test/ --exclude "**/app.e2e.test.ts"
+        run: npx vitest run apps/api/src/test/ apps/api/src/rbac/redis-throttler.storage.test.ts --exclude "**/app.e2e.test.ts"
 
       - name: MySQL error log
         if: failure()

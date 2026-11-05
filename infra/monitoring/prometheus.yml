@@ -1,0 +1,21 @@
+# Pegah Prometheus (ADR-0027). Everything is on 127.0.0.1; nothing is public.
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+
+rule_files:
+  - /etc/prometheus/pegah-alerts.yml
+
+scrape_configs:
+  - job_name: pegah-api
+    static_configs:
+      - targets: ["127.0.0.1:9464"]
+  - job_name: pegah-worker
+    static_configs:
+      - targets: ["127.0.0.1:9465"]
+  - job_name: node
+    static_configs:
+      - targets: ["127.0.0.1:9100"]
+  - job_name: prometheus
+    static_configs:
+      - targets: ["127.0.0.1:9091"]

@@ -68,14 +68,16 @@ to 127.0.0.1; Nginx is the only public listener.
 Redis is a cache and queue, never the source of truth for bookings, payments,
 refunds, balances or inventory. Every key must be registered here before use.
 
-| Key format                         | Owner   | TTL            | Invalidation                     | Fallback                                                      |
-| ---------------------------------- | ------- | -------------- | -------------------------------- | ------------------------------------------------------------- |
-| `pg:v1:catalog:destination:{slug}` | catalog | 10 min         | on destination update            | read MySQL                                                    |
-| `pg:v1:search:hotel:{hash(query)}` | pricing | 2 min          | expiry only; revalidated at hold | read MySQL                                                    |
-| `pg:v1:ratelimit:{route}:{ip}`     | auth    | window         | expiry                           | auth routes fail closed; other routes fail open with an alert |
-| `bull:{queue}:*`                   | worker  | BullMQ managed | BullMQ                           | outbox retries                                                |
+| Key format                              | Owner   | TTL            | Invalidation                     | Fallback                                                         |
+| --------------------------------------- | ------- | -------------- | -------------------------------- | ---------------------------------------------------------------- |
+| `pg:v1:catalog:destination:{slug}`      | catalog | 10 min         | on destination update            | read MySQL                                                       |
+| `pg:v1:search:hotel:{hash(query)}`      | pricing | 2 min          | expiry only; revalidated at hold | read MySQL                                                       |
+| `pegah:v1:ratelimit:{throttler}:{hash}` | rbac    | window (60 s)  | expiry                           | per-process in-memory limits (still enforced) + warning + metric |
+| `bull:{queue}:*`                        | worker  | BullMQ managed | BullMQ                           | outbox retries                                                   |
 
-(Planned keys; none is in use yet because Redis is not installed.)
+All keys start with `pegah:` (the Redis ACL user can touch nothing else).
+In use: the rate-limit key (ADR-0027). The catalog and search keys are planned
+(HTTP caching is used for now); `bull:*` arrives with BullMQ.
 
 **HTTP caching in use (Phase 3):** public catalog reads send
 `Cache-Control: public` — destinations and hotels 300 s, tours 120 s, hotel
@@ -84,7 +86,11 @@ catalog. Invalidation: expiry only. Search prices are labelled indicative
 (`pricedAt`) and are always recomputed under a row lock before a hold.
 Session, auth and admin responses send `Cache-Control: no-store`.
 
-## 6. Background jobs (planned)
+## 6. Background jobs
+
+In use (ADR-0027): `pegah-worker` runs the hold sweeper (expiry and payment
+reconciliation) and the email outbox from the same codebase as the API.
+Planned queues:
 
 | Queue         | Job                                     | Trigger                     |
 | ------------- | --------------------------------------- | --------------------------- |

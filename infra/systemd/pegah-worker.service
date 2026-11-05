@@ -1,0 +1,30 @@
+[Unit]
+Description=Pegah worker (hold expiry, email outbox, payment reconciliation)
+After=network-online.target mysqld.service redis.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pegah
+Group=pegah
+WorkingDirectory=/opt/pegah/current/apps/api
+# Same environment as the API; worker.js forces RUN_BACKGROUND_JOBS=true and
+# uses WORKER_METRICS_PORT (ADR-0027).
+EnvironmentFile=/opt/pegah/shared/env/api.env
+ExecStart=/usr/bin/node --enable-source-maps dist/worker.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

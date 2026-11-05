@@ -1,5 +1,6 @@
 # Managed by Pegah bootstrap. The deploy user may restart only Pegah units.
 Cmnd_Alias PEGAH_UNITS = /usr/bin/systemctl restart pegah-api.service, \
                          /usr/bin/systemctl restart pegah-web.service, \
-                         /usr/bin/systemctl restart pegah-admin.service
+                         /usr/bin/systemctl restart pegah-admin.service, \
+                         /usr/bin/systemctl restart pegah-worker.service
 pegah ALL=(root) NOPASSWD: PEGAH_UNITS

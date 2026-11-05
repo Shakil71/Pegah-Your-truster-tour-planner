@@ -66,6 +66,6 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - 🔶 HTTPS: self-signed on :8443 ready (owner runs `enable-https.sh`); trusted
   certificate needs a domain.
 - ✅ Playwright end-to-end + axe accessibility checks in CI (deploys require them).
-- ⬜ Worker process with Redis/Valkey (outbox, emails, distributed rate limits).
-- ⬜ Monitoring (Prometheus, Grafana, Loki) and restore drill for backups.
+- ✅ Worker process and Redis rate limits (ADR-0027); owner runs `enable-worker-redis.sh` once.
+- ✅ Monitoring: Prometheus, node_exporter, Grafana dashboard and alert rules (owner runs `enable-monitoring.sh`). ⬜ Loki (with a second server), alert notifications (need a destination), backup restore drill.
 - ⬜ Staging instance; remove demo data; Bangla localisation (next-intl).

@@ -9,6 +9,7 @@ import { cleanupOpenApiDoc } from "nestjs-zod";
 import { randomUUID } from "node:crypto";
 import { AppModule } from "./app.module";
 import type { AppConfig } from "./config/config";
+import { httpDuration } from "./metrics/metrics.service";
 
 export const API_PREFIX = "api/v1";
 
@@ -63,6 +64,22 @@ export async function createApp({
     allowedHeaders: ["content-type", "x-csrf-token", "idempotency-key"],
     maxAge: 600,
   });
+
+  // Request latency by route pattern for /metrics (cheap; recorded even when metrics are off).
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addHook("onResponse", (request, reply, done) => {
+      httpDuration.observe(
+        {
+          method: request.method,
+          route: request.routeOptions.url ?? "unmatched",
+          status: `${Math.floor(reply.statusCode / 100)}xx`,
+        },
+        reply.elapsedTime / 1000,
+      );
+      done();
+    });
 
   await app.register(fastifyCookie);
   // Payment callbacks arrive as application/x-www-form-urlencoded; Nest's Fastify

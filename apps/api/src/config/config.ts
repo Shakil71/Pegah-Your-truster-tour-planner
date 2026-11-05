@@ -87,6 +87,24 @@ export const EnvSchema = z.object({
   SMTP_PASSWORD: z.string().max(200).optional(),
   /** Outbox dispatcher interval in seconds; 0 disables it (tests). */
   OUTBOX_POLL_SECONDS: z.coerce.number().int().min(0).max(3600).default(10),
+
+  // ── Worker, Redis and metrics (ADR-0027).
+  /**
+   * true = this process runs the hold sweeper and email outbox. The API runs
+   * them until the dedicated worker (pegah-worker) is installed, which sets
+   * this to false for the API; the worker always runs them.
+   */
+  RUN_BACKGROUND_JOBS: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((v) => v === "true"),
+  /** redis://user:pass@127.0.0.1:6379/0 — shared rate limits. Unset = per-process limits. */
+  REDIS_URL: z
+    .string()
+    .regex(/^rediss?:\/\//, "REDIS_URL must start with redis:// or rediss://")
+    .optional(),
+  /** Loopback port for Prometheus metrics (0 = off). Never exposed through Nginx. */
+  METRICS_PORT: z.coerce.number().int().min(0).max(65535).default(0),
 });
 
 export type AppConfig = z.infer<typeof EnvSchema>;
