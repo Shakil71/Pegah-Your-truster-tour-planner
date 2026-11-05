@@ -8,6 +8,7 @@ const pages = [
   { path: "/tours", name: "tours" },
   { path: "/login", name: "sign in" },
   { path: "/partner/login", name: "partner sign in" },
+  { path: "/about", name: "about" },
 ];
 
 for (const p of pages) {

@@ -13,7 +13,8 @@
     "soon": "soon",
     "myTrips": "{name} · My trips",
     "signIn": "Sign in",
-    "switchLanguage": "বাংলায় দেখুন / View in English"
+    "switchLanguage": "বাংলায় দেখুন / View in English",
+    "about": "About"
   },
   "footer": {
     "tagline": "Stays, tours and travel planning across Bangladesh.",
@@ -455,5 +456,74 @@
     "beingWrittenIntro": "We are preparing it now. For anything urgent about a booking, open it from your account.",
     "myTrips": "My trips",
     "home": "Home"
+  },
+  "about": {
+    "title": "About Pegah",
+    "eyebrow": "Since 2022",
+    "heroTitle": "Your trusted travel companion, <em>since 2022</em>",
+    "heroIntro": "Pegah began its journey in 2022 with one simple idea: a holiday should feel easy, honest and affordable. Today we plan trips across Bangladesh for families, couples, teams and anyone who wants to travel well for less.",
+    "storyEyebrow": "Our story",
+    "storyTitle": "How the journey <em>began</em>",
+    "storyBody": "We started small, planning trips for friends and families who wanted someone dependable to handle the details. Word spread, and the trips grew into corporate tours, family holidays and honeymoon packages. Through every season we have kept one promise: tell the truth about prices, and stand by our travellers from booking until they are home.",
+    "timeline": {
+      "y2022": "Pegah starts its journey, planning tours across Bangladesh.",
+      "firsts": "We introduce corporate tours, family tours and honeymoon packages — and pioneer travel gift cards.",
+      "today": "Still working with honesty and sincerity, and making holidays affordable for everyone."
+    },
+    "timelineLabels": {
+      "y2022": "2022",
+      "firsts": "Firsts",
+      "today": "Today"
+    },
+    "servicesEyebrow": "What we do",
+    "servicesTitle": "Trips for <em>every</em> kind of traveller",
+    "services": {
+      "corporate": {
+        "title": "Corporate tours",
+        "body": "Team retreats, incentive trips and conferences, planned end to end so your team can simply enjoy it."
+      },
+      "family": {
+        "title": "Family tours",
+        "body": "Safe, comfortable trips that work for grandparents and children alike, at a pace that suits everyone."
+      },
+      "honeymoon": {
+        "title": "Honeymoon packages",
+        "body": "Quiet stays and thoughtful touches for your first journey together — from the sea to the hills."
+      },
+      "giftcards": {
+        "title": "Gift cards",
+        "body": "Give someone a journey. We pioneered travel gift cards so loved ones can choose their own holiday."
+      }
+    },
+    "valuesEyebrow": "How we work",
+    "valuesTitle": "Honesty and sincerity, <em>still</em>",
+    "values": {
+      "honest": {
+        "title": "Honest prices",
+        "body": "The price you see includes taxes and fees. No surprises at the last step."
+      },
+      "sincere": {
+        "title": "Sincere care",
+        "body": "One planner looks after your trip, before you leave and while you travel."
+      },
+      "affordable": {
+        "title": "Holidays for less",
+        "body": "Tell us your budget — Pegah arranges a good holiday at a lower cost."
+      },
+      "everyone": {
+        "title": "Offers for everyone",
+        "body": "Anyone can avail our offers. Good travel should not be a privilege."
+      }
+    },
+    "ctaTitle": "Plan your next holiday with Pegah",
+    "ctaBody": "Tell us where you want to go and what you want to spend. We will do the rest.",
+    "ctaStays": "Find a stay",
+    "ctaTours": "Browse tours",
+    "contactTitle": "Visit or call us",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "directions": "Get directions",
+    "photoNote": "Photos: Wikimedia Commons contributors (credits in the footer)."
   }
 }

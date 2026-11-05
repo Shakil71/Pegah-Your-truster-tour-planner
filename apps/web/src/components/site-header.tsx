@@ -12,6 +12,7 @@ const nav = [
   { href: "/stays", key: "stays" },
   { href: "/tours", key: "tours" },
   { href: "/#explore", key: "destinations" },
+  { href: "/about", key: "about" },
 ] as const;
 
 /** Transparent over the hero photo (home), solid once the page scrolls or on inner pages. */
@@ -42,7 +43,7 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
       <div className="mx-auto grid h-[72px] max-w-[1280px] grid-cols-[1fr_auto] items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
         <div className="justify-self-start">
           <Link href="/" aria-label={t("home")} className="no-underline">
-            <Logo className="text-[1.8rem]" />
+            <Logo tone={solid ? "dark" : "light"} className="h-11" />
           </Link>
         </div>
         <nav aria-label={t("mainNav")} className="hidden md:block">

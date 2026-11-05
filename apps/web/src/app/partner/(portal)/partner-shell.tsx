@@ -48,7 +48,7 @@ export function PartnerShell({
       <header className="border-b border-rule bg-night text-white">
         <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-6">
           <Link href="/partner" className="flex items-center gap-3 no-underline">
-            <Logo className="text-[1.6rem]" />
+            <Logo tone="light" className="h-10" />
             <span className="rounded-full border border-white/20 px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/75">
               {kind === "SUPPLIER" ? "Supplier" : "Agent"}
             </span>

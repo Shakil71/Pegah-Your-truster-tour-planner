@@ -123,6 +123,13 @@ export function GeneralForm({ view, csrfToken }: { view: View; csrfToken: string
           value={v.officeAddress}
           onChange={(e) => setV({ ...v, officeAddress: e.target.value })}
         />
+        <TextField
+          label="Email for purchase alerts"
+          type="email"
+          value={v.notificationEmail ?? ""}
+          onChange={(e) => setV({ ...v, notificationEmail: e.target.value })}
+          hint="New offer and gift card purchases are emailed here."
+        />
       </div>
       {note && <FormAlert tone={note.tone}>{note.text}</FormAlert>}
       <button

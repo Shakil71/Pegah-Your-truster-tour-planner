@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Brand and About page (2026-11-05)
+
+- Owner-supplied Pegah logo across website, console and partner portal, with a
+  light version for dark surfaces.
+- About page (English and Bangla): journey since 2022, corporate, family and
+  honeymoon tours, gift cards, honesty and sincerity, contact details.
+- Company contact details as Settings defaults; new "Email for purchase
+  alerts" setting (default pegah.com.bd@gmail.com).
+
 ### Added — Home page editor (2026-11-05)
 
 - Console **Content → Home page**: hero slides from the media library with

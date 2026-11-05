@@ -59,7 +59,7 @@ export default async function VoucherPage({ params }: { params: Promise<{ id: st
 
       <header className="flex items-start justify-between gap-6 border-b border-rule pb-6">
         <div>
-          <Logo className="text-[2.2rem]" />
+          <Logo className="h-14" />
           <p className="mt-1 text-[0.82rem] text-ink-2">{t("tagline")}</p>
         </div>
         <div className="text-right">

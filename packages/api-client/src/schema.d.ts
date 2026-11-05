@@ -3069,6 +3069,7 @@ export interface components {
         supportEmail: string | "";
         whatsapp: string;
         officeAddress: string;
+        notificationEmail?: string | "";
       };
       announcement: {
         enabled: boolean;
@@ -3113,6 +3114,7 @@ export interface components {
       supportEmail: string | "";
       whatsapp: string;
       officeAddress: string;
+      notificationEmail?: string | "";
     };
     AdminAnnouncementDto: {
       enabled: boolean;
@@ -3156,6 +3158,7 @@ export interface components {
         supportEmail: string | "";
         whatsapp: string;
         officeAddress: string;
+        notificationEmail?: string | "";
       };
       announcement: {
         enabled: boolean;

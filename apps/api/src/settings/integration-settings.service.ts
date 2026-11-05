@@ -72,11 +72,13 @@ export interface EmailChannel {
   transporter: Transporter | null;
 }
 
+/** Pegah published company details; the owner can change them in Settings. */
 const DEFAULT_GENERAL: GeneralSettings = {
-  supportPhone: "",
-  supportEmail: "",
-  whatsapp: "",
-  officeAddress: "",
+  supportPhone: "+8801784782962",
+  supportEmail: "pegah.com.bd@gmail.com",
+  whatsapp: "+8801784782962",
+  officeAddress: "153/1, Shahalibag, Mirpur-1, Dhaka-1216",
+  notificationEmail: "pegah.com.bd@gmail.com",
 };
 const DEFAULT_ANNOUNCEMENT: Announcement = {
   enabled: false,
@@ -155,6 +157,11 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
   paymentExtensionMinutes(): number {
     return this.booking.paymentExtensionMinutes;
   }
+  /** Address for staff alerts about purchases. */
+  notificationEmail(): string {
+    return this.general.notificationEmail || this.general.supportEmail || "pegah.com.bd@gmail.com";
+  }
+
   publicSite(): PublicSite {
     return {
       general: this.general,

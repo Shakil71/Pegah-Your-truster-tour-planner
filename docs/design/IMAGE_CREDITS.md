@@ -27,3 +27,9 @@ licensed photography, and keep this file current.
 
 Note: `hero-ratargul-boatman.jpg` is 1.4 MB. Before production, serve all
 photos through Next.js image optimisation (AVIF/WebP, responsive sizes).
+
+## Brand
+
+| File                                                                             | Source                                                                                                                          | Licence        |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `apps/web/public/brand/pegah-logo.webp`, `pegah-logo-light.webp`, `pegah-og.png` | Pegah wordmark supplied by the owner (2026-11-05); cleaned of stray pixels, light variant recolours the plane for dark surfaces | Owned by Pegah |

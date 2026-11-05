@@ -28,7 +28,7 @@ const columns: { title: string; links: { key: string; href: string | null }[] }[
   {
     title: "pegah",
     links: [
-      { key: "about", href: "/pages/about" },
+      { key: "about", href: "/about" },
       { key: "forPartners", href: "/pages/partners" },
       { key: "partnerSignIn", href: "/partner/login" },
       { key: "terms", href: "/pages/terms" },
@@ -46,7 +46,7 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))]">
           <div className="col-span-2 md:col-span-1">
-            <Logo className="text-[2.4rem]" />
+            <Logo tone="light" className="h-16" />
             <p className="mt-3.5 max-w-[34ch] opacity-80">{t("tagline")}</p>
             {contact && (contact.supportPhone || contact.supportEmail) && (
               <address className="mt-4 grid gap-1 text-[0.92rem] not-italic opacity-90">

@@ -13,6 +13,8 @@ export const GeneralSettingsSchema = z.object({
   supportEmail: z.union([z.email(), z.literal("")]),
   whatsapp: Text(20),
   officeAddress: Text(300),
+  /** Where staff alerts go (new offer and gift card purchases). Empty = support email. */
+  notificationEmail: z.union([z.email(), z.literal("")]).optional(),
 });
 export type GeneralSettings = z.infer<typeof GeneralSettingsSchema>;
 

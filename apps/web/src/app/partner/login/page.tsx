@@ -12,7 +12,7 @@ export default async function PartnerLoginPage() {
   return (
     <main className="grid min-h-dvh place-items-center bg-night px-4 py-12">
       <div className="w-full max-w-[420px] rounded-card bg-card p-6 md:p-8">
-        <Logo className="text-[2rem] text-ink" />
+        <Logo className="h-14" />
         <p className="mt-6 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary-ink">
           Partner portal
         </p>

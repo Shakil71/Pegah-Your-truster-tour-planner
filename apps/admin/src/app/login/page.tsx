@@ -41,7 +41,7 @@ export default async function LoginPage({
 
       <section className="flex items-center justify-center px-5 py-12 sm:px-10">
         <div className="w-full max-w-[400px]">
-          <Logo className="text-[2rem] text-ink" />
+          <Logo className="h-14" />
           <h1 className="mt-8 font-display text-[2rem] font-medium leading-tight">Staff sign in</h1>
           <p className="mt-2 text-ink-2">
             Use the account an owner created for you. Sessions end after 30 idle minutes.

@@ -24,7 +24,7 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
     >
       <div className="flex h-[72px] items-center gap-3 px-6">
         <Link href="/" onClick={onNavigate} className="text-white">
-          <Logo className="text-[1.7rem]" />
+          <Logo tone="light" className="h-11" />
         </Link>
         <span className="rounded-full border border-white/15 px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/70">
           Admin
