@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Media library (2026-11-05)
+
+- Console **Media library**: upload (resized in the browser, re-encoded as
+  WebP without camera/GPS data), captions and credits, delete when unused
+  (ADR-0030).
+- Main photo picker for destinations, hotels and tours; the website shows the
+  chosen photo.
+- Migration `20261110090000_media_blobs`.
+
 ### Added — Console control (2026-11-05)
 
 - Settings page is now editable: contact details, announcement banner

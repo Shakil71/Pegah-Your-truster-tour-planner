@@ -28,6 +28,7 @@ import { newPublicId } from "../common/ids";
 import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
 import { addDays, dhakaToday, formatCalendarDate, parseCalendarDate } from "../common/time";
+import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 
 /** Bookings that still occupy inventory or need attention. */
@@ -68,14 +69,44 @@ export class CatalogAdminService {
   constructor(
     @Inject(PRISMA) private readonly db: Db,
     @Inject(AuditService) private readonly audit: AuditService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
+
+  /** Main photo as shown in the console (key, URL, alt). */
+  private heroRef(m: { storageKey: string; altText: string } | null) {
+    if (!m) return null;
+    const base = this.config.MEDIA_BASE_URL.replace(/\/$/, "");
+    return { key: m.storageKey, url: `${base}/${m.storageKey}`, alt: m.altText };
+  }
+
+  /** Media key → asset id for a hero photo; undefined keeps, null clears. */
+  private async heroId(
+    tx: Pick<Tx, "mediaAsset">,
+    key: string | null | undefined,
+  ): Promise<{ heroMediaId?: bigint | null }> {
+    if (key === undefined) return {};
+    if (key === null) return { heroMediaId: null };
+    const m = await tx.mediaAsset.findUnique({ where: { storageKey: key }, select: { id: true } });
+    if (!m) {
+      throw new ProblemException(
+        422,
+        "unknown-media",
+        "Unknown image",
+        "Pick an image from the media library.",
+      );
+    }
+    return { heroMediaId: m.id };
+  }
 
   // ─── Destinations ─────────────────────────────────────────────────────────
 
   async listDestinations(): Promise<AdminDestination[]> {
     const rows = await this.db.destination.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      include: { _count: { select: { hotels: true, tours: true } } },
+      include: {
+        _count: { select: { hotels: true, tours: true } },
+        hero: { select: { storageKey: true, altText: true } },
+      },
     });
     return rows.map((d) => ({
       slug: d.slug,
@@ -87,6 +118,7 @@ export class CatalogAdminService {
       sortOrder: d.sortOrder,
       hotelCount: d._count.hotels,
       tourCount: d._count.tours,
+      hero: this.heroRef(d.hero),
       updatedAt: d.updatedAt.toISOString(),
     }));
   }
@@ -94,7 +126,10 @@ export class CatalogAdminService {
   async createDestination(input: CreateDestination, actor: AuthContext, ip: string | null) {
     try {
       await this.db.$transaction(async (tx) => {
-        await tx.destination.create({ data: { ...input, nameBn: input.nameBn ?? null } });
+        const { heroMedia, ...fields } = input;
+        await tx.destination.create({
+          data: { ...fields, nameBn: fields.nameBn ?? null, ...(await this.heroId(tx, heroMedia)) },
+        });
         await this.record(tx, actor, ip, "catalog.destination.created", "destination", input.slug, {
           name: input.name,
           status: input.status,
@@ -116,9 +151,10 @@ export class CatalogAdminService {
     await this.db.$transaction(async (tx) => {
       const found = await tx.destination.findUnique({ where: { slug }, select: { id: true } });
       if (!found) throw notFound("destination");
+      const { heroMedia, ...fields } = input;
       await tx.destination.update({
         where: { id: found.id },
-        data: { ...input, nameBn: input.nameBn ?? null },
+        data: { ...fields, nameBn: fields.nameBn ?? null, ...(await this.heroId(tx, heroMedia)) },
       });
       await this.record(tx, actor, ip, "catalog.destination.updated", "destination", slug, {
         status: input.status,
@@ -176,6 +212,7 @@ export class CatalogAdminService {
       include: {
         destination: { select: { slug: true, name: true } },
         partner: { select: { publicId: true, name: true } },
+        hero: { select: { storageKey: true, altText: true } },
         rooms: { orderBy: [{ isActive: "desc" }, { maxAdults: "asc" }, { name: "asc" }] },
       },
     });
@@ -201,12 +238,13 @@ export class CatalogAdminService {
       serviceChargeBps: h.serviceChargeBps,
       vatBps: h.vatBps,
       supplier: h.partner ? { id: h.partner.publicId, name: h.partner.name } : null,
+      hero: this.heroRef(h.hero),
       rooms: h.rooms.map(toAdminRoom),
     };
   }
 
   async createHotel(input: CreateHotel, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
     try {
       await this.db.$transaction(async (tx) => {
         const destinationId = await this.destinationId(tx, destinationSlug);
@@ -216,6 +254,7 @@ export class CatalogAdminService {
             publicId: newPublicId(),
             destinationId,
             partnerId: await this.supplierId(tx, supplierId),
+            ...(await this.heroId(tx, heroMedia)),
             nameBn: fields.nameBn ?? null,
             description: fields.description ?? null,
           },
@@ -233,7 +272,7 @@ export class CatalogAdminService {
   }
 
   async updateHotel(slug: string, input: HotelInput, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
     await this.db.$transaction(async (tx) => {
       const found = await tx.hotel.findUnique({ where: { slug } });
       if (!found) throw notFound("hotel");
@@ -244,6 +283,7 @@ export class CatalogAdminService {
           ...fields,
           destinationId,
           ...(supplierId !== undefined ? { partnerId: await this.supplierId(tx, supplierId) } : {}),
+          ...(await this.heroId(tx, heroMedia)),
           nameBn: fields.nameBn ?? null,
           description: fields.description ?? null,
         },
@@ -470,6 +510,7 @@ export class CatalogAdminService {
       include: {
         destination: { select: { slug: true, name: true } },
         partner: { select: { publicId: true, name: true } },
+        hero: { select: { storageKey: true, altText: true } },
         schedules: { orderBy: { departsAt: "asc" } },
       },
     });
@@ -499,12 +540,13 @@ export class CatalogAdminService {
       excludes: list(t.excludes),
       vatBps: t.vatBps,
       supplier: t.partner ? { id: t.partner.publicId, name: t.partner.name } : null,
+      hero: this.heroRef(t.hero),
       departures: t.schedules.map(toAdminDeparture),
     };
   }
 
   async createTour(input: CreateTour, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
     try {
       await this.db.$transaction(async (tx) => {
         const destinationId = await this.destinationId(tx, destinationSlug);
@@ -514,6 +556,7 @@ export class CatalogAdminService {
             publicId: newPublicId(),
             destinationId,
             partnerId: await this.supplierId(tx, supplierId),
+            ...(await this.heroId(tx, heroMedia)),
             titleBn: fields.titleBn ?? null,
           },
         });
@@ -530,7 +573,7 @@ export class CatalogAdminService {
   }
 
   async updateTour(slug: string, input: TourInput, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
     await this.db.$transaction(async (tx) => {
       const found = await tx.tour.findUnique({ where: { slug } });
       if (!found) throw notFound("tour");
@@ -541,6 +584,7 @@ export class CatalogAdminService {
           ...fields,
           destinationId,
           ...(supplierId !== undefined ? { partnerId: await this.supplierId(tx, supplierId) } : {}),
+          ...(await this.heroId(tx, heroMedia)),
           titleBn: fields.titleBn ?? null,
         },
       });

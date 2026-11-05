@@ -44,6 +44,12 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
         icon: "pin",
         permission: "catalog:read",
       },
+      {
+        href: "/catalog/media",
+        label: "Media library",
+        icon: "layout",
+        permission: "catalog:read",
+      },
     ],
   },
   {

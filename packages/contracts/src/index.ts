@@ -13,3 +13,4 @@ export * from "./account";
 export * from "./growth";
 export * from "./partner";
 export * from "./settings";
+export * from "./media";

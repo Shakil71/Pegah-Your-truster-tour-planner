@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BookingSummarySchema } from "./booking";
+import { HeroRefSchema, MediaKeySchema } from "./media";
 import {
   CalendarDateSchema,
   InstantSchema,
@@ -40,6 +41,8 @@ export const DestinationInputSchema = z.object({
   summary: Text(10, 500),
   status: PublishStatusSchema,
   sortOrder: z.number().int().min(0).max(9999),
+  /** Main photo from the media library (key); null removes it, omitted keeps it. */
+  heroMedia: MediaKeySchema.nullable().optional(),
 });
 export type DestinationInput = z.infer<typeof DestinationInputSchema>;
 export const CreateDestinationSchema = DestinationInputSchema.extend({ slug: SlugSchema });
@@ -56,6 +59,7 @@ export const AdminDestinationSchema = z
     sortOrder: z.number().int(),
     hotelCount: z.number().int(),
     tourCount: z.number().int(),
+    hero: HeroRefSchema.nullable(),
     updatedAt: InstantSchema,
   })
   .meta({ id: "AdminDestination" });
@@ -83,6 +87,8 @@ export const HotelInputSchema = z.object({
   status: PublishStatusSchema,
   /** Supplier partner that manages this hotel in the partner portal. */
   supplierId: PublicIdSchema.nullable().optional(),
+  /** Main photo from the media library (key); null removes it, omitted keeps it. */
+  heroMedia: MediaKeySchema.nullable().optional(),
 });
 export type HotelInput = z.infer<typeof HotelInputSchema>;
 export const CreateHotelSchema = HotelInputSchema.extend({ slug: SlugSchema });
@@ -132,6 +138,7 @@ export const AdminHotelDetailSchema = AdminHotelSummarySchema.extend({
   serviceChargeBps: z.number().int(),
   vatBps: z.number().int(),
   supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
+  hero: HeroRefSchema.nullable(),
   rooms: z.array(AdminRoomSchema),
 });
 export type AdminHotelDetail = z.infer<typeof AdminHotelDetailSchema>;
@@ -201,6 +208,7 @@ export const TourInputSchema = z.object({
   vatBps: Bps,
   status: PublishStatusSchema,
   supplierId: PublicIdSchema.nullable().optional(),
+  heroMedia: MediaKeySchema.nullable().optional(),
 });
 export type TourInput = z.infer<typeof TourInputSchema>;
 export const CreateTourSchema = TourInputSchema.extend({ slug: SlugSchema });
@@ -250,6 +258,7 @@ export const AdminTourDetailSchema = AdminTourSummarySchema.extend({
   excludes: z.array(z.string()),
   vatBps: z.number().int(),
   supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
+  hero: HeroRefSchema.nullable(),
   departures: z.array(AdminDepartureSchema),
 });
 export type AdminTourDetail = z.infer<typeof AdminTourDetailSchema>;

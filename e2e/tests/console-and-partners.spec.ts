@@ -117,3 +117,49 @@ test("an announcement saved in the console appears on the website in both langua
   await page.getByRole("button", { name: "Save banner" }).click();
   await expect(page.getByText(/Saved\. It applies/).first()).toBeVisible();
 });
+
+test("a photo uploaded in the console becomes a hotel's main photo on the website", async ({
+  page,
+}) => {
+  const sharp = (await import("sharp")).default;
+  const png = await sharp({
+    create: { width: 1600, height: 1000, channels: 3, background: { r: 200, g: 120, b: 40 } },
+  })
+    .png()
+    .toBuffer();
+
+  await staffSignIn(page);
+  await page.goto("/admin/catalog/media");
+  await page.getByLabel("Photo (JPEG, PNG or WebP)").setInputFiles({
+    name: "lodge.png",
+    mimeType: "image/png",
+    buffer: png,
+  });
+  await page
+    .getByLabel("Description for screen readers (required)")
+    .fill("Lodge veranda at sunset");
+  await page.getByRole("button", { name: "Upload photo" }).click();
+  await expect(page.getByText("Lodge veranda at sunset").first()).toBeVisible();
+  await expectAccessible(page, "media library");
+
+  await page.goto("/admin/catalog/hotels");
+  await page.locator('a[href^="/admin/catalog/hotels/demo-"]').first().click();
+  await page.getByRole("button", { name: /Choose photo|Change photo/ }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: /Lodge veranda at sunset/ })
+    .first()
+    .click();
+  await page.getByRole("button", { name: /^Save/ }).first().click();
+  await expect(page.getByText(/Saved\./).first()).toBeVisible();
+
+  const slug = page.url().split("/").pop()!;
+  await page.goto(`/stays/${slug}`);
+  const hero = page.locator("section img").first();
+  await expect(hero).toHaveAttribute("alt", "Lodge veranda at sunset");
+  // Served through the Next.js image optimizer from the media library.
+  await expect(hero).toHaveAttribute("src", /%2Fmedia%2F[a-f0-9]{24}\.webp/);
+  await expect
+    .poll(() => hero.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
+    .toBeGreaterThan(0);
+});

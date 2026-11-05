@@ -9,6 +9,7 @@ import { cleanupOpenApiDoc } from "nestjs-zod";
 import { randomUUID } from "node:crypto";
 import { AppModule } from "./app.module";
 import type { AppConfig } from "./config/config";
+import { MEDIA_MAX_BYTES } from "./media/media.service";
 import { httpDuration } from "./metrics/metrics.service";
 
 export const API_PREFIX = "api/v1";
@@ -80,6 +81,16 @@ export async function createApp({
       );
       done();
     });
+
+  // Media uploads arrive as raw image bodies (ADR-0030); every other route keeps the 100 KB limit.
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addContentTypeParser(
+      ["image/jpeg", "image/png", "image/webp"],
+      { parseAs: "buffer", bodyLimit: MEDIA_MAX_BYTES + 64 * 1024 },
+      (_req, body, done) => done(null, body),
+    );
 
   await app.register(fastifyCookie);
   // Payment callbacks arrive as application/x-www-form-urlencoded; Nest's Fastify

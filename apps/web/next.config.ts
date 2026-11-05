@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
       { source: "/admin", destination: `${adminOrigin}/admin` },
       { source: "/admin/:path*", destination: `${adminOrigin}/admin/:path*` },
       { source: "/api/:path*", destination: `${apiOrigin}/api/:path*` },
+      // Media library images (ADR-0030), served by the API with immutable caching.
+      { source: "/media/:path*", destination: `${apiOrigin}/api/v1/media/:path*` },
     ];
   },
 };

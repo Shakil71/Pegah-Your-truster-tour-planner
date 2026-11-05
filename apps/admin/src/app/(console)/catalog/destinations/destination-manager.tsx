@@ -16,6 +16,7 @@ import {
   cx,
   zodResolver,
 } from "@pegah/ui";
+import { HeroPicker, type HeroRef } from "@/components/media-picker";
 import { PublishPill } from "@/components/publish-pill";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 
@@ -51,6 +52,7 @@ export function DestinationManager({
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState<string | null>(null);
+  const [hero, setHero] = useState<HeroRef | null>(null);
   const [message, setMessage] = useState<{ tone: "good" | "critical"; text: string } | null>(null);
   const form = useForm<Values>({
     resolver: zodResolver(CreateDestinationSchema),
@@ -66,6 +68,7 @@ export function DestinationManager({
   function edit(d: Destination | null) {
     setMessage(null);
     setEditing(d?.slug ?? null);
+    setHero(d?.hero ?? null);
     reset(
       d
         ? {
@@ -89,11 +92,11 @@ export function DestinationManager({
       ? await browserApi.PUT("/api/v1/admin/destinations/{slug}", {
           params: { path: { slug: editing } },
           headers: csrf(csrfToken),
-          body: rest,
+          body: { ...rest, heroMedia: hero?.key ?? null },
         })
       : await browserApi.POST("/api/v1/admin/destinations", {
           headers: csrf(csrfToken),
-          body: values,
+          body: { ...values, heroMedia: hero?.key ?? null },
         });
     if (!result.response.ok) {
       setMessage({ tone: "critical", text: problemMessage(result.error) });
@@ -177,6 +180,7 @@ export function DestinationManager({
           className="panel grid content-start gap-4 p-5 md:p-6"
           noValidate
         >
+          <HeroPicker value={hero} onChange={setHero} csrfToken={csrfToken} />
           <div className="flex items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 text-[0.95rem] font-semibold">
               <Icon name={editing ? "settings" : "plus"} className="size-4" />

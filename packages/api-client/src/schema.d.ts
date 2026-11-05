@@ -1428,6 +1428,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/media": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminMediaController_list"];
+    put?: never;
+    post: operations["AdminMediaController_upload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/media/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminMediaController_update"];
+    post?: never;
+    delete: operations["AdminMediaController_remove"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2188,6 +2220,11 @@ export interface components {
       sortOrder: number;
       hotelCount: number;
       tourCount: number;
+      hero: {
+        key: string;
+        url: string;
+        alt: string;
+      } | null;
       /** Format: date-time */
       updatedAt: string;
     };
@@ -2202,6 +2239,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       sortOrder: number;
+      heroMedia?: string | null;
       slug: string;
     };
     AdminDestinationResultDto_Output: {
@@ -2215,6 +2253,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       sortOrder: number;
+      heroMedia?: string | null;
     };
     AdminHotelSummary_Output: {
       id: string;
@@ -2251,6 +2290,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
+      heroMedia?: string | null;
       slug: string;
     };
     AdminRoom_Output: {
@@ -2291,6 +2331,11 @@ export interface components {
         id: string;
         name: string;
       } | null;
+      hero: {
+        key: string;
+        url: string;
+        alt: string;
+      } | null;
       rooms: components["schemas"]["AdminRoom_Output"][];
     };
     AdminHotelInputDto: {
@@ -2309,6 +2354,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
+      heroMedia?: string | null;
     };
     AdminRoomInputDto: {
       name: string;
@@ -2390,6 +2436,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
+      heroMedia?: string | null;
       slug: string;
     };
     AdminDeparture_Output: {
@@ -2435,6 +2482,11 @@ export interface components {
         id: string;
         name: string;
       } | null;
+      hero: {
+        key: string;
+        url: string;
+        alt: string;
+      } | null;
       departures: components["schemas"]["AdminDeparture_Output"][];
     };
     AdminTourInputDto: {
@@ -2454,6 +2506,7 @@ export interface components {
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
+      heroMedia?: string | null;
     };
     AdminCreateDepartureDto: {
       /** Format: date-time */
@@ -3080,6 +3133,50 @@ export interface components {
         textBn: string;
         linkHref: string | "";
       } | null;
+    };
+    AdminMediaListDto_Output: {
+      items: {
+        key: string;
+        url: string;
+        alt: string;
+        credit: string | null;
+        license: string | null;
+        width: number | null;
+        height: number | null;
+        byteSize: number | null;
+        /** Format: date-time */
+        createdAt: string;
+        usedBy: {
+          hotels: number;
+          tours: number;
+          destinations: number;
+        };
+      }[];
+      nextCursor: string | null;
+    };
+    AdminMediaResultDto_Output: {
+      media: {
+        key: string;
+        url: string;
+        alt: string;
+        credit: string | null;
+        license: string | null;
+        width: number | null;
+        height: number | null;
+        byteSize: number | null;
+        /** Format: date-time */
+        createdAt: string;
+        usedBy: {
+          hotels: number;
+          tours: number;
+          destinations: number;
+        };
+      };
+    };
+    AdminMediaUpdateDto: {
+      alt: string;
+      credit: string | null;
+      license: string | null;
     };
   };
   responses: never;
@@ -5455,6 +5552,102 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["PublicSiteDto_Output"];
         };
+      };
+    };
+  };
+  AdminMediaController_list: {
+    parameters: {
+      query?: {
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminMediaListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminMediaController_upload: {
+    parameters: {
+      query: {
+        alt: string;
+        credit?: string;
+        license?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "image/jpeg": string;
+        "image/png": string;
+        "image/webp": string;
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminMediaResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminMediaController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminMediaUpdateDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminMediaResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminMediaController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

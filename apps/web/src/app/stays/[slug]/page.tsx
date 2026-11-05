@@ -62,8 +62,8 @@ export default async function HotelPage({ params, searchParams }: Props) {
 
         <section className="relative overflow-hidden rounded-card bg-night text-white">
           <Image
-            src={photoFor(hotel.slug, hotel.destination.slug)}
-            alt=""
+            src={hotel.hero?.url ?? photoFor(hotel.slug, hotel.destination.slug)}
+            alt={hotel.hero?.alt ?? ""}
             fill
             priority
             sizes="(min-width: 1280px) 1280px, 100vw"

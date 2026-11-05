@@ -531,3 +531,25 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   a customer out everywhere. Bookings are never changed by these actions.
 - **Website:** contact details and the announcement come from the public
   `GET /site`; the banner is written in English and Bangla.
+
+## ADR-0030 — Media library stored in MySQL
+
+- **Status:** Accepted (2026-11-05)
+- **Need:** staff choose and upload photos for destinations, hotels and tours
+  in the console, without server access.
+- **Storage:** image bytes in `media_blobs` (LONGBLOB), metadata in
+  `media_assets`. No server folder, Nginx location or SELinux change is
+  needed, and the nightly database backup includes the photos. Suitable for
+  hundreds of photos; move to object storage when the library grows large.
+- **Processing:** every upload is decoded with sharp, auto-rotated, limited to
+  2000 px, re-encoded as WebP and stored without metadata (no camera or GPS
+  data). Only JPEG, PNG and WebP are accepted. The key is a content hash, so the
+  same photo is stored once and `/media/{key}` is cached for a year.
+- **Upload limit:** Nginx accepts 1 MB bodies, so the console shrinks photos in
+  the browser first; the API refuses anything larger.
+- **Use:** each destination, hotel and tour can have a main photo
+  (`heroMedia`); the website shows it, and falls back to the bundled sample
+  photo until one is chosen. A photo in use cannot be deleted.
+- **Permissions:** catalog:read to browse, catalog:manage to upload, edit and
+  delete; every change is audited. Photos must be owned or licensed and
+  credited (docs/design/IMAGE_CREDITS.md).

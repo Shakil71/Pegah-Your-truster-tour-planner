@@ -154,14 +154,29 @@ model MediaAsset {
   license    String?  @db.VarChar(80)
   width      Int?     @db.UnsignedSmallInt
   height     Int?     @db.UnsignedSmallInt
+  /// Image bytes stored in MySQL (ADR-0030); size in bytes of the stored WebP.
+  byteSize   Int?     @map("byte_size") @db.UnsignedInt
+  uploadedBy BigInt?  @map("uploaded_by") @db.UnsignedBigInt
   createdAt  DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
+  blob         MediaBlob?
   destinations Destination[]
   hotels       Hotel[]
   tours        Tour[]
 
   @@map("media_assets")
+}
+
+/// The stored image (WebP, metadata stripped, at most 2000 px on the long side).
+/// Kept apart from media_assets so listing assets never loads image bytes.
+model MediaBlob {
+  assetId BigInt     @id @map("asset_id") @db.UnsignedBigInt
+  mime    String     @db.VarChar(40)
+  bytes   Bytes      @db.LongBlob
+  asset   MediaAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("media_blobs")
 }
 
 enum PublishStatus {

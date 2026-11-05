@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass } from "@pegah/ui";
+import { HeroPicker, type HeroRef } from "@/components/media-picker";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { bpsToPercent, percentToBps } from "@/lib/money-input";
 
@@ -45,6 +46,7 @@ export function TourForm({
   readOnly?: boolean;
 }) {
   const router = useRouter();
+  const [hero, setHero] = useState<HeroRef | null>(tour?.hero ?? null);
   const [message, setMessage] = useState<{ tone: "good" | "critical"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { register, handleSubmit, formState } = useForm<Values>({
@@ -90,6 +92,7 @@ export function TourForm({
       excludes: lines(v.excludes),
       vatBps: vat,
       status: v.status,
+      heroMedia: hero?.key ?? null,
     };
     const result = tour
       ? await browserApi.PUT("/api/v1/admin/tours/{slug}", {
@@ -121,6 +124,7 @@ export function TourForm({
 
   return (
     <form onSubmit={handleSubmit(save)} className="panel grid gap-4 p-5 md:p-6" noValidate>
+      <HeroPicker value={hero} onChange={setHero} csrfToken={csrfToken} readOnly={readOnly} />
       <fieldset disabled={readOnly} className="grid gap-4 md:grid-cols-2">
         <TextField
           label="URL slug"

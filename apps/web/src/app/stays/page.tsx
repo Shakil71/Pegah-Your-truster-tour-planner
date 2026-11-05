@@ -94,8 +94,8 @@ export default async function StaysPage({ searchParams }: { searchParams: Promis
                   <article className="panel group relative grid overflow-hidden md:grid-cols-[320px_minmax(0,1fr)_240px]">
                     <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[220px]">
                       <Image
-                        src={photoFor(o.hotel.slug, destination.slug)}
-                        alt=""
+                        src={o.hotel.hero?.url ?? photoFor(o.hotel.slug, destination.slug)}
+                        alt={o.hotel.hero?.alt ?? ""}
                         fill
                         sizes="(min-width: 768px) 320px, 100vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"

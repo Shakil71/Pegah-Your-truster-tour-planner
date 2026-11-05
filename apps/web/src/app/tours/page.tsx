@@ -78,8 +78,8 @@ export default async function ToursPage({
                 <article className="panel group relative flex h-full flex-col overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <Image
-                      src={photoFor(tour.slug, tour.destination.slug)}
-                      alt=""
+                      src={tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug)}
+                      alt={tour.hero?.alt ?? ""}
                       fill
                       sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"

@@ -62,8 +62,8 @@ export default async function TourPage({ params }: Props) {
 
         <section className="relative overflow-hidden rounded-card bg-night text-white">
           <Image
-            src={photoFor(tour.slug, tour.destination.slug)}
-            alt=""
+            src={tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug)}
+            alt={tour.hero?.alt ?? ""}
             fill
             priority
             sizes="(min-width: 1280px) 1280px, 100vw"

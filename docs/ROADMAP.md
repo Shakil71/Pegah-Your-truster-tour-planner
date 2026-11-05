@@ -46,7 +46,8 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Coupons and promotions (server-side rules, limits under lock).
 - ✅ Sales report and bookings CSV (occupancy is on the dashboard and room calendar).
 - ✅ Content pages (About, Terms, Privacy…) with admin editor.
-- ⛔ Media uploads and homepage section editing — need a server storage folder, an Nginx `/media` location and SELinux labels (owner, root).
+- ✅ Media library and main photos (ADR-0030, stored in MySQL; no server change needed).
+- ⬜ Homepage section editing.
 
 ## Phase 7 — Partner portals ✅
 
