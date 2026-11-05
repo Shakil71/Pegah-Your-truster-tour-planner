@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Icon } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
 import { requireCustomer, requirePartner, serverApi } from "@/lib/api-server";
+import type { Locale } from "@/i18n/locales";
 import { calendarDate, money } from "@/lib/format";
 import { parseStayParams } from "@/lib/trip";
 import { CheckoutForm } from "./checkout-form";
 import { PromoField } from "./promo-field";
 
-export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("checkout"))("title"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 type Search = Record<string, string | undefined>;
@@ -26,6 +30,9 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   )}`;
   /** Agents book for a client through the partner API; the client is the contact. */
   const agentMode = sp.as === "agent";
+  const t = await getTranslations("checkout");
+  const tp = await getTranslations("price");
+  const locale = (await getLocale()) as Locale;
   const session = agentMode ? await requirePartner("AGENT") : await requireCustomer(returnTo);
   const api = await serverApi();
 
@@ -69,39 +76,33 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       <div className="grid gap-6">
         <div>
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary-ink">
-            {agentMode ? `Booking for a client · ${session.user.partner?.name ?? ""}` : "Checkout"}
+            {agentMode ? t("forClient", { partner: session.user.partner?.name ?? "" }) : t("title")}
           </p>
           <h1 className="mt-1.5 font-display text-[clamp(2rem,3.6vw,3rem)] font-medium leading-tight">
-            Who is travelling?
+            {t("heading")}
           </h1>
         </div>
 
         {!request || !q ? (
           <section className="panel px-6 py-14 text-center">
-            <h2 className="font-display text-[1.6rem] font-medium">
-              This selection is no longer valid
-            </h2>
-            <p className="mt-1 text-ink-2">
-              {problem?.detail ?? "Pick a room or departure again."}
-            </p>
+            <h2 className="font-display text-[1.6rem] font-medium">{t("invalidSelection")}</h2>
+            <p className="mt-1 text-ink-2">{problem?.detail ?? t("pickAgain")}</p>
             <Link href="/stays" className="mt-4 inline-block font-semibold text-primary-ink">
-              Back to stays
+              {t("backToStays")}
             </Link>
           </section>
         ) : !q.available || !q.price ? (
           <section className="panel px-6 py-14 text-center">
             <Icon name="alert" className="mx-auto size-8 text-warn" />
-            <h2 className="mt-3 font-display text-[1.6rem] font-medium">No longer available</h2>
+            <h2 className="mt-3 font-display text-[1.6rem] font-medium">{t("unavailable")}</h2>
             <p className="mt-1 text-ink-2">
-              {q.unavailableReason === "sold-out"
-                ? "It just sold out for your selection."
-                : "This option cannot be booked for your selection."}
+              {q.unavailableReason === "sold-out" ? t("soldOut") : t("cannotBook")}
             </p>
             <Link
               href={q.product === "HOTEL" ? `/stays/${q.productSlug}` : `/tours/${q.productSlug}`}
               className="mt-4 inline-block font-semibold text-primary-ink"
             >
-              Choose another option
+              {t("chooseAnother")}
             </Link>
           </section>
         ) : (
@@ -128,7 +129,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             <aside className="grid content-start gap-4 lg:sticky lg:top-[96px]">
               <section className="panel p-5 md:p-6" aria-labelledby="sum-h">
                 <h2 id="sum-h" className="text-[1rem] font-semibold">
-                  Your selection
+                  {t("yourSelection")}
                 </h2>
                 <p className="mt-3 font-display text-[1.4rem] font-medium leading-tight">
                   {q.productName}
@@ -136,51 +137,53 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
                 <p className="text-[0.9rem] text-ink-2">{q.optionName}</p>
                 <dl className="mt-4 grid gap-2 text-[0.9rem]">
                   <div className="flex justify-between">
-                    <dt className="text-ink-2">{q.product === "HOTEL" ? "Check-in" : "Departs"}</dt>
-                    <dd className="tabular">{calendarDate(q.startDate)}</dd>
+                    <dt className="text-ink-2">
+                      {q.product === "HOTEL" ? t("checkIn") : t("departs")}
+                    </dt>
+                    <dd className="tabular">{calendarDate(q.startDate, locale)}</dd>
                   </div>
                   {q.endDate && (
                     <div className="flex justify-between">
                       <dt className="text-ink-2">
-                        {q.product === "HOTEL" ? "Check-out" : "Returns"}
+                        {q.product === "HOTEL" ? t("checkOut") : t("returns")}
                       </dt>
-                      <dd className="tabular">{calendarDate(q.endDate)}</dd>
+                      <dd className="tabular">{calendarDate(q.endDate, locale)}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <dt className="text-ink-2">Guests</dt>
+                    <dt className="text-ink-2">{t("guests")}</dt>
                     <dd>
-                      {q.adults} adult{q.adults === 1 ? "" : "s"}
-                      {q.children ? `, ${q.children} child${q.children === 1 ? "" : "ren"}` : ""}
-                      {q.rooms ? ` · ${q.rooms} room${q.rooms === 1 ? "" : "s"}` : ""}
+                      {t("party", { adults: q.adults, children: q.children, rooms: q.rooms ?? 0 })}
                     </dd>
                   </div>
                 </dl>
                 <dl className="tabular mt-4 grid gap-2 border-t border-rule pt-4 text-[0.9rem]">
                   <div className="flex justify-between">
-                    <dt className="text-ink-2">
-                      Base{q.nights ? ` (${q.nights} night${q.nights === 1 ? "" : "s"})` : ""}
-                    </dt>
+                    <dt className="text-ink-2">{tp("base", { nights: q.nights ?? 0 })}</dt>
                     <dd>{money(q.price.base)}</dd>
                   </div>
                   {q.price.discount.amountMinor > 0 && (
                     <div className="flex justify-between text-good">
-                      <dt>Discount{q.promotion ? ` (${q.promotion.code})` : ""}</dt>
+                      <dt>
+                        {q.promotion
+                          ? tp("discountCode", { code: q.promotion.code })
+                          : tp("discount")}
+                      </dt>
                       <dd>− {money(q.price.discount)}</dd>
                     </div>
                   )}
                   {q.price.serviceCharge.amountMinor > 0 && (
                     <div className="flex justify-between">
-                      <dt className="text-ink-2">Service charge</dt>
+                      <dt className="text-ink-2">{tp("serviceCharge")}</dt>
                       <dd>{money(q.price.serviceCharge)}</dd>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <dt className="text-ink-2">VAT</dt>
+                    <dt className="text-ink-2">{tp("vat")}</dt>
                     <dd>{money(q.price.vat)}</dd>
                   </div>
                   <div className="mt-1 flex justify-between border-t border-rule pt-3 text-[1.15rem] font-bold">
-                    <dt>Total</dt>
+                    <dt>{tp("total")}</dt>
                     <dd>{money(q.price.total)}</dd>
                   </div>
                 </dl>

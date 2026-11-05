@@ -2,11 +2,14 @@
 
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { dhakaDate } from "@pegah/shared";
 import { Icon, buttonClass, type IconName } from "@pegah/ui";
 import { places, quickPicks, trust } from "@/data/home";
+import { useContent } from "@/data/home.bn";
+import { intlLocale, type Locale } from "@/i18n/locales";
 
 /** Dates are plain calendar days; UTC arithmetic avoids DST and zone drift. */
 function iso(d: Date) {
@@ -67,7 +70,12 @@ type GuestKey = keyof typeof limits;
 const tabClass =
   "relative inline-flex cursor-pointer items-center gap-2 rounded-t-control px-4 pb-3.5 pt-3 text-[0.95rem] font-semibold text-ink-2 hover:text-ink data-[state=active]:text-ink data-[state=active]:after:absolute data-[state=active]:after:inset-x-4 data-[state=active]:after:bottom-0 data-[state=active]:after:h-0.5 data-[state=active]:after:content-[''] data-[state=active]:after:stitch-x";
 
+const TOUR_STYLES = ["any", "houseboat", "launch", "trek", "heritage"] as const;
+
 export function SearchPanel() {
+  const t = useTranslations("search");
+  const locale = useLocale() as Locale;
+  const c = useContent();
   const router = useRouter();
   const initial = useMemo(() => defaultDates(), []);
   const [where, setWhere] = useState("Srimangal, Sylhet");
@@ -75,23 +83,21 @@ export function SearchPanel() {
   const [checkOut, setCheckOut] = useState(initial.checkOut);
   const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
   const [tourWhere, setTourWhere] = useState("Sundarbans");
-  const [tourStyle, setTourStyle] = useState("Any style");
+  const [tourStyle, setTourStyle] = useState<(typeof TOUR_STYLES)[number]>("any");
   const [status, setStatus] = useState("");
 
   const months = useMemo(() => {
     const { year, month } = dhakaDate();
     return Array.from({ length: 6 }, (_, m) =>
-      new Date(Date.UTC(year, month + m, 1)).toLocaleString("en-GB", {
+      new Date(Date.UTC(year, month + m, 1)).toLocaleString(intlLocale(locale), {
         month: "long",
         year: "numeric",
         timeZone: "UTC",
       }),
     );
-  }, []);
+  }, [locale]);
 
-  const guestLabel = `${guests.adults} ${guests.adults === 1 ? "adult" : "adults"}${
-    guests.children ? `, ${guests.children} ${guests.children === 1 ? "child" : "children"}` : ""
-  } · ${guests.rooms} ${guests.rooms === 1 ? "room" : "rooms"}`;
+  const guestLabel = t("guestSummary", guests);
 
   function bump(key: GuestKey, delta: number) {
     setGuests((g) => {
@@ -116,30 +122,27 @@ export function SearchPanel() {
   return (
     <div className="relative z-10 mx-auto -mt-10 max-w-[1280px] md:-mt-24">
       <Tabs.Root defaultValue="stays" className="rounded-card bg-card shadow-lift">
-        <Tabs.List
-          aria-label="What are you booking?"
-          className="flex flex-wrap gap-1 px-3.5 pt-2.5"
-        >
+        <Tabs.List aria-label={t("tabsLabel")} className="flex flex-wrap gap-1 px-3.5 pt-2.5">
           <Tabs.Trigger value="stays" className={tabClass}>
             <Icon name="bed" />
-            Stays
+            {t("stays")}
           </Tabs.Trigger>
           <Tabs.Trigger value="tours" className={tabClass}>
             <Icon name="boat" />
-            Tours
+            {t("tours")}
           </Tabs.Trigger>
           <Tabs.Trigger value="flights" className={tabClass}>
             <Icon name="plane" />
-            Flights
+            {t("flights")}
             <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
-              soon
+              {t("soon")}
             </small>
           </Tabs.Trigger>
           <Tabs.Trigger value="visa" className={tabClass}>
             <Icon name="doc" />
-            Visa
+            {t("visa")}
             <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
-              soon
+              {t("soon")}
             </small>
           </Tabs.Trigger>
         </Tabs.List>
@@ -149,9 +152,7 @@ export function SearchPanel() {
             className="grid grid-cols-2 gap-2.5 border-t border-rule p-3.5 lg:grid-cols-[2fr_1.1fr_1.1fr_1.3fr_auto]"
             onSubmit={(e) => {
               e.preventDefault();
-              setStatus(
-                `Searching stays in ${where} for ${nights} ${nights === 1 ? "night" : "nights"}…`,
-              );
+              setStatus(t("searchingStays", { where, nights }));
               const q = new URLSearchParams({
                 where,
                 checkIn,
@@ -163,7 +164,7 @@ export function SearchPanel() {
               router.push(`/stays?${q.toString()}`);
             }}
           >
-            <Field icon="pin" label="Where to?" htmlFor="q-where" wide>
+            <Field icon="pin" label={t("whereTo")} htmlFor="q-where" wide>
               <input
                 id="q-where"
                 list="pg-places"
@@ -173,7 +174,7 @@ export function SearchPanel() {
                 className={inputClass}
               />
             </Field>
-            <Field icon="calendar" label="Check-in" htmlFor="q-in">
+            <Field icon="calendar" label={t("checkIn")} htmlFor="q-in">
               <input
                 id="q-in"
                 type="date"
@@ -183,7 +184,7 @@ export function SearchPanel() {
                 className={inputClass}
               />
             </Field>
-            <Field icon="calendar" label="Check-out" htmlFor="q-out">
+            <Field icon="calendar" label={t("checkOut")} htmlFor="q-out">
               <input
                 id="q-out"
                 type="date"
@@ -193,7 +194,7 @@ export function SearchPanel() {
                 className={inputClass}
               />
             </Field>
-            <Field icon="user" label="Guests" htmlFor="q-guests">
+            <Field icon="user" label={t("guests")} htmlFor="q-guests">
               <Popover.Root>
                 <Popover.Trigger
                   id="q-guests"
@@ -209,9 +210,9 @@ export function SearchPanel() {
                   >
                     {(
                       [
-                        ["adults", "Adults", "13 and over"],
-                        ["children", "Children", "Under 13"],
-                        ["rooms", "Rooms", ""],
+                        ["adults", t("adults"), t("adultsHint")],
+                        ["children", t("children"), t("childrenHint")],
+                        ["rooms", t("rooms"), ""],
                       ] as const
                     ).map(([key, label, hint]) => (
                       <div key={key} className="flex items-center justify-between gap-3">
@@ -222,7 +223,7 @@ export function SearchPanel() {
                         <span className="flex items-center gap-3">
                           <button
                             type="button"
-                            aria-label={`Fewer ${label.toLowerCase()}`}
+                            aria-label={t("fewer", { what: label })}
                             disabled={guests[key] <= limits[key][0]}
                             onClick={() => bump(key, -1)}
                             className="size-[34px] cursor-pointer rounded-full border-[1.5px] border-ink font-bold disabled:cursor-not-allowed disabled:opacity-30"
@@ -232,7 +233,7 @@ export function SearchPanel() {
                           <b className="tabular w-4 text-center">{guests[key]}</b>
                           <button
                             type="button"
-                            aria-label={`More ${label.toLowerCase()}`}
+                            aria-label={t("more", { what: label })}
                             disabled={guests[key] >= limits[key][1]}
                             onClick={() => bump(key, 1)}
                             className="size-[34px] cursor-pointer rounded-full border-[1.5px] border-ink font-bold disabled:cursor-not-allowed disabled:opacity-30"
@@ -250,11 +251,11 @@ export function SearchPanel() {
               type="submit"
               className={buttonClass("primary", "lg", "col-span-2 lg:col-span-1")}
             >
-              Search <Icon name="arrowRight" />
+              {t("search")} <Icon name="arrowRight" />
             </button>
           </form>
           <div className="flex flex-wrap items-center gap-2 px-3.5 pb-4 text-[0.86rem]">
-            <span className="mr-1 text-ink-2">Popular:</span>
+            <span className="mr-1 text-ink-2">{t("popular")}</span>
             {quickPicks.map((q) => (
               <button
                 key={q.label}
@@ -262,7 +263,7 @@ export function SearchPanel() {
                 onClick={() => setWhere(q.query)}
                 className="cursor-pointer rounded-full border border-dashed border-ink-2 px-3 py-1 hover:border-solid hover:border-ink"
               >
-                {q.label}
+                {c(q.label)}
               </button>
             ))}
           </div>
@@ -273,11 +274,11 @@ export function SearchPanel() {
             className="grid grid-cols-2 gap-2.5 border-t border-rule p-3.5 lg:grid-cols-[2fr_1.1fr_1.1fr_1.3fr_auto]"
             onSubmit={(e) => {
               e.preventDefault();
-              setStatus(`Finding tours in ${tourWhere}…`);
+              setStatus(t("findingTours", { where: tourWhere }));
               router.push(`/tours?${new URLSearchParams({ where: tourWhere }).toString()}`);
             }}
           >
-            <Field icon="pin" label="Destination" htmlFor="t-where" wide>
+            <Field icon="pin" label={t("destination")} htmlFor="t-where" wide>
               <input
                 id="t-where"
                 list="pg-places"
@@ -287,54 +288,48 @@ export function SearchPanel() {
                 className={inputClass}
               />
             </Field>
-            <Field icon="calendar" label="Month" htmlFor="t-month">
+            <Field icon="calendar" label={t("month")} htmlFor="t-month">
               <select id="t-month" className={inputClass}>
                 {months.map((m) => (
                   <option key={m}>{m}</option>
                 ))}
               </select>
             </Field>
-            <Field icon="users" label="Travellers" htmlFor="t-people">
+            <Field icon="users" label={t("travellers")} htmlFor="t-people">
               <select id="t-people" defaultValue="2" className={inputClass}>
                 {["1", "2", "3", "4", "5", "6+"].map((n) => (
                   <option key={n}>{n}</option>
                 ))}
               </select>
             </Field>
-            <Field icon="boat" label="Style" htmlFor="t-kind">
+            <Field icon="boat" label={t("style")} htmlFor="t-kind">
               <select
                 id="t-kind"
                 value={tourStyle}
-                onChange={(e) => setTourStyle(e.target.value)}
+                onChange={(e) => setTourStyle(e.target.value as (typeof TOUR_STYLES)[number])}
                 className={inputClass}
               >
-                {["Any style", "Houseboat", "Launch cruise", "Hill trek", "Heritage walk"].map(
-                  (s) => (
-                    <option key={s}>{s}</option>
-                  ),
-                )}
+                {TOUR_STYLES.map((s) => (
+                  <option key={s} value={s}>
+                    {t(`styles.${s}`)}
+                  </option>
+                ))}
               </select>
             </Field>
             <button
               type="submit"
               className={buttonClass("primary", "lg", "col-span-2 lg:col-span-1")}
             >
-              Find tours <Icon name="arrowRight" />
+              {t("findTours")} <Icon name="arrowRight" />
             </button>
           </form>
         </Tabs.Content>
 
         <Tabs.Content value="flights">
-          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">
-            Flight booking opens once our airline ticketing partner is live. We will only show fares
-            we can actually issue.
-          </p>
+          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">{t("flightsSoon")}</p>
         </Tabs.Content>
         <Tabs.Content value="visa">
-          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">
-            Visa assistance is coming. You will be able to check requirements by country and track
-            your application here.
-          </p>
+          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">{t("visaSoon")}</p>
         </Tabs.Content>
 
         <datalist id="pg-places">
@@ -353,12 +348,12 @@ export function SearchPanel() {
       </p>
 
       <ul className="grid grid-cols-1 gap-6 pt-6 sm:grid-cols-2 lg:grid-cols-4">
-        {trust.map((t) => (
-          <li key={t.title} className="flex items-start gap-3 text-[0.9rem] text-ink-2">
-            <Icon name={t.icon} className="mt-0.5 size-[26px] text-primary-ink" />
+        {trust.map((item) => (
+          <li key={item.title} className="flex items-start gap-3 text-[0.9rem] text-ink-2">
+            <Icon name={item.icon} className="mt-0.5 size-[26px] text-primary-ink" />
             <span>
-              <b className="block font-semibold text-ink">{t.title}</b>
-              {t.body}
+              <b className="block font-semibold text-ink">{c(item.title)}</b>
+              {c(item.body)}
             </span>
           </li>
         ))}

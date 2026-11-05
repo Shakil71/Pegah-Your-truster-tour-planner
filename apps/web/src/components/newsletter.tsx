@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { buttonClass } from "@pegah/ui";
 import { newsletterPhoto } from "@/data/home";
@@ -8,6 +9,7 @@ import { newsletterPhoto } from "@/data/home";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function Newsletter() {
+  const t = useTranslations("newsletter");
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
 
@@ -27,32 +29,27 @@ export function Newsletter() {
       <span className="absolute inset-0 bg-[linear-gradient(90deg,rgb(9_12_34/0.85),rgb(9_12_34/0.35)_70%,rgb(9_12_34/0.15))]" />
       <div className="relative z-[1] mx-auto grid max-w-[1280px] gap-4 py-28">
         <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-          Season letters
+          {t("eyebrow")}
         </p>
         <h2
           id="nl-h"
           className="max-w-[14ch] font-display text-[clamp(2rem,4.4vw,3.5rem)] font-medium leading-[1.04]"
         >
-          First to know when the season opens.
+          {t("title")}
         </h2>
-        <p className="m-0 max-w-[44ch] text-white/85">
-          One email at the start of each ritu: new departures, early prices, and where the light is
-          best.
-        </p>
+        <p className="m-0 max-w-[44ch] text-white/85">{t("intro")}</p>
         <form
           noValidate
           className="mt-2 flex max-w-[520px] flex-wrap gap-2.5"
           onSubmit={(e) => {
             e.preventDefault();
             setMsg(
-              EMAIL.test(email.trim())
-                ? `Prototype: the live site would subscribe ${email.trim()}.`
-                : "Enter an email address like name@example.com.",
+              EMAIL.test(email.trim()) ? t("prototype", { email: email.trim() }) : t("invalid"),
             );
           }}
         >
           <label htmlFor="nl-email" className="sr-only">
-            Email address
+            {t("emailLabel")}
           </label>
           <input
             id="nl-email"
@@ -64,7 +61,7 @@ export function Newsletter() {
             className="min-w-0 flex-[1_1_240px] rounded-control border-[1.5px] border-white/60 bg-night/35 px-4 py-3.5 text-white placeholder:text-white/65"
           />
           <button type="submit" className={buttonClass("primary", "md", "h-auto px-6 py-3.5")}>
-            Subscribe
+            {t("subscribe")}
           </button>
         </form>
         <p role="status" aria-live="polite" className="min-h-6 text-[0.9rem]">

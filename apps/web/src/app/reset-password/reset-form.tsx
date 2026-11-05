@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { FormAlert, TextField, buttonClass } from "@pegah/ui";
 import { browserApi, problemMessage } from "@/lib/api-browser";
@@ -10,12 +11,13 @@ export function ResetForm({ token }: { token: string }) {
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (password !== confirm) {
-      setError("The two passwords do not match.");
+      setError(t("mismatch"));
       return;
     }
     setBusy(true);
@@ -37,11 +39,9 @@ export function ResetForm({ token }: { token: string }) {
   if (done) {
     return (
       <div className="mt-2 grid gap-3">
-        <FormAlert tone="good">
-          Password changed. For safety, every device was signed out.
-        </FormAlert>
+        <FormAlert tone="good">{t("passwordChangedAll")}</FormAlert>
         <Link href="/login" className={buttonClass("primary", "md", "h-12 no-underline")}>
-          Sign in
+          {t("signIn")}
         </Link>
       </div>
     );
@@ -49,15 +49,15 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <form onSubmit={submit} className="mt-4 grid gap-4">
       <TextField
-        label="New password"
+        label={t("newPassword")}
         type="password"
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        hint="At least 10 characters."
+        hint={t("tenChars")}
       />
       <TextField
-        label="Repeat new password"
+        label={t("repeatPassword")}
         type="password"
         autoComplete="new-password"
         value={confirm}
@@ -69,7 +69,7 @@ export function ResetForm({ token }: { token: string }) {
         disabled={busy || password.length < 10}
         className={buttonClass("primary", "md", "h-12")}
       >
-        {busy ? "Saving…" : "Save new password"}
+        {busy ? t("saving") : t("savePassword")}
       </button>
     </form>
   );

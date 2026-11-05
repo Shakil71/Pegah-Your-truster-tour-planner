@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon, buttonClass } from "@pegah/ui";
@@ -21,6 +22,7 @@ export function StaySearchBar({
   /** Property pages re-price in place instead of going back to the list. */
   action?: string;
 }) {
+  const t = useTranslations("search");
   const router = useRouter();
   const [w, setW] = useState(where);
   const [p, setP] = useState(params);
@@ -47,7 +49,7 @@ export function StaySearchBar({
       {action === "/stays" && (
         <label className="col-span-2 grid gap-1 md:col-span-1">
           <span className="text-[0.68rem] font-bold uppercase tracking-[0.1em] text-ink-2">
-            Where to?
+            {t("whereTo")}
           </span>
           <select value={w} onChange={(e) => setW(e.target.value)} className={field}>
             {destinations.map((d) => (
@@ -60,7 +62,7 @@ export function StaySearchBar({
       )}
       <label className="grid gap-1">
         <span className="text-[0.68rem] font-bold uppercase tracking-[0.1em] text-ink-2">
-          Check-in
+          {t("checkIn")}
         </span>
         <input
           type="date"
@@ -79,7 +81,7 @@ export function StaySearchBar({
       </label>
       <label className="grid gap-1">
         <span className="text-[0.68rem] font-bold uppercase tracking-[0.1em] text-ink-2">
-          Check-out
+          {t("checkOut")}
         </span>
         <input
           type="date"
@@ -91,9 +93,9 @@ export function StaySearchBar({
       </label>
       {(
         [
-          ["adults", "Adults", 1, 16],
-          ["children", "Children", 0, 10],
-          ["rooms", "Rooms", 1, 8],
+          ["adults", t("adults"), 1, 16],
+          ["children", t("children"), 0, 10],
+          ["rooms", t("rooms"), 1, 8],
         ] as const
       ).map(([key, label, min, max]) => (
         <label key={key} className="grid gap-1">
@@ -118,7 +120,7 @@ export function StaySearchBar({
         className={buttonClass("primary", "md", "col-span-2 h-12 self-end md:col-span-1")}
       >
         <Icon name="search" className="size-[18px]" />
-        {action === "/stays" ? "Search" : "Update"}
+        {action === "/stays" ? t("search") : t("update")}
       </button>
     </form>
   );

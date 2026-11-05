@@ -1,19 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Icon, Logo, cx } from "@pegah/ui";
 import { browserApi } from "@/lib/api-browser";
 import { useScrolledPast } from "@/lib/use-browser";
+import { LanguageSwitch } from "./language-switch";
 
 const nav = [
-  { href: "/stays", label: "Stays" },
-  { href: "/tours", label: "Tours" },
-  { href: "/#explore", label: "Destinations" },
-];
+  { href: "/stays", key: "stays" },
+  { href: "/tours", key: "tours" },
+  { href: "/#explore", key: "destinations" },
+] as const;
 
 /** Transparent over the hero photo (home), solid once the page scrolls or on inner pages. */
 export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) {
+  const t = useTranslations("header");
   const scrolled = useScrolledPast(40);
   const solid = alwaysSolid || scrolled;
   const [name, setName] = useState<string | null>(null);
@@ -38,11 +41,11 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
       {/* Three columns so the menu sits in the true centre, whatever the widths of the logo and actions. */}
       <div className="mx-auto grid h-[72px] max-w-[1280px] grid-cols-[1fr_auto] items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
         <div className="justify-self-start">
-          <Link href="/" aria-label="Pegah home" className="no-underline">
+          <Link href="/" aria-label={t("home")} className="no-underline">
             <Logo className="text-[1.8rem]" />
           </Link>
         </div>
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label={t("mainNav")} className="hidden md:block">
           <ul className="flex gap-8 text-[0.94rem] font-medium">
             {nav.map((item) => (
               <li key={item.href}>
@@ -50,19 +53,21 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
                   href={item.href}
                   className="border-b-2 border-transparent py-1.5 no-underline hover:border-current"
                 >
-                  {item.label}
+                  {t(item.key)}
                 </Link>
               </li>
             ))}
             <li>
               <span className="py-1.5 opacity-80">
-                Flights<sup className="ml-1 text-[0.58rem] uppercase tracking-wider">soon</sup>
+                {t("flights")}
+                <sup className="ml-1 text-[0.58rem] uppercase tracking-wider">{t("soon")}</sup>
               </span>
             </li>
           </ul>
         </nav>
         <div className="flex items-center gap-4 justify-self-end text-sm">
-          <span className="tabular hidden md:inline">৳ BDT · EN</span>
+          <span className="tabular hidden md:inline">৳ BDT</span>
+          <LanguageSwitch />
           <Link
             href={name ? "/account/bookings" : "/login"}
             className={cx(
@@ -71,7 +76,7 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
             )}
           >
             <Icon name="user" className="size-4" />
-            {name ? `${name} · My trips` : "Sign in"}
+            {name ? t("myTrips", { name }) : t("signIn")}
           </Link>
         </div>
       </div>

@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Hanken_Grotesk, Noto_Serif_Bengali } from "next/font/google";
+import { Bodoni_Moda, Hanken_Grotesk, Hind_Siliguri, Noto_Serif_Bengali } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { ValidationLocale } from "@/i18n/validation-locale";
 import "./globals.css";
 
 const display = Bodoni_Moda({
@@ -16,21 +19,40 @@ const bengali = Noto_Serif_Bengali({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: { default: "Pegah — Stays and tours across Bangladesh", template: "%s · Pegah" },
-  description:
-    "Book tea-country bungalows, Sundarbans launches and haor houseboats. Prices in taka, confirmed by your host.",
-};
+/** Bangla body text (ADR-0028); the bengali subset is only downloaded where Bangla appears. */
+const bengaliText = Hind_Siliguri({
+  subsets: ["bengali"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--pg-font-bn-text",
+  display: "swap",
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("meta");
+  return {
+    title: { default: t("title"), template: "%s · Pegah" },
+    description: t("description"),
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#0f1330",
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
   return (
-    <html lang="en" className={`${display.variable} ${text.variable} ${bengali.variable}`}>
-      <body>{children}</body>
+    <html
+      lang={locale}
+      className={`${display.variable} ${text.variable} ${bengali.variable} ${bengaliText.variable}`}
+    >
+      <body>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ValidationLocale />
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
   );
 }

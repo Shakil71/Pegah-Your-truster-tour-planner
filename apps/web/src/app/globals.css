@@ -18,6 +18,11 @@
     outline: 2px dashed var(--pg-primary);
     outline-offset: 3px;
   }
+  /* Bengali script has no italic tradition; browsers only fake a slant.
+     Emphasis stays upright and keeps its colour (ADR-0028). */
+  :lang(bn) em {
+    font-style: normal;
+  }
   h1,
   h2,
   h3 {

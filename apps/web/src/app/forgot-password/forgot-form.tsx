@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { FormAlert, TextField, buttonClass } from "@pegah/ui";
 import { browserApi, problemMessage } from "@/lib/api-browser";
@@ -8,6 +9,7 @@ export function ForgotForm() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
@@ -20,28 +22,19 @@ export function ForgotForm() {
     );
     setBusy(false);
     if (!response.ok) {
-      setError(
-        response.status === 429
-          ? "Too many requests. Please wait a minute."
-          : problemMessage(problem),
-      );
+      setError(response.status === 429 ? t("tooManyRequests") : problemMessage(problem));
       return;
     }
     setDone(true);
   }
 
   if (done) {
-    return (
-      <FormAlert tone="good">
-        If an account exists for {email}, a reset link is on its way. Check your inbox and spam
-        folder.
-      </FormAlert>
-    );
+    return <FormAlert tone="good">{t("resetSent", { email })}</FormAlert>;
   }
   return (
     <form onSubmit={submit} className="mt-4 grid gap-4">
       <TextField
-        label="Email"
+        label={t("email")}
         type="email"
         autoComplete="email"
         value={email}
@@ -53,7 +46,7 @@ export function ForgotForm() {
         disabled={busy || !email}
         className={buttonClass("primary", "md", "h-12")}
       >
-        {busy ? "Sending…" : "Send reset link"}
+        {busy ? t("sending") : t("sendLink")}
       </button>
     </form>
   );

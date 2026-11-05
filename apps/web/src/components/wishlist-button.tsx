@@ -1,16 +1,18 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { cx } from "@pegah/ui";
 
 /** Local-only toggle until saved items exist in the account API (Phase 4). */
 export function WishlistButton({ label }: { label: string }) {
+  const t = useTranslations("home");
   const [saved, setSaved] = useState(false);
   return (
     <button
       type="button"
       aria-pressed={saved}
-      aria-label={`Save ${label}`}
+      aria-label={t("save", { name: label })}
       onClick={() => setSaved((s) => !s)}
       className={cx(
         "absolute right-3 top-3 z-[2] grid size-[38px] cursor-pointer place-items-center rounded-full bg-white/95 transition-colors",

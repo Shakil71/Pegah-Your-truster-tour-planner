@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon, buttonClass } from "@pegah/ui";
@@ -7,10 +8,13 @@ import { BookingStatusBadge } from "@/components/shop/booking-status";
 import { PageShell } from "@/components/shop/page-shell";
 import { SignOutButton } from "@/components/shop/sign-out-button";
 import { ensure, requireCustomer, serverApi } from "@/lib/api-server";
+import type { Locale } from "@/i18n/locales";
 import { calendarDate, money } from "@/lib/format";
 import { photoFor } from "@/lib/trip";
 
-export const metadata: Metadata = { title: "My trips", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("account"))("myTrips"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 export default async function MyTripsPage({
@@ -19,6 +23,8 @@ export default async function MyTripsPage({
   searchParams: Promise<{ cursor?: string }>;
 }) {
   const session = await requireCustomer("/account/bookings");
+  const t = await getTranslations("account");
+  const locale = (await getLocale()) as Locale;
   const { cursor } = await searchParams;
   const api = await serverApi();
   const page = ensure(
@@ -36,7 +42,7 @@ export default async function MyTripsPage({
               {session.user.email}
             </p>
             <h1 className="mt-1.5 font-display text-[clamp(2rem,3.6vw,3rem)] font-medium leading-tight">
-              My trips
+              {t("myTrips")}
             </h1>
           </div>
           <SignOutButton csrfToken={session.csrfToken} />
@@ -46,14 +52,14 @@ export default async function MyTripsPage({
         {page.items.length === 0 ? (
           <section className="panel px-6 py-16 text-center">
             <Icon name="ticket" className="mx-auto size-9 text-ink-3" />
-            <h2 className="mt-3 font-display text-[1.6rem] font-medium">No trips yet</h2>
-            <p className="mt-1 text-ink-2">Find a stay or a tour and hold it in a few taps.</p>
+            <h2 className="mt-3 font-display text-[1.6rem] font-medium">{t("noTrips")}</h2>
+            <p className="mt-1 text-ink-2">{t("noTripsIntro")}</p>
             <div className="mt-5 flex justify-center gap-3">
               <Link href="/stays" className={buttonClass("primary", "md", "no-underline")}>
-                Browse stays
+                {t("browseStays")}
               </Link>
               <Link href="/tours" className={buttonClass("outline", "md", "no-underline")}>
-                Browse tours
+                {t("browseTours")}
               </Link>
             </div>
           </section>
@@ -82,9 +88,9 @@ export default async function MyTripsPage({
                       </Link>
                     </h2>
                     <p className="mt-1 text-[0.88rem] text-ink-2">
-                      {calendarDate(b.startDate)}
-                      {b.endDate ? ` – ${calendarDate(b.endDate)}` : ""} · {b.guests} guest
-                      {b.guests === 1 ? "" : "s"}
+                      {calendarDate(b.startDate, locale)}
+                      {b.endDate ? ` – ${calendarDate(b.endDate, locale)}` : ""} ·{" "}
+                      {t("guests", { count: b.guests })}
                     </p>
                   </div>
                   <div className="flex flex-col items-start justify-center gap-2 border-t border-rule p-5 sm:items-end sm:border-l sm:border-t-0">
@@ -103,7 +109,7 @@ export default async function MyTripsPage({
             href={`/account/bookings?cursor=${encodeURIComponent(page.nextCursor)}`}
             className="justify-self-center font-semibold text-primary-ink"
           >
-            Older trips →
+            {t("olderTrips")} →
           </Link>
         )}
       </div>

@@ -61,7 +61,7 @@ always-dark panels) use the fixed tokens above. Every page is scanned with axe
 | Display        | Bodoni Moda (opsz) | Headlines ≥ 1.3 rem only; italic in madder for one emphasised word |
 | Text / UI      | Hanken Grotesk     | 16 px base, 1.6 line height                                        |
 | Bangla display | Noto Serif Bengali | Season names; future Bangla headings                               |
-| Bangla text    | Hind Siliguri      | Planned for localisation                                           |
+| Bangla text    | Hind Siliguri      | In use on the Bangla website (ADR-0028); no italics for Bengali    |
 
 Scale: 0.72 (labels, uppercase +0.14em) · 0.88 · 1 · 1.3 · 1.55 · 2 · 3.1 · 5.4 rem.
 Digits use `tabular-nums lining-nums` wherever prices or dates align.

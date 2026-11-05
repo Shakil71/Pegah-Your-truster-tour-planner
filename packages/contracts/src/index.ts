@@ -1,5 +1,5 @@
 import "./messages";
-export { friendlyMessage } from "./messages";
+export { friendlyMessage, friendlyMessageBn } from "./messages";
 export * from "./common";
 export * from "./permissions";
 export * from "./auth";

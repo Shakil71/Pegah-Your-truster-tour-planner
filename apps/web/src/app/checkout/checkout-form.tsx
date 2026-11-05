@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -60,6 +61,7 @@ export function CheckoutForm({
   savedTravellers: { fullName: string; ageGroup: "ADULT" | "CHILD" }[];
   customer: { name: string; email: string; phone: string };
 }) {
+  const t = useTranslations("checkout");
   const router = useRouter();
   const [idempotencyKey] = useState(() => crypto.randomUUID());
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +111,7 @@ export function CheckoutForm({
     }
     const type = (problem as { type?: string } | undefined)?.type;
     if (type === "/problems/price-changed") {
-      setError(`${problemMessage(problem)} The page has been refreshed with the new price.`);
+      setError(`${problemMessage(problem)} ${t("priceRefreshed")}`);
       router.refresh();
       return;
     }
@@ -121,41 +123,35 @@ export function CheckoutForm({
       );
       return;
     }
-    setError(
-      response.status === 429
-        ? "Too many attempts. Please wait a minute and try again."
-        : problemMessage(problem),
-    );
+    setError(response.status === 429 ? t("tooMany") : problemMessage(problem));
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid content-start gap-6" noValidate>
       <section className="panel grid gap-4 p-5 md:p-6" aria-labelledby="contact-h">
         <h2 id="contact-h" className="text-[1rem] font-semibold">
-          {mode === "agent"
-            ? "Client contact (receives booking emails)"
-            : "Contact for this booking"}
+          {mode === "agent" ? t("clientContact") : t("contact")}
         </h2>
         <TextField
-          label="Full name"
+          label={t("fullName")}
           autoComplete="name"
           error={errors.contact?.name?.message}
           {...register("contact.name")}
         />
         <div className="grid gap-4 md:grid-cols-2">
           <TextField
-            label="Email"
+            label={t("email")}
             type="email"
             autoComplete="email"
             error={errors.contact?.email?.message}
             {...register("contact.email")}
           />
           <TextField
-            label="Mobile"
+            label={t("mobile")}
             type="tel"
             autoComplete="tel"
             placeholder="+8801XXXXXXXXX"
-            hint="We send booking updates here."
+            hint={t("mobileHint")}
             error={errors.contact?.phone?.message}
             {...register("contact.phone")}
           />
@@ -164,17 +160,17 @@ export function CheckoutForm({
 
       <section className="panel grid gap-4 p-5 md:p-6" aria-labelledby="trav-h">
         <h2 id="trav-h" className="text-[1rem] font-semibold">
-          Travellers <span className="font-normal text-ink-3">(names as on ID)</span>
+          {t("travellers")} <span className="font-normal text-ink-3">{t("namesAsOnId")}</span>
         </h2>
         {Array.from({ length: adults + children }, (_, i) => (
           <TextField
             key={i}
             label={
               i === 0
-                ? "Lead guest (adult)"
+                ? t("leadGuest")
                 : i < adults
-                  ? `Adult ${i + 1}`
-                  : `Child ${i - adults + 1}`
+                  ? t("adultN", { n: i + 1 })
+                  : t("childN", { n: i - adults + 1 })
             }
             autoComplete={i === 0 ? "name" : "off"}
             list={i < adults ? "saved-adults" : "saved-children"}
@@ -206,10 +202,7 @@ export function CheckoutForm({
           onChange={(e) => setAgreed(e.target.checked)}
           className="mt-1 size-4 accent-[var(--pg-primary)]"
         />
-        <span>
-          I understand this <b>holds</b> the booking for 15 minutes and that it is not confirmed
-          until payment is completed.
-        </span>
+        <span>{t.rich("agree", { b: (chunks) => <b>{chunks}</b> })}</span>
       </label>
 
       {error && <FormAlert>{error}</FormAlert>}
@@ -219,7 +212,7 @@ export function CheckoutForm({
         disabled={isSubmitting || !agreed}
         className={buttonClass("primary", "lg")}
       >
-        {isSubmitting ? "Holding…" : mode === "agent" ? "Hold for my client" : "Hold my booking"}
+        {isSubmitting ? t("holding") : mode === "agent" ? t("holdForClient") : t("hold")}
         {!isSubmitting && <Icon name="arrowRight" className="size-[18px]" />}
       </button>
     </form>

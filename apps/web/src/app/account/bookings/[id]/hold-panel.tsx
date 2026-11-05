@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormAlert, Icon } from "@pegah/ui";
@@ -25,6 +26,7 @@ export function HoldPanel({
   /** Partner agent view: pays through the partner API; no cancel (the client contacts Pegah). */
   agent?: boolean;
 }) {
+  const t = useTranslations("hold");
   const router = useRouter();
   // Server and client clocks differ by a few seconds; the text opts out of hydration checks.
   const [left, setLeft] = useState<number>(() => remaining(holdExpiresAt));
@@ -69,7 +71,7 @@ export function HoldPanel({
   }
 
   async function cancel() {
-    if (!window.confirm("Cancel this hold and release the room or seats?")) return;
+    if (!window.confirm(t("confirmCancel"))) return;
     setBusy(true);
     setError(null);
     const { error: problem, response } = await browserApi.POST("/api/v1/me/bookings/{id}/cancel", {
@@ -97,7 +99,7 @@ export function HoldPanel({
       <div className="relative flex flex-wrap items-center justify-between gap-6">
         <div>
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-            {agent ? "Held for your client" : "Held for you"}
+            {agent ? t("heldForClient") : t("heldForYou")}
           </p>
           <p
             className="tabular mt-1 font-display text-[3rem] font-medium leading-none"
@@ -107,11 +109,7 @@ export function HoldPanel({
             {mm}:{ss}
           </p>
           <p className="mt-2 max-w-[48ch] text-white/75">
-            {left === 0
-              ? "The hold has ended. The room or seats go back on sale within a minute."
-              : canPay
-                ? "Pay to confirm. Your card or wallet details are entered on the secure payment page, never on Pegah. Unpaid holds are released when the timer ends."
-                : "Online payment opens soon. Until then this hold is not a confirmed booking and is released automatically when the timer ends."}
+            {left === 0 ? t("ended") : canPay ? t("payToConfirm") : t("paymentSoon")}
           </p>
         </div>
         <div className="grid gap-2">
@@ -122,7 +120,7 @@ export function HoldPanel({
             className="inline-flex h-11 items-center justify-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-50"
           >
             <Icon name="card" className="size-[18px]" />
-            {canPay ? (paying ? "Opening payment…" : "Pay now") : "Pay now · coming soon"}
+            {canPay ? (paying ? t("opening") : t("payNow")) : t("payNowSoon")}
           </button>
           {!agent && (
             <button
@@ -131,7 +129,7 @@ export function HoldPanel({
               disabled={busy || left === 0}
               className="h-11 rounded-control border-[1.5px] border-white/70 px-5 font-semibold text-white hover:bg-white hover:text-night disabled:opacity-40"
             >
-              {busy ? "Cancelling…" : "Cancel hold"}
+              {busy ? t("cancelling") : t("cancelHold")}
             </button>
           )}
         </div>

@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Bangla website (2026-11-05)
+
+- EN / বাংলা switch in the header; the whole customer website (home, search,
+  stays, tours, checkout, sign-in, account, trips, voucher, content pages) in
+  Bangla with next-intl; URLs unchanged (ADR-0028).
+- Bangla catalog names where filled in; Bangla form validation messages;
+  Hind Siliguri for Bangla text.
+- Translation guard test and a Bangla end-to-end + axe test.
+
 ### Added — Worker, Redis rate limits, monitoring (2026-11-05)
 
 - `pegah-worker` process (same codebase, `dist/worker.js`) for hold expiry,

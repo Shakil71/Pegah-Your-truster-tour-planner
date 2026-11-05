@@ -1,51 +1,51 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Logo } from "@pegah/ui";
 import { photoCredits } from "@/data/home";
 import { buildInfo } from "@/lib/build-info";
 
-const columns: { title: string; links: { label: string; href: string | null }[] }[] = [
+const columns: { title: string; links: { key: string; href: string | null }[] }[] = [
   {
-    title: "Travel",
+    title: "travel",
     links: [
-      { label: "Stays", href: "/stays" },
-      { label: "Tours", href: "/tours" },
-      { label: "Destinations", href: "/#explore" },
-      { label: "Flights (soon)", href: null },
-      { label: "Visa (soon)", href: null },
+      { key: "stays", href: "/stays" },
+      { key: "tours", href: "/tours" },
+      { key: "destinations", href: "/#explore" },
+      { key: "flightsSoon", href: null },
+      { key: "visaSoon", href: null },
     ],
   },
   {
-    title: "Help",
+    title: "help",
     links: [
-      { label: "Manage a booking", href: "/account/bookings" },
-      { label: "Cancellations and refunds", href: "/pages/cancellations" },
-      { label: "Payment methods", href: "/pages/payments" },
-      { label: "Contact a planner", href: "/pages/contact" },
+      { key: "manageBooking", href: "/account/bookings" },
+      { key: "cancellations", href: "/pages/cancellations" },
+      { key: "paymentMethods", href: "/pages/payments" },
+      { key: "contact", href: "/pages/contact" },
     ],
   },
   {
-    title: "Pegah",
+    title: "pegah",
     links: [
-      { label: "About", href: "/pages/about" },
-      { label: "For hotels and operators", href: "/pages/partners" },
-      { label: "Partner sign in", href: "/partner/login" },
-      { label: "Terms", href: "/pages/terms" },
-      { label: "Privacy", href: "/pages/privacy" },
+      { key: "about", href: "/pages/about" },
+      { key: "forPartners", href: "/pages/partners" },
+      { key: "partnerSignIn", href: "/partner/login" },
+      { key: "terms", href: "/pages/terms" },
+      { key: "privacy", href: "/pages/privacy" },
     ],
   },
 ];
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const t = await getTranslations("footer");
   return (
     <footer className="bg-night px-[max(16px,env(safe-area-inset-left,0px))] pb-8 pt-[72px] text-on-night">
       <div className="mx-auto max-w-[1280px]">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.5fr_repeat(3,minmax(0,1fr))]">
           <div className="col-span-2 md:col-span-1">
             <Logo className="text-[2.4rem]" />
-            <p className="mt-3.5 max-w-[34ch] opacity-80">
-              Stays, tours and travel planning across Bangladesh.
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Planned payment methods">
+            <p className="mt-3.5 max-w-[34ch] opacity-80">{t("tagline")}</p>
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label={t("paymentMethodsLabel")}>
               {["Visa", "Mastercard", "bKash", "Nagad"].map((p) => (
                 <li
                   key={p}
@@ -59,17 +59,17 @@ export function SiteFooter() {
           {columns.map((c) => (
             <div key={c.title}>
               <h2 className="mb-3.5 text-[0.7rem] font-bold uppercase tracking-[0.16em] opacity-65">
-                {c.title}
+                {t(`columns.${c.title}`)}
               </h2>
               <ul className="grid gap-2 text-[0.92rem]">
                 {c.links.map((l) => (
-                  <li key={l.label}>
+                  <li key={l.key}>
                     {l.href ? (
                       <Link href={l.href} className="hover:underline">
-                        {l.label}
+                        {t(`links.${l.key}`)}
                       </Link>
                     ) : (
-                      <span className="opacity-60">{l.label}</span>
+                      <span className="opacity-60">{t(`links.${l.key}`)}</span>
                     )}
                   </li>
                 ))}
@@ -79,22 +79,24 @@ export function SiteFooter() {
         </div>
         <hr aria-hidden="true" className="stitch my-12 border-0" />
         <div className="flex flex-wrap justify-between gap-x-6 gap-y-2 text-[0.8rem] opacity-70">
-          <span>© 2026 Pegah. Prices in BDT.</span>
-          <span>Design build · sample data · not a live booking site</span>
+          <span>{t("copyright")}</span>
+          <span>{t("prelaunch")}</span>
           {buildInfo.commitUrl ? (
             <a
               href={buildInfo.commitUrl}
               className="tabular underline-offset-2 hover:underline"
-              title="Deployed commit"
+              title={t("deployedCommit")}
             >
-              Build {buildInfo.sha} · {buildInfo.builtAtLabel}
+              {t("build")} {buildInfo.sha} · {buildInfo.builtAtLabel}
             </a>
           ) : (
-            <span className="tabular">Build {buildInfo.sha}</span>
+            <span className="tabular">
+              {t("build")} {buildInfo.sha}
+            </span>
           )}
         </div>
         <details className="mt-[18px] text-[0.78rem] opacity-75">
-          <summary className="cursor-pointer">Photo credits (Wikimedia Commons)</summary>
+          <summary className="cursor-pointer">{t("photoCredits")}</summary>
           <ul className="mt-2.5 grid gap-1 text-[0.76rem]">
             {photoCredits.map((c) => (
               <li key={c}>{c}</li>

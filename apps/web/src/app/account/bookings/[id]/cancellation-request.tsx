@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormAlert, TextAreaField, buttonClass } from "@pegah/ui";
@@ -19,6 +20,7 @@ export function CancellationRequest({
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const t = useTranslations("trip");
   const [error, setError] = useState<string | null>(null);
 
   if (!open) {
@@ -28,7 +30,7 @@ export function CancellationRequest({
         onClick={() => setOpen(true)}
         className="text-[0.9rem] font-semibold text-critical"
       >
-        Request cancellation
+        {t("requestCancellation")}
       </button>
     );
   }
@@ -55,15 +57,15 @@ export function CancellationRequest({
 
   return (
     <form onSubmit={submit} className="panel grid gap-3 p-5">
-      <h2 className="text-[1rem] font-semibold">Request cancellation</h2>
+      <h2 className="text-[1rem] font-semibold">{t("requestCancellation")}</h2>
       {policy && <p className="text-[0.86rem] text-ink-2">Policy: {policy}</p>}
       <TextAreaField
-        label="Why are you cancelling?"
+        label={t("whyCancel")}
         value={reason}
         minLength={5}
         maxLength={500}
         onChange={(e) => setReason(e.target.value)}
-        hint="Our team reviews it against the policy and emails you. The booking stays valid until then."
+        hint={t("cancelHint")}
       />
       {error && <FormAlert>{error}</FormAlert>}
       <div className="flex gap-2">
@@ -72,7 +74,7 @@ export function CancellationRequest({
           disabled={busy || reason.trim().length < 5}
           className={buttonClass("ink", "sm")}
         >
-          {busy ? "Sending…" : "Send request"}
+          {busy ? t("sending") : t("sendRequest")}
         </button>
         <button type="button" onClick={() => setOpen(false)} className={buttonClass("ghost", "sm")}>
           Keep my booking

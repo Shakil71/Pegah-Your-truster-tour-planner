@@ -1,12 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { RITUS, type RituKey } from "@pegah/shared";
 import { cx } from "@pegah/ui";
 import { seasonGuide } from "@/data/home";
+import { useContent } from "@/data/home.bn";
 
 export function SeasonsPanel({ current }: { current: RituKey }) {
+  const t = useTranslations("seasons");
+  const c = useContent();
   const [active, setActive] = useState<RituKey>(current);
   const guide = seasonGuide[active];
 
@@ -28,20 +32,20 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
             />
           ))}
           <span className="absolute bottom-4 left-[18px] z-[1] font-display text-[1.3rem] italic text-white [text-shadow:0_1px_12px_rgb(0_0_0/0.5)]">
-            {guide.caption}
+            {c(guide.caption)}
           </span>
         </div>
         <div className="grid content-center gap-4 px-6 py-8 lg:py-12 lg:pl-0 lg:pr-12">
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-            Six seasons, not four
+            {t("eyebrow")}
           </p>
           <h2
             id="sea-h"
             className="font-display text-[clamp(2rem,3.6vw,3rem)] font-medium leading-[1.05]"
           >
-            Go where the season is right.
+            {t("title")}
           </h2>
-          <div className="grid grid-cols-3 gap-2" role="group" aria-label="Choose a season">
+          <div className="grid grid-cols-3 gap-2" role="group" aria-label={t("choose")}>
             {RITUS.map((r) => (
               <button
                 key={r.key}
@@ -62,7 +66,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
                       r.key === active ? "text-fixed-accent" : "text-primary",
                     )}
                   >
-                    Now
+                    {t("now")}
                   </span>
                 )}
                 <span lang="bn" className="font-bn text-[1.15rem] leading-[1.3]">
@@ -74,7 +78,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
             ))}
           </div>
           <p aria-live="polite" className="m-0 min-h-[3.3em] text-white/85">
-            {guide.note}
+            {c(guide.note)}
           </p>
           <div className="flex flex-wrap gap-2">
             {guide.go.map((g) => (
@@ -83,7 +87,7 @@ export function SeasonsPanel({ current }: { current: RituKey }) {
                 href="#stays"
                 className="rounded-full border border-white/40 px-3.5 py-1.5 text-[0.86rem] text-white hover:bg-primary hover:text-on-primary hover:border-primary"
               >
-                {g} →
+                {c(g)} →
               </a>
             ))}
           </div>

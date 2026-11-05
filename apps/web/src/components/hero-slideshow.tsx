@@ -1,15 +1,19 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { cx } from "@pegah/ui";
 import { heroSlides } from "@/data/home";
+import { useContent } from "@/data/home.bn";
 import { usePrefersReducedMotion } from "@/lib/use-browser";
 
 const INTERVAL_MS = 6500;
 
 /** Full-bleed crossfading hero with stitch-line progress and a pause control (WCAG 2.2.2). */
 export function HeroSlideshow() {
+  const t = useTranslations("hero");
+  const c = useContent();
   const [current, setCurrent] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
   const [userPaused, setUserPaused] = useState<boolean | null>(null);
@@ -31,7 +35,7 @@ export function HeroSlideshow() {
 
   return (
     <section
-      aria-label="Featured places"
+      aria-label={t("label")}
       className="relative h-auto min-h-[640px] overflow-hidden bg-night text-white md:h-[clamp(600px,86vh,860px)]"
     >
       {heroSlides.map((s, i) => (
@@ -60,29 +64,26 @@ export function HeroSlideshow() {
       <div className="absolute inset-x-0 top-[120px] z-[2] px-[max(16px,env(safe-area-inset-left,0px))] md:top-auto md:bottom-[150px]">
         <div className="mx-auto max-w-[1280px]">
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-            Stays · Tours · Planning across Bangladesh
+            {t("eyebrow")}
           </p>
           <h1 className="mt-3.5 max-w-[12ch] font-display text-[clamp(2.9rem,7.4vw,6.6rem)] font-medium leading-[0.95] tracking-[-0.03em] [text-shadow:0_2px_30px_rgb(0_0_0/0.25)]">
-            Bangladesh, <em className="text-primary">beautifully</em> booked.
+            {t.rich("title", { em: (chunks) => <em className="text-primary">{chunks}</em> })}
           </h1>
-          <p className="mt-[18px] max-w-[40ch] text-[1.1rem] text-white/90">
-            Tea-country bungalows, Sundarbans launches and haor houseboats. Real prices in taka,
-            confirmed by the people who host you.
-          </p>
+          <p className="mt-[18px] max-w-[40ch] text-[1.1rem] text-white/90">{t("intro")}</p>
         </div>
       </div>
 
       <div className="absolute inset-x-4 bottom-[60px] z-[2] grid justify-items-start gap-2.5 md:inset-x-auto md:right-[max(16px,env(safe-area-inset-right,0px))] md:bottom-[150px] md:justify-items-end md:text-right">
         <p className="font-display text-[1.35rem] italic" aria-live="polite">
-          {slide.place}
+          {c(slide.place)}
         </p>
         <p className="text-[0.7rem] opacity-75">{slide.credit}</p>
-        <div className="flex items-center gap-1.5" role="group" aria-label="Choose photo">
+        <div className="flex items-center gap-1.5" role="group" aria-label={t("choosePhoto")}>
           {heroSlides.map((s, i) => (
             <button
               key={s.place}
               type="button"
-              aria-label={`Show ${s.place}`}
+              aria-label={t("show", { place: c(s.place) })}
               aria-current={i === current}
               onClick={() => go(i)}
               className="grid h-[18px] w-[34px] cursor-pointer items-center"
@@ -104,7 +105,7 @@ export function HeroSlideshow() {
           <button
             type="button"
             onClick={() => setUserPaused(!paused)}
-            aria-label={paused ? "Play slideshow" : "Pause slideshow"}
+            aria-label={paused ? t("play") : t("pause")}
             className="ml-1.5 grid size-[30px] cursor-pointer place-items-center rounded-full border-[1.5px] border-white/70 bg-night/25"
           >
             <svg viewBox="0 0 12 12" className="size-3 fill-current" aria-hidden="true">

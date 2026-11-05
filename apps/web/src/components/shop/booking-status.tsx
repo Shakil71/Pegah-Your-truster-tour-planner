@@ -1,4 +1,5 @@
 import type { BookingStatus } from "@pegah/contracts";
+import { useTranslations } from "next-intl";
 import { Icon, cx, type IconName } from "@pegah/ui";
 
 /** Customer-facing wording. "Confirmed" appears only for CONFIRMED / COMPLETED. */
@@ -35,6 +36,7 @@ const META: Record<BookingStatus, { label: string; icon: IconName; tone: string 
 };
 
 export function BookingStatusBadge({ status }: { status: BookingStatus }) {
+  const t = useTranslations("status");
   const m = META[status];
   return (
     <span
@@ -44,7 +46,7 @@ export function BookingStatusBadge({ status }: { status: BookingStatus }) {
       )}
     >
       <Icon name={m.icon} className="size-4" />
-      {m.label}
+      {t(status)}
     </span>
   );
 }

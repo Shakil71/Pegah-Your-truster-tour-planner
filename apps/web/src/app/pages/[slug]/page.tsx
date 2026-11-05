@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/shop/page-shell";
+import { intlLocale, type Locale } from "@/i18n/locales";
 import { serverApi } from "@/lib/api-server";
 
 export const revalidate = 300;
@@ -15,7 +17,9 @@ async function load(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = await load((await params).slug);
-  return page ? { title: page.title, description: page.summary } : { title: "Not found" };
+  return page
+    ? { title: page.title, description: page.summary }
+    : { title: (await getTranslations("pages"))("notFound") };
 }
 
 /**
@@ -23,6 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * paragraphs and headings by React (escaped), never injected as HTML.
  */
 export default async function ContentPage({ params }: Props) {
+  const t = await getTranslations("pages");
+  const locale = (await getLocale()) as Locale;
   const page = await load((await params).slug);
   if (!page) notFound();
   const blocks = page.body
@@ -53,12 +59,13 @@ export default async function ContentPage({ params }: Props) {
           )}
         </div>
         <p className="mt-10 text-[0.8rem] text-ink-3">
-          Last updated{" "}
-          {new Date(page.updatedAt).toLocaleDateString("en-GB", {
-            timeZone: "Asia/Dhaka",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
+          {t("lastUpdated", {
+            date: new Date(page.updatedAt).toLocaleDateString(intlLocale(locale), {
+              timeZone: "Asia/Dhaka",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }),
           })}
         </p>
       </article>

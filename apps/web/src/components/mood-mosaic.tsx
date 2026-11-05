@@ -1,6 +1,9 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Icon, cx } from "@pegah/ui";
 import { moods } from "@/data/home";
+import { useContent } from "@/data/home.bn";
+
 import { SectionHead } from "./section-head";
 
 const placement = [
@@ -13,6 +16,8 @@ const placement = [
 ];
 
 export function MoodMosaic() {
+  const t = useTranslations("home");
+  const c = useContent();
   return (
     <section
       id="explore"
@@ -22,17 +27,9 @@ export function MoodMosaic() {
       <div className="mx-auto max-w-[1280px]">
         <SectionHead
           id="mood-h"
-          eyebrow="Explore by mood"
-          title={
-            <>
-              Six ways to <em>see</em> Bangladesh
-            </>
-          }
-          aside={
-            <p className="m-0 max-w-[42ch] text-ink-2">
-              From mangrove creeks to Mughal ruins. Start with how you want the trip to feel.
-            </p>
-          }
+          eyebrow={t("moodEyebrow")}
+          title={t.rich("moodTitle", { em: (chunks) => <em>{chunks}</em> })}
+          aside={<p className="m-0 max-w-[42ch] text-ink-2">{t("moodIntro")}</p>}
         />
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:grid-rows-[260px_260px]">
           {moods.map((m, i) => (
@@ -58,7 +55,7 @@ export function MoodMosaic() {
               </span>
               <span className="absolute inset-x-5 bottom-[18px] z-[1]">
                 <span className="block text-[0.7rem] font-bold uppercase tracking-[0.16em] text-primary">
-                  {m.mood}
+                  {c(m.mood)}
                 </span>
                 <span
                   className={cx(
@@ -66,7 +63,7 @@ export function MoodMosaic() {
                     i === 0 ? "text-[clamp(2rem,3.4vw,2.8rem)]" : "text-[1.6rem]",
                   )}
                 >
-                  {m.name}
+                  {c(m.name)}
                 </span>
               </span>
             </a>

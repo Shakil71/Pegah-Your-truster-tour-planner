@@ -17,6 +17,8 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Bangla customer website (ADR-0028).
+
 - Cross-cutting: worker process, Redis rate limits, metrics and monitoring
   setup (ADR-0027). Owner action: run the two setup scripts
   (`docs/operations/MONITORING.md`).

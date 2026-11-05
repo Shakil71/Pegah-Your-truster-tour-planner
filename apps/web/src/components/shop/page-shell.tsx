@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -17,10 +18,10 @@ export function PageShell({ children }: { children: ReactNode }) {
 
 /** Honest booking notice shown wherever a booking could be made. True whether payment is live or not. */
 export function PaymentNotice() {
+  const t = useTranslations("shop");
   return (
     <p className="rounded-[14px] border border-dashed border-primary/60 bg-primary-soft px-4 py-3 text-[0.86rem] text-ink">
-      <b>How holding works:</b> we keep the room or seats for you for 15 minutes. A booking is{" "}
-      <b>confirmed only after your payment is verified</b>; unpaid holds are released automatically.
+      {t.rich("paymentNotice", { b: (chunks) => <b>{chunks}</b> })}
     </p>
   );
 }

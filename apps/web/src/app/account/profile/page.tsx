@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { AccountTabs } from "@/components/shop/account-tabs";
 import { PageShell } from "@/components/shop/page-shell";
 import { ensure, requireCustomer, serverApi } from "@/lib/api-server";
 import { PasswordForm, ProfileForm } from "./profile-forms";
 import { TravellersManager } from "./travellers-manager";
 
-export const metadata: Metadata = { title: "Profile", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getTranslations("profile"))("title"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const session = await requireCustomer("/account/profile");
+  const t = await getTranslations("profile");
   const api = await serverApi();
   const [profile, travellers] = await Promise.all([
     api.GET("/api/v1/me/profile").then(ensure),
@@ -23,7 +27,7 @@ export default async function ProfilePage() {
             {profile.email}
           </p>
           <h1 className="mt-1.5 font-display text-[clamp(2rem,3.6vw,3rem)] font-medium leading-tight">
-            Your profile
+            {t("heading")}
           </h1>
         </div>
         <AccountTabs active="profile" />

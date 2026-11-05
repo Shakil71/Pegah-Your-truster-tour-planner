@@ -1,3 +1,4 @@
+import { useLocale } from "next-intl";
 import { currentRitu } from "@pegah/shared";
 import { HeroSlideshow } from "@/components/hero-slideshow";
 import { MoodMosaic } from "@/components/mood-mosaic";
@@ -16,6 +17,7 @@ export const revalidate = 3600;
 
 export default function HomePage() {
   const ritu = currentRitu();
+  const locale = useLocale();
   return (
     <>
       <SiteHeader />
@@ -24,7 +26,7 @@ export default function HomePage() {
         <div className="px-[max(16px,env(safe-area-inset-left,0px))]">
           <SearchPanel />
         </div>
-        <TrendingRail season={ritu.en} />
+        <TrendingRail season={locale === "bn" ? ritu.bn : ritu.en} />
         <MoodMosaic />
         <StaysGrid />
         <SeasonsPanel current={ritu.key} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
@@ -18,6 +19,7 @@ const blank: Draft = { fullName: "", ageGroup: "ADULT", dateOfBirth: "", nationa
 /** People the customer often travels with; offered as suggestions at checkout. */
 export function TravellersManager({ items, csrfToken }: { items: Traveller[]; csrfToken: string }) {
   const router = useRouter();
+  const tr = useTranslations("profile");
   const [editing, setEditing] = useState<string | "new" | null>(null);
   const [draft, setDraft] = useState<Draft>(blank);
   const [busy, setBusy] = useState(false);
@@ -66,7 +68,7 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
   }
 
   async function remove(t: Traveller) {
-    if (!window.confirm(`Remove ${t.fullName}?`)) return;
+    if (!window.confirm(tr("removeConfirm", { name: t.fullName }))) return;
     await browserApi.DELETE("/api/v1/me/travellers/{id}", {
       params: { path: { id: t.id } },
       headers: csrf(csrfToken),
@@ -79,11 +81,9 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 id="trav-h" className="text-[1rem] font-semibold">
-            Saved travellers
+            {tr("travellers")}
           </h2>
-          <p className="mt-1 text-[0.84rem] text-ink-2">
-            Names are suggested when you fill in a booking. No ID documents are stored.
-          </p>
+          <p className="mt-1 text-[0.84rem] text-ink-2">{tr("travellersIntro")}</p>
         </div>
         {editing === null && (
           <button
@@ -91,7 +91,7 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
             onClick={() => open("new")}
             className={buttonClass("outline", "sm")}
           >
-            <Icon name="plus" className="size-4" /> Add traveller
+            <Icon name="plus" className="size-4" /> {tr("addTraveller")}
           </button>
         )}
       </div>
@@ -101,26 +101,26 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
           className="mt-4 grid gap-3 rounded-[14px] border border-primary/50 bg-primary-soft/40 p-4 md:grid-cols-4"
         >
           <TextField
-            label="Full name (as on ID)"
+            label={tr("fullNameId")}
             value={draft.fullName}
             onChange={(e) => setDraft({ ...draft, fullName: e.target.value })}
           />
           <SelectField
-            label="Age group"
+            label={tr("ageGroup")}
             value={draft.ageGroup}
             onChange={(e) => setDraft({ ...draft, ageGroup: e.target.value as Draft["ageGroup"] })}
           >
-            <option value="ADULT">Adult</option>
-            <option value="CHILD">Child</option>
+            <option value="ADULT">{tr("adult")}</option>
+            <option value="CHILD">{tr("child")}</option>
           </SelectField>
           <TextField
-            label="Date of birth (optional)"
+            label={tr("dob")}
             type="date"
             value={draft.dateOfBirth}
             onChange={(e) => setDraft({ ...draft, dateOfBirth: e.target.value })}
           />
           <TextField
-            label="Nationality (optional)"
+            label={tr("nationality")}
             maxLength={2}
             placeholder="BD"
             value={draft.nationality}
@@ -133,21 +133,21 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
           )}
           <div className="flex gap-2 md:col-span-4">
             <button type="submit" disabled={busy} className={buttonClass("primary", "sm")}>
-              {busy ? "Saving…" : "Save traveller"}
+              {busy ? tr("saving") : tr("saveTraveller")}
             </button>
             <button
               type="button"
               onClick={() => setEditing(null)}
               className={buttonClass("ghost", "sm")}
             >
-              Cancel
+              {tr("cancel")}
             </button>
           </div>
         </form>
       )}
       <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {items.length === 0 && editing === null && (
-          <li className="text-[0.9rem] text-ink-2">No saved travellers yet.</li>
+          <li className="text-[0.9rem] text-ink-2">{tr("none")}</li>
         )}
         {items.map((t) => (
           <li
@@ -157,16 +157,16 @@ export function TravellersManager({ items, csrfToken }: { items: Traveller[]; cs
             <span>
               <span className="block font-semibold">{t.fullName}</span>
               <span className="text-[0.8rem] text-ink-3">
-                {t.ageGroup === "CHILD" ? "Child" : "Adult"}
+                {t.ageGroup === "CHILD" ? tr("child") : tr("adult")}
                 {t.nationality ? ` · ${t.nationality}` : ""}
               </span>
             </span>
             <span className="flex gap-2 text-[0.82rem] font-semibold">
               <button type="button" onClick={() => open(t)} className="text-primary-ink">
-                Edit
+                {tr("edit")}
               </button>
               <button type="button" onClick={() => remove(t)} className="text-critical">
-                Remove
+                {tr("remove")}
               </button>
             </span>
           </li>

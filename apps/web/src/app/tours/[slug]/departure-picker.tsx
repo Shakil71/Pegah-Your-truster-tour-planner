@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { buttonClass, cx } from "@pegah/ui";
+import type { Locale } from "@/i18n/locales";
 import { dhakaDateTime, money } from "@/lib/format";
 
 type Departure = Schemas["TourDeparture_Output"];
@@ -16,6 +18,8 @@ export function DeparturePicker({
   departures: Departure[];
   isAgent?: boolean;
 }) {
+  const t = useTranslations("tour");
+  const locale = useLocale() as Locale;
   const open = departures.filter((d) => d.status === "SCHEDULED" && d.seatsLeft > 0);
   const [id, setId] = useState(open[0]?.id ?? "");
   const [adults, setAdults] = useState(2);
@@ -27,8 +31,8 @@ export function DeparturePicker({
   if (open.length === 0) {
     return (
       <section className="panel p-5 md:p-6">
-        <h2 className="text-[1rem] font-semibold">Departures</h2>
-        <p className="mt-2 text-ink-2">No open departures right now. Check back soon.</p>
+        <h2 className="text-[1rem] font-semibold">{t("departures")}</h2>
+        <p className="mt-2 text-ink-2">{t("noneOpen")}</p>
       </section>
     );
   }
@@ -36,10 +40,10 @@ export function DeparturePicker({
   return (
     <section className="panel grid gap-4 p-5 md:p-6" aria-labelledby="dep-h">
       <h2 id="dep-h" className="text-[1rem] font-semibold">
-        Choose a departure
+        {t("chooseDeparture")}
       </h2>
       <fieldset className="grid gap-2">
-        <legend className="sr-only">Departure</legend>
+        <legend className="sr-only">{t("departure")}</legend>
         {open.map((d) => (
           <label
             key={d.id}
@@ -58,15 +62,15 @@ export function DeparturePicker({
                 className="accent-[var(--pg-primary)]"
               />
               <span>
-                <span className="block font-semibold">{dhakaDateTime(d.departsAt)}</span>
+                <span className="block font-semibold">{dhakaDateTime(d.departsAt, locale)}</span>
                 <span className="text-[0.78rem] text-ink-3">
-                  {d.seatsLeft} seat{d.seatsLeft === 1 ? "" : "s"} left
+                  {t("seatsLeft", { count: d.seatsLeft })}
                 </span>
               </span>
             </span>
             <span className="tabular text-right text-[0.9rem] font-semibold">
               {money(d.priceAdult)}
-              <span className="block text-[0.72rem] font-normal text-ink-3">per adult</span>
+              <span className="block text-[0.72rem] font-normal text-ink-3">{t("perAdult")}</span>
             </span>
           </label>
         ))}
@@ -74,8 +78,8 @@ export function DeparturePicker({
       <div className="grid grid-cols-2 gap-3">
         {(
           [
-            ["Adults", adults, setAdults, 1],
-            ["Children", children, setChildren, 0],
+            [t("adults"), adults, setAdults, 1],
+            [t("children"), children, setChildren, 0],
           ] as const
         ).map(([label, value, set, min]) => (
           <label key={label} className="grid gap-1">
@@ -96,12 +100,12 @@ export function DeparturePicker({
       </div>
       {chosen && (
         <p className="text-[0.84rem] text-ink-2">
-          Children {money(chosen.priceChild)} each. VAT is added at checkout.
+          {t("childPrice", { price: money(chosen.priceChild) })}
         </p>
       )}
       {!fits && chosen && (
         <p className="text-[0.84rem] font-semibold text-warn">
-          Only {chosen.seatsLeft} seats left on this departure.
+          {t("onlySeatsLeft", { count: chosen.seatsLeft })}
         </p>
       )}
       <Link
@@ -117,14 +121,14 @@ export function DeparturePicker({
           cx("no-underline", !fits && "pointer-events-none opacity-40"),
         )}
       >
-        Hold {party} seat{party === 1 ? "" : "s"}
+        {t("holdSeats", { count: party })}
       </Link>
       {isAgent && fits && (
         <Link
           href={`/checkout?${new URLSearchParams({ product: "TOUR", departure: id, adults: String(adults), children: String(children), as: "agent" })}`}
           className={buttonClass("outline", "md", "no-underline")}
         >
-          Book for a client
+          {t("bookForClient")}
         </Link>
       )}
     </section>

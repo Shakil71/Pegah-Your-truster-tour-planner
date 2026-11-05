@@ -35,8 +35,12 @@
   --color-info: var(--pg-info);
   --color-info-soft: var(--pg-info-soft);
 
-  --font-display: var(--pg-font-display), "Bodoni 72", Didot, Georgia, serif;
-  --font-sans: var(--pg-font-text), "Segoe UI", system-ui, sans-serif;
+  /* Bengali glyphs fall through to the Bangla families (loaded only when used). */
+  --font-display:
+    var(--pg-font-display), var(--pg-font-bn, "Noto Serif Bengali"), "Bodoni 72", Didot, Georgia,
+    serif;
+  --font-sans:
+    var(--pg-font-text), var(--pg-font-bn-text, "Hind Siliguri"), "Segoe UI", system-ui, sans-serif;
   --font-bn: var(--pg-font-bn), "Hind Siliguri", serif;
 
   --radius-control: 10px;

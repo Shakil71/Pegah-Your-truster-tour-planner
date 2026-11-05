@@ -1,5 +1,9 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+/** Language from a cookie, messages per request (ADR-0028). */
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /**
  * Where the admin app listens. The public site proxies /admin/* to it, so the
@@ -33,4 +37,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

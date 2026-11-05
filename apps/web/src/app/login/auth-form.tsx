@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +13,7 @@ type Mode = "login" | "register";
 type Values = { email: string; password: string; fullName?: string; phone?: string };
 
 export function AuthForm({ next, initialMode }: { next: string; initialMode: Mode }) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +41,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
             },
           });
     if (!result.response.ok) {
-      setError(
-        result.response.status === 429
-          ? "Too many attempts. Please wait a minute."
-          : problemMessage(result.error),
-      );
+      setError(result.response.status === 429 ? t("tooMany") : problemMessage(result.error));
       return;
     }
     router.replace(next);
@@ -55,12 +53,12 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
       <div
         className="flex rounded-full border border-rule bg-paper p-1"
         role="tablist"
-        aria-label="Account"
+        aria-label={t("account")}
       >
         {(
           [
-            ["login", "Sign in"],
-            ["register", "Create account"],
+            ["login", t("signIn")],
+            ["register", t("createAccount")],
           ] as const
         ).map(([m, label]) => (
           <button
@@ -82,24 +80,20 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
         ))}
       </div>
       <h1 className="mt-8 font-display text-[2rem] font-medium leading-tight">
-        {mode === "login" ? "Welcome back" : "Create your Pegah account"}
+        {mode === "login" ? t("welcomeBack") : t("createTitle")}
       </h1>
-      <p className="mt-1 text-ink-2">
-        {mode === "login"
-          ? "Sign in to hold rooms and seats and see your trips."
-          : "It takes a minute. We only ask for what a booking needs."}
-      </p>
+      <p className="mt-1 text-ink-2">{mode === "login" ? t("signInIntro") : t("registerIntro")}</p>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-4" noValidate key={mode}>
         {mode === "register" && (
           <TextField
-            label="Full name"
+            label={t("fullName")}
             autoComplete="name"
             error={errors.fullName?.message}
             {...register("fullName")}
           />
         )}
         <TextField
-          label="Email"
+          label={t("email")}
           type="email"
           autoComplete="email"
           error={errors.email?.message}
@@ -107,7 +101,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
         />
         {mode === "register" && (
           <TextField
-            label="Mobile (optional)"
+            label={t("mobileOptional")}
             type="tel"
             autoComplete="tel"
             placeholder="+8801XXXXXXXXX"
@@ -116,12 +110,10 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
           />
         )}
         <TextField
-          label="Password"
+          label={t("password")}
           type="password"
           autoComplete={mode === "login" ? "current-password" : "new-password"}
-          hint={
-            mode === "register" ? "At least 10 characters. A short phrase works well." : undefined
-          }
+          hint={mode === "register" ? t("passwordHint") : undefined}
           error={errors.password?.message}
           {...register("password")}
         />
@@ -130,7 +122,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
             href="/forgot-password"
             className="justify-self-start text-[0.86rem] font-semibold text-primary-ink"
           >
-            Forgot your password?
+            {t("forgot")}
           </Link>
         )}
         {error && <FormAlert>{error}</FormAlert>}
@@ -139,7 +131,7 @@ export function AuthForm({ next, initialMode }: { next: string; initialMode: Mod
           disabled={isSubmitting}
           className={buttonClass("primary", "md", "h-12")}
         >
-          {isSubmitting ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+          {isSubmitting ? t("pleaseWait") : mode === "login" ? t("signIn") : t("createAccount")}
         </button>
       </form>
     </div>

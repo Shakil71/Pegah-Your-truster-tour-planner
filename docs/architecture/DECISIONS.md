@@ -478,3 +478,30 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   line) and node_exporter 1.12.1 under `/opt`, and the RHEL Grafana package,
   all on 127.0.0.1 with SELinux enforcing and no firewall changes; access via an
   SSH tunnel. Loki is deferred until there is a second server.
+
+## ADR-0028 — Bangla on the customer website (next-intl)
+
+- **Status:** Accepted (2026-11-05)
+- **How:** next-intl 4 on the website. The language is a cookie
+  (`NEXT_LOCALE`, set by the EN / বাংলা switch in the header); URLs are the
+  same in both languages, so links, payment return addresses and emails never
+  change. English stays the default. Interface wording lives in
+  `apps/web/messages/{en,bn}.json`; static home-page content has a small
+  English → Bangla dictionary (`data/home.bn.ts`) that falls back to English.
+- **Catalog content:** hotel, tour and destination names show their Bangla
+  name when one is filled in (`nameBn`, `titleBn`); descriptions stay as
+  entered until the catalog has Bangla description fields.
+- **Numbers:** prices keep Latin digits in both languages (৳ 13,248), matching
+  the payment page and bank messages; counts and dates use Bangla numerals in
+  Bangla (২ রাত, ১২ নভেম্বর).
+- **Type:** Hind Siliguri for Bangla text and Noto Serif Bengali for Bangla
+  headings, both as fallbacks behind the Latin families and loaded only where
+  Bengali glyphs appear (unicode-range). Bengali emphasis stays upright.
+- **Validation:** form messages switch to Bangla in the browser
+  (`friendlyMessageBn`); the server and API problem details stay English.
+- **Guards:** a unit test fails if the two languages differ in keys, if a
+  message is not valid ICU, or if the code uses a key that does not exist; the
+  end-to-end suite switches to Bangla and runs axe on Bangla pages.
+- **Not yet:** the partner portal and the console stay English (B2B and staff
+  tools); emails and API error texts are English; SEO hreflang per language
+  needs language-specific URLs, which can come with the production domain.

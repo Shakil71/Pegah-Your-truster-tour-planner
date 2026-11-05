@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { cx } from "@pegah/ui";
@@ -17,6 +18,7 @@ export function PromoField({
   applied: { code: string; name: string } | null;
   error: string | null;
 }) {
+  const t = useTranslations("checkout");
   const router = useRouter();
   const path = usePathname();
   const params = useSearchParams();
@@ -34,10 +36,10 @@ export function PromoField({
     return (
       <p className="mt-4 flex items-center justify-between gap-3 rounded-[12px] bg-good-soft px-3.5 py-2.5 text-[0.86rem] text-good">
         <span>
-          <b>{applied.code}</b> applied · {applied.name}
+          {t.rich("promoApplied", { b: () => <b>{applied.code}</b>, name: applied.name })}
         </span>
         <button type="button" onClick={() => go(null)} className="font-semibold underline">
-          Remove
+          {t("promoRemove")}
         </button>
       </p>
     );
@@ -51,7 +53,7 @@ export function PromoField({
       }}
     >
       <label htmlFor="promo" className="text-[0.84rem] font-semibold">
-        Promo code
+        {t("promoCode")}
       </label>
       <div className="flex gap-2">
         <input
@@ -71,7 +73,7 @@ export function PromoField({
             pending && "opacity-60",
           )}
         >
-          {pending ? "Checking…" : "Apply"}
+          {pending ? t("promoChecking") : t("promoApply")}
         </button>
       </div>
       {error && current && (

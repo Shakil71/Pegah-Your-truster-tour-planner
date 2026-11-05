@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { BookingContactSchema, GuestInputSchema, PasswordSchema } from "./index";
+import { BookingContactSchema, GuestInputSchema, PasswordSchema, friendlyMessageBn } from "./index";
 
 const message = (schema: z.ZodType, value: unknown) =>
   schema.safeParse(value).error?.issues[0]?.message;
@@ -22,5 +22,13 @@ describe("validation messages", () => {
       message(BookingContactSchema, { name: "Ana", email: "a@b.co", phone: "123" }),
     ).not.toMatch(/Too small|expected/);
     expect(message(z.string().min(5, "Custom"), "a")).toBe("Custom");
+  });
+
+  it("have Bangla versions for the website", () => {
+    const bn = (schema: z.ZodType, value: unknown) =>
+      schema.safeParse(value, { error: friendlyMessageBn }).error?.issues[0]?.message;
+    expect(bn(PasswordSchema, "short")).toBe("অন্তত ১০ অক্ষর লিখুন।");
+    expect(bn(z.email(), "nope")).toBe("সঠিক ইমেইল ঠিকানা লিখুন।");
+    expect(bn(z.object({ a: z.string() }), {})).toBe("এটি পূরণ করুন।");
   });
 });

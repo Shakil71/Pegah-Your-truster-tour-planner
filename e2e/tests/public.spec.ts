@@ -38,3 +38,25 @@ test("checkout asks visitors to sign in first", async ({ page }) => {
   await page.goto("/checkout?product=TOUR");
   await expect(page).toHaveURL(/\/login\?next=/);
 });
+
+test("the site switches to Bangla and stays accessible @mobile", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "বাংলা" }).first().click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "bn");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("বাংলাদেশ");
+  await expectAccessible(page, "home (Bangla)");
+  await expectNoHorizontalScroll(page);
+
+  // The choice is a cookie: other pages follow, URLs stay the same.
+  await page.goto("/stays?where=srimangal");
+  await expect(page.getByText("রুম দেখুন").first()).toBeVisible();
+  await page.locator('a[href^="/stays/demo-"]').first().click();
+  await expect(page.getByRole("link", { name: "এই রুম হোল্ড করুন" }).first()).toBeVisible();
+  await expectAccessible(page, "property (Bangla)");
+
+  await page.goto("/login");
+  await expect(page.getByRole("heading", { name: "আবার স্বাগতম" })).toBeVisible();
+  await page.getByRole("button", { name: "English" }).first().click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+});
