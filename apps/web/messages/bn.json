@@ -18,7 +18,11 @@
   "footer": {
     "tagline": "বাংলাদেশজুড়ে থাকা, ট্যুর আর ভ্রমণ পরিকল্পনা।",
     "paymentMethodsLabel": "পরিকল্পিত পেমেন্ট পদ্ধতি",
-    "columns": { "travel": "ভ্রমণ", "help": "সহায়তা", "pegah": "পেগাহ" },
+    "columns": {
+      "travel": "ভ্রমণ",
+      "help": "সহায়তা",
+      "pegah": "পেগাহ"
+    },
     "links": {
       "stays": "থাকা",
       "tours": "ট্যুর",
@@ -138,7 +142,10 @@
     "from": "<b></b> থেকে",
     "sampleTours": "ডিজাইন পর্যালোচনার জন্য নমুনা ট্যুর ও দাম",
     "promisesEyebrow": "আমাদের পরিকল্পনার ধরন",
-    "promisesTitle": "যে কথা আমরা <em>রাখি</em>"
+    "promisesTitle": "যে কথা আমরা <em>রাখি</em>",
+    "destCounts": "{stays, plural, other {#টি থাকার জায়গা}} · {tours, plural, other {#টি ট্যুর}}",
+    "realStaysIntro": "আমাদের টিম ঘুরে দেখে যে জায়গাগুলো তালিকায় রেখেছে। আপনার তারিখের আসল দাম দেখতে একটি খুলুন।",
+    "seeRooms": "রুম ও দাম দেখুন"
   },
   "seasons": {
     "eyebrow": "চার নয়, ছয় ঋতু",

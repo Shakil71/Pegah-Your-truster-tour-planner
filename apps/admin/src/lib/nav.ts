@@ -56,6 +56,7 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     title: "Growth",
     items: [
       { href: "/promotions", label: "Promotions", icon: "tag", permission: "promotion:manage" },
+      { href: "/home-page", label: "Home page", icon: "grid", permission: "content:manage" },
       { href: "/content", label: "Content pages", icon: "layout", permission: "content:manage" },
       { href: "/reports", label: "Reports", icon: "chart", permission: "report:read" },
     ],

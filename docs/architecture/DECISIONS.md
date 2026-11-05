@@ -553,3 +553,17 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Permissions:** catalog:read to browse, catalog:manage to upload, edit and
   delete; every change is audited. Photos must be owned or licensed and
   credited (docs/design/IMAGE_CREDITS.md).
+
+## ADR-0031 — Home page editor
+
+- **Status:** Accepted (2026-11-05)
+- **What staff control:** hero slides (media-library photos with English and
+  Bangla place names), featured destinations, featured hotels, featured tours
+  (chosen from the real catalog, in order) and up to three promises in English
+  and Bangla. Stored in `site_settings["home"]`; `content:manage`; audited.
+- **Rendering:** `GET /home` resolves the choices against the published
+  catalog at request time, so unpublished or deleted items drop out instead of
+  breaking the page. Featured stays and tours show real data (next departure,
+  price from) instead of the sample cards and sample prices.
+- **Fallback:** a section left empty keeps the built-in content, so the home
+  page is never blank while the catalog is being built.

@@ -1,5 +1,6 @@
-import { useLocale } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { currentRitu } from "@pegah/shared";
+import { FeaturedDestinations, FeaturedStays, FeaturedTours } from "@/components/featured";
 import { HeroSlideshow } from "@/components/hero-slideshow";
 import { MoodMosaic } from "@/components/mood-mosaic";
 import { Newsletter } from "@/components/newsletter";
@@ -12,30 +13,55 @@ import { SiteNotice } from "@/components/site-notice";
 import { StaysGrid } from "@/components/stays-grid";
 import { ToursSection } from "@/components/tours-section";
 import { TrendingRail } from "@/components/trending-rail";
+import { serverApi } from "@/lib/api-server";
 
-/** Re-render hourly so the "current season" follows the Asia/Dhaka calendar. */
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+/**
+ * Home page. Sections chosen in the console (ADR-0031) use the real catalog;
+ * a section nobody has set up yet shows the built-in content instead.
+ */
+export default async function HomePage() {
   const ritu = currentRitu();
-  const locale = useLocale();
+  const locale = await getLocale();
+  const bn = locale === "bn";
+  const api = await serverApi();
+  const home = (await api.GET("/api/v1/home")).data;
+  const season = bn ? ritu.bn : ritu.en;
+
   return (
     <>
       <SiteHeader />
       <main id="top">
-        <HeroSlideshow />
+        <HeroSlideshow
+          slides={home?.slides.map((s) => ({
+            src: s.url,
+            alt: s.alt,
+            place: bn ? s.placeBn : s.placeEn,
+            credit: s.credit,
+          }))}
+        />
         <div className="px-[max(16px,env(safe-area-inset-left,0px))]">
           <SearchPanel />
           <div className="mx-auto max-w-[1280px]">
             <SiteNotice className="mt-6" />
           </div>
         </div>
-        <TrendingRail season={locale === "bn" ? ritu.bn : ritu.en} />
+        {home?.destinations.length ? (
+          <FeaturedDestinations items={home.destinations} season={season} />
+        ) : (
+          <TrendingRail season={season} />
+        )}
         <MoodMosaic />
-        <StaysGrid />
+        {home?.hotels.length ? <FeaturedStays items={home.hotels} /> : <StaysGrid />}
         <SeasonsPanel current={ritu.key} />
-        <ToursSection />
-        <Promises />
+        {home?.tours.length ? <FeaturedTours items={home.tours} /> : <ToursSection />}
+        <Promises
+          items={home?.promises.map((p) => ({
+            title: bn ? p.titleBn : p.titleEn,
+            body: bn ? p.bodyBn : p.bodyEn,
+          }))}
+        />
         <Newsletter />
       </main>
       <SiteFooter />

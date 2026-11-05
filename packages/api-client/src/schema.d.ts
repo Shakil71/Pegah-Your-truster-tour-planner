@@ -1460,6 +1460,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/home": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminHomeController_get"];
+    put: operations["AdminHomeController_save"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/home": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicHomeController_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3177,6 +3209,56 @@ export interface components {
       alt: string;
       credit: string | null;
       license: string | null;
+    };
+    AdminHomeSettingsDto_Output: {
+      slides: {
+        media: string;
+        placeEn: string;
+        placeBn: string;
+      }[];
+      featuredDestinations: string[];
+      featuredHotels: string[];
+      featuredTours: string[];
+      promises: {
+        titleEn: string;
+        titleBn: string;
+        bodyEn: string;
+        bodyBn: string;
+      }[];
+    };
+    AdminHomeSettingsDto: {
+      slides: {
+        media: string;
+        placeEn: string;
+        placeBn: string;
+      }[];
+      featuredDestinations: string[];
+      featuredHotels: string[];
+      featuredTours: string[];
+      promises: {
+        titleEn: string;
+        titleBn: string;
+        bodyEn: string;
+        bodyBn: string;
+      }[];
+    };
+    PublicHomeDto_Output: {
+      slides: {
+        url: string;
+        alt: string;
+        credit: string | null;
+        placeEn: string;
+        placeBn: string;
+      }[];
+      destinations: components["schemas"]["DestinationSummary_Output"][];
+      hotels: components["schemas"]["HotelSummary_Output"][];
+      tours: components["schemas"]["TourSummary_Output"][];
+      promises: {
+        titleEn: string;
+        titleBn: string;
+        bodyEn: string;
+        bodyBn: string;
+      }[];
     };
   };
   responses: never;
@@ -5648,6 +5730,67 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  AdminHomeController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHomeSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminHomeController_save: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminHomeSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminHomeSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  PublicHomeController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicHomeDto_Output"];
+        };
       };
     };
   };

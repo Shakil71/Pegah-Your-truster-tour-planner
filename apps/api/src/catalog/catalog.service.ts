@@ -8,6 +8,7 @@ import type {
   HotelOffer,
   HotelSearchQuery,
   HotelSearchResponse,
+  HotelSummary,
   TourDetail,
   TourSummary,
 } from "@pegah/contracts";
@@ -299,6 +300,17 @@ export class CatalogService {
           : 1,
     );
     return { rooms, pricedAt: now.toISOString() };
+  }
+
+  /** Published hotels by slug, in the order given (home page features). */
+  async hotelsBySlug(slugs: string[]): Promise<HotelSummary[]> {
+    if (slugs.length === 0) return [];
+    const rows = await this.db.hotel.findMany({
+      where: { slug: { in: slugs }, status: "PUBLISHED", destination: { status: "PUBLISHED" } },
+      include: { destination: { select: { slug: true, name: true } }, hero: MEDIA_SELECT },
+    });
+    const bySlug = new Map(rows.map((h) => [h.slug, toHotelSummary(h, this.media)]));
+    return slugs.flatMap((slug) => bySlug.get(slug) ?? []);
   }
 
   async listTours(now: Date = new Date()): Promise<TourSummary[]> {

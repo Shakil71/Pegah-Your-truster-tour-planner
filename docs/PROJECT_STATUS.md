@@ -17,6 +17,9 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Console control: editable settings with encrypted credentials, customer
+  account controls, media library, home page editor (ADR-0029 … ADR-0031).
+
 - Bangla customer website (ADR-0028).
 
 - Cross-cutting: worker process, Redis rate limits, metrics and monitoring

@@ -163,3 +163,22 @@ test("a photo uploaded in the console becomes a hotel's main photo on the websit
     .poll(() => hero.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
     .toBeGreaterThan(0);
 });
+
+test("hotels featured in the home page editor replace the sample section", async ({ page }) => {
+  await staffSignIn(page);
+  await page.goto("/admin/home-page");
+  await expectAccessible(page, "home page editor");
+  const add = page.getByLabel("Add hotel");
+  const option = add.locator("option").nth(1);
+  const label = (await option.textContent())!.split(" · ")[0]!.trim();
+  await add.selectOption({ index: 1 });
+  await page.getByRole("button", { name: "Save home page" }).click();
+  await expect(page.getByText("Home page saved.")).toBeVisible();
+
+  await page.goto("/");
+  const stays = page.locator("#stays");
+  await expect(stays.getByRole("link", { name: label })).toBeVisible();
+  await expect(stays.getByText("See rooms and prices").first()).toBeVisible();
+  await expect(stays.getByText(/Sample properties/)).toHaveCount(0);
+  await expectAccessible(page, "home with featured stays");
+});

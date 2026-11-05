@@ -47,7 +47,7 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Sales report and bookings CSV (occupancy is on the dashboard and room calendar).
 - ✅ Content pages (About, Terms, Privacy…) with admin editor.
 - ✅ Media library and main photos (ADR-0030, stored in MySQL; no server change needed).
-- ⬜ Homepage section editing.
+- ✅ Home page editor (ADR-0031).
 
 ## Phase 7 — Partner portals ✅
 

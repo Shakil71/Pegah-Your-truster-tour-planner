@@ -4,6 +4,14 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Home page editor (2026-11-05)
+
+- Console **Content → Home page**: hero slides from the media library with
+  bilingual captions, featured destinations, hotels and tours from the real
+  catalog (ordered), and bilingual promises (ADR-0031).
+- The website home page renders these from `GET /home`; empty sections keep
+  the built-in content.
+
 ### Added — Media library (2026-11-05)
 
 - Console **Media library**: upload (resized in the browser, re-encoded as

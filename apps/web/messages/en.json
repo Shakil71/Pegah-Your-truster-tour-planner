@@ -142,7 +142,10 @@
     "from": "from <b></b>",
     "sampleTours": "Sample tours and prices for design review",
     "promisesEyebrow": "How we plan",
-    "promisesTitle": "What you can <em>hold us</em> to"
+    "promisesTitle": "What you can <em>hold us</em> to",
+    "destCounts": "{stays, plural, one {# stay} other {# stays}} · {tours, plural, one {# tour} other {# tours}}",
+    "realStaysIntro": "Places our team has visited and listed. Open one to see live prices for your dates.",
+    "seeRooms": "See rooms and prices"
   },
   "seasons": {
     "eyebrow": "Six seasons, not four",

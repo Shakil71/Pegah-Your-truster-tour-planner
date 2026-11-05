@@ -4039,6 +4039,81 @@
         ],
         "tags": ["admin-media"]
       }
+    },
+    "/api/v1/admin/home": {
+      "get": {
+        "operationId": "AdminHomeController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminHomeSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-content"]
+      },
+      "put": {
+        "operationId": "AdminHomeController_save",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminHomeSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminHomeSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-content"]
+      }
+    },
+    "/api/v1/home": {
+      "get": {
+        "operationId": "PublicHomeController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicHomeDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["site"]
+      }
     }
   },
   "info": {
@@ -11592,6 +11667,289 @@
           }
         },
         "required": ["alt", "credit", "license"]
+      },
+      "AdminHomeSettingsDto_Output": {
+        "type": "object",
+        "properties": {
+          "slides": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "object",
+              "properties": {
+                "media": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{24}\\.webp$"
+                },
+                "placeEn": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                },
+                "placeBn": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                }
+              },
+              "required": ["media", "placeEn", "placeBn"],
+              "additionalProperties": false
+            }
+          },
+          "featuredDestinations": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "featuredHotels": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "featuredTours": {
+            "type": "array",
+            "maxItems": 6,
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "promises": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "properties": {
+                "titleEn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "titleBn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "bodyEn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                },
+                "bodyBn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                }
+              },
+              "required": ["titleEn", "titleBn", "bodyEn", "bodyBn"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "slides",
+          "featuredDestinations",
+          "featuredHotels",
+          "featuredTours",
+          "promises"
+        ],
+        "additionalProperties": false
+      },
+      "AdminHomeSettingsDto": {
+        "type": "object",
+        "properties": {
+          "slides": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "media": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{24}\\.webp$"
+                },
+                "placeEn": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                },
+                "placeBn": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                }
+              },
+              "required": ["media", "placeEn", "placeBn"]
+            }
+          },
+          "featuredDestinations": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "featuredHotels": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "featuredTours": {
+            "maxItems": 6,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "promises": {
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "titleEn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "titleBn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "bodyEn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                },
+                "bodyBn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                }
+              },
+              "required": ["titleEn", "titleBn", "bodyEn", "bodyBn"]
+            }
+          }
+        },
+        "required": [
+          "slides",
+          "featuredDestinations",
+          "featuredHotels",
+          "featuredTours",
+          "promises"
+        ]
+      },
+      "PublicHomeDto_Output": {
+        "type": "object",
+        "properties": {
+          "slides": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                },
+                "credit": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 255
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "placeEn": {
+                  "type": "string"
+                },
+                "placeBn": {
+                  "type": "string"
+                }
+              },
+              "required": ["url", "alt", "credit", "placeEn", "placeBn"],
+              "additionalProperties": false
+            }
+          },
+          "destinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DestinationSummary_Output"
+            }
+          },
+          "hotels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HotelSummary_Output"
+            }
+          },
+          "tours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TourSummary_Output"
+            }
+          },
+          "promises": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "titleEn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "titleBn": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 80
+                },
+                "bodyEn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                },
+                "bodyBn": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 240
+                }
+              },
+              "required": ["titleEn", "titleBn", "bodyEn", "bodyBn"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["slides", "destinations", "hotels", "tours", "promises"],
+        "additionalProperties": false
       }
     }
   }

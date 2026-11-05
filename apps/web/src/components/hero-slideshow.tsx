@@ -1,29 +1,44 @@
 "use client";
 
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { cx } from "@pegah/ui";
-import { heroSlides } from "@/data/home";
+import { heroSlides as defaultSlides } from "@/data/home";
 import { useContent } from "@/data/home.bn";
 import { usePrefersReducedMotion } from "@/lib/use-browser";
 
 const INTERVAL_MS = 6500;
 
 /** Full-bleed crossfading hero with stitch-line progress and a pause control (WCAG 2.2.2). */
-export function HeroSlideshow() {
+/** One slide: a bundled photo, or a media-library photo chosen in the console (ADR-0031). */
+export type HeroSlide = {
+  src: string | StaticImageData;
+  alt: string;
+  place: string;
+  credit: string | null;
+};
+
+export function HeroSlideshow({ slides: fromConsole }: { slides?: HeroSlide[] }) {
   const t = useTranslations("hero");
   const c = useContent();
+  const heroSlides: HeroSlide[] =
+    fromConsole && fromConsole.length > 0
+      ? fromConsole
+      : defaultSlides.map((s) => ({ src: s.src, alt: s.alt, place: c(s.place), credit: s.credit }));
   const [current, setCurrent] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
   const [userPaused, setUserPaused] = useState<boolean | null>(null);
   const paused = userPaused ?? reducedMotion;
   const [cycle, setCycle] = useState(0);
 
-  const go = useCallback((i: number) => {
-    setCurrent((i + heroSlides.length) % heroSlides.length);
-    setCycle((c) => c + 1);
-  }, []);
+  const go = useCallback(
+    (i: number) => {
+      setCurrent((i + heroSlides.length) % heroSlides.length);
+      setCycle((c) => c + 1);
+    },
+    [heroSlides.length],
+  );
 
   useEffect(() => {
     if (paused) return;
@@ -54,7 +69,7 @@ export function HeroSlideshow() {
             fill
             priority={i === 0}
             sizes="100vw"
-            placeholder="blur"
+            placeholder={typeof s.src === "string" ? "empty" : "blur"}
             className={cx("object-cover", i === current && "animate-drift")}
           />
         </div>
@@ -75,15 +90,15 @@ export function HeroSlideshow() {
 
       <div className="absolute inset-x-4 bottom-[60px] z-[2] grid justify-items-start gap-2.5 md:inset-x-auto md:right-[max(16px,env(safe-area-inset-right,0px))] md:bottom-[150px] md:justify-items-end md:text-right">
         <p className="font-display text-[1.35rem] italic" aria-live="polite">
-          {c(slide.place)}
+          {slide.place}
         </p>
-        <p className="text-[0.7rem] opacity-75">{slide.credit}</p>
+        {slide.credit && <p className="text-[0.7rem] opacity-75">{slide.credit}</p>}
         <div className="flex items-center gap-1.5" role="group" aria-label={t("choosePhoto")}>
           {heroSlides.map((s, i) => (
             <button
               key={s.place}
               type="button"
-              aria-label={t("show", { place: c(s.place) })}
+              aria-label={t("show", { place: s.place })}
               aria-current={i === current}
               onClick={() => go(i)}
               className="grid h-[18px] w-[34px] cursor-pointer items-center"
