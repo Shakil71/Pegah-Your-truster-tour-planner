@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — End-to-end and accessibility testing (2026-11-05)
+
+- Playwright suite in `e2e/` against the real stack and MySQL, with axe WCAG
+  2.1 AA scans and phone-width checks; new CI job, required for deploys.
+- Accessibility fixes: contrast (`--pg-thread-ink`, darker `--pg-ink-3`),
+  fixed colour tokens instead of raw hex, console account chip name,
+  keyboard-scrollable report tables.
+- Plain-English validation messages for all forms and API errors.
+
 ### Added — Phase 7: partner portals (2026-11-04)
 
 - Partners (suppliers and travel agents) with their own sign-in at `/partner`

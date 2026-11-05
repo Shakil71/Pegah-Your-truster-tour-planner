@@ -65,7 +65,7 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 
 - 🔶 HTTPS: self-signed on :8443 ready (owner runs `enable-https.sh`); trusted
   certificate needs a domain.
-- ⬜ Playwright end-to-end + axe accessibility checks in CI.
+- ✅ Playwright end-to-end + axe accessibility checks in CI (deploys require them).
 - ⬜ Worker process with Redis/Valkey (outbox, emails, distributed rate limits).
 - ⬜ Monitoring (Prometheus, Grafana, Loki) and restore drill for backups.
 - ⬜ Staging instance; remove demo data; Bangla localisation (next-intl).

@@ -41,3 +41,23 @@ process (job "Database integration (MySQL 8.4)"; no containers). Covered: the
 concurrent last-room race, idempotent replay and key reuse, price change,
 party validation, hold release on cancel and expiry, the CHECK constraint,
 the dashboard, staff-management rules and the audit log.
+
+## End-to-end and accessibility suite
+
+Playwright drives the real stack in Chromium: API (simulator payments, no
+email), website and console, built beforehand, on a freshly migrated
+`pegah_it_e2e` database with the demo catalog and a generated owner account.
+
+```bash
+npx turbo run build                       # with API_INTERNAL_URL=http://127.0.0.1:4000
+PEGAH_E2E_DATABASE_URL=mysql://user:pass@127.0.0.1:3307/ npm run e2e:prepare
+npm run e2e
+```
+
+Covered: public pages (desktop and phone width, no sideways scroll), customer
+hold → simulated payment → confirmed → voucher, failed payment stays
+unconfirmed, every main console page, and an agent booking for a client.
+Every page is scanned with axe (WCAG 2.0/2.1 A and AA); serious and critical
+findings fail the run and are fixed, never muted. The scan waits for entrance
+animations to settle. CI job: "End-to-end and accessibility (Playwright +
+axe)"; the server deploys only after it passes.

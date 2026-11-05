@@ -17,6 +17,8 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Cross-cutting: Playwright end-to-end + axe accessibility suite in CI.
+
 - Phase 7: partner portals: supplier inventory and reservations, agent
   booking with commission and statements, admin partner management (ADR-0026).
 
