@@ -11,7 +11,7 @@ import { PRISMA, type Db } from "../prisma/prisma.service";
 
 class HealthResponseDto extends createZodDto(HealthResponseSchema) {}
 
-const VERSION = process.env.npm_package_version ?? "0.1.0";
+export const VERSION = process.env.npm_package_version ?? "0.1.0";
 
 /** Written by infra/deploy/deploy.sh at the release root; absent locally. */
 function readBuildInfo(): { commit: string | null; builtAt: string | null } {
@@ -27,7 +27,7 @@ function readBuildInfo(): { commit: string | null; builtAt: string | null } {
     return { commit: null, builtAt: null };
   }
 }
-const BUILD = readBuildInfo();
+export const BUILD = readBuildInfo();
 
 /** Liveness (process is up) and readiness (dependencies reachable) probes. */
 @ApiTags("health")

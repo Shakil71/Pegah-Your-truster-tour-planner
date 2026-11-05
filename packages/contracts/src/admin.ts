@@ -161,3 +161,38 @@ export const AuditListResponseSchema = z.object({
   nextCursor: nullableText(),
 });
 export type AuditListResponse = z.infer<typeof AuditListResponseSchema>;
+
+/**
+ * Read-only system status for the console Settings page. Never contains
+ * secrets: only on/off states, modes, limits and build facts.
+ */
+export const SystemSettingsSchema = z.object({
+  environment: z.enum(["development", "test", "production"]),
+  version: z.string(),
+  commit: nullableText(64),
+  builtAt: nullableText(40),
+  database: z.enum(["up", "down"]),
+  payments: z.object({
+    provider: z.enum(["none", "sslcommerz", "simulator"]),
+    mode: z.enum(["sandbox", "live"]).nullable(),
+    liveApproved: z.boolean(),
+    credentialsSet: z.boolean(),
+    publicBaseUrl: nullableText(255),
+    holdExtensionMinutes: z.number().int(),
+  }),
+  email: z.object({
+    transport: z.enum(["none", "log", "smtp"]),
+    from: z.string(),
+    smtpHost: nullableText(200),
+    queued: z.number().int(),
+    failed: z.number().int(),
+  }),
+  booking: z.object({ holdMinutes: z.number().int(), holdSweepSeconds: z.number().int() }),
+  sessions: z.object({
+    customerTtlMinutes: z.number().int(),
+    customerIdleMinutes: z.number().int(),
+    staffTtlMinutes: z.number().int(),
+    staffIdleMinutes: z.number().int(),
+  }),
+});
+export type SystemSettings = z.infer<typeof SystemSettingsSchema>;

@@ -4,6 +4,13 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Console Settings page (2026-11-05)
+
+- `GET /admin/settings` (`settings:read`, owner and admin) and a read-only
+  Settings page: payment and email status (no secret values), queued and failed
+  emails, hold and session limits, build and database status.
+- Removed the last "coming soon" placeholder and stale sidebar copy.
+
 ### Added — End-to-end and accessibility testing (2026-11-05)
 
 - Playwright suite in `e2e/` against the real stack and MySQL, with axe WCAG

@@ -96,6 +96,15 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## System settings
+
+| Method | Path            | Permission    | Purpose                                                  |
+| ------ | --------------- | ------------- | -------------------------------------------------------- |
+| GET    | /admin/settings | settings:read | Payment, email, booking and session status; build facts. |
+
+Read-only and secret-free: it reports whether credentials are set, never
+their values. Configuration changes are made in the server environment files.
+
 ## Partner portals (ADR-0026)
 
 | Method   | Path                                    | Access          | Purpose                                  |

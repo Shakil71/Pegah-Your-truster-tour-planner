@@ -22,6 +22,7 @@ export const PERMISSIONS = {
   "report:read": "View and export sales reports",
   "content:manage": "Edit website content pages",
   "partner:manage": "Create suppliers and agents, their users and assignments (audited)",
+  "settings:read": "View system settings and integration status (no secrets)",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

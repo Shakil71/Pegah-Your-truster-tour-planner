@@ -30,7 +30,8 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   timeout: 60_000,
-  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
+  // In CI, "github" turns each failure into an annotation on the check run.
+  reporter: process.env.CI ? [["github"], ["list"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: BASE,
     trace: "retain-on-failure",

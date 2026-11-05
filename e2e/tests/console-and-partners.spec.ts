@@ -19,6 +19,7 @@ test("staff sign in and the main console pages are accessible", async ({ page })
     "/admin/promotions",
     "/admin/reports",
     "/admin/audit",
+    "/admin/settings",
   ]) {
     const res = await page.goto(path);
     expect(res?.status(), path).toBe(200);

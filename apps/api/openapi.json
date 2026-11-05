@@ -3509,6 +3509,30 @@
         ],
         "tags": ["admin-partners"]
       }
+    },
+    "/api/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettingsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSystemSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
     }
   },
   "info": {
@@ -3659,7 +3683,8 @@
                 "promotion:manage",
                 "report:read",
                 "content:manage",
-                "partner:manage"
+                "partner:manage",
+                "settings:read"
               ]
             }
           },
@@ -6098,7 +6123,8 @@
                 "promotion:manage",
                 "report:read",
                 "content:manage",
-                "partner:manage"
+                "partner:manage",
+                "settings:read"
               ]
             }
           },
@@ -9988,6 +10014,191 @@
           }
         },
         "required": ["hotelSlugs", "tourSlugs"]
+      },
+      "AdminSystemSettingsDto_Output": {
+        "type": "object",
+        "properties": {
+          "environment": {
+            "type": "string",
+            "enum": ["development", "test", "production"]
+          },
+          "version": {
+            "type": "string"
+          },
+          "commit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "builtAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "database": {
+            "type": "string",
+            "enum": ["up", "down"]
+          },
+          "payments": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": ["none", "sslcommerz", "simulator"]
+              },
+              "mode": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": ["sandbox", "live"]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "liveApproved": {
+                "type": "boolean"
+              },
+              "credentialsSet": {
+                "type": "boolean"
+              },
+              "publicBaseUrl": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 255
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "holdExtensionMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "provider",
+              "mode",
+              "liveApproved",
+              "credentialsSet",
+              "publicBaseUrl",
+              "holdExtensionMinutes"
+            ],
+            "additionalProperties": false
+          },
+          "email": {
+            "type": "object",
+            "properties": {
+              "transport": {
+                "type": "string",
+                "enum": ["none", "log", "smtp"]
+              },
+              "from": {
+                "type": "string"
+              },
+              "smtpHost": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "queued": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "failed": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["transport", "from", "smtpHost", "queued", "failed"],
+            "additionalProperties": false
+          },
+          "booking": {
+            "type": "object",
+            "properties": {
+              "holdMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "holdSweepSeconds": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["holdMinutes", "holdSweepSeconds"],
+            "additionalProperties": false
+          },
+          "sessions": {
+            "type": "object",
+            "properties": {
+              "customerTtlMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "customerIdleMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "staffTtlMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "staffIdleMinutes": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "customerTtlMinutes",
+              "customerIdleMinutes",
+              "staffTtlMinutes",
+              "staffIdleMinutes"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "environment",
+          "version",
+          "commit",
+          "builtAt",
+          "database",
+          "payments",
+          "email",
+          "booking",
+          "sessions"
+        ],
+        "additionalProperties": false
       }
     }
   }

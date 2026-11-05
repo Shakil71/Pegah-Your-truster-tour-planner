@@ -1268,6 +1268,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminSettingsController_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1314,6 +1330,7 @@ export interface components {
         | "report:read"
         | "content:manage"
         | "partner:manage"
+        | "settings:read"
       )[];
       partner: {
         id: string;
@@ -1921,6 +1938,7 @@ export interface components {
         | "report:read"
         | "content:manage"
         | "partner:manage"
+        | "settings:read"
       )[];
       memberCount: number;
     };
@@ -2765,6 +2783,42 @@ export interface components {
     AdminPartnerOwnershipDto: {
       hotelSlugs: string[];
       tourSlugs: string[];
+    };
+    AdminSystemSettingsDto_Output: {
+      /** @enum {string} */
+      environment: "development" | "test" | "production";
+      version: string;
+      commit: string | null;
+      builtAt: string | null;
+      /** @enum {string} */
+      database: "up" | "down";
+      payments: {
+        /** @enum {string} */
+        provider: "none" | "sslcommerz" | "simulator";
+        mode: ("sandbox" | "live") | null;
+        liveApproved: boolean;
+        credentialsSet: boolean;
+        publicBaseUrl: string | null;
+        holdExtensionMinutes: number;
+      };
+      email: {
+        /** @enum {string} */
+        transport: "none" | "log" | "smtp";
+        from: string;
+        smtpHost: string | null;
+        queued: number;
+        failed: number;
+      };
+      booking: {
+        holdMinutes: number;
+        holdSweepSeconds: number;
+      };
+      sessions: {
+        customerTtlMinutes: number;
+        customerIdleMinutes: number;
+        staffTtlMinutes: number;
+        staffIdleMinutes: number;
+      };
     };
   };
   responses: never;
@@ -4902,6 +4956,25 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSystemSettingsDto_Output"];
         };
       };
     };

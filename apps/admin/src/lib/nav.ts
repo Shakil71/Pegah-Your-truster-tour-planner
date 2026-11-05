@@ -4,12 +4,11 @@ export type NavItem = {
   href: string;
   label: string;
   icon: IconName;
-  phase?: string;
   /** Hidden for staff without this permission (the API enforces it regardless). */
   permission?: string;
 };
 
-/** Admin modules from PRODUCT_REQUIREMENTS §Admin. `phase` marks modules not built yet. */
+/** Admin modules from PRODUCT_REQUIREMENTS §Admin. */
 export const navGroups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "Overview",
@@ -71,9 +70,7 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { href: "/staff", label: "Staff and roles", icon: "key", permission: "user:manage" },
       { href: "/audit", label: "Audit log", icon: "log", permission: "audit:read" },
-      { href: "/settings", label: "Settings", icon: "settings", phase: "Phase 7" },
+      { href: "/settings", label: "Settings", icon: "settings", permission: "settings:read" },
     ],
   },
 ];
-
-export const plannedSections = navGroups.flatMap((g) => g.items).filter((i) => i.phase);

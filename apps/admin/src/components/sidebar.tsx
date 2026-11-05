@@ -66,11 +66,6 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
                         )}
                       />
                       <span className="flex-1">{item.label}</span>
-                      {item.phase ? (
-                        <span className="text-[0.6rem] font-semibold uppercase tracking-wider text-white/30">
-                          {item.phase.replace("Phase ", "P")}
-                        </span>
-                      ) : null}
                     </Link>
                   </li>
                 );
@@ -87,8 +82,16 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
           </span>
           Live API · pre-launch
         </p>
-        <p className="mt-1 text-white/60">
-          Real bookings and holds. Payments arrive in Phase 5, so nothing is confirmed yet.
+        <p className="mt-1 text-white/65">
+          Demo listings. Online payment stays off until the payment provider account is approved;{" "}
+          <Link
+            href="/settings"
+            onClick={onNavigate}
+            className="font-semibold text-white underline"
+          >
+            see Settings
+          </Link>
+          .
         </p>
         <p className="tabular mt-2 text-[0.72rem] text-white/65">
           Build {buildInfo.sha} · {buildInfo.builtAtLabel}

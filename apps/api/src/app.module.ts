@@ -1,3 +1,4 @@
+import { AdminSettingsController } from "./admin/settings.controller";
 import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
@@ -98,6 +99,7 @@ export class AppModule {
         PublicPagesController,
         PartnerPortalController,
         AdminPartnersController,
+        AdminSettingsController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
