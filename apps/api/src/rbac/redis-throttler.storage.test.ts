@@ -26,6 +26,8 @@ describe.skipIf(!REDIS_URL)("rate limits in a real Redis", () => {
 
   it("share one fixed window across instances and expire it", async () => {
     const other = new RedisThrottlerStorage(REDIS_URL!);
+    expect(await storage.ready()).toBe(true);
+    expect(await other.ready()).toBe(true);
     const key = randomUUID();
     const a = await storage.increment(key, 1000, 2, 1000, "default");
     const b = await other.increment(key, 1000, 2, 1000, "default");

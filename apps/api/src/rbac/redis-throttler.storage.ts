@@ -44,6 +44,18 @@ export class RedisThrottlerStorage implements ThrottlerStorage, OnApplicationShu
     this.redis.on("error", (error: Error) => this.warn(error));
   }
 
+  /** Resolves once connected (or after `ms`); used by tests and health checks. */
+  ready(ms = 3000): Promise<boolean> {
+    if (this.redis.status === "ready") return Promise.resolve(true);
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => resolve(false), ms);
+      this.redis.once("ready", () => {
+        clearTimeout(timer);
+        resolve(true);
+      });
+    });
+  }
+
   async increment(
     key: string,
     ttl: number,
