@@ -4,6 +4,16 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Console control (2026-11-05)
+
+- Settings page is now editable: contact details, announcement banner
+  (English and Bangla), hold and payment-extension minutes, SSLCOMMERZ and SMTP
+  with encrypted, write-only passwords and a test-email button (ADR-0029).
+- Customer account controls: disable/enable with a reason, sign out everywhere.
+- Website shows the banner and contact details from the console.
+- Migration `20261109090000_site_settings`; permissions `customer:manage`,
+  `settings:manage`, `settings:secrets`.
+
 ### Added — Bangla website (2026-11-05)
 
 - EN / বাংলা switch in the header; the whole customer website (home, search,

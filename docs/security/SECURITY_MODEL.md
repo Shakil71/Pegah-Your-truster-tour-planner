@@ -94,3 +94,14 @@ overrides, staff logins) write append-only `audit_events`.
   immediately; every partner and admin partner action is audited.
 - Commission is computed on the server at booking time and constrained by a
   database CHECK; partner input never sets it.
+
+## Console credentials (ADR-0029)
+
+- Payment and SMTP passwords entered in the console are sealed with
+  AES-256-GCM under SETTINGS_ENCRYPTION_KEY, which lives only in api.env
+  (0600) and never in the database or its backups. A database dump alone
+  reveals nothing.
+- They are write-only: no API returns them, the console shows only "saved",
+  and audit entries record that a section changed, not its secrets.
+- Only the owner role holds settings:secrets. Disabling a customer requires a
+  reason, ends their sessions immediately and is audited.

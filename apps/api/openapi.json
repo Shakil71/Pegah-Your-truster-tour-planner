@@ -2113,6 +2113,80 @@
           }
         ],
         "tags": ["admin-catalog"]
+      },
+      "patch": {
+        "operationId": "CatalogAdminController_customerStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCustomerStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-catalog"]
+      }
+    },
+    "/api/v1/admin/customers/{id}/sign-out": {
+      "post": {
+        "operationId": "CatalogAdminController_customerSignOut",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomerSignOutDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-catalog"]
       }
     },
     "/api/v1/me/profile": {
@@ -3533,6 +3607,243 @@
         ],
         "tags": ["admin"]
       }
+    },
+    "/api/v1/admin/settings/site": {
+      "get": {
+        "operationId": "AdminSettingsController_site",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/general": {
+      "put": {
+        "operationId": "AdminSettingsController_general",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminGeneralSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/announcement": {
+      "put": {
+        "operationId": "AdminSettingsController_announcement",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminAnnouncementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/booking": {
+      "put": {
+        "operationId": "AdminSettingsController_booking",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminBookingSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/payments": {
+      "put": {
+        "operationId": "AdminSettingsController_payments",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPaymentSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/email": {
+      "put": {
+        "operationId": "AdminSettingsController_emailSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminEmailSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/settings/email/test": {
+      "post": {
+        "operationId": "AdminSettingsController_emailTest",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEmailTestDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/site": {
+      "get": {
+        "operationId": "PublicSiteController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicSiteDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["site"]
+      }
     }
   },
   "info": {
@@ -3676,6 +3987,7 @@
                 "catalog:manage",
                 "inventory:manage",
                 "customer:read",
+                "customer:manage",
                 "payment:read",
                 "refund:approve",
                 "user:manage",
@@ -3684,7 +3996,9 @@
                 "report:read",
                 "content:manage",
                 "partner:manage",
-                "settings:read"
+                "settings:read",
+                "settings:manage",
+                "settings:secrets"
               ]
             }
           },
@@ -6116,6 +6430,7 @@
                 "catalog:manage",
                 "inventory:manage",
                 "customer:read",
+                "customer:manage",
                 "payment:read",
                 "refund:approve",
                 "user:manage",
@@ -6124,7 +6439,9 @@
                 "report:read",
                 "content:manage",
                 "partner:manage",
-                "settings:read"
+                "settings:read",
+                "settings:manage",
+                "settings:secrets"
               ]
             }
           },
@@ -8292,6 +8609,32 @@
         ],
         "additionalProperties": false
       },
+      "AdminCustomerStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "DISABLED"]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "required": ["status"]
+      },
+      "AdminCustomerSignOutDto_Output": {
+        "type": "object",
+        "properties": {
+          "sessionsEnded": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["sessionsEnded"],
+        "additionalProperties": false
+      },
       "ProfileDto_Output": {
         "type": "object",
         "properties": {
@@ -10198,6 +10541,433 @@
           "booking",
           "sessions"
         ],
+        "additionalProperties": false
+      },
+      "AdminSiteSettingsDto_Output": {
+        "type": "object",
+        "properties": {
+          "general": {
+            "type": "object",
+            "properties": {
+              "supportPhone": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "supportEmail": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              },
+              "whatsapp": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "officeAddress": {
+                "type": "string",
+                "maxLength": 300
+              }
+            },
+            "required": ["supportPhone", "supportEmail", "whatsapp", "officeAddress"],
+            "additionalProperties": false
+          },
+          "announcement": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "tone": {
+                "type": "string",
+                "enum": ["info", "warning"]
+              },
+              "textEn": {
+                "type": "string",
+                "maxLength": 240
+              },
+              "textBn": {
+                "type": "string",
+                "maxLength": 240
+              },
+              "linkHref": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^(\\/[\\w\\-./?=&#%]*|https:\\/\\/\\S+)$"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              }
+            },
+            "required": ["enabled", "tone", "textEn", "textBn", "linkHref"],
+            "additionalProperties": false
+          },
+          "booking": {
+            "type": "object",
+            "properties": {
+              "holdMinutes": {
+                "type": "integer",
+                "minimum": 5,
+                "maximum": 60
+              },
+              "paymentExtensionMinutes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 60
+              }
+            },
+            "required": ["holdMinutes", "paymentExtensionMinutes"],
+            "additionalProperties": false
+          },
+          "payments": {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": ["none", "sslcommerz", "simulator"]
+              },
+              "mode": {
+                "type": "string",
+                "enum": ["sandbox", "live"]
+              },
+              "liveApproved": {
+                "type": "boolean"
+              },
+              "storeId": {
+                "type": "string"
+              },
+              "storePasswordSet": {
+                "type": "boolean"
+              },
+              "source": {
+                "type": "string",
+                "enum": ["console", "server"]
+              }
+            },
+            "required": [
+              "provider",
+              "mode",
+              "liveApproved",
+              "storeId",
+              "storePasswordSet",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "email": {
+            "type": "object",
+            "properties": {
+              "transport": {
+                "type": "string",
+                "enum": ["none", "log", "smtp"]
+              },
+              "from": {
+                "type": "string"
+              },
+              "smtpHost": {
+                "type": "string"
+              },
+              "smtpPort": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "smtpSecure": {
+                "type": "boolean"
+              },
+              "smtpUser": {
+                "type": "string"
+              },
+              "smtpPasswordSet": {
+                "type": "boolean"
+              },
+              "source": {
+                "type": "string",
+                "enum": ["console", "server"]
+              }
+            },
+            "required": [
+              "transport",
+              "from",
+              "smtpHost",
+              "smtpPort",
+              "smtpSecure",
+              "smtpUser",
+              "smtpPasswordSet",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "encryptionReady": {
+            "type": "boolean"
+          },
+          "publicBaseUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "general",
+          "announcement",
+          "booking",
+          "payments",
+          "email",
+          "encryptionReady",
+          "publicBaseUrl"
+        ],
+        "additionalProperties": false
+      },
+      "AdminGeneralSettingsDto": {
+        "type": "object",
+        "properties": {
+          "supportPhone": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "supportEmail": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          },
+          "whatsapp": {
+            "type": "string",
+            "maxLength": 20
+          },
+          "officeAddress": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "required": ["supportPhone", "supportEmail", "whatsapp", "officeAddress"]
+      },
+      "AdminAnnouncementDto": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "tone": {
+            "type": "string",
+            "enum": ["info", "warning"]
+          },
+          "textEn": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "textBn": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "linkHref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(\\/[\\w\\-./?=&#%]*|https:\\/\\/\\S+)$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          }
+        },
+        "required": ["enabled", "tone", "textEn", "textBn", "linkHref"]
+      },
+      "AdminBookingSettingsDto": {
+        "type": "object",
+        "properties": {
+          "holdMinutes": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 60
+          },
+          "paymentExtensionMinutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60
+          }
+        },
+        "required": ["holdMinutes", "paymentExtensionMinutes"]
+      },
+      "AdminPaymentSettingsDto": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": ["none", "sslcommerz"]
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["sandbox", "live"]
+          },
+          "liveApproved": {
+            "type": "boolean"
+          },
+          "storeId": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "storePassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["provider", "mode", "liveApproved", "storeId"]
+      },
+      "AdminEmailSettingsDto": {
+        "type": "object",
+        "properties": {
+          "transport": {
+            "type": "string",
+            "enum": ["none", "smtp"]
+          },
+          "from": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200
+          },
+          "smtpHost": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "smtpPort": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "smtpSecure": {
+            "type": "boolean"
+          },
+          "smtpUser": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "smtpPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": ["transport", "from", "smtpHost", "smtpPort", "smtpSecure", "smtpUser"]
+      },
+      "AdminEmailTestDto_Output": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["SENT", "SKIPPED", "FAILED"]
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "to"],
+        "additionalProperties": false
+      },
+      "PublicSiteDto_Output": {
+        "type": "object",
+        "properties": {
+          "general": {
+            "type": "object",
+            "properties": {
+              "supportPhone": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "supportEmail": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              },
+              "whatsapp": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "officeAddress": {
+                "type": "string",
+                "maxLength": 300
+              }
+            },
+            "required": ["supportPhone", "supportEmail", "whatsapp", "officeAddress"],
+            "additionalProperties": false
+          },
+          "announcement": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "tone": {
+                    "type": "string",
+                    "enum": ["info", "warning"]
+                  },
+                  "textEn": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "textBn": {
+                    "type": "string",
+                    "maxLength": 240
+                  },
+                  "linkHref": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^(\\/[\\w\\-./?=&#%]*|https:\\/\\/\\S+)$"
+                      },
+                      {
+                        "type": "string",
+                        "const": ""
+                      }
+                    ]
+                  }
+                },
+                "required": ["enabled", "tone", "textEn", "textBn", "linkHref"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["general", "announcement"],
         "additionalProperties": false
       }
     }

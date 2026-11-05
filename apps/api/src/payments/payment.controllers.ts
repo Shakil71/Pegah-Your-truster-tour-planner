@@ -29,7 +29,8 @@ import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { PaymentService, type CallbackResult } from "./payment.service";
-import { PAYMENT_PROVIDER, formatDecimal, type PaymentProvider } from "./provider";
+import { IntegrationSettings } from "../settings/integration-settings.service";
+import { formatDecimal } from "./provider";
 import { SimulatorProvider } from "./simulator.provider";
 
 class PaymentSessionResponseDto extends createZodDto(PaymentSessionResponseSchema) {}
@@ -124,14 +125,14 @@ export class PaymentCallbacksController {
 @Controller("payments/simulator")
 export class SimulatorController {
   constructor(
-    @Inject(PAYMENT_PROVIDER) private readonly provider: PaymentProvider | null,
+    @Inject(IntegrationSettings) private readonly integrations: IntegrationSettings,
     @Inject(PaymentService) private readonly payments: PaymentService,
     @Inject(PRISMA) private readonly db: Db,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   private sim(tranId: string): SimulatorProvider {
-    const p = this.provider;
+    const p = this.integrations.paymentProvider();
     if (
       !(p instanceof SimulatorProvider) ||
       !PublicIdSchema.safeParse(tranId).success ||

@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   "catalog:manage": "Create and edit destinations, hotels, rooms and tours",
   "inventory:manage": "Edit room inventory, rates and tour capacity",
   "customer:read": "View customer profiles",
+  "customer:manage": "Disable or enable customer accounts and sign them out (audited)",
   "payment:read": "View payments and payment events",
   "refund:approve": "Approve or reject refunds (audited)",
   "user:manage": "Create staff users and assign roles (audited)",
@@ -23,6 +24,8 @@ export const PERMISSIONS = {
   "content:manage": "Edit website content pages",
   "partner:manage": "Create suppliers and agents, their users and assignments (audited)",
   "settings:read": "View system settings and integration status (no secrets)",
+  "settings:manage": "Edit contact details, the announcement banner and booking times (audited)",
+  "settings:secrets": "Configure payment and email credentials (owner; audited)",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

@@ -91,3 +91,29 @@ test("an agent created in the console books for a client", async ({ page, browse
   await expectAccessible(agent, "agent statement");
   await agentContext.close();
 });
+
+test("an announcement saved in the console appears on the website in both languages", async ({
+  page,
+  browser,
+}) => {
+  await staffSignIn(page);
+  await page.goto("/admin/settings");
+  await page.getByLabel("Show the banner on the website").check();
+  await page.getByLabel("Message in English").fill("Eid holiday offers are live");
+  await page.getByLabel("Message in Bangla").fill("ঈদের ছুটির অফার চলছে");
+  await page.getByRole("button", { name: "Save banner" }).click();
+  await expect(page.getByText(/Saved\. It applies/).first()).toBeVisible();
+
+  const visitor = await browser.newContext();
+  const site = await visitor.newPage();
+  await site.goto("/stays?where=srimangal");
+  await expect(site.getByText("Eid holiday offers are live")).toBeVisible();
+  await site.getByRole("button", { name: "বাংলা" }).first().click();
+  await expect(site.getByText("ঈদের ছুটির অফার চলছে")).toBeVisible();
+  await visitor.close();
+
+  // Turn it off again so other tests see a clean site.
+  await page.getByLabel("Show the banner on the website").uncheck();
+  await page.getByRole("button", { name: "Save banner" }).click();
+  await expect(page.getByText(/Saved\. It applies/).first()).toBeVisible();
+});

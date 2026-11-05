@@ -6,8 +6,8 @@ import { newBookingReference, newPublicId } from "../common/ids";
 import { ProblemException } from "../common/problem";
 import { parseStay } from "../common/stay-dates";
 import { dhakaToday, formatCalendarDate, stayNights } from "../common/time";
-import { APP_CONFIG, type AppConfig } from "../config/config";
 import { applyBps, priceWithDiscount } from "../pricing/pricing";
+import { IntegrationSettings } from "../settings/integration-settings.service";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { PromotionService } from "../promotions/promotion.service";
 import { assertTransition } from "./booking-state-machine";
@@ -74,8 +74,8 @@ export class BookingCreateService {
   constructor(
     @Inject(PRISMA) private readonly db: Db,
     @Inject(AuditService) private readonly audit: AuditService,
-    @Inject(APP_CONFIG) private readonly config: AppConfig,
     @Inject(PromotionService) private readonly promotions: PromotionService,
+    @Inject(IntegrationSettings) private readonly integrations: IntegrationSettings,
   ) {}
 
   /** Returns the new booking's public id. */
@@ -102,7 +102,7 @@ export class BookingCreateService {
   }
 
   private holdUntil(now: Date): Date {
-    return new Date(now.getTime() + this.config.BOOKING_HOLD_MINUTES * 60_000);
+    return new Date(now.getTime() + this.integrations.holdMinutes() * 60_000);
   }
 
   private async createHotel(

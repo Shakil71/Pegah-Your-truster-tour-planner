@@ -6,6 +6,7 @@ import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
 import { requireStaff, serverApi } from "@/lib/api-server";
 import { dhakaDateTime, money } from "@/lib/format";
+import { AccountControls } from "./account-controls";
 
 export const metadata: Metadata = { title: "Customer" };
 
@@ -70,6 +71,9 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
           </div>
         ))}
       </div>
+      {session.user.permissions.includes("customer:manage") && (
+        <AccountControls customerId={c.id} status={c.status} csrfToken={session.csrfToken} />
+      )}
       <section className="panel overflow-hidden" aria-labelledby="cust-bookings-h">
         <div className="flex items-center justify-between px-5 pt-5 md:px-6">
           <h2 id="cust-bookings-h" className="text-[0.95rem] font-semibold">

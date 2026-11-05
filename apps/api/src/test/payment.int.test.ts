@@ -4,7 +4,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { HoldExpiryService } from "../booking/hold-expiry.service";
-import { PAYMENT_PROVIDER } from "../payments/provider";
+import { IntegrationSettings } from "../settings/integration-settings.service";
 import type { SimulatorProvider } from "../payments/simulator.provider";
 import { addDays, dhakaToday, formatCalendarDate } from "../common/time";
 import { ADMIN_URL, createHarness, type Harness, type Session } from "./int-harness";
@@ -69,7 +69,7 @@ describe.skipIf(!ADMIN_URL)("payments against MySQL 8.4 (simulator provider)", (
       PUBLIC_BASE_URL: "http://localhost:3000",
       PAYMENT_HOLD_EXTENSION_MINUTES: "20",
     });
-    sim = h.app.get<SimulatorProvider>(PAYMENT_PROVIDER);
+    sim = h.app.get(IntegrationSettings).paymentProvider() as SimulatorProvider;
     alice = await h.register("alice@example.com");
   }, 120_000);
 

@@ -12,3 +12,4 @@ export * from "./admin-catalog";
 export * from "./account";
 export * from "./growth";
 export * from "./partner";
+export * from "./settings";

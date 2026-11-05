@@ -3,7 +3,7 @@ import type { AdminBookingListQuery, BookingDetail, BookingSummary } from "@pega
 import type { Prisma } from "@pegah/db";
 import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
-import { APP_CONFIG, type AppConfig } from "../config/config";
+import { IntegrationSettings } from "../settings/integration-settings.service";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { allowedTransitions, type BookingActor } from "./booking-state-machine";
 import { decodeCursor, encodeCursor, toBookingSummary } from "./booking.mappers";
@@ -18,7 +18,7 @@ export interface BookingPage {
 export class BookingQueryService {
   constructor(
     @Inject(PRISMA) private readonly db: Db,
-    @Inject(APP_CONFIG) private readonly config: AppConfig,
+    @Inject(IntegrationSettings) private readonly integrations: IntegrationSettings,
   ) {}
 
   /** Staff listing. Callers must hold booking:read (checked by the guard). */
@@ -129,7 +129,7 @@ export class BookingQueryService {
         succeededAt: p.succeededAt?.toISOString() ?? null,
       })),
       canPay:
-        this.config.PAYMENT_PROVIDER !== "none" &&
+        this.integrations.paymentProvider() !== null &&
         booking.status === "PENDING_PAYMENT" &&
         booking.holdExpiresAt !== null &&
         booking.holdExpiresAt.getTime() - Date.now() > 60_000,

@@ -1,6 +1,5 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { createTransport, type Transporter } from "nodemailer";
-import { APP_CONFIG, type AppConfig } from "../config/config";
+import { IntegrationSettings } from "../settings/integration-settings.service";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import type { RenderedEmail } from "./templates";
 
@@ -13,7 +12,8 @@ export interface OutgoingEmail extends RenderedEmail {
 /**
  * Sends transactional email and records every attempt in `email_messages`
  * (recipient, template, subject, outcome — never the body, which may carry a
- * reset link). Transport is chosen by EMAIL_TRANSPORT:
+ * reset link). The transport comes from the console settings, or api.env
+ * until they are saved (ADR-0029):
  *  - none: recorded as SKIPPED (default until SMTP credentials exist);
  *  - log:  recipient and subject written to the log (development);
  *  - smtp: sent with STARTTLS or implicit TLS; plain-text SMTP is refused.
@@ -21,29 +21,14 @@ export interface OutgoingEmail extends RenderedEmail {
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger("Email");
-  private readonly transporter: Transporter | null;
 
   constructor(
     @Inject(PRISMA) private readonly db: Db,
-    @Inject(APP_CONFIG) private readonly config: AppConfig,
-  ) {
-    this.transporter =
-      config.EMAIL_TRANSPORT === "smtp"
-        ? createTransport({
-            host: config.SMTP_HOST,
-            port: config.SMTP_PORT,
-            secure: config.SMTP_SECURE,
-            requireTLS: !config.SMTP_SECURE,
-            auth: { user: config.SMTP_USER, pass: config.SMTP_PASSWORD },
-            connectionTimeout: 10_000,
-            greetingTimeout: 10_000,
-            socketTimeout: 20_000,
-          })
-        : null;
-  }
+    @Inject(IntegrationSettings) private readonly integrations: IntegrationSettings,
+  ) {}
 
   get enabled(): boolean {
-    return this.config.EMAIL_TRANSPORT !== "none";
+    return this.integrations.emailChannel().transport !== "none";
   }
 
   /** Sends one message; never throws (the caller's business action already succeeded). */
@@ -71,11 +56,12 @@ export class EmailService {
         },
       });
 
-    if (this.config.EMAIL_TRANSPORT === "none") {
+    const channel = this.integrations.emailChannel();
+    if (channel.transport === "none") {
       await finish("SKIPPED");
       return "SKIPPED";
     }
-    if (this.config.EMAIL_TRANSPORT === "log") {
+    if (channel.transport === "log") {
       this.logger.log(
         { to: msg.to, template: msg.template, subject: msg.subject },
         "Email (log transport)",
@@ -83,9 +69,13 @@ export class EmailService {
       await finish("SENT", { providerId: "log" });
       return "SENT";
     }
+    if (!channel.transporter) {
+      await finish("FAILED", { error: "SMTP is selected but not fully configured" });
+      return "FAILED";
+    }
     try {
-      const info = await this.transporter!.sendMail({
-        from: this.config.EMAIL_FROM,
+      const info = await channel.transporter.sendMail({
+        from: channel.from,
         to: msg.to,
         subject: msg.subject,
         text: msg.text,

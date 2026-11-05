@@ -4,8 +4,6 @@
  * Adding a provider = implementing this interface + one config value.
  */
 
-export const PAYMENT_PROVIDER = Symbol("PAYMENT_PROVIDER");
-
 export type ProviderMode = "sandbox" | "live" | "simulator";
 
 export interface SessionRequest {

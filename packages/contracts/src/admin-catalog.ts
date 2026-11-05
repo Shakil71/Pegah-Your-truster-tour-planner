@@ -316,3 +316,13 @@ export const CustomerDetailSchema = AdminCustomerSchema.extend({
   bookings: z.array(BookingSummarySchema),
 });
 export type CustomerDetail = z.infer<typeof CustomerDetailSchema>;
+
+/** Disable or re-enable a customer account. Disabling signs them out everywhere. */
+export const CustomerStatusUpdateSchema = z.object({
+  status: z.enum(["ACTIVE", "DISABLED"]),
+  /** Why, for the audit log (required when disabling). */
+  reason: z.string().trim().max(300).optional(),
+});
+export type CustomerStatusUpdate = z.infer<typeof CustomerStatusUpdateSchema>;
+
+export const CustomerSignOutResultSchema = z.object({ sessionsEnded: z.number().int() });

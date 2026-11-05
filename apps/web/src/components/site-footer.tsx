@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Logo } from "@pegah/ui";
 import { photoCredits } from "@/data/home";
+import { serverApi } from "@/lib/api-server";
 import { buildInfo } from "@/lib/build-info";
 
 const columns: { title: string; links: { key: string; href: string | null }[] }[] = [
@@ -38,6 +39,8 @@ const columns: { title: string; links: { key: string; href: string | null }[] }[
 
 export async function SiteFooter() {
   const t = await getTranslations("footer");
+  const api = await serverApi();
+  const contact = (await api.GET("/api/v1/site")).data?.general;
   return (
     <footer className="bg-night px-[max(16px,env(safe-area-inset-left,0px))] pb-8 pt-[72px] text-on-night">
       <div className="mx-auto max-w-[1280px]">
@@ -45,6 +48,21 @@ export async function SiteFooter() {
           <div className="col-span-2 md:col-span-1">
             <Logo className="text-[2.4rem]" />
             <p className="mt-3.5 max-w-[34ch] opacity-80">{t("tagline")}</p>
+            {contact && (contact.supportPhone || contact.supportEmail) && (
+              <address className="mt-4 grid gap-1 text-[0.92rem] not-italic opacity-90">
+                {contact.supportPhone && (
+                  <a href={`tel:${contact.supportPhone}`} className="tabular hover:underline">
+                    {contact.supportPhone}
+                  </a>
+                )}
+                {contact.supportEmail && (
+                  <a href={`mailto:${contact.supportEmail}`} className="hover:underline">
+                    {contact.supportEmail}
+                  </a>
+                )}
+                {contact.officeAddress && <span>{contact.officeAddress}</span>}
+              </address>
+            )}
             <ul className="mt-4 flex flex-wrap gap-2" aria-label={t("paymentMethodsLabel")}>
               {["Visa", "Mastercard", "bKash", "Nagad"].map((p) => (
                 <li

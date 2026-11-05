@@ -96,6 +96,21 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Console control (ADR-0029)
+
+| Method | Path                           | Permission       | Purpose                                 |
+| ------ | ------------------------------ | ---------------- | --------------------------------------- |
+| GET    | /admin/settings/site           | settings:read    | Editable settings (secrets only as set) |
+| PUT    | /admin/settings/general        | settings:manage  | Contact details                         |
+| PUT    | /admin/settings/announcement   | settings:manage  | Banner in English and Bangla            |
+| PUT    | /admin/settings/booking        | settings:manage  | Hold and payment-extension minutes      |
+| PUT    | /admin/settings/payments       | settings:secrets | SSLCOMMERZ (password write-only)        |
+| PUT    | /admin/settings/email          | settings:secrets | SMTP (password write-only)              |
+| POST   | /admin/settings/email/test     | settings:secrets | Test email to the signed-in owner       |
+| PATCH  | /admin/customers/{id}          | customer:manage  | Disable (reason required) or enable     |
+| POST   | /admin/customers/{id}/sign-out | customer:manage  | End every session of the customer       |
+| GET    | /site                          | public           | Contact details and active banner       |
+
 ## System settings
 
 | Method | Path            | Permission    | Purpose                                                  |

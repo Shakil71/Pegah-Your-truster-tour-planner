@@ -1,15 +1,97 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { CustomerDetail, CustomerList, CustomerListQuery } from "@pegah/contracts";
+import type {
+  CustomerDetail,
+  CustomerList,
+  CustomerListQuery,
+  CustomerStatusUpdate,
+} from "@pegah/contracts";
+import { AuditService } from "../audit/audit.service";
+import type { AuthContext } from "../auth/auth.types";
 import type { Prisma } from "@pegah/db";
 import { decodeCursor, encodeCursor, toBookingSummary } from "../booking/booking.mappers";
 import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 
-/** Read-only customer views for support and operations (customer:read). */
+/** Customer views (customer:read) and account controls (customer:manage, audited). */
 @Injectable()
 export class CustomerAdminService {
-  constructor(@Inject(PRISMA) private readonly db: Db) {}
+  constructor(
+    @Inject(PRISMA) private readonly db: Db,
+    @Inject(AuditService) private readonly audit: AuditService,
+  ) {}
+
+  private async customerId(publicId: string): Promise<bigint> {
+    const u = await this.db.user.findFirst({
+      where: { publicId, kind: "CUSTOMER" },
+      select: { id: true },
+    });
+    if (!u) throw new ProblemException(404, "customer-not-found", "Customer not found");
+    return u.id;
+  }
+
+  /** Disables (and signs out) or re-enables a customer. Bookings are untouched. */
+  async setStatus(
+    publicId: string,
+    input: CustomerStatusUpdate,
+    actor: AuthContext,
+    ip: string | null,
+  ): Promise<CustomerDetail> {
+    if (input.status === "DISABLED" && !input.reason) {
+      throw new ProblemException(422, "reason-required", "Give a reason for disabling the account");
+    }
+    const id = await this.customerId(publicId);
+    await this.db.$transaction(async (tx) => {
+      await tx.user.update({ where: { id }, data: { status: input.status } });
+      if (input.status === "DISABLED") {
+        await tx.session.updateMany({
+          where: { userId: id, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+      }
+      await this.audit.record(
+        {
+          actorType: "STAFF",
+          actorUserId: actor.user.id,
+          action: input.status === "DISABLED" ? "customer.disabled" : "customer.enabled",
+          targetType: "user",
+          targetId: publicId,
+          ipAddress: ip,
+          metadata: input.reason ? { reason: input.reason } : {},
+        },
+        tx,
+      );
+    });
+    return this.detail(publicId);
+  }
+
+  /** Ends every session of the customer (lost phone, shared computer). */
+  async signOutEverywhere(
+    publicId: string,
+    actor: AuthContext,
+    ip: string | null,
+  ): Promise<{ sessionsEnded: number }> {
+    const id = await this.customerId(publicId);
+    return this.db.$transaction(async (tx) => {
+      const { count } = await tx.session.updateMany({
+        where: { userId: id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+      await this.audit.record(
+        {
+          actorType: "STAFF",
+          actorUserId: actor.user.id,
+          action: "customer.signed_out",
+          targetType: "user",
+          targetId: publicId,
+          ipAddress: ip,
+          metadata: { sessionsEnded: count },
+        },
+        tx,
+      );
+      return { sessionsEnded: count };
+    });
+  }
 
   async list(q: CustomerListQuery): Promise<CustomerList> {
     const where: Prisma.UserWhereInput = { kind: "CUSTOMER" };

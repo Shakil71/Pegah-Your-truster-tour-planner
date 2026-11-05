@@ -785,6 +785,22 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    patch: operations["CatalogAdminController_customerStatus"];
+    trace?: never;
+  };
+  "/api/v1/admin/customers/{id}/sign-out": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["CatalogAdminController_customerSignOut"];
+    delete?: never;
+    options?: never;
+    head?: never;
     patch?: never;
     trace?: never;
   };
@@ -1284,6 +1300,134 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/settings/site": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminSettingsController_site"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/general": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_general"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/announcement": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_announcement"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/booking": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_booking"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/payments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_payments"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/email": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_emailSettings"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/settings/email/test": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminSettingsController_emailTest"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/site": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicSiteController_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1322,6 +1466,7 @@ export interface components {
         | "catalog:manage"
         | "inventory:manage"
         | "customer:read"
+        | "customer:manage"
         | "payment:read"
         | "refund:approve"
         | "user:manage"
@@ -1331,6 +1476,8 @@ export interface components {
         | "content:manage"
         | "partner:manage"
         | "settings:read"
+        | "settings:manage"
+        | "settings:secrets"
       )[];
       partner: {
         id: string;
@@ -1930,6 +2077,7 @@ export interface components {
         | "catalog:manage"
         | "inventory:manage"
         | "customer:read"
+        | "customer:manage"
         | "payment:read"
         | "refund:approve"
         | "user:manage"
@@ -1939,6 +2087,8 @@ export interface components {
         | "content:manage"
         | "partner:manage"
         | "settings:read"
+        | "settings:manage"
+        | "settings:secrets"
       )[];
       memberCount: number;
     };
@@ -2353,6 +2503,14 @@ export interface components {
       createdAt: string;
       lifetimeValue: components["schemas"]["Money_Output"];
       bookings: components["schemas"]["BookingSummary_Output"][];
+    };
+    AdminCustomerStatusDto: {
+      /** @enum {string} */
+      status: "ACTIVE" | "DISABLED";
+      reason?: string;
+    };
+    AdminCustomerSignOutDto_Output: {
+      sessionsEnded: number;
     };
     ProfileDto_Output: {
       id: string;
@@ -2819,6 +2977,109 @@ export interface components {
         staffTtlMinutes: number;
         staffIdleMinutes: number;
       };
+    };
+    AdminSiteSettingsDto_Output: {
+      general: {
+        supportPhone: string;
+        supportEmail: string | "";
+        whatsapp: string;
+        officeAddress: string;
+      };
+      announcement: {
+        enabled: boolean;
+        /** @enum {string} */
+        tone: "info" | "warning";
+        textEn: string;
+        textBn: string;
+        linkHref: string | "";
+      };
+      booking: {
+        holdMinutes: number;
+        paymentExtensionMinutes: number;
+      };
+      payments: {
+        /** @enum {string} */
+        provider: "none" | "sslcommerz" | "simulator";
+        /** @enum {string} */
+        mode: "sandbox" | "live";
+        liveApproved: boolean;
+        storeId: string;
+        storePasswordSet: boolean;
+        /** @enum {string} */
+        source: "console" | "server";
+      };
+      email: {
+        /** @enum {string} */
+        transport: "none" | "log" | "smtp";
+        from: string;
+        smtpHost: string;
+        smtpPort: number;
+        smtpSecure: boolean;
+        smtpUser: string;
+        smtpPasswordSet: boolean;
+        /** @enum {string} */
+        source: "console" | "server";
+      };
+      encryptionReady: boolean;
+      publicBaseUrl: string | null;
+    };
+    AdminGeneralSettingsDto: {
+      supportPhone: string;
+      supportEmail: string | "";
+      whatsapp: string;
+      officeAddress: string;
+    };
+    AdminAnnouncementDto: {
+      enabled: boolean;
+      /** @enum {string} */
+      tone: "info" | "warning";
+      textEn: string;
+      textBn: string;
+      linkHref: string | "";
+    };
+    AdminBookingSettingsDto: {
+      holdMinutes: number;
+      paymentExtensionMinutes: number;
+    };
+    AdminPaymentSettingsDto: {
+      /** @enum {string} */
+      provider: "none" | "sslcommerz";
+      /** @enum {string} */
+      mode: "sandbox" | "live";
+      liveApproved: boolean;
+      storeId: string;
+      storePassword?: string;
+    };
+    AdminEmailSettingsDto: {
+      /** @enum {string} */
+      transport: "none" | "smtp";
+      from: string;
+      smtpHost: string;
+      smtpPort: number;
+      smtpSecure: boolean;
+      smtpUser: string;
+      smtpPassword?: string;
+    };
+    AdminEmailTestDto_Output: {
+      /** @enum {string} */
+      status: "SENT" | "SKIPPED" | "FAILED";
+      to: string;
+    };
+    PublicSiteDto_Output: {
+      general: {
+        supportPhone: string;
+        supportEmail: string | "";
+        whatsapp: string;
+        officeAddress: string;
+      };
+      announcement: {
+        enabled: boolean;
+        /** @enum {string} */
+        tone: "info" | "warning";
+        textEn: string;
+        textBn: string;
+        linkHref: string | "";
+      } | null;
     };
   };
   responses: never;
@@ -4087,6 +4348,52 @@ export interface operations {
       };
     };
   };
+  CatalogAdminController_customerStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCustomerStatusDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminCustomerDetailDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_customerSignOut: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminCustomerSignOutDto_Output"];
+        };
+      };
+    };
+  };
   AccountController_profile: {
     parameters: {
       query?: never;
@@ -4975,6 +5282,178 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AdminSystemSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_site: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_general: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminGeneralSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_announcement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminAnnouncementDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_booking: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminBookingSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_payments: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminPaymentSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_emailSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminEmailSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
+  AdminSettingsController_emailTest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminEmailTestDto_Output"];
+        };
+      };
+    };
+  };
+  PublicSiteController_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicSiteDto_Output"];
         };
       };
     };

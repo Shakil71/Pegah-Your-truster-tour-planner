@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SiteNotice } from "@/components/site-notice";
 
 /** Inner pages: solid header, content offset below it, footer. */
 export function PageShell({ children }: { children: ReactNode }) {
@@ -9,7 +10,10 @@ export function PageShell({ children }: { children: ReactNode }) {
     <>
       <SiteHeader solid />
       <main className="min-h-dvh bg-paper px-[max(16px,env(safe-area-inset-left,0px))] pb-20 pt-[104px]">
-        <div className="mx-auto max-w-[1280px]">{children}</div>
+        <div className="mx-auto max-w-[1280px]">
+          <SiteNotice className="mb-6" />
+          {children}
+        </div>
       </main>
       <SiteFooter />
     </>

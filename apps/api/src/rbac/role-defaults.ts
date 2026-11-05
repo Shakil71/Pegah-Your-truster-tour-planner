@@ -16,8 +16,9 @@ export const ROLE_DEFAULTS: Record<
   },
   admin: {
     name: "Administrator",
-    description: "Runs daily operations; cannot approve refunds.",
-    permissions: PERMISSION_KEYS.filter((p) => p !== "refund:approve"),
+    description:
+      "Runs daily operations; cannot approve refunds or change payment and email credentials.",
+    permissions: PERMISSION_KEYS.filter((p) => p !== "refund:approve" && p !== "settings:secrets"),
   },
   operations: {
     name: "Operations",

@@ -211,6 +211,13 @@ with SPF and DKIM set up, or mail will land in spam.
 Switched off (`PAYMENT_PROVIDER` unset). To switch SSLCOMMERZ on, follow
 [SSLCOMMERZ_INTEGRATION.md](SSLCOMMERZ_INTEGRATION.md).
 
+### Console credentials key (ADR-0029)
+
+`SETTINGS_ENCRYPTION_KEY` (32 random bytes, base64: `openssl rand -base64 32`)
+in `/opt/pegah/shared/env/api.env` lets the owner save payment and email
+passwords in the console. Keep a copy in the owner's password manager:
+without it, saved passwords must be entered again. Never commit it.
+
 ### Worker, Redis and monitoring (ADR-0027) — run once
 
 See `docs/operations/MONITORING.md`: `enable-worker-redis.sh`, then

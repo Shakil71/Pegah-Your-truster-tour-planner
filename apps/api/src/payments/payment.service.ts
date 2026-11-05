@@ -8,12 +8,8 @@ import { newPublicId } from "../common/ids";
 import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
-import {
-  PAYMENT_PROVIDER,
-  ProviderError,
-  type PaymentProvider,
-  type Verification,
-} from "./provider";
+import { IntegrationSettings } from "../settings/integration-settings.service";
+import { ProviderError, type PaymentProvider, type Verification } from "./provider";
 
 export type CallbackKind = "ipn" | "success" | "fail" | "cancel";
 
@@ -61,11 +57,16 @@ export class PaymentService {
 
   constructor(
     @Inject(PRISMA) private readonly db: Db,
-    @Inject(PAYMENT_PROVIDER) private readonly provider: PaymentProvider | null,
+    @Inject(IntegrationSettings) private readonly integrations: IntegrationSettings,
     @Inject(BookingStatusService) private readonly status: BookingStatusService,
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
+
+  /** The current adapter; changes when the owner edits payment settings (ADR-0029). */
+  private get provider(): PaymentProvider | null {
+    return this.integrations.paymentProvider();
+  }
 
   get enabled(): boolean {
     return this.provider !== null;
@@ -120,11 +121,11 @@ export class PaymentService {
         );
       }
       // First attempt only: give the customer time to finish on the payment page.
-      if (booking.payments.length === 0 && this.config.PAYMENT_HOLD_EXTENSION_MINUTES > 0) {
+      if (booking.payments.length === 0 && this.integrations.paymentExtensionMinutes() > 0) {
         const extended = new Date(
           Math.max(
             booking.holdExpiresAt.getTime(),
-            now.getTime() + this.config.PAYMENT_HOLD_EXTENSION_MINUTES * 60_000,
+            now.getTime() + this.integrations.paymentExtensionMinutes() * 60_000,
           ),
         );
         await tx.booking.update({ where: { id: booking.id }, data: { holdExpiresAt: extended } });

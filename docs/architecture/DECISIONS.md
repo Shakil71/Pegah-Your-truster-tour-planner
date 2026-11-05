@@ -505,3 +505,29 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Not yet:** the partner portal and the console stay English (B2B and staff
   tools); emails and API error texts are English; SEO hreflang per language
   needs language-specific URLs, which can come with the production domain.
+
+## ADR-0029 — Console control: settings, encrypted credentials, customer accounts
+
+- **Status:** Accepted (2026-11-05)
+- **Owner request:** everything should be controllable from the console, not
+  by editing server files.
+- **Site settings:** `site_settings` holds one JSON value per section
+  (general contact details, announcement banner, booking times, payments,
+  email), validated by @pegah/contracts. A section saved in the console wins
+  over api.env; until then api.env applies, so existing servers keep working.
+  Every process re-reads settings every 30 s (and the saving process at once),
+  so payment and email adapters change without a restart.
+- **Credentials:** SSLCOMMERZ store password and SMTP password are write-only:
+  sealed with AES-256-GCM under `SETTINGS_ENCRYPTION_KEY` (32 bytes, server
+  env only, never in the database or backups), with the slot name as
+  associated data and a key fingerprint to detect a missing or rotated key.
+  The API only reports "set"; audit entries never contain them.
+- **Permissions:** `settings:manage` (owner, admin) for contact details,
+  banner and booking times; `settings:secrets` (owner only) for payment and
+  email. The payment simulator can never be chosen from the console, and live
+  mode needs an explicit owner approval switch.
+- **Customers:** `customer:manage` (owner, admin) disables an account with a
+  required reason (ending every session at once) or re-enables it, and can sign
+  a customer out everywhere. Bookings are never changed by these actions.
+- **Website:** contact details and the announcement come from the public
+  `GET /site`; the banner is written in English and Bangla.

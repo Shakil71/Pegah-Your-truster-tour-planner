@@ -103,6 +103,15 @@ export const EnvSchema = z.object({
     .string()
     .regex(/^rediss?:\/\//, "REDIS_URL must start with redis:// or rediss://")
     .optional(),
+  /**
+   * 32 random bytes, base64 — seals credentials entered in the console
+   * (AES-256-GCM, ADR-0029). Unset = credentials can only come from this file.
+   * Generate: openssl rand -base64 32
+   */
+  SETTINGS_ENCRYPTION_KEY: z
+    .string()
+    .refine((v) => Buffer.from(v, "base64").length === 32, "Must be 32 bytes, base64")
+    .optional(),
   /** Loopback port for Prometheus metrics (0 = off). Never exposed through Nginx. */
   METRICS_PORT: z.coerce.number().int().min(0).max(65535).default(0),
 });

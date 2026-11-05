@@ -883,3 +883,28 @@ model AuditEvent {
   @@index([createdAt])
   @@map("audit_events")
 }
+
+/// Site settings edited in the console (ADR-0029). One JSON value per section
+/// ("general", "announcement", "booking", "payments", "email"), validated by
+/// @pegah/contracts schemas in the API. Never holds secrets.
+model SiteSetting {
+  key       String   @id @db.VarChar(60)
+  value     Json
+  updatedBy BigInt?  @map("updated_by") @db.UnsignedBigInt
+  updatedAt DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@map("site_settings")
+}
+
+/// Write-only credentials entered in the console, encrypted with AES-256-GCM
+/// under SETTINGS_ENCRYPTION_KEY (server only). `keyId` identifies the key a
+/// value was sealed with, so a rotated or missing key is detected, not misread.
+model SecretSetting {
+  key        String   @id @db.VarChar(60)
+  ciphertext String   @db.Text
+  keyId      String   @map("key_id") @db.VarChar(16)
+  updatedBy  BigInt?  @map("updated_by") @db.UnsignedBigInt
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@map("secret_settings")
+}

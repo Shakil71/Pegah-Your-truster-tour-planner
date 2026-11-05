@@ -1,6 +1,6 @@
 import { MetricsService } from "./metrics/metrics.service";
 import { RedisThrottlerStorage } from "./rbac/redis-throttler.storage";
-import { AdminSettingsController } from "./admin/settings.controller";
+import { AdminSettingsController, PublicSiteController } from "./admin/settings.controller";
 import { DynamicModule, Global, Module, type Provider } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
@@ -53,7 +53,7 @@ import {
   SimulatorController,
 } from "./payments/payment.controllers";
 import { PaymentService } from "./payments/payment.service";
-import { paymentProvider } from "./payments/provider.factory";
+import { IntegrationSettings } from "./settings/integration-settings.service";
 import { AdminPartnersController, PartnerPortalController } from "./partners/partner.controllers";
 import { PartnerService } from "./partners/partner.service";
 import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
@@ -106,6 +106,7 @@ export class AppModule {
         PartnerPortalController,
         AdminPartnersController,
         AdminSettingsController,
+        PublicSiteController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -130,7 +131,7 @@ export class AppModule {
         DashboardService,
         StaffService,
         AuditQueryService,
-        paymentProvider,
+        IntegrationSettings,
         PaymentService,
         CatalogAdminService,
         CustomerAdminService,

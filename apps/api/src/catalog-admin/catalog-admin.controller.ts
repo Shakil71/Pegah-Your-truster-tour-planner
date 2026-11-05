@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Inject,
   Param,
   Patch,
@@ -31,6 +32,8 @@ import {
   CustomerDetailSchema,
   CustomerListQuerySchema,
   CustomerListSchema,
+  CustomerSignOutResultSchema,
+  CustomerStatusUpdateSchema,
   DestinationInputSchema,
   HotelInputSchema,
   PublicIdSchema,
@@ -79,6 +82,8 @@ class AdminTourDetailDto extends createZodDto(AdminTourDetailSchema) {}
 class AdminDepartureResultDto extends createZodDto(z.object({ departure: AdminDepartureSchema })) {}
 class AdminCustomerListDto extends createZodDto(CustomerListSchema) {}
 class AdminCustomerDetailDto extends createZodDto(CustomerDetailSchema) {}
+class AdminCustomerStatusDto extends createZodDto(CustomerStatusUpdateSchema) {}
+class AdminCustomerSignOutDto extends createZodDto(CustomerSignOutResultSchema) {}
 
 function slug(value: string, what: string): string {
   const parsed = SlugSchema.safeParse(value);
@@ -306,5 +311,29 @@ export class CatalogAdminController {
   customer(@Param("id") id: string, @Res({ passthrough: true }) reply: FastifyReply) {
     noStore(reply);
     return this.customers.detail(pid(id, "customer"));
+  }
+
+  @RequirePermissions("customer:manage")
+  @Patch("customers/:id")
+  @ZodResponse({ status: 200, type: AdminCustomerDetailDto })
+  customerStatus(
+    @Param("id") id: string,
+    @Body() body: AdminCustomerStatusDto,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    return this.customers.setStatus(pid(id, "customer"), body, a, ip(r));
+  }
+
+  @RequirePermissions("customer:manage")
+  @Post("customers/:id/sign-out")
+  @HttpCode(200)
+  @ZodResponse({ status: 200, type: AdminCustomerSignOutDto })
+  customerSignOut(
+    @Param("id") id: string,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    return this.customers.signOutEverywhere(pid(id, "customer"), a, ip(r));
   }
 }

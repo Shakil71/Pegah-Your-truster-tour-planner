@@ -5,6 +5,13 @@ import { Icon, cx, type IconName } from "@pegah/ui";
 import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
 import { ensure, requireStaff, serverApi } from "@/lib/api-server";
+import {
+  AnnouncementForm,
+  BookingForm,
+  EmailForm,
+  GeneralForm,
+  PaymentsForm,
+} from "./settings-forms";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -75,6 +82,9 @@ export default async function SettingsPage() {
   }
   const api = await serverApi();
   const s = ensure(await api.GET("/api/v1/admin/settings"));
+  const view = ensure(await api.GET("/api/v1/admin/settings/site"));
+  const canManage = session.user.permissions.includes("settings:manage");
+  const canSecrets = session.user.permissions.includes("settings:secrets");
   const p = s.payments;
   const paymentTone: Tone =
     p.provider === "sslcommerz" && p.mode === "live"
@@ -98,7 +108,7 @@ export default async function SettingsPage() {
       <PageHeader
         eyebrow="System"
         title="Settings"
-        intro="What is switched on right now. These values live in the server's environment files and are changed on the server by the operator, then the services are restarted; nothing here can be changed from the browser."
+        intro="What is switched on right now, and the settings you control. Changes are saved, audited and applied within 30 seconds, without a restart. Payment and email credentials can only be changed by the owner."
       />
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -189,6 +199,22 @@ export default async function SettingsPage() {
             ]}
           />
         </Card>
+      </div>
+
+      {(canManage || canSecrets) && (
+        <h2 className="mt-4 font-display text-[1.6rem] font-medium">Change settings</h2>
+      )}
+      {!view.encryptionReady && canSecrets && (
+        <p className="rounded-[12px] bg-warn-soft px-4 py-3 text-[0.88rem] text-warn">
+          Passwords cannot be saved yet: SETTINGS_ENCRYPTION_KEY is missing on the server.
+        </p>
+      )}
+      <div className="grid gap-5 lg:grid-cols-2">
+        {canManage && <GeneralForm view={view} csrfToken={session.csrfToken} />}
+        {canManage && <AnnouncementForm view={view} csrfToken={session.csrfToken} />}
+        {canManage && <BookingForm view={view} csrfToken={session.csrfToken} />}
+        {canSecrets && <PaymentsForm view={view} csrfToken={session.csrfToken} />}
+        {canSecrets && <EmailForm view={view} csrfToken={session.csrfToken} />}
       </div>
     </div>
   );
