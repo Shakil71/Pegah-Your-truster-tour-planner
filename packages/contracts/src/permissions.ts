@@ -21,6 +21,7 @@ export const PERMISSIONS = {
   "promotion:manage": "Create and edit coupon codes",
   "report:read": "View and export sales reports",
   "content:manage": "Edit website content pages",
+  "partner:manage": "Create suppliers and agents, their users and assignments (audited)",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

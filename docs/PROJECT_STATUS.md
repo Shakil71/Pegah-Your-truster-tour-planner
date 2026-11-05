@@ -17,6 +17,9 @@ end; it needs sandbox credentials and the checklist in
 
 ## Completed
 
+- Phase 7: partner portals: supplier inventory and reservations, agent
+  booking with commission and statements, admin partner management (ADR-0026).
+
 - Phase 6 completion: promotions, sales reports + CSV, content pages (ADR-0025).
 
 - Phase 5 completion: cancellations and refunds, email outbox (off until SMTP),

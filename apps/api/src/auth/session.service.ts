@@ -32,13 +32,15 @@ export class SessionService {
   ) {}
 
   cookieName(kind: SessionKind): string {
-    const base = kind === "STAFF" ? "pg_staff_sid" : "pg_sid";
+    const base =
+      kind === "STAFF" ? "pg_staff_sid" : kind === "PARTNER" ? "pg_partner_sid" : "pg_sid";
     // __Host- cookies must be Secure, Path=/ and host-only: browsers enforce it.
     return this.config.COOKIE_SECURE ? `__Host-${base}` : base;
   }
 
   ttlMinutes(kind: SessionKind): { absolute: number; idle: number } {
-    return kind === "STAFF"
+    // Partner users manage inventory like staff: same shorter lifetimes.
+    return kind === "STAFF" || kind === "PARTNER"
       ? { absolute: this.config.STAFF_SESSION_TTL_MIN, idle: this.config.STAFF_SESSION_IDLE_MIN }
       : {
           absolute: this.config.CUSTOMER_SESSION_TTL_MIN,
@@ -81,7 +83,7 @@ export class SessionService {
     const tokenHash = sha256Hex(token);
     const session = await this.db.session.findUnique({
       where: { tokenHash },
-      include: { user: true },
+      include: { user: { include: { partner: true } } },
     });
     if (!session || session.kind !== kind || session.revokedAt) return null;
     if (session.expiresAt.getTime() <= now.getTime()) return null;
@@ -90,6 +92,8 @@ export class SessionService {
     const user = session.user;
     if (user.status !== "ACTIVE") return null;
     if (kind === "STAFF" && user.kind !== "STAFF") return null;
+    if (kind === "PARTNER" && (user.kind !== "PARTNER" || user.partner?.status !== "ACTIVE"))
+      return null;
 
     const { roles, permissions } =
       kind === "STAFF" ? await this.loadAccess(user.id) : { roles: [], permissions: [] };
@@ -111,6 +115,17 @@ export class SessionService {
       },
       roles,
       permissions,
+      ...(kind === "PARTNER" && user.partner
+        ? {
+            partner: {
+              id: user.partner.id,
+              publicId: user.partner.publicId,
+              kind: user.partner.kind,
+              name: user.partner.name,
+              commissionBps: user.partner.commissionBps,
+            },
+          }
+        : {}),
     };
   }
 

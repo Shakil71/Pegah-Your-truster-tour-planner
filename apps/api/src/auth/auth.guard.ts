@@ -4,7 +4,13 @@ import { CSRF_HEADER, type Permission } from "@pegah/contracts";
 import type { FastifyRequest } from "fastify";
 import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
-import { IS_PUBLIC, IS_STAFF, REQUIRED_PERMISSIONS, SKIP_ORIGIN_CHECK } from "./decorators";
+import {
+  IS_PARTNER,
+  IS_PUBLIC,
+  IS_STAFF,
+  REQUIRED_PERMISSIONS,
+  SKIP_ORIGIN_CHECK,
+} from "./decorators";
 import { SessionService } from "./session.service";
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
@@ -48,7 +54,11 @@ export class AuthGuard implements CanActivate {
     const required =
       this.reflector.getAllAndOverride<Permission[] | undefined>(REQUIRED_PERMISSIONS, targets) ??
       [];
-    const kind = flag(IS_STAFF) || required.length > 0 ? "STAFF" : "CUSTOMER";
+    const kind = flag(IS_PARTNER)
+      ? "PARTNER"
+      : flag(IS_STAFF) || required.length > 0
+        ? "STAFF"
+        : "CUSTOMER";
     const token = request.cookies?.[this.sessions.cookieName(kind)];
     const auth = await this.sessions.resolve(token, kind);
     if (auth) request.auth = auth;

@@ -235,6 +235,103 @@
         "tags": ["staff-auth"]
       }
     },
+    "/api/v1/partner/auth/login": {
+      "post": {
+        "operationId": "PartnerAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["partner-auth"]
+      }
+    },
+    "/api/v1/partner/auth/logout": {
+      "post": {
+        "operationId": "PartnerAuthController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-auth"]
+      }
+    },
+    "/api/v1/partner/auth/session": {
+      "get": {
+        "operationId": "PartnerAuthController_session",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponseDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-auth"]
+      }
+    },
+    "/api/v1/partner/auth/password": {
+      "post": {
+        "operationId": "PartnerAuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-auth"]
+      }
+    },
     "/api/v1/destinations": {
       "get": {
         "operationId": "CatalogController_destinations",
@@ -2783,6 +2880,635 @@
         },
         "tags": ["content"]
       }
+    },
+    "/api/v1/partner/overview": {
+      "get": {
+        "operationId": "PartnerPortalController_overview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerOverviewDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/reservations": {
+      "get": {
+        "operationId": "PartnerPortalController_reservations",
+        "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerBookingListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/rooms/{id}/calendar": {
+      "get": {
+        "operationId": "PartnerPortalController_calendar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 62,
+              "default": 31,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerRoomCalendarDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      },
+      "put": {
+        "operationId": "PartnerPortalController_updateCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerCalendarUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerCalendarResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/departures/{id}": {
+      "patch": {
+        "operationId": "PartnerPortalController_updateDeparture",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartnerDepartureUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerDepartureResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/bookings": {
+      "get": {
+        "operationId": "PartnerPortalController_agentBookings",
+        "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerBookingListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      },
+      "post": {
+        "operationId": "PartnerPortalController_createBooking",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookingRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/bookings/{id}": {
+      "get": {
+        "operationId": "PartnerPortalController_agentBooking",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingDetailDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/bookings/{id}/payment-session": {
+      "post": {
+        "operationId": "PartnerPortalController_pay",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartnerPaymentSessionDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/partner/statement": {
+      "get": {
+        "operationId": "PartnerPortalController_statement",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentStatementDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "partner": []
+          }
+        ],
+        "tags": ["partner-portal"]
+      }
+    },
+    "/api/v1/admin/partners": {
+      "get": {
+        "operationId": "AdminPartnersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      },
+      "post": {
+        "operationId": "AdminPartnersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreatePartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      }
+    },
+    "/api/v1/admin/partners/{id}": {
+      "put": {
+        "operationId": "AdminPartnersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUpdatePartnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      }
+    },
+    "/api/v1/admin/partners/{id}/members": {
+      "post": {
+        "operationId": "AdminPartnersController_addMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPartnerMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      }
+    },
+    "/api/v1/admin/partners/{id}/members/{memberId}": {
+      "patch": {
+        "operationId": "AdminPartnersController_memberStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminMemberStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      }
+    },
+    "/api/v1/admin/partners/{id}/ownership": {
+      "put": {
+        "operationId": "AdminPartnersController_ownership",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPartnerOwnershipDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPartnerResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-partners"]
+      }
     }
   },
   "info": {
@@ -2905,7 +3631,7 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["CUSTOMER", "STAFF"]
+            "enum": ["CUSTOMER", "STAFF", "PARTNER"]
           },
           "roles": {
             "type": "array",
@@ -2932,12 +3658,43 @@
                 "audit:read",
                 "promotion:manage",
                 "report:read",
-                "content:manage"
+                "content:manage",
+                "partner:manage"
               ]
             }
+          },
+          "partner": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": ["SUPPLIER", "AGENT"]
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "commissionBps": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": ["id", "kind", "name", "commissionBps"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
-        "required": ["id", "email", "fullName", "phone", "kind", "roles", "permissions"],
+        "required": ["id", "email", "fullName", "phone", "kind", "roles", "permissions", "partner"],
         "additionalProperties": false
       },
       "SessionResponseDto_Output": {
@@ -4134,7 +4891,7 @@
           },
           "actorType": {
             "type": "string",
-            "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]
+            "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]
           },
           "reason": {
             "anyOf": [
@@ -4427,6 +5184,26 @@
               ]
             }
           },
+          "agent": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "commission": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  }
+                },
+                "required": ["name", "commission"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "promotionCode": {
             "anyOf": [
               {
@@ -4574,6 +5351,7 @@
           "travellers",
           "history",
           "allowedTransitions",
+          "agent",
           "promotionCode",
           "payments",
           "canPay",
@@ -5229,7 +6007,7 @@
                 },
                 "actorType": {
                   "type": "string",
-                  "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]
+                  "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]
                 },
                 "actorName": {
                   "anyOf": [
@@ -5319,7 +6097,8 @@
                 "audit:read",
                 "promotion:manage",
                 "report:read",
-                "content:manage"
+                "content:manage",
+                "partner:manage"
               ]
             }
           },
@@ -5537,7 +6316,7 @@
           },
           "actorType": {
             "type": "string",
-            "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]
+            "enum": ["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]
           },
           "actorName": {
             "anyOf": [
@@ -6157,6 +6936,17 @@
             "type": "string",
             "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
           },
+          "supplierId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "slug": {
             "type": "string",
             "minLength": 2,
@@ -6349,6 +7139,27 @@
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
+          "supplier": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "rooms": {
             "type": "array",
             "items": {
@@ -6375,6 +7186,7 @@
           "cancellationPolicy",
           "serviceChargeBps",
           "vatBps",
+          "supplier",
           "rooms"
         ],
         "additionalProperties": false
@@ -6463,6 +7275,17 @@
           "status": {
             "type": "string",
             "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "supplierId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -6853,6 +7676,17 @@
             "type": "string",
             "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
           },
+          "supplierId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "slug": {
             "type": "string",
             "minLength": 2,
@@ -7042,6 +7876,27 @@
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
+          "supplier": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "departures": {
             "type": "array",
             "items": {
@@ -7069,6 +7924,7 @@
           "includes",
           "excludes",
           "vatBps",
+          "supplier",
           "departures"
         ],
         "additionalProperties": false
@@ -7163,6 +8019,17 @@
           "status": {
             "type": "string",
             "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "supplierId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8364,6 +9231,763 @@
         },
         "required": ["slug", "title", "summary", "body", "updatedAt"],
         "additionalProperties": false
+      },
+      "PartnerOverviewDto_Output": {
+        "type": "object",
+        "properties": {
+          "partner": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "kind": {
+                "type": "string",
+                "enum": ["SUPPLIER", "AGENT"]
+              },
+              "name": {
+                "type": "string"
+              },
+              "commissionBps": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["id", "kind", "name", "commissionBps"],
+            "additionalProperties": false
+          },
+          "supplier": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "hotels": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "slug": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 80,
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+                        },
+                        "rooms": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "isActive": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["id", "name", "isActive"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["slug", "name", "status", "rooms"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "tours": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "slug": {
+                          "type": "string",
+                          "minLength": 2,
+                          "maxLength": 80,
+                          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+                        },
+                        "departures": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AdminDeparture_Output"
+                          }
+                        }
+                      },
+                      "required": ["slug", "title", "status", "departures"],
+                      "additionalProperties": false
+                    }
+                  },
+                  "upcomingReservations": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "confirmedValue30d": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  }
+                },
+                "required": ["hotels", "tours", "upcomingReservations", "confirmedValue30d"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "agent": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "bookings30d": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "commissionEarned": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  },
+                  "commissionPending": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  }
+                },
+                "required": ["bookings30d", "commissionEarned", "commissionPending"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["partner", "supplier", "agent"],
+        "additionalProperties": false
+      },
+      "PartnerBookingListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "DRAFT",
+                    "PENDING_AVAILABILITY",
+                    "PENDING_PAYMENT",
+                    "PAYMENT_PROCESSING",
+                    "CONFIRMED",
+                    "COMPLETED",
+                    "FAILED",
+                    "EXPIRED",
+                    "MANUAL_REVIEW",
+                    "CANCELLATION_REQUESTED",
+                    "CANCELLED",
+                    "REFUND_PENDING",
+                    "REFUNDED"
+                  ]
+                },
+                "productType": {
+                  "type": "string",
+                  "enum": ["HOTEL", "TOUR"]
+                },
+                "productName": {
+                  "type": "string"
+                },
+                "startDate": {
+                  "type": "string",
+                  "format": "date",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                },
+                "endDate": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "guests": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "total": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "contactName": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "commission": {
+                  "$ref": "#/components/schemas/Money_Output"
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "status",
+                "productType",
+                "productName",
+                "startDate",
+                "endDate",
+                "guests",
+                "total",
+                "contactName",
+                "createdAt",
+                "commission"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["items", "nextCursor"],
+        "additionalProperties": false
+      },
+      "PartnerRoomCalendarDto_Output": {
+        "type": "object",
+        "properties": {
+          "room": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          },
+          "hotel": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              }
+            },
+            "required": ["slug", "name", "currency"],
+            "additionalProperties": false
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay_Output"
+            }
+          }
+        },
+        "required": ["room", "hotel", "days"],
+        "additionalProperties": false
+      },
+      "PartnerCalendarUpdateDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "weekdays": {
+            "minItems": 1,
+            "maxItems": 7,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "rate": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": ["from", "to"]
+      },
+      "PartnerCalendarResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "datesUpdated": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["datesUpdated"],
+        "additionalProperties": false
+      },
+      "PartnerDepartureUpdateDto": {
+        "type": "object",
+        "properties": {
+          "capacity": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 500
+          },
+          "priceAdult": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "priceChild": {
+            "$ref": "#/components/schemas/Money"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["SCHEDULED", "CLOSED", "CANCELLED"]
+          }
+        }
+      },
+      "PartnerDepartureResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "departure": {
+            "$ref": "#/components/schemas/AdminDeparture_Output"
+          }
+        },
+        "required": ["departure"],
+        "additionalProperties": false
+      },
+      "PartnerPaymentSessionDto_Output": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["sandbox", "live", "simulator"]
+          },
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["paymentId", "provider", "mode", "redirectUrl"],
+        "additionalProperties": false
+      },
+      "AgentStatementDto_Output": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "productName": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "total": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "commission": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "productName",
+                "status",
+                "total",
+                "commission",
+                "createdAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "totals": {
+            "type": "object",
+            "properties": {
+              "bookings": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "confirmedValue": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "commissionEarned": {
+                "$ref": "#/components/schemas/Money_Output"
+              }
+            },
+            "required": ["bookings", "confirmedValue", "commissionEarned"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["month", "items", "totals"],
+        "additionalProperties": false
+      },
+      "Partner_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["SUPPLIER", "AGENT"]
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commissionBps": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "SUSPENDED"]
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "fullName": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["ACTIVE", "DISABLED"]
+                }
+              },
+              "required": ["id", "fullName", "email", "status"],
+              "additionalProperties": false
+            }
+          },
+          "hotels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": ["slug", "name"],
+              "additionalProperties": false
+            }
+          },
+          "tours": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "slug": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": ["slug", "title"],
+              "additionalProperties": false
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "email",
+          "phone",
+          "commissionBps",
+          "status",
+          "members",
+          "hotels",
+          "tours",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "AdminPartnerListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Partner_Output"
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "AdminCreatePartnerDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["SUPPLIER", "AGENT"]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\+8801[3-9]\\d{8}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commissionBps": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          },
+          "member": {
+            "type": "object",
+            "properties": {
+              "fullName": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "email": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string",
+                "minLength": 10,
+                "maxLength": 128
+              }
+            },
+            "required": ["fullName", "email", "password"]
+          }
+        },
+        "required": ["kind", "name", "email", "phone", "commissionBps", "member"]
+      },
+      "AdminPartnerResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "partner": {
+            "$ref": "#/components/schemas/Partner_Output"
+          }
+        },
+        "required": ["partner"],
+        "additionalProperties": false
+      },
+      "AdminUpdatePartnerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 160
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\+8801[3-9]\\d{8}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "commissionBps": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5000
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "SUSPENDED"]
+          }
+        },
+        "required": ["name", "email", "phone", "commissionBps", "status"]
+      },
+      "AdminPartnerMemberDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": ["fullName", "email", "password"]
+      },
+      "AdminMemberStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ACTIVE", "DISABLED"]
+          }
+        },
+        "required": ["status"]
+      },
+      "AdminPartnerOwnershipDto": {
+        "type": "object",
+        "properties": {
+          "hotelSlugs": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "tourSlugs": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          }
+        },
+        "required": ["hotelSlugs", "tourSlugs"]
       }
     }
   }

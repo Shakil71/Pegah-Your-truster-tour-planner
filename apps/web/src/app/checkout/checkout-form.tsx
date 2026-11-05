@@ -43,6 +43,7 @@ export function CheckoutForm({
   adultCount: adults,
   childCount: children,
   csrfToken,
+  mode = "customer",
   savedTravellers,
   customer,
 }: {
@@ -53,6 +54,8 @@ export function CheckoutForm({
   adultCount: number;
   childCount: number;
   csrfToken: string;
+  /** "agent": a partner agent books for a client via the partner API and earns commission. */
+  mode?: "customer" | "agent";
   /** Saved travellers offered as name suggestions. */
   savedTravellers: { fullName: string; ageGroup: "ADULT" | "CHILD" }[];
   customer: { name: string; email: string; phone: string };
@@ -85,7 +88,7 @@ export function CheckoutForm({
       data,
       error: problem,
       response,
-    } = await browserApi.POST("/api/v1/bookings", {
+    } = await browserApi.POST(mode === "agent" ? "/api/v1/partner/bookings" : "/api/v1/bookings", {
       params: { header: { "Idempotency-Key": idempotencyKey } },
       headers: csrf(csrfToken),
       body: {
@@ -97,7 +100,11 @@ export function CheckoutForm({
       },
     });
     if (response.ok && data) {
-      router.push(`/account/bookings/${data.id}?new=1`);
+      router.push(
+        mode === "agent"
+          ? `/partner/bookings/${data.id}?new=1`
+          : `/account/bookings/${data.id}?new=1`,
+      );
       return;
     }
     const type = (problem as { type?: string } | undefined)?.type;
@@ -108,7 +115,9 @@ export function CheckoutForm({
     }
     if (response.status === 401) {
       router.push(
-        `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+        mode === "agent"
+          ? "/partner/login"
+          : `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
       );
       return;
     }
@@ -123,7 +132,9 @@ export function CheckoutForm({
     <form onSubmit={handleSubmit(onSubmit)} className="grid content-start gap-6" noValidate>
       <section className="panel grid gap-4 p-5 md:p-6" aria-labelledby="contact-h">
         <h2 id="contact-h" className="text-[1rem] font-semibold">
-          Contact for this booking
+          {mode === "agent"
+            ? "Client contact (receives booking emails)"
+            : "Contact for this booking"}
         </h2>
         <TextField
           label="Full name"
@@ -208,7 +219,7 @@ export function CheckoutForm({
         disabled={isSubmitting || !agreed}
         className={buttonClass("primary", "lg")}
       >
-        {isSubmitting ? "Holding…" : "Hold my booking"}
+        {isSubmitting ? "Holding…" : mode === "agent" ? "Hold for my client" : "Hold my booking"}
         {!isSubmitting && <Icon name="arrowRight" className="size-[18px]" />}
       </button>
     </form>

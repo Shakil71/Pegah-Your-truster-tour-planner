@@ -22,6 +22,8 @@ datasource db {
 enum UserKind {
   CUSTOMER
   STAFF
+  /// Works for a supplier or travel agent (Phase 7).
+  PARTNER
 }
 
 enum UserStatus {
@@ -37,6 +39,8 @@ model User {
   fullName     String     @map("full_name") @db.VarChar(120)
   phone        String?    @db.VarChar(20)
   kind         UserKind   @default(CUSTOMER)
+  /// Set only for PARTNER users: the company they act for.
+  partnerId    BigInt?    @map("partner_id") @db.UnsignedBigInt
   status       UserStatus @default(ACTIVE)
   lastLoginAt  DateTime?  @map("last_login_at") @db.DateTime(3)
   createdAt    DateTime   @default(now()) @map("created_at") @db.DateTime(3)
@@ -48,7 +52,9 @@ model User {
   bookings     Booking[]
   travellers   TravellerProfile[]
   resetTokens  PasswordResetToken[]
+  partner      Partner?             @relation(fields: [partnerId], references: [id], onDelete: Restrict)
 
+  @@index([partnerId])
   @@map("users")
 }
 
@@ -111,6 +117,7 @@ model UserRole {
 enum SessionKind {
   CUSTOMER
   STAFF
+  PARTNER
 }
 
 /// Server-side session. The cookie carries a random token; only its SHA-256
@@ -209,9 +216,12 @@ model Hotel {
   createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
+  /// Supplier that manages this hotel in the partner portal (optional).
+  partnerId   BigInt?     @map("partner_id") @db.UnsignedBigInt
   destination Destination @relation(fields: [destinationId], references: [id], onDelete: Restrict)
   hero        MediaAsset? @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
   rooms       HotelRoom[]
+  partner     Partner?    @relation(fields: [partnerId], references: [id], onDelete: SetNull)
 
   @@index([destinationId, status])
   @@index([heroMediaId])
@@ -304,9 +314,11 @@ model Tour {
   createdAt      DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt      DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
+  partnerId   BigInt?        @map("partner_id") @db.UnsignedBigInt
   destination Destination    @relation(fields: [destinationId], references: [id], onDelete: Restrict)
   hero        MediaAsset?    @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
   schedules   TourSchedule[]
+  partner     Partner?       @relation(fields: [partnerId], references: [id], onDelete: SetNull)
 
   @@index([destinationId, status])
   @@index([heroMediaId])
@@ -386,6 +398,9 @@ model Booking {
   vatMinor           BigInt        @default(0) @map("vat_minor")
   /// Promotion discount on the base, before service charge and VAT.
   discountMinor      BigInt        @default(0) @map("discount_minor")
+  /// Travel agent that made this booking for a client, and the commission earned.
+  agentPartnerId     BigInt?       @map("agent_partner_id") @db.UnsignedBigInt
+  commissionMinor    BigInt        @default(0) @map("commission_minor")
   promotionId        BigInt?       @map("promotion_id") @db.UnsignedBigInt
   totalMinor         BigInt        @map("total_minor")
   contactName        String        @map("contact_name") @db.VarChar(120)
@@ -403,6 +418,7 @@ model Booking {
   payments  Payment[]
   refunds   Refund[]
   promotion Promotion?             @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+  agent     Partner?               @relation("AgentBookings", fields: [agentPartnerId], references: [id], onDelete: Restrict)
   emails    EmailMessage[]
 
   @@index([userId, createdAt])
@@ -500,6 +516,7 @@ enum ActorType {
   STAFF
   SYSTEM
   PAYMENT_PROVIDER
+  PARTNER
 }
 
 model BookingStatusHistory {
@@ -591,6 +608,44 @@ model PaymentEvent {
   @@unique([provider, eventKey])
   @@index([paymentId])
   @@map("payment_events")
+}
+
+// ─── Partners (Phase 7) ──────────────────────────────────────────────────────
+
+enum PartnerKind {
+  /// Hotel or tour operator managing its own inventory.
+  SUPPLIER
+  /// Travel agent booking for clients and earning commission.
+  AGENT
+}
+
+enum PartnerStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+/// A partner company. Its users (users.partner_id) sign in to the partner
+/// portal and only ever see records owned by the partner.
+model Partner {
+  id            BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId      String        @unique @map("public_id") @db.Char(26)
+  kind          PartnerKind
+  name          String        @db.VarChar(160)
+  email         String        @db.VarChar(254)
+  phone         String?       @db.VarChar(20)
+  /// Agents only: commission on the booking total, basis points.
+  commissionBps Int           @default(0) @map("commission_bps") @db.UnsignedSmallInt
+  status        PartnerStatus @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  members       User[]
+  hotels        Hotel[]
+  tours         Tour[]
+  agentBookings Booking[] @relation("AgentBookings")
+
+  @@index([kind, status])
+  @@map("partners")
 }
 
 // ─── Promotions ──────────────────────────────────────────────────────────────

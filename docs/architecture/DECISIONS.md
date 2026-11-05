@@ -421,3 +421,31 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
 - **Permissions:** `promotion:manage`, `report:read`, `content:manage`
   (owner, admin; operations and finance get reports; content gets content and
   promotions). `seed:rbac` applies them on deploy.
+
+## ADR-0026 — Partner portals: suppliers and travel agents
+
+- **Status:** Accepted (2026-11-04)
+- **Model:** one `partners` table with `kind` SUPPLIER or AGENT, status
+  ACTIVE/SUSPENDED and `commission_bps` (agents; CHECK at most 50%). Partner users
+  are `users` with `kind = PARTNER` and a `partner_id`. They sign in only at
+  `/partner/auth/login` (customer and staff sign-in refuse them, and vice versa)
+  and get their own cookie (`pg_partner_sid`, staff-length timeouts).
+- **Tenancy:** suppliers own hotels and tours through `hotels.partner_id` and
+  `tours.partner_id`, assigned by staff. Every partner request resolves the
+  partner from the session, and every room, departure or booking id is checked
+  against it in the API (unknown or foreign ids return 404). Suppliers change
+  only rooms on sale, nightly rates and departure seats/status, through the same
+  catalog service, locks and audit as staff (actor type PARTNER).
+- **Agents:** `POST /partner/bookings` runs the normal booking engine
+  (idempotency, row locks, price revalidation, hold) and stores
+  `agent_partner_id` and `commission_minor` = commission rate × total, fixed at
+  booking time (CHECK 0 ≤ commission ≤ total). Commission counts as earned only
+  for CONFIRMED/COMPLETED bookings; the monthly statement uses Dhaka months. The
+  client is the booking contact and receives the emails, without account links;
+  after payment the agent returns to `/partner/bookings/{id}`. Agent net rates
+  are deferred until an agent contract needs them.
+- **Admin:** `partner:manage` (owner, admin) creates partners and their first
+  user, edits commission and status (suspending revokes partner sessions at
+  once), manages users and assigns hotels and tours. All actions are audited.
+- **Payouts** are settled outside the platform for now; the statement is the
+  reconciliation record.

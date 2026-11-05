@@ -41,6 +41,8 @@ const MIN_HOLD_LEFT_MS = 60_000;
 export interface CallbackResult {
   bookingPublicId: string | null;
   outcome: "success" | "pending" | "failed" | "cancelled" | "review" | "unknown";
+  /** Booked by a partner agent: the payer returns to the partner portal. */
+  viaAgent?: boolean;
 }
 
 /**
@@ -218,7 +220,7 @@ export class PaymentService {
     const payment = /^[0-9A-HJKMNP-TV-Z]{26}$/.test(tranId)
       ? await this.db.payment.findUnique({
           where: { provider_providerTxnId: { provider: provider.name, providerTxnId: tranId } },
-          include: { booking: { select: { publicId: true } } },
+          include: { booking: { select: { publicId: true, agentPartnerId: true } } },
         })
       : null;
 
@@ -260,12 +262,20 @@ export class PaymentService {
       // hold sweeper will reconcile later.
       this.logger.warn({ paymentId: payment.publicId, err: error }, "Verification failed");
       if (eventId) await this.finishEvent(eventId, "verification-unavailable", now);
-      return { bookingPublicId: payment.booking.publicId, outcome: "pending" };
+      return {
+        bookingPublicId: payment.booking.publicId,
+        outcome: "pending",
+        viaAgent: payment.booking.agentPartnerId !== null,
+      };
     }
 
     const outcome = await this.applyVerification(payment.id, verification, now);
     if (eventId) await this.finishEvent(eventId, outcome, now);
-    return { bookingPublicId: payment.booking.publicId, outcome };
+    return {
+      bookingPublicId: payment.booking.publicId,
+      outcome,
+      viaAgent: payment.booking.agentPartnerId !== null,
+    };
   }
 
   /**

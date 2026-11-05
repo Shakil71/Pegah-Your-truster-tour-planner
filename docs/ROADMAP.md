@@ -48,11 +48,12 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Content pages (About, Terms, Privacy…) with admin editor.
 - ⛔ Media uploads and homepage section editing — need a server storage folder, an Nginx `/media` location and SELinux labels (owner, root).
 
-## Phase 7 — Partner portals ⬜
+## Phase 7 — Partner portals ✅
 
-- ⬜ Supplier portal: hotel/operator owners manage their own inventory and see reservations.
-- ⬜ B2B agent portal: agent accounts, agent rates, commission, statements.
-- ⬜ Refunds console for finance (`refund:approve`).
+- ✅ Supplier portal: hotel/operator owners manage their own rooms, rates and departures and see reservations (ADR-0026).
+- ✅ B2B agent portal: agent accounts, book for a client, commission, monthly statements. ⬜ Agent net rates (when a contract needs them).
+- ✅ Refunds console for finance (`refund:approve`), delivered in Phase 5.
+- ✅ Admin: Suppliers and agents page (`partner:manage`).
 
 ## Phase 8 — Third-party supply ⛔
 

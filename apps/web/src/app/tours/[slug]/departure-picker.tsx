@@ -9,7 +9,13 @@ import { dhakaDateTime, money } from "@/lib/format";
 type Departure = Schemas["TourDeparture_Output"];
 
 /** Choose a departure and party size; the checkout asks the API for the exact price. */
-export function DeparturePicker({ departures }: { departures: Departure[] }) {
+export function DeparturePicker({
+  departures,
+  isAgent = false,
+}: {
+  departures: Departure[];
+  isAgent?: boolean;
+}) {
   const open = departures.filter((d) => d.status === "SCHEDULED" && d.seatsLeft > 0);
   const [id, setId] = useState(open[0]?.id ?? "");
   const [adults, setAdults] = useState(2);
@@ -113,6 +119,14 @@ export function DeparturePicker({ departures }: { departures: Departure[] }) {
       >
         Hold {party} seat{party === 1 ? "" : "s"}
       </Link>
+      {isAgent && fits && (
+        <Link
+          href={`/checkout?${new URLSearchParams({ product: "TOUR", departure: id, adults: String(adults), children: String(children), as: "agent" })}`}
+          className={buttonClass("outline", "md", "no-underline")}
+        >
+          Book for a client
+        </Link>
+      )}
     </section>
   );
 }

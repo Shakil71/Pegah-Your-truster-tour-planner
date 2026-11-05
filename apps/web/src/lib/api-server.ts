@@ -51,3 +51,18 @@ export function ensure<T>(result: { data?: T; error?: unknown; response: Respons
   if (result.response.status === 404) notFound();
   throw new Error(`API ${result.response.status} for ${new URL(result.response.url).pathname}`);
 }
+
+/** The signed-in partner (supplier or agent) user, or null. */
+export async function getPartner(): Promise<CustomerSession | null> {
+  const api = await serverApi();
+  const { data } = await api.GET("/api/v1/partner/auth/session");
+  return data?.user.partner ? data : null;
+}
+
+/** The signed-in partner, or a redirect to the partner sign-in page. */
+export async function requirePartner(kind?: "SUPPLIER" | "AGENT"): Promise<CustomerSession> {
+  const session = await getPartner();
+  if (!session) redirect("/partner/login");
+  if (kind && session.user.partner?.kind !== kind) redirect("/partner");
+  return session;
+}

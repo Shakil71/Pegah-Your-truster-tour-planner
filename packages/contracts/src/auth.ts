@@ -32,7 +32,7 @@ export const LoginRequestSchema = z.object({
 });
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 
-export const SessionKindSchema = z.enum(["CUSTOMER", "STAFF"]);
+export const SessionKindSchema = z.enum(["CUSTOMER", "STAFF", "PARTNER"]);
 export type SessionKind = z.infer<typeof SessionKindSchema>;
 
 export const SessionUserSchema = z
@@ -44,6 +44,15 @@ export const SessionUserSchema = z
     kind: SessionKindSchema,
     roles: z.array(z.string()),
     permissions: z.array(PermissionSchema),
+    /** Partner portal users: the company they act for. */
+    partner: z
+      .object({
+        id: PublicIdSchema,
+        kind: z.enum(["SUPPLIER", "AGENT"]),
+        name: z.string(),
+        commissionBps: z.number().int(),
+      })
+      .nullable(),
   })
   .meta({ id: "SessionUser" });
 export type SessionUser = z.infer<typeof SessionUserSchema>;

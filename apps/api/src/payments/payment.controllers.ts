@@ -48,7 +48,8 @@ function bookingId(id: string): string {
 function landing(config: AppConfig, result: CallbackResult): string {
   const base = (config.PUBLIC_BASE_URL ?? "").replace(/\/$/, "");
   if (!result.bookingPublicId) return `${base}/account/bookings?payment=unknown`;
-  return `${base}/account/bookings/${result.bookingPublicId}?payment=${result.outcome}`;
+  const area = result.viaAgent ? "partner" : "account";
+  return `${base}/${area}/bookings/${result.bookingPublicId}?payment=${result.outcome}`;
 }
 
 @ApiTags("payments")

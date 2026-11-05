@@ -154,9 +154,11 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
       guests: booking.guestCount,
       totalText: taka(booking.totalMinor.toString(), booking.currency),
       contactName: booking.contactName,
-      link: base
-        ? `${base}/account/bookings/${booking.publicId}${type === "booking.confirmed" ? "/voucher" : ""}`
-        : null,
+      // Agent bookings: the client has no Pegah account, so no account link.
+      link:
+        base && booking.agentPartnerId === null
+          ? `${base}/account/bookings/${booking.publicId}${type === "booking.confirmed" ? "/voucher" : ""}`
+          : null,
     };
     const rendered = render(facts);
     if (!rendered) return;

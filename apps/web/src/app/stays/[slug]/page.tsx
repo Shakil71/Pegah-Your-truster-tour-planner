@@ -5,7 +5,7 @@ import { problemMessage } from "@pegah/api-client";
 import { Icon, buttonClass } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
 import { StaySearchBar } from "@/components/shop/stay-search-bar";
-import { ensure, serverApi } from "@/lib/api-server";
+import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import { money } from "@/lib/format";
 import { nightsOf, parseStayParams, photoFor, stayQuery } from "@/lib/trip";
 
@@ -36,6 +36,7 @@ export default async function HotelPage({ params, searchParams }: Props) {
   const stay = parseStayParams(await searchParams);
   const api = await serverApi();
   const hotel = ensure(await api.GET("/api/v1/hotels/{slug}", { params: { path: { slug } } }));
+  const isAgent = (await getPartner())?.user.partner?.kind === "AGENT";
   const offers = await api.GET("/api/v1/hotels/{slug}/offers", {
     params: { path: { slug }, query: stay },
   });
@@ -131,6 +132,14 @@ export default async function HotelPage({ params, searchParams }: Props) {
                       >
                         Hold this room
                       </Link>
+                      {isAgent && (
+                        <Link
+                          href={`/checkout?${stayQuery(stay, { product: "HOTEL", room: r.room.id, as: "agent" })}`}
+                          className={buttonClass("outline", "sm", "no-underline")}
+                        >
+                          Book for a client
+                        </Link>
+                      )}
                     </>
                   ) : (
                     <p className="rounded-full bg-paper-2 px-3 py-1.5 text-[0.82rem] font-semibold text-ink-2">

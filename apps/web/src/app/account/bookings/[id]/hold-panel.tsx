@@ -15,12 +15,15 @@ export function HoldPanel({
   holdExpiresAt,
   csrfToken,
   canPay,
+  agent = false,
 }: {
   bookingId: string;
   holdExpiresAt: string;
   csrfToken: string;
   /** Server says online payment is enabled and this booking can be paid now. */
   canPay: boolean;
+  /** Partner agent view: pays through the partner API; no cancel (the client contacts Pegah). */
+  agent?: boolean;
 }) {
   const router = useRouter();
   // Server and client clocks differ by a few seconds; the text opts out of hydration checks.
@@ -47,10 +50,15 @@ export function HoldPanel({
       data,
       error: problem,
       response,
-    } = await browserApi.POST("/api/v1/me/bookings/{id}/payment-session", {
-      params: { path: { id: bookingId } },
-      headers: csrf(csrfToken),
-    });
+    } = await browserApi.POST(
+      agent
+        ? "/api/v1/partner/bookings/{id}/payment-session"
+        : "/api/v1/me/bookings/{id}/payment-session",
+      {
+        params: { path: { id: bookingId } },
+        headers: csrf(csrfToken),
+      },
+    );
     if (!response.ok || !data) {
       setPaying(false);
       setError(problemMessage(problem));
@@ -89,7 +97,7 @@ export function HoldPanel({
       <div className="relative flex flex-wrap items-center justify-between gap-6">
         <div>
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-            Held for you
+            {agent ? "Held for your client" : "Held for you"}
           </p>
           <p
             className="tabular mt-1 font-display text-[3rem] font-medium leading-none"
@@ -116,14 +124,16 @@ export function HoldPanel({
             <Icon name="card" className="size-[18px]" />
             {canPay ? (paying ? "Opening payment…" : "Pay now") : "Pay now · coming soon"}
           </button>
-          <button
-            type="button"
-            onClick={cancel}
-            disabled={busy || left === 0}
-            className="h-11 rounded-control border-[1.5px] border-white/70 px-5 font-semibold text-white hover:bg-white hover:text-night disabled:opacity-40"
-          >
-            {busy ? "Cancelling…" : "Cancel hold"}
-          </button>
+          {!agent && (
+            <button
+              type="button"
+              onClick={cancel}
+              disabled={busy || left === 0}
+              className="h-11 rounded-control border-[1.5px] border-white/70 px-5 font-semibold text-white hover:bg-white hover:text-night disabled:opacity-40"
+            >
+              {busy ? "Cancelling…" : "Cancel hold"}
+            </button>
+          )}
         </div>
       </div>
       {error && (

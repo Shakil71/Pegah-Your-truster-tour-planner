@@ -78,7 +78,14 @@ export function ProfileForm({ profile, csrfToken }: { profile: Profile; csrfToke
   );
 }
 
-export function PasswordForm({ csrfToken }: { csrfToken: string }) {
+export function PasswordForm({
+  csrfToken,
+  partner = false,
+}: {
+  csrfToken: string;
+  /** Partner portal user: changes the password through the partner API. */
+  partner?: boolean;
+}) {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [busy, setBusy] = useState(false);
@@ -89,10 +96,13 @@ export function PasswordForm({ csrfToken }: { csrfToken: string }) {
     e.preventDefault();
     setBusy(true);
     setNote(null);
-    const { error, response } = await browserApi.POST("/api/v1/me/password", {
-      headers: csrf(csrfToken),
-      body: { currentPassword: current, newPassword: next },
-    });
+    const { error, response } = await browserApi.POST(
+      partner ? "/api/v1/partner/auth/password" : "/api/v1/me/password",
+      {
+        headers: csrf(csrfToken),
+        body: { currentPassword: current, newPassword: next },
+      },
+    );
     setBusy(false);
     setErrs(fieldErrors(error));
     if (!response.ok) {

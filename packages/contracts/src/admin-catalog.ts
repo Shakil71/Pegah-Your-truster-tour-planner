@@ -81,6 +81,8 @@ export const HotelInputSchema = z.object({
   /** VAT on base + service charge, basis points (1500 = 15%). */
   vatBps: Bps,
   status: PublishStatusSchema,
+  /** Supplier partner that manages this hotel in the partner portal. */
+  supplierId: PublicIdSchema.nullable().optional(),
 });
 export type HotelInput = z.infer<typeof HotelInputSchema>;
 export const CreateHotelSchema = HotelInputSchema.extend({ slug: SlugSchema });
@@ -129,6 +131,7 @@ export const AdminHotelDetailSchema = AdminHotelSummarySchema.extend({
   cancellationPolicy: z.string(),
   serviceChargeBps: z.number().int(),
   vatBps: z.number().int(),
+  supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
   rooms: z.array(AdminRoomSchema),
 });
 export type AdminHotelDetail = z.infer<typeof AdminHotelDetailSchema>;
@@ -197,6 +200,7 @@ export const TourInputSchema = z.object({
   excludes: StringList,
   vatBps: Bps,
   status: PublishStatusSchema,
+  supplierId: PublicIdSchema.nullable().optional(),
 });
 export type TourInput = z.infer<typeof TourInputSchema>;
 export const CreateTourSchema = TourInputSchema.extend({ slug: SlugSchema });
@@ -245,6 +249,7 @@ export const AdminTourDetailSchema = AdminTourSummarySchema.extend({
   includes: z.array(z.string()),
   excludes: z.array(z.string()),
   vatBps: z.number().int(),
+  supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
   departures: z.array(AdminDepartureSchema),
 });
 export type AdminTourDetail = z.infer<typeof AdminTourDetailSchema>;

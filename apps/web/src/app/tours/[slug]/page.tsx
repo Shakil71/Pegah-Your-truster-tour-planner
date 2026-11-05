@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
-import { ensure, serverApi } from "@/lib/api-server";
+import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import { photoFor } from "@/lib/trip";
 import { DeparturePicker } from "./departure-picker";
 
@@ -42,6 +42,7 @@ export default async function TourPage({ params }: Props) {
   const { slug } = await params;
   const api = await serverApi();
   const tour = ensure(await api.GET("/api/v1/tours/{slug}", { params: { path: { slug } } }));
+  const isAgent = (await getPartner())?.user.partner?.kind === "AGENT";
 
   return (
     <PageShell>
@@ -93,7 +94,7 @@ export default async function TourPage({ params }: Props) {
             </div>
           </div>
           <aside className="grid content-start gap-4 lg:sticky lg:top-[96px]">
-            <DeparturePicker departures={tour.departures} />
+            <DeparturePicker departures={tour.departures} isAgent={isAgent} />
             <PaymentNotice />
           </aside>
         </div>

@@ -58,8 +58,12 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "Partners",
     items: [
-      { href: "/suppliers", label: "Suppliers", icon: "handshake", phase: "Phase 7" },
-      { href: "/agents", label: "B2B agents", icon: "users", phase: "Phase 7" },
+      {
+        href: "/partners",
+        label: "Suppliers and agents",
+        icon: "handshake",
+        permission: "partner:manage",
+      },
     ],
   },
   {

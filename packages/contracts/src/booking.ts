@@ -57,7 +57,7 @@ export const BookingStatusChangeSchema = z
   .object({
     from: BookingStatusSchema.nullable(),
     to: BookingStatusSchema,
-    actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]),
+    actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]),
     reason: nullableText(),
     at: InstantSchema,
   })
@@ -280,6 +280,8 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
   travellers: z.array(BookingGuestViewSchema),
   history: z.array(BookingStatusChangeSchema),
   allowedTransitions: z.array(BookingStatusSchema),
+  /** Travel agent that booked for the client, and its commission. */
+  agent: z.object({ name: z.string(), commission: MoneySchema }).nullable(),
   /** Coupon used for this booking, if any. */
   promotionCode: nullableText(40),
   /** Payment attempts, newest first. */

@@ -16,6 +16,16 @@ export interface AuthContext {
   user: AuthUser;
   roles: string[];
   permissions: Permission[];
+  /** PARTNER sessions only: the active partner company the user acts for. */
+  partner?: AuthPartner;
+}
+
+export interface AuthPartner {
+  id: bigint;
+  publicId: string;
+  kind: "SUPPLIER" | "AGENT";
+  name: string;
+  commissionBps: number;
 }
 
 declare module "fastify" {

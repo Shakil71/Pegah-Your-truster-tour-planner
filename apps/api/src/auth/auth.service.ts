@@ -64,6 +64,7 @@ export class AuthService {
             kind: "CUSTOMER",
             roles: [],
             permissions: [],
+            partner: null,
           },
           csrfToken: this.sessions.csrfToken(session.tokenHash),
         },
@@ -83,7 +84,10 @@ export class AuthService {
 
   /** Verifies credentials and opens a customer or staff session. */
   async login(input: LoginRequest, kind: SessionKind, meta: SessionMeta): Promise<IssuedSession> {
-    const user = await this.db.user.findUnique({ where: { email: input.email } });
+    const user = await this.db.user.findUnique({
+      where: { email: input.email },
+      include: { partner: true },
+    });
     const valid = user
       ? await this.passwords.verify(user.passwordHash, input.password)
       : await this.passwords.verifyAgainstDummy(input.password);
@@ -92,13 +96,17 @@ export class AuthService {
       valid &&
       user !== null &&
       user.status === "ACTIVE" &&
-      (kind === "CUSTOMER" || user.kind === "STAFF");
+      // Each portal accepts only its own kind of account.
+      ((kind === "CUSTOMER" && user.kind === "CUSTOMER") ||
+        (kind === "STAFF" && user.kind === "STAFF") ||
+        (kind === "PARTNER" && user.kind === "PARTNER" && user.partner?.status === "ACTIVE"));
 
-    if (kind === "STAFF") {
+    if (kind === "STAFF" || kind === "PARTNER") {
+      const who = kind === "STAFF" ? "staff" : "partner";
       await this.audit.record({
-        actorType: "STAFF",
+        actorType: kind,
         actorUserId: allowed ? user!.id : null,
-        action: allowed ? "auth.staff_login.succeeded" : "auth.staff_login.failed",
+        action: allowed ? `auth.${who}_login.succeeded` : `auth.${who}_login.failed`,
         targetType: "user",
         targetId: allowed ? user!.publicId : undefined,
         ipAddress: meta.ipAddress,
@@ -136,6 +144,15 @@ export class AuthService {
           phone: user.phone,
           kind,
           ...access,
+          partner:
+            kind === "PARTNER" && user.partner
+              ? {
+                  id: user.partner.publicId,
+                  kind: user.partner.kind,
+                  name: user.partner.name,
+                  commissionBps: user.partner.commissionBps,
+                }
+              : null,
         },
         csrfToken: this.sessions.csrfToken(session.tokenHash),
       },
@@ -156,6 +173,14 @@ export class AuthService {
         kind: auth.kind,
         roles: auth.roles,
         permissions: auth.permissions,
+        partner: auth.partner
+          ? {
+              id: auth.partner.publicId,
+              kind: auth.partner.kind,
+              name: auth.partner.name,
+              commissionBps: auth.partner.commissionBps,
+            }
+          : null,
       },
       csrfToken: this.sessions.csrfToken(auth.tokenHash),
     };

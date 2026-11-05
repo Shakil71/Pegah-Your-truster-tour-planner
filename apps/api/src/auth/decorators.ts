@@ -14,6 +14,10 @@ export const Public = () => SetMetadata(IS_PUBLIC, true);
 /** Route uses the staff session cookie and requires a STAFF session. */
 export const Staff = () => SetMetadata(IS_STAFF, true);
 
+/** Route uses the partner session cookie (supplier or agent portal). */
+export const IS_PARTNER = "pegah:isPartner";
+export const PartnerPortal = () => SetMetadata(IS_PARTNER, true);
+
 /** Requires a staff session holding every listed permission. */
 export const RequirePermissions = (...permissions: Permission[]) =>
   SetMetadata(REQUIRED_PERMISSIONS, permissions);

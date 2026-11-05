@@ -7,7 +7,7 @@ import { ProblemException } from "../common/problem";
 import { parseStay } from "../common/stay-dates";
 import { dhakaToday, formatCalendarDate, stayNights } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
-import { priceWithDiscount } from "../pricing/pricing";
+import { applyBps, priceWithDiscount } from "../pricing/pricing";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { PromotionService } from "../promotions/promotion.service";
 import { assertTransition } from "./booking-state-machine";
@@ -54,6 +54,8 @@ export interface CreateBookingContext {
   userId: bigint;
   userPublicId: string;
   ipAddress: string | null;
+  /** Set when a travel agent books for a client: commission is recorded on the booking. */
+  agent?: { partnerId: bigint; commissionBps: number };
 }
 
 /**
@@ -390,6 +392,8 @@ export class BookingCreateService {
         baseMinor: b.baseMinor,
         discountMinor: b.discountMinor,
         promotionId: b.promotionId,
+        agentPartnerId: b.ctx.agent?.partnerId ?? null,
+        commissionMinor: b.ctx.agent ? applyBps(b.totalMinor, b.ctx.agent.commissionBps) : 0n,
         serviceChargeMinor: b.serviceChargeMinor,
         vatMinor: b.vatMinor,
         totalMinor: b.totalMinor,

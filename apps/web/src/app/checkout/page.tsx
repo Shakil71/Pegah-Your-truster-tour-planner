@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
-import { requireCustomer, serverApi } from "@/lib/api-server";
+import { requireCustomer, requirePartner, serverApi } from "@/lib/api-server";
 import { calendarDate, money } from "@/lib/format";
 import { parseStayParams } from "@/lib/trip";
 import { CheckoutForm } from "./checkout-form";
@@ -24,7 +24,9 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const returnTo = `/checkout?${new URLSearchParams(
     Object.entries(sp).filter((e): e is [string, string] => typeof e[1] === "string"),
   )}`;
-  const session = await requireCustomer(returnTo);
+  /** Agents book for a client through the partner API; the client is the contact. */
+  const agentMode = sp.as === "agent";
+  const session = agentMode ? await requirePartner("AGENT") : await requireCustomer(returnTo);
   const api = await serverApi();
 
   let quote;
@@ -59,7 +61,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   }
 
   const q = quote?.data;
-  const saved = (await api.GET("/api/v1/me/travellers")).data?.items ?? [];
+  const saved = agentMode ? [] : ((await api.GET("/api/v1/me/travellers")).data?.items ?? []);
   const problem = quote?.error as { detail?: string } | undefined;
 
   return (
@@ -67,7 +69,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       <div className="grid gap-6">
         <div>
           <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary-ink">
-            Checkout
+            {agentMode ? `Booking for a client · ${session.user.partner?.name ?? ""}` : "Checkout"}
           </p>
           <h1 className="mt-1.5 font-display text-[clamp(2rem,3.6vw,3rem)] font-medium leading-tight">
             Who is travelling?
@@ -111,12 +113,17 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               adultCount={q.adults}
               childCount={q.children}
               csrfToken={session.csrfToken}
+              mode={agentMode ? "agent" : "customer"}
               savedTravellers={saved.map((t) => ({ fullName: t.fullName, ageGroup: t.ageGroup }))}
-              customer={{
-                name: session.user.fullName,
-                email: session.user.email,
-                phone: session.user.phone ?? "",
-              }}
+              customer={
+                agentMode
+                  ? { name: "", email: "", phone: "" }
+                  : {
+                      name: session.user.fullName,
+                      email: session.user.email,
+                      phone: session.user.phone ?? "",
+                    }
+              }
             />
             <aside className="grid content-start gap-4 lg:sticky lg:top-[96px]">
               <section className="panel p-5 md:p-6" aria-labelledby="sum-h">

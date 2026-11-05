@@ -38,6 +38,11 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
         </div>
         <p className="mt-1 text-ink-2">
           {b.productType === "HOTEL" ? "Stay" : "Tour"} · created {dhakaDateTime(b.createdAt)}
+          {b.agent && (
+            <span className="ml-2 rounded-full bg-info-soft px-2 py-0.5 text-[0.76rem] font-semibold text-info">
+              Booked by agent {b.agent.name} · commission {money(b.agent.commission)}
+            </span>
+          )}
         </p>
         {/* Everything this booking touches, one click away. */}
         <nav aria-label="Related" className="mt-3 flex flex-wrap gap-2">

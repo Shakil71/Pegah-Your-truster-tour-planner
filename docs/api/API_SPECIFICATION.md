@@ -96,6 +96,29 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Partner portals (ADR-0026)
+
+| Method   | Path                                    | Access          | Purpose                                  |
+| -------- | --------------------------------------- | --------------- | ---------------------------------------- |
+| POST     | /partner/auth/login, /logout, /password | partner         | Sign in, sign out, change password       |
+| GET      | /partner/auth/session                   | partner         | Current partner user and CSRF token      |
+| GET      | /partner/overview                       | partner         | Supplier inventory or agent totals       |
+| GET      | /partner/reservations                   | supplier        | Bookings for own hotels and tours        |
+| GET/PUT  | /partner/rooms/{id}/calendar            | supplier (owns) | Room inventory and rates                 |
+| PATCH    | /partner/departures/{id}                | supplier (owns) | Seats, close or reopen                   |
+| GET/POST | /partner/bookings                       | agent           | Client bookings / book (Idempotency-Key) |
+| GET      | /partner/bookings/{id}                  | agent (own)     | Booking detail with commission           |
+| POST     | /partner/bookings/{id}/payment-session  | agent (own)     | Hosted payment page                      |
+| GET      | /partner/statement?month=YYYY-MM        | agent           | Monthly commission statement (Dhaka)     |
+| GET/POST | /admin/partners                         | partner:manage  | List / create partner with first user    |
+| PUT      | /admin/partners/{id}                    | partner:manage  | Edit, commission, suspend                |
+| POST     | /admin/partners/{id}/members            | partner:manage  | Add a user                               |
+| PATCH    | /admin/partners/{id}/members/{memberId} | partner:manage  | Disable or enable a user                 |
+| PUT      | /admin/partners/{id}/ownership          | partner:manage  | Assign hotels and tours to a supplier    |
+
+Foreign or unknown ids return 404. Admin hotel and tour inputs accept
+`supplierId`; their details return `supplier`.
+
 ## Promotions, reports and content (ADR-0025)
 
 | Method   | Path                        | Permission       | Purpose                            |

@@ -28,6 +28,7 @@ const columns: { title: string; links: { label: string; href: string | null }[] 
     links: [
       { label: "About", href: "/pages/about" },
       { label: "For hotels and operators", href: "/pages/partners" },
+      { label: "Partner sign in", href: "/partner/login" },
       { label: "Terms", href: "/pages/terms" },
       { label: "Privacy", href: "/pages/privacy" },
     ],

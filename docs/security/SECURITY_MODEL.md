@@ -82,3 +82,15 @@ overrides, staff logins) write append-only `audit_events`.
   logs and never included in error messages.
 - The development simulator cannot be enabled in production; live mode needs
   `SSLCOMMERZ_LIVE_APPROVED=true`.
+
+## Partner portals (ADR-0026)
+
+- Partner users have their own user kind, sign-in endpoint and cookie; each
+  portal accepts only its own kind, so a partner password never opens the
+  customer or staff area.
+- Tenancy is enforced in the API: the partner comes from the session, and every
+  room, departure and booking id is checked against it (404 otherwise).
+- Suspending a partner or disabling a partner user revokes their sessions
+  immediately; every partner and admin partner action is audited.
+- Commission is computed on the server at booking time and constrained by a
+  database CHECK; partner input never sets it.

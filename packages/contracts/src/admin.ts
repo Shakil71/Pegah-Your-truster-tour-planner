@@ -66,7 +66,7 @@ export const DashboardSummarySchema = z.object({
   recentActivity: z.array(
     z.object({
       action: z.string(),
-      actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]),
+      actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]),
       actorName: nullableText(),
       targetType: nullableText(),
       targetId: nullableText(),
@@ -132,7 +132,7 @@ export const AuditEventViewSchema = z
   .object({
     id: z.string(),
     action: z.string(),
-    actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER"]),
+    actorType: z.enum(["CUSTOMER", "STAFF", "SYSTEM", "PAYMENT_PROVIDER", "PARTNER"]),
     actorName: nullableText(),
     actorEmail: nullableText(),
     targetType: nullableText(),

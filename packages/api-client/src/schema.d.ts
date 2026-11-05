@@ -164,6 +164,70 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/partner/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PartnerAuthController_login"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/auth/logout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PartnerAuthController_logout"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/auth/session": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerAuthController_session"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/auth/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PartnerAuthController_changePassword"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/destinations": {
     parameters: {
       query?: never;
@@ -996,6 +1060,214 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/partner/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_overview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/reservations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_reservations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/rooms/{id}/calendar": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_calendar"];
+    put: operations["PartnerPortalController_updateCalendar"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/departures/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["PartnerPortalController_updateDeparture"];
+    trace?: never;
+  };
+  "/api/v1/partner/bookings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_agentBookings"];
+    put?: never;
+    post: operations["PartnerPortalController_createBooking"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/bookings/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_agentBooking"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/bookings/{id}/payment-session": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PartnerPortalController_pay"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/partner/statement": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PartnerPortalController_statement"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/partners": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminPartnersController_list"];
+    put?: never;
+    post: operations["AdminPartnersController_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/partners/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminPartnersController_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/partners/{id}/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminPartnersController_addMember"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/partners/{id}/members/{memberId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch: operations["AdminPartnersController_memberStatus"];
+    trace?: never;
+  };
+  "/api/v1/admin/partners/{id}/ownership": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminPartnersController_ownership"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1023,7 +1295,7 @@ export interface components {
       fullName: string;
       phone: string | null;
       /** @enum {string} */
-      kind: "CUSTOMER" | "STAFF";
+      kind: "CUSTOMER" | "STAFF" | "PARTNER";
       roles: string[];
       permissions: (
         | "dashboard:read"
@@ -1041,7 +1313,15 @@ export interface components {
         | "promotion:manage"
         | "report:read"
         | "content:manage"
+        | "partner:manage"
       )[];
+      partner: {
+        id: string;
+        /** @enum {string} */
+        kind: "SUPPLIER" | "AGENT";
+        name: string;
+        commissionBps: number;
+      } | null;
     };
     SessionResponseDto_Output: {
       user: components["schemas"]["SessionUser_Output"];
@@ -1317,7 +1597,7 @@ export interface components {
         | "REFUND_PENDING"
         | "REFUNDED";
       /** @enum {string} */
-      actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER";
+      actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER" | "PARTNER";
       reason: string | null;
       /** Format: date-time */
       at: string;
@@ -1405,6 +1685,10 @@ export interface components {
         | "REFUND_PENDING"
         | "REFUNDED"
       )[];
+      agent: {
+        name: string;
+        commission: components["schemas"]["Money_Output"];
+      } | null;
       promotionCode: string | null;
       payments: components["schemas"]["Payment_Output"][];
       canPay: boolean;
@@ -1608,7 +1892,7 @@ export interface components {
       recentActivity: {
         action: string;
         /** @enum {string} */
-        actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER";
+        actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER" | "PARTNER";
         actorName: string | null;
         targetType: string | null;
         targetId: string | null;
@@ -1636,6 +1920,7 @@ export interface components {
         | "promotion:manage"
         | "report:read"
         | "content:manage"
+        | "partner:manage"
       )[];
       memberCount: number;
     };
@@ -1682,7 +1967,7 @@ export interface components {
       id: string;
       action: string;
       /** @enum {string} */
-      actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER";
+      actorType: "CUSTOMER" | "STAFF" | "SYSTEM" | "PAYMENT_PROVIDER" | "PARTNER";
       actorName: string | null;
       actorEmail: string | null;
       targetType: string | null;
@@ -1797,6 +2082,7 @@ export interface components {
       vatBps: number;
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      supplierId?: string | null;
       slug: string;
     };
     AdminRoom_Output: {
@@ -1833,6 +2119,10 @@ export interface components {
       cancellationPolicy: string;
       serviceChargeBps: number;
       vatBps: number;
+      supplier: {
+        id: string;
+        name: string;
+      } | null;
       rooms: components["schemas"]["AdminRoom_Output"][];
     };
     AdminHotelInputDto: {
@@ -1850,6 +2140,7 @@ export interface components {
       vatBps: number;
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      supplierId?: string | null;
     };
     AdminRoomInputDto: {
       name: string;
@@ -1930,6 +2221,7 @@ export interface components {
       vatBps: number;
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      supplierId?: string | null;
       slug: string;
     };
     AdminDeparture_Output: {
@@ -1971,6 +2263,10 @@ export interface components {
       includes: string[];
       excludes: string[];
       vatBps: number;
+      supplier: {
+        id: string;
+        name: string;
+      } | null;
       departures: components["schemas"]["AdminDeparture_Output"][];
     };
     AdminTourInputDto: {
@@ -1989,6 +2285,7 @@ export interface components {
       vatBps: number;
       /** @enum {string} */
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      supplierId?: string | null;
     };
     AdminCreateDepartureDto: {
       /** Format: date-time */
@@ -2271,6 +2568,204 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
     };
+    PartnerOverviewDto_Output: {
+      partner: {
+        id: string;
+        /** @enum {string} */
+        kind: "SUPPLIER" | "AGENT";
+        name: string;
+        commissionBps: number;
+      };
+      supplier: {
+        hotels: {
+          slug: string;
+          name: string;
+          /** @enum {string} */
+          status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+          rooms: {
+            id: string;
+            name: string;
+            isActive: boolean;
+          }[];
+        }[];
+        tours: {
+          slug: string;
+          title: string;
+          /** @enum {string} */
+          status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+          departures: components["schemas"]["AdminDeparture_Output"][];
+        }[];
+        upcomingReservations: number;
+        confirmedValue30d: components["schemas"]["Money_Output"];
+      } | null;
+      agent: {
+        bookings30d: number;
+        commissionEarned: components["schemas"]["Money_Output"];
+        commissionPending: components["schemas"]["Money_Output"];
+      } | null;
+    };
+    PartnerBookingListDto_Output: {
+      items: {
+        id: string;
+        reference: string;
+        /** @enum {string} */
+        status:
+          | "DRAFT"
+          | "PENDING_AVAILABILITY"
+          | "PENDING_PAYMENT"
+          | "PAYMENT_PROCESSING"
+          | "CONFIRMED"
+          | "COMPLETED"
+          | "FAILED"
+          | "EXPIRED"
+          | "MANUAL_REVIEW"
+          | "CANCELLATION_REQUESTED"
+          | "CANCELLED"
+          | "REFUND_PENDING"
+          | "REFUNDED";
+        /** @enum {string} */
+        productType: "HOTEL" | "TOUR";
+        productName: string;
+        /** Format: date */
+        startDate: string;
+        endDate: string | null;
+        guests: number;
+        total: components["schemas"]["Money_Output"];
+        contactName: string;
+        /** Format: date-time */
+        createdAt: string;
+        commission: components["schemas"]["Money_Output"];
+      }[];
+      nextCursor: string | null;
+    };
+    PartnerRoomCalendarDto_Output: {
+      room: {
+        id: string;
+        name: string;
+      };
+      hotel: {
+        slug: string;
+        name: string;
+        currency: string;
+      };
+      days: components["schemas"]["CalendarDay_Output"][];
+    };
+    PartnerCalendarUpdateDto: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      weekdays?: number[];
+      total?: number;
+      rate?: components["schemas"]["Money"];
+    };
+    PartnerCalendarResultDto_Output: {
+      datesUpdated: number;
+    };
+    PartnerDepartureUpdateDto: {
+      capacity?: number;
+      priceAdult?: components["schemas"]["Money"];
+      priceChild?: components["schemas"]["Money"];
+      /** @enum {string} */
+      status?: "SCHEDULED" | "CLOSED" | "CANCELLED";
+    };
+    PartnerDepartureResultDto_Output: {
+      departure: components["schemas"]["AdminDeparture_Output"];
+    };
+    PartnerPaymentSessionDto_Output: {
+      paymentId: string;
+      provider: string;
+      /** @enum {string} */
+      mode: "sandbox" | "live" | "simulator";
+      /** Format: uri */
+      redirectUrl: string;
+    };
+    AgentStatementDto_Output: {
+      month: string;
+      items: {
+        id: string;
+        reference: string;
+        productName: string;
+        status: string;
+        total: components["schemas"]["Money_Output"];
+        commission: components["schemas"]["Money_Output"];
+        /** Format: date-time */
+        createdAt: string;
+      }[];
+      totals: {
+        bookings: number;
+        confirmedValue: components["schemas"]["Money_Output"];
+        commissionEarned: components["schemas"]["Money_Output"];
+      };
+    };
+    Partner_Output: {
+      id: string;
+      /** @enum {string} */
+      kind: "SUPPLIER" | "AGENT";
+      name: string;
+      email: string;
+      phone: string | null;
+      commissionBps: number;
+      /** @enum {string} */
+      status: "ACTIVE" | "SUSPENDED";
+      members: {
+        id: string;
+        fullName: string;
+        email: string;
+        /** @enum {string} */
+        status: "ACTIVE" | "DISABLED";
+      }[];
+      hotels: {
+        slug: string;
+        name: string;
+      }[];
+      tours: {
+        slug: string;
+        title: string;
+      }[];
+      /** Format: date-time */
+      createdAt: string;
+    };
+    AdminPartnerListDto_Output: {
+      items: components["schemas"]["Partner_Output"][];
+    };
+    AdminCreatePartnerDto: {
+      /** @enum {string} */
+      kind: "SUPPLIER" | "AGENT";
+      name: string;
+      email: string;
+      phone: string | null;
+      commissionBps: number;
+      member: {
+        fullName: string;
+        email: string;
+        password: string;
+      };
+    };
+    AdminPartnerResultDto_Output: {
+      partner: components["schemas"]["Partner_Output"];
+    };
+    AdminUpdatePartnerDto: {
+      name: string;
+      email: string;
+      phone: string | null;
+      commissionBps: number;
+      /** @enum {string} */
+      status: "ACTIVE" | "SUSPENDED";
+    };
+    AdminPartnerMemberDto: {
+      fullName: string;
+      email: string;
+      password: string;
+    };
+    AdminMemberStatusDto: {
+      /** @enum {string} */
+      status: "ACTIVE" | "DISABLED";
+    };
+    AdminPartnerOwnershipDto: {
+      hotelSlugs: string[];
+      tourSlugs: string[];
+    };
   };
   responses: never;
   parameters: never;
@@ -2479,6 +2974,86 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["SessionResponseDto_Output"];
         };
+      };
+    };
+  };
+  PartnerAuthController_login: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequestDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResponseDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerAuthController_logout: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PartnerAuthController_session: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResponseDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerAuthController_changePassword: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["StaffChangePasswordDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
@@ -3959,6 +4534,374 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PublicContentPageDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_overview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerOverviewDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_reservations: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerBookingListDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_calendar: {
+    parameters: {
+      query: {
+        from: string;
+        days?: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerRoomCalendarDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_updateCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerCalendarUpdateDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerCalendarResultDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_updateDeparture: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartnerDepartureUpdateDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerDepartureResultDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_agentBookings: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerBookingListDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_createBooking: {
+    parameters: {
+      query?: never;
+      header: {
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBookingRequestDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingDetailDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_agentBooking: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingDetailDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_pay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PartnerPaymentSessionDto_Output"];
+        };
+      };
+    };
+  };
+  PartnerPortalController_statement: {
+    parameters: {
+      query: {
+        month: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AgentStatementDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreatePartnerDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminUpdatePartnerDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_addMember: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminPartnerMemberDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_memberStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        memberId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminMemberStatusDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminPartnersController_ownership: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminPartnerOwnershipDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminPartnerResultDto_Output"];
         };
       };
     };

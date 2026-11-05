@@ -84,6 +84,7 @@ export class BookingQueryService {
         payments: { orderBy: { id: "desc" } },
         refunds: { orderBy: { id: "desc" } },
         promotion: { select: { code: true } },
+        agent: { select: { name: true } },
         ...(actor === "STAFF" ? { emails: { orderBy: { id: "desc" as const }, take: 30 } } : {}),
       },
     });
@@ -148,6 +149,12 @@ export class BookingQueryService {
         cancellationPolicy: first?.hotelRoom?.hotel.cancellationPolicy ?? null,
       },
       promotionCode: booking.promotion?.code ?? null,
+      agent: booking.agent
+        ? {
+            name: booking.agent.name,
+            commission: toMoney(booking.commissionMinor, booking.currency),
+          }
+        : null,
       refunds: booking.refunds.map((r) => ({
         id: r.publicId,
         amount: toMoney(r.amountMinor, r.currency),

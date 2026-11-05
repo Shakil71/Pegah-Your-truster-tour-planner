@@ -4,6 +4,24 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Phase 7: partner portals (2026-11-04)
+
+- Partners (suppliers and travel agents) with their own sign-in at `/partner`
+  and a separate session cookie; customer and staff sign-in refuse partner
+  accounts (ADR-0026).
+- Supplier portal: overview of assigned hotels and tours, room calendar (rooms
+  on sale and rates), departure seats and close/reopen, reservations.
+- Agent portal: Book for a client on stay and tour pages, agent checkout,
+  booking page with Pay, client bookings with commission, monthly statement.
+- Admin Suppliers and agents page (`partner:manage`): create partners and
+  users, commission, suspend (revokes sessions), assign hotels and tours.
+  Booking detail shows the agent and commission.
+- Payment return sends agents to the partner portal; client emails for agent
+  bookings carry no account link.
+- Money input helpers moved to `@pegah/shared` (shared by web and admin).
+- Migration `20261108090000_partners` (partners, ownership columns, commission CHECKs).
+- Tests: partner MySQL integration suite; partner e2e smoke.
+
 ### Added — Staff password change (2026-11-04)
 
 - `POST /staff/auth/password` and an admin **My account** page (click your name

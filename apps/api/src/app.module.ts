@@ -14,7 +14,7 @@ import { AuditQueryService } from "./admin/audit-query.service";
 import { DashboardService } from "./admin/dashboard.service";
 import { StaffService } from "./admin/staff.service";
 import { AuditService } from "./audit/audit.service";
-import { AuthController, StaffAuthController } from "./auth/auth.controller";
+import { AuthController, PartnerAuthController, StaffAuthController } from "./auth/auth.controller";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuthService } from "./auth/auth.service";
 import { PasswordService } from "./auth/password.service";
@@ -51,6 +51,8 @@ import {
 } from "./payments/payment.controllers";
 import { PaymentService } from "./payments/payment.service";
 import { paymentProvider } from "./payments/provider.factory";
+import { AdminPartnersController, PartnerPortalController } from "./partners/partner.controllers";
+import { PartnerService } from "./partners/partner.service";
 import { PrismaLifecycle, prismaProvider } from "./prisma/prisma.service";
 import { PromotionService } from "./promotions/promotion.service";
 
@@ -77,6 +79,7 @@ export class AppModule {
         HealthController,
         AuthController,
         StaffAuthController,
+        PartnerAuthController,
         CatalogController,
         AdminBookingsController,
         MyBookingsController,
@@ -93,6 +96,8 @@ export class AppModule {
         AdminRefundsController,
         GrowthAdminController,
         PublicPagesController,
+        PartnerPortalController,
+        AdminPartnersController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -122,6 +127,7 @@ export class AppModule {
         CancellationService,
         PromotionService,
         GrowthService,
+        PartnerService,
         // Order matters: rate limit first, then authentication/authorization.
         { provide: APP_GUARD, useClass: ThrottlerGuard },
         { provide: APP_GUARD, useClass: AuthGuard },
