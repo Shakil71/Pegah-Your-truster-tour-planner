@@ -19,7 +19,8 @@ end; it needs sandbox credentials and the checklist in
 
 - Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);
   light/dark theme toggle (ADR-0033); gift cards at checkout (ADR-0034).
-  Email verification at sign-up (ADR-0035). Next: Bangla emails and partner portal.
+  Email verification at sign-up (ADR-0035); Bangla emails (ADR-0036).
+  Next: Bangla partner portal.
 
 - Console control: editable settings with encrypted credentials, customer
   account controls, media library, home page editor (ADR-0029 … ADR-0031).

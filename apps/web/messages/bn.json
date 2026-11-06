@@ -455,7 +455,8 @@
     "none": "এখনো কোনো ভ্রমণসঙ্গী সংরক্ষণ করা হয়নি।",
     "edit": "সম্পাদনা",
     "remove": "সরান",
-    "removeConfirm": "{name}-কে সরাবেন?"
+    "removeConfirm": "{name}-কে সরাবেন?",
+    "emailLanguage": "ইমেইলের ভাষা"
   },
   "pages": {
     "notFound": "পাওয়া যায়নি",

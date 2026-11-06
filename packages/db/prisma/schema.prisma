@@ -44,6 +44,8 @@ model User {
   status          UserStatus @default(ACTIVE)
   /// When the customer proved they own the email address (ADR-0035).
   emailVerifiedAt DateTime?  @map("email_verified_at") @db.DateTime(3)
+  /// Language for emails: "en" or "bn" (CHECK users_locale_chk, ADR-0036).
+  locale          String     @default("en") @db.VarChar(5)
   lastLoginAt     DateTime?  @map("last_login_at") @db.DateTime(3)
   createdAt       DateTime   @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt       DateTime   @updatedAt @map("updated_at") @db.DateTime(3)

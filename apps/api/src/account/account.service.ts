@@ -17,7 +17,7 @@ import { ProblemException } from "../common/problem";
 import { formatCalendarDate, parseCalendarDate } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { EmailService } from "../email/email.service";
-import { templates } from "../email/templates";
+import { emailLocale, templates } from "../email/templates";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 
 const RESET_TTL_MS = 30 * 60_000;
@@ -45,6 +45,7 @@ export class AccountService {
       fullName: u.fullName,
       phone: u.phone,
       emailVerified: u.emailVerifiedAt !== null,
+      locale: u.locale === "bn" ? "bn" : "en",
       createdAt: u.createdAt.toISOString(),
     };
   }
@@ -57,7 +58,11 @@ export class AccountService {
     await this.db.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: auth.user.id },
-        data: { fullName: input.fullName, phone: input.phone },
+        data: {
+          fullName: input.fullName,
+          phone: input.phone,
+          ...(input.locale ? { locale: input.locale } : {}),
+        },
       });
       await this.audit.record(
         {
@@ -145,7 +150,7 @@ export class AccountService {
     await this.email.send({
       to: user.email,
       template: "password-reset",
-      ...templates.passwordReset(user.fullName, link),
+      ...templates.passwordReset(user.fullName, link, emailLocale(user.locale)),
     });
   }
 

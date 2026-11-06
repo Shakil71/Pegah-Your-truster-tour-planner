@@ -64,6 +64,41 @@ describe.skipIf(!ADMIN_URL)("email verification against MySQL 8.4", () => {
     expect(list.items[0].emailVerified).toBe(true);
   });
 
+  it("writes emails in the language the site was shown in, and lets the customer change it (ADR-0036)", async () => {
+    const res = await h.call("POST", "/auth/register", {
+      headers: { cookie: "NEXT_LOCALE=bn" },
+      body: {
+        email: "verify-bn@example.com",
+        password: "correct-horse-battery",
+        fullName: "Rafiq Uddin",
+      },
+    });
+    expect(res.statusCode).toBe(201);
+    const bn = [...sent].reverse().find((m) => m.to === "verify-bn@example.com")!;
+    expect(bn.subject).toBe("পেগাহ-এর জন্য আপনার ইমেইল নিশ্চিত করুন");
+    expect(bn.html).toContain('<html lang="bn">');
+
+    const raw = res.headers["set-cookie"];
+    const cookie = (Array.isArray(raw) ? raw : [raw])
+      .map((c) => String(c).split(";")[0])
+      .join("; ");
+    const session = { cookie, csrf: res.json().csrfToken };
+    const profile = (await h.call("GET", "/me/profile", { session })).json();
+    expect(profile.locale).toBe("bn");
+    const changed = await h.call("PUT", "/me/profile", {
+      session,
+      body: { fullName: "Rafiq Uddin", phone: null, locale: "en" },
+    });
+    expect(changed.json().locale).toBe("en");
+    await h.call("POST", "/me/email-verification", { session, remoteAddress: "10.40.0.1" });
+    const en = [...sent].reverse().find((m) => m.to === "verify-bn@example.com")!;
+    expect(en.subject).toBe("Confirm your email for Pegah");
+    // The database only accepts the two supported languages.
+    await expect(
+      h.db.user.update({ where: { email: "verify-bn@example.com" }, data: { locale: "fr" } }),
+    ).rejects.toThrow();
+  });
+
   it("replaces older links when a new one is requested, and refuses expired links", async () => {
     const bob = await h.register("verify-bob@example.com");
     const first = linkFor("verify-bob@example.com");

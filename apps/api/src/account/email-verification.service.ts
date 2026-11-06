@@ -5,7 +5,7 @@ import { sha256Hex } from "../auth/session.service";
 import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { EmailService } from "../email/email.service";
-import { templates } from "../email/templates";
+import { emailLocale, templates } from "../email/templates";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { IntegrationSettings } from "../settings/integration-settings.service";
 
@@ -64,7 +64,11 @@ export class EmailVerificationService {
     await this.email.send({
       to: user.email,
       template: "email-verification",
-      ...templates.emailVerification(user.fullName, `${base}/verify-email?token=${token}`),
+      ...templates.emailVerification(
+        user.fullName,
+        `${base}/verify-email?token=${token}`,
+        emailLocale(user.locale),
+      ),
     });
   }
 

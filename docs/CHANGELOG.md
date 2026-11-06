@@ -4,6 +4,12 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Bangla emails (2026-11-06)
+
+- Customer emails (bookings, refunds, verification, password reset, orders,
+  gift cards) are sent in Bangla for customers who use the site in Bangla;
+  Profile → "Language for emails" changes it (ADR-0036).
+
 ### Added — Email verification (2026-11-06)
 
 - New customer accounts get a confirmation link by email; account pages show

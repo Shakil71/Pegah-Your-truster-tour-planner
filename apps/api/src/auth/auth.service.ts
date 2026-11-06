@@ -35,7 +35,11 @@ export class AuthService {
   ) {}
 
   /** Creates a customer account and signs it in. */
-  async register(input: RegisterRequest, meta: SessionMeta): Promise<IssuedSession> {
+  async register(
+    input: RegisterRequest,
+    meta: SessionMeta,
+    locale: "en" | "bn" = "en",
+  ): Promise<IssuedSession> {
     const passwordHash = await this.passwords.hash(input.password);
     try {
       const { user, session } = await this.db.$transaction(async (tx) => {
@@ -47,6 +51,7 @@ export class AuthService {
             fullName: input.fullName,
             phone: input.phone ?? null,
             kind: "CUSTOMER",
+            locale,
           },
         });
         const session = await this.sessions.create(user.id, "CUSTOMER", meta, tx);

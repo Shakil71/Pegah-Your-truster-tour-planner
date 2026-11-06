@@ -455,7 +455,8 @@
     "none": "No saved travellers yet.",
     "edit": "Edit",
     "remove": "Remove",
-    "removeConfirm": "Remove {name}?"
+    "removeConfirm": "Remove {name}?",
+    "emailLanguage": "Language for emails"
   },
   "pages": {
     "notFound": "Not found",

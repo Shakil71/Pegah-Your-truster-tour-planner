@@ -76,7 +76,9 @@ export class AuthController extends SessionCookieController {
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
-    const issued = await this.auth.register(body, sessionMeta(request));
+    // Emails follow the language the website was shown in (next-intl cookie, ADR-0036).
+    const locale = request.cookies?.NEXT_LOCALE === "bn" ? "bn" : "en";
+    const issued = await this.auth.register(body, sessionMeta(request), locale);
     await this.verification.sendAfterRegister(issued.response.user.id, request.ip ?? null);
     return this.issue(reply, "CUSTOMER", issued);
   }

@@ -5,7 +5,13 @@ import { formatCalendarDate } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { EmailService } from "./email.service";
-import { templates, type BookingFacts, type RenderedEmail } from "./templates";
+import {
+  templates,
+  type BookingFacts,
+  type RenderedEmail,
+  emailLocale,
+  type EmailLocale,
+} from "./templates";
 
 const BATCH = 20;
 const MAX_ATTEMPTS = 5;
@@ -108,17 +114,23 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   private async handle(type: string, bookingPublicId: string, payload: Payload) {
     // Offers and gift cards (ADR-0032).
     if (this.commerce.handles(type)) return this.commerce.handle(type, bookingPublicId, payload);
-    const render = (b: BookingFacts): { template: string; mail: RenderedEmail } | null => {
+    const render = (
+      b: BookingFacts,
+      l: EmailLocale,
+    ): { template: string; mail: RenderedEmail } | null => {
       switch (type) {
         case "booking.held":
           return {
             template: "booking-held",
-            mail: templates.bookingHeld(b, dhakaTime(String(payload.holdExpiresAt ?? ""))),
+            mail: templates.bookingHeld(b, dhakaTime(String(payload.holdExpiresAt ?? ""), l), l),
           };
         case "booking.confirmed":
-          return { template: "booking-confirmed", mail: templates.bookingConfirmed(b) };
+          return { template: "booking-confirmed", mail: templates.bookingConfirmed(b, l) };
         case "booking.cancellation_requested":
-          return { template: "cancellation-requested", mail: templates.cancellationRequested(b) };
+          return {
+            template: "cancellation-requested",
+            mail: templates.cancellationRequested(b, l),
+          };
         case "booking.cancelled":
           return {
             template: "booking-cancelled",
@@ -127,12 +139,13 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
               typeof payload.refundMinor === "string" && payload.refundMinor !== "0"
                 ? taka(payload.refundMinor, String(payload.currency ?? "BDT"))
                 : null,
+              l,
             ),
           };
         case "booking.cancellation_rejected":
           return {
             template: "cancellation-rejected",
-            mail: templates.cancellationRejected(b, String(payload.reason ?? "")),
+            mail: templates.cancellationRejected(b, String(payload.reason ?? ""), l),
           };
         case "refund.paid":
           return {
@@ -140,6 +153,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
             mail: templates.refundPaid(
               b,
               taka(String(payload.amountMinor ?? "0"), String(payload.currency ?? "BDT")),
+              l,
             ),
           };
         default:
@@ -148,7 +162,10 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
       }
     };
 
-    const booking = await this.db.booking.findUnique({ where: { publicId: bookingPublicId } });
+    const booking = await this.db.booking.findUnique({
+      where: { publicId: bookingPublicId },
+      include: { user: { select: { locale: true } } },
+    });
     if (!booking) return;
     const base = this.config.PUBLIC_BASE_URL?.replace(/\/$/, "");
     const facts: BookingFacts = {
@@ -165,7 +182,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
           ? `${base}/account/bookings/${booking.publicId}${type === "booking.confirmed" ? "/voucher" : ""}`
           : null,
     };
-    const rendered = render(facts);
+    const rendered = render(facts, emailLocale(booking.user.locale));
     if (!rendered) return;
     const result = await this.email.send({
       to: booking.contactEmail,
@@ -179,10 +196,10 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
 
 export { taka } from "./taka";
 
-function dhakaTime(iso: string): string {
+function dhakaTime(iso: string, l: EmailLocale): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "soon";
-  return new Intl.DateTimeFormat("en-GB", {
+  if (Number.isNaN(d.getTime())) return l === "bn" ? "শিগগিরই" : "soon";
+  return new Intl.DateTimeFormat(l === "bn" ? "bn-BD" : "en-GB", {
     timeZone: "Asia/Dhaka",
     day: "numeric",
     month: "short",

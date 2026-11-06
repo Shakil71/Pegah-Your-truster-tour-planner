@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
-import { FormAlert, TextField, buttonClass } from "@pegah/ui";
+import { FormAlert, SelectField, TextField, buttonClass } from "@pegah/ui";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 
 type Profile = Schemas["ProfileDto_Output"];
@@ -21,6 +21,7 @@ export function ProfileForm({ profile, csrfToken }: { profile: Profile; csrfToke
   const router = useRouter();
   const [fullName, setFullName] = useState(profile.fullName);
   const [phone, setPhone] = useState(profile.phone ?? "");
+  const [locale, setLocale] = useState<"en" | "bn">(profile.locale);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<Note>(null);
   const [errs, setErrs] = useState<Record<string, string>>({});
@@ -31,7 +32,7 @@ export function ProfileForm({ profile, csrfToken }: { profile: Profile; csrfToke
     setNote(null);
     const { error, response } = await browserApi.PUT("/api/v1/me/profile", {
       headers: csrf(csrfToken),
-      body: { fullName, phone: phone.trim() || null },
+      body: { fullName, phone: phone.trim() || null, locale },
     });
     setBusy(false);
     setErrs(fieldErrors(error));
@@ -63,6 +64,16 @@ export function ProfileForm({ profile, csrfToken }: { profile: Profile; csrfToke
         error={errs.phone}
       />
       <TextField label={t("email")} value={profile.email} disabled hint={t("emailHint")} />
+      <SelectField
+        label={t("emailLanguage")}
+        value={locale}
+        onChange={(e) => setLocale(e.target.value === "bn" ? "bn" : "en")}
+      >
+        <option value="en">English</option>
+        <option value="bn" lang="bn">
+          বাংলা
+        </option>
+      </SelectField>
       {note && <FormAlert tone={note.tone}>{note.text}</FormAlert>}
       <button
         type="submit"

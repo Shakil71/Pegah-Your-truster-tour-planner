@@ -656,3 +656,18 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   detail. Existing accounts start unverified.
 - **Not changed:** registration still answers 409 for an existing email
   (known issue); removing that needs a check-your-email sign-up flow.
+
+## ADR-0036 — Customer emails in Bangla
+
+- **Status:** Accepted (2026-11-06)
+- **Language choice:** `users.locale` (`en` | `bn`, CHECK
+  `users_locale_chk`). Sign-up takes it from the language the website was
+  shown in (the next-intl `NEXT_LOCALE` cookie); customers change it under
+  Profile → Language for emails. Existing accounts are English.
+- **Coverage:** booking held/confirmed/cancellation/refund emails, email
+  verification, password reset, order received/paid and gift card delivery
+  (in the buyer's language). Staff alerts stay English.
+- **Templates:** each template takes the locale; the HTML carries
+  `lang="bn"` and a Bengali font fallback. Unit tests check that every Bangla
+  email is fully Bangla and that the honesty rules ("not confirmed until
+  payment") hold in both languages.

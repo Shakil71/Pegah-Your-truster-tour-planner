@@ -19,6 +19,8 @@ export const ProfileSchema = z.object({
   phone: nullableText(20),
   /** The customer opened the link sent to their email (ADR-0035). */
   emailVerified: z.boolean(),
+  /** Language of emails to this customer (ADR-0036). */
+  locale: z.enum(["en", "bn"]),
   createdAt: InstantSchema,
 });
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -26,6 +28,8 @@ export type Profile = z.infer<typeof ProfileSchema>;
 export const UpdateProfileSchema = z.object({
   fullName: z.string().trim().min(2).max(120),
   phone: BdPhoneSchema.nullable(),
+  /** Language of emails; left out = unchanged. */
+  locale: z.enum(["en", "bn"]).optional(),
 });
 export type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
 

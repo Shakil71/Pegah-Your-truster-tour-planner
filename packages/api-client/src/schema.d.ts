@@ -3010,12 +3010,16 @@ export interface components {
       fullName: string;
       phone: string | null;
       emailVerified: boolean;
+      /** @enum {string} */
+      locale: "en" | "bn";
       /** Format: date-time */
       createdAt: string;
     };
     UpdateProfileDto: {
       fullName: string;
       phone: string | null;
+      /** @enum {string} */
+      locale?: "en" | "bn";
     };
     ChangePasswordDto: {
       currentPassword: string;
