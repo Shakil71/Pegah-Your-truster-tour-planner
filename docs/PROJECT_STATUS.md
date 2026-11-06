@@ -1,6 +1,6 @@
 # Project Status
 
-_Last updated: 2026-11-04_
+_Last updated: 2026-11-06_
 
 ## Current phase
 
@@ -16,6 +16,9 @@ end; it needs sandbox credentials and the checklist in
 `docs/operations/SSLCOMMERZ_INTEGRATION.md` before use (ADR-0022).
 
 ## Completed
+
+- Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);
+  light/dark theme toggle (ADR-0033). Next: gift card redemption at checkout.
 
 - Console control: editable settings with encrypted credentials, customer
   account controls, media library, home page editor (ADR-0029 … ADR-0031).

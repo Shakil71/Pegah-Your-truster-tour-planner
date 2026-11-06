@@ -50,6 +50,7 @@ model User {
   rolesGranted UserRole[]           @relation("RoleGrants")
   sessions     Session[]
   bookings     Booking[]
+  orders       Order[]
   travellers   TravellerProfile[]
   resetTokens  PasswordResetToken[]
   partner      Partner?             @relation(fields: [partnerId], references: [id], onDelete: Restrict)
@@ -161,6 +162,8 @@ model MediaAsset {
   updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
   blob         MediaBlob?
+  offers       Offer[]
+  ads          Ad[]
   destinations Destination[]
   hotels       Hotel[]
   tours        Tour[]
@@ -572,7 +575,9 @@ enum PaymentStatus {
 model Payment {
   id              BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
   publicId        String        @unique @map("public_id") @db.Char(26)
-  bookingId       BigInt        @map("booking_id") @db.UnsignedBigInt
+  /// Exactly one of bookingId / orderId is set (CHECK payments_target_chk).
+  bookingId       BigInt?       @map("booking_id") @db.UnsignedBigInt
+  orderId         BigInt?       @map("order_id") @db.UnsignedBigInt
   provider        String        @db.VarChar(30)
   /// Our transaction id sent to the provider (SSLCOMMERZ tran_id).
   providerTxnId   String        @map("provider_txn_id") @db.VarChar(64)
@@ -592,11 +597,13 @@ model Payment {
   createdAt       DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
-  booking Booking        @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  booking Booking?       @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  order   Order?         @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   events  PaymentEvent[]
 
   @@unique([provider, providerTxnId])
   @@index([bookingId])
+  @@index([orderId])
   @@index([status, createdAt])
   @@map("payments")
 }
@@ -922,4 +929,177 @@ model SecretSetting {
   updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
   @@map("secret_settings")
+}
+
+// ─── Offers, ads, orders and gift cards (ADR-0032) ─────────────────────────────
+
+/// A package or deal the owner sells directly (e.g. "Cox's Bazar 3 days").
+model Offer {
+  id                 BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId           String        @unique @map("public_id") @db.Char(26)
+  slug               String        @unique @db.VarChar(80)
+  titleEn            String        @map("title_en") @db.VarChar(160)
+  titleBn            String        @map("title_bn") @db.VarChar(160)
+  summaryEn          String        @map("summary_en") @db.VarChar(300)
+  summaryBn          String        @map("summary_bn") @db.VarChar(300)
+  detailsEn          String        @map("details_en") @db.Text
+  detailsBn          String        @map("details_bn") @db.Text
+  priceMinor         BigInt        @map("price_minor")
+  /// Shown struck through when set (must be higher than the price).
+  originalPriceMinor BigInt?       @map("original_price_minor")
+  currency           String        @default("BDT") @db.Char(3)
+  heroMediaId        BigInt?       @map("hero_media_id") @db.UnsignedBigInt
+  validUntil         DateTime?     @map("valid_until") @db.DateTime(3)
+  /// Units for sale; null = unlimited. sold counts paid and pending orders.
+  stock              Int?          @db.UnsignedInt
+  sold               Int           @default(0) @db.UnsignedInt
+  status             PublishStatus @default(DRAFT)
+  sortOrder          Int           @default(0) @map("sort_order")
+  createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  hero   MediaAsset? @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+  orders Order[]
+
+  @@index([status, sortOrder])
+  @@map("offers")
+}
+
+enum AdPlacement {
+  HOME_TOP
+  HOME_MIDDLE
+  OFFERS_TOP
+}
+
+/// A promotional banner the owner runs on the website for a period.
+model Ad {
+  id        BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId  String      @unique @map("public_id") @db.Char(26)
+  titleEn   String      @map("title_en") @db.VarChar(120)
+  titleBn   String      @map("title_bn") @db.VarChar(120)
+  textEn    String      @default("") @map("text_en") @db.VarChar(240)
+  textBn    String      @default("") @map("text_bn") @db.VarChar(240)
+  mediaId   BigInt      @map("media_id") @db.UnsignedBigInt
+  linkHref  String      @default("") @map("link_href") @db.VarChar(300)
+  placement AdPlacement
+  startsAt  DateTime?   @map("starts_at") @db.DateTime(3)
+  endsAt    DateTime?   @map("ends_at") @db.DateTime(3)
+  active    Boolean     @default(true)
+  sortOrder Int         @default(0) @map("sort_order")
+  createdAt DateTime    @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt DateTime    @updatedAt @map("updated_at") @db.DateTime(3)
+
+  media MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@index([placement, active])
+  @@map("ads")
+}
+
+enum OrderKind {
+  OFFER
+  GIFT_CARD
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+/// A purchase that is not a booking: an offer or a gift card.
+model Order {
+  id             BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId       String      @unique @map("public_id") @db.Char(26)
+  reference      String      @unique @db.VarChar(12)
+  kind           OrderKind
+  status         OrderStatus @default(PENDING_PAYMENT)
+  userId         BigInt      @map("user_id") @db.UnsignedBigInt
+  offerId        BigInt?     @map("offer_id") @db.UnsignedBigInt
+  quantity       Int         @default(1) @db.UnsignedSmallInt
+  amountMinor    BigInt      @map("amount_minor")
+  currency       String      @default("BDT") @db.Char(3)
+  buyerName      String      @map("buyer_name") @db.VarChar(120)
+  buyerEmail     String      @map("buyer_email") @db.VarChar(254)
+  buyerPhone     String      @map("buyer_phone") @db.VarChar(20)
+  note           String?     @db.VarChar(500)
+  /// Gift cards: who receives it (the buyer when buying for themselves).
+  recipientName  String?     @map("recipient_name") @db.VarChar(120)
+  recipientEmail String?     @map("recipient_email") @db.VarChar(254)
+  giftMessage    String?     @map("gift_message") @db.VarChar(300)
+  /// Unpaid orders are cancelled after this; offer stock is released.
+  expiresAt      DateTime    @map("expires_at") @db.DateTime(3)
+  paidAt         DateTime?   @map("paid_at") @db.DateTime(3)
+  /// Set when staff recorded an offline payment (cash, bKash, transfer).
+  paidOffline    String?     @map("paid_offline") @db.VarChar(200)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.DateTime(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  offer    Offer?    @relation(fields: [offerId], references: [id], onDelete: Restrict)
+  payments Payment[]
+  giftCard GiftCard?
+
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+  @@map("orders")
+}
+
+enum GiftCardStatus {
+  ACTIVE
+  VOID
+}
+
+/// Stored value redeemable on bookings. Only a hash of the code is stored.
+model GiftCard {
+  id             BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId       String         @unique @map("public_id") @db.Char(26)
+  /// SHA-256 of the normalised code; the code itself is never stored.
+  codeHash       String         @unique @map("code_hash") @db.Char(64)
+  last4          String         @db.Char(4)
+  /// The code sealed with SETTINGS_ENCRYPTION_KEY so staff can resend it; null without a key.
+  codeSealed     String?        @map("code_sealed") @db.Text
+  initialMinor   BigInt         @map("initial_minor")
+  balanceMinor   BigInt         @map("balance_minor")
+  currency       String         @default("BDT") @db.Char(3)
+  status         GiftCardStatus @default(ACTIVE)
+  expiresAt      DateTime       @map("expires_at") @db.DateTime(3)
+  recipientName  String         @map("recipient_name") @db.VarChar(120)
+  recipientEmail String         @map("recipient_email") @db.VarChar(254)
+  orderId        BigInt?        @unique @map("order_id") @db.UnsignedBigInt
+  issuedBy       BigInt?        @map("issued_by") @db.UnsignedBigInt
+  createdAt      DateTime       @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.DateTime(3)
+
+  order Order?        @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  txns  GiftCardTxn[]
+
+  @@index([status, expiresAt])
+  @@map("gift_cards")
+}
+
+enum GiftCardTxnKind {
+  ISSUE
+  REDEEM
+  RELEASE
+  VOID
+}
+
+/// Every change to a gift card balance, with the booking it paid for.
+model GiftCardTxn {
+  id           BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  giftCardId   BigInt          @map("gift_card_id") @db.UnsignedBigInt
+  kind         GiftCardTxnKind
+  /// Positive adds to the balance, negative takes from it.
+  amountMinor  BigInt          @map("amount_minor")
+  balanceAfter BigInt          @map("balance_after")
+  bookingId    BigInt?         @map("booking_id") @db.UnsignedBigInt
+  note         String?         @db.VarChar(200)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.DateTime(3)
+
+  giftCard GiftCard @relation(fields: [giftCardId], references: [id], onDelete: Restrict)
+
+  @@index([giftCardId, createdAt])
+  @@index([bookingId])
+  @@map("gift_card_txns")
 }

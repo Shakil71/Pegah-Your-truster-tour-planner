@@ -3,6 +3,21 @@
  * tokens.css. Utilities: bg-paper, text-ink, bg-primary, text-primary-ink,
  * font-display, rounded-card, shadow-lift, etc.
  */
+/*
+ * dark: variant. Matches an explicit data-theme="dark" on <html> (the visitor's
+ * choice, ThemeToggle) or the system preference when no choice was made.
+ */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
 @theme inline {
   --color-paper: var(--pg-paper);
   --color-paper-2: var(--pg-paper-2);

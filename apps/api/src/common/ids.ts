@@ -15,3 +15,10 @@ export function newBookingReference(): string {
   for (let i = 0; i < 6; i++) out += REFERENCE_ALPHABET[randomInt(REFERENCE_ALPHABET.length)];
   return `PG-${out}`;
 }
+
+/** Order reference (offers, gift cards), e.g. PO-7K3QX9; distinct from bookings. */
+export function newOrderReference(): string {
+  let out = "";
+  for (let i = 0; i < 6; i++) out += REFERENCE_ALPHABET[randomInt(REFERENCE_ALPHABET.length)];
+  return `PO-${out}`;
+}

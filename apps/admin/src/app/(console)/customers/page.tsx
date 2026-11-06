@@ -55,7 +55,12 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
             {q ? `No customers match “${q}”.` : "No customers yet."}
           </p>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Table, scrolls sideways"
+          >
             <table className="w-full min-w-[760px] text-left text-[0.86rem]">
               <thead>
                 <tr className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">

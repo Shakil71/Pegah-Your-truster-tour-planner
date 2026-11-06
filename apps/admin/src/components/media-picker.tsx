@@ -88,11 +88,15 @@ export function HeroPicker({
   onChange,
   csrfToken,
   readOnly,
+  label = "Main photo",
+  emptyText = "No photo yet (a sample is shown on the website)",
 }: {
   value: HeroRef | null;
   onChange: (v: HeroRef | null) => void;
   csrfToken: string;
   readOnly?: boolean;
+  label?: string;
+  emptyText?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [items, setItems] = useState<MediaItem[] | null>(null);
@@ -115,7 +119,7 @@ export function HeroPicker({
 
   return (
     <div className="grid gap-2">
-      <span className="text-[0.84rem] font-semibold">Main photo</span>
+      <span className="text-[0.84rem] font-semibold">{label}</span>
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative h-[90px] w-[140px] overflow-hidden rounded-[10px] border border-rule bg-paper-2">
           {value ? (
@@ -123,7 +127,7 @@ export function HeroPicker({
             <img src={value.url} alt={value.alt} className="size-full object-cover" />
           ) : (
             <span className="grid size-full place-items-center px-2 text-center text-[0.74rem] text-ink-3">
-              No photo yet (a sample is shown on the website)
+              {emptyText}
             </span>
           )}
         </div>

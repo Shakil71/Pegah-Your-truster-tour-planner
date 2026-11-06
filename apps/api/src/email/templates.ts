@@ -21,13 +21,13 @@ export interface BookingFacts {
   link: string | null;
 }
 
-const esc = (s: string) =>
+export const esc = (s: string) =>
   s.replace(
     /[&<>"']/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
   );
 
-function layout(
+export function layout(
   title: string,
   paragraphs: string[],
   cta?: { label: string; href: string },

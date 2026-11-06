@@ -57,6 +57,9 @@ const paths = {
   filter: "M4 5h16l-6 7.5V19l-4 1.5v-8z",
   download: "M12 4v11M7 10l5 5 5-5M5 20h14",
   dots: "M5 12h.01M12 12h.01M19 12h.01",
+  gift: "M3 8h18v4H3zM5 12v9h14v-9M12 8v13M12 8c-1.5-3-5.5-4-5.5-1.5S10 8 12 8zM12 8c1.5-3 5.5-4 5.5-1.5S14 8 12 8z",
+  megaphone: "M3 10v4h3l9 5V5L6 10zM18 9a4 4 0 0 1 0 6M6 14l1.5 6h3L9 15",
+  bag: "M5 8h14l-1 13H6zM9 8V6a3 3 0 0 1 6 0v2",
 } as const;
 
 export type IconName = keyof typeof paths;

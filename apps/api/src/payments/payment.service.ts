@@ -8,6 +8,7 @@ import { newPublicId } from "../common/ids";
 import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
+import { OrderFulfilment } from "../commerce/order-fulfilment.service";
 import { IntegrationSettings } from "../settings/integration-settings.service";
 import { ProviderError, type PaymentProvider, type Verification } from "./provider";
 
@@ -36,6 +37,8 @@ const MIN_HOLD_LEFT_MS = 60_000;
 
 export interface CallbackResult {
   bookingPublicId: string | null;
+  /** Set when the payment was for an order (offer or gift card) instead of a booking. */
+  orderPublicId?: string | null;
   outcome: "success" | "pending" | "failed" | "cancelled" | "review" | "unknown";
   /** Booked by a partner agent: the payer returns to the partner portal. */
   viaAgent?: boolean;
@@ -61,6 +64,7 @@ export class PaymentService {
     @Inject(BookingStatusService) private readonly status: BookingStatusService,
     @Inject(AuditService) private readonly audit: AuditService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    @Inject(OrderFulfilment) private readonly fulfilment: OrderFulfilment,
   ) {}
 
   /** The current adapter; changes when the owner edits payment settings (ADR-0029). */
@@ -221,7 +225,10 @@ export class PaymentService {
     const payment = /^[0-9A-HJKMNP-TV-Z]{26}$/.test(tranId)
       ? await this.db.payment.findUnique({
           where: { provider_providerTxnId: { provider: provider.name, providerTxnId: tranId } },
-          include: { booking: { select: { publicId: true, agentPartnerId: true } } },
+          include: {
+            booking: { select: { publicId: true, agentPartnerId: true } },
+            order: { select: { publicId: true } },
+          },
         })
       : null;
 
@@ -264,18 +271,20 @@ export class PaymentService {
       this.logger.warn({ paymentId: payment.publicId, err: error }, "Verification failed");
       if (eventId) await this.finishEvent(eventId, "verification-unavailable", now);
       return {
-        bookingPublicId: payment.booking.publicId,
+        bookingPublicId: payment.booking?.publicId ?? null,
+        orderPublicId: payment.order?.publicId ?? null,
         outcome: "pending",
-        viaAgent: payment.booking.agentPartnerId !== null,
+        viaAgent: (payment.booking?.agentPartnerId ?? null) !== null,
       };
     }
 
     const outcome = await this.applyVerification(payment.id, verification, now);
     if (eventId) await this.finishEvent(eventId, outcome, now);
     return {
-      bookingPublicId: payment.booking.publicId,
+      bookingPublicId: payment.booking?.publicId ?? null,
+      orderPublicId: payment.order?.publicId ?? null,
       outcome,
-      viaAgent: payment.booking.agentPartnerId !== null,
+      viaAgent: (payment.booking?.agentPartnerId ?? null) !== null,
     };
   }
 
@@ -284,9 +293,21 @@ export class PaymentService {
    * hold sweeper before it expires a booking, in case callbacks were lost).
    */
   async reconcileBooking(bookingId: bigint, now: Date = new Date()): Promise<void> {
+    return this.reconcile({ bookingId }, now);
+  }
+
+  /** Same check for an order before it expires. */
+  async reconcileOrder(orderId: bigint, now: Date = new Date()): Promise<void> {
+    return this.reconcile({ orderId }, now);
+  }
+
+  private async reconcile(
+    target: { bookingId: bigint } | { orderId: bigint },
+    now: Date,
+  ): Promise<void> {
     if (!this.provider) return;
     const open = await this.db.payment.findMany({
-      where: { bookingId, status: { in: ["INITIATED", "PENDING"] } },
+      where: { ...target, status: { in: ["INITIATED", "PENDING"] } },
       select: { id: true, providerTxnId: true },
     });
     for (const p of open) {
@@ -296,6 +317,172 @@ export class PaymentService {
       } catch (error) {
         this.logger.warn({ err: error }, "Reconciliation lookup failed");
       }
+    }
+  }
+
+  /** A verified payment for an order: exact amount, then the shared fulfilment path. */
+  private async applyOrderPayment(
+    tx: Tx,
+    payment: {
+      id: bigint;
+      publicId: string;
+      status: string;
+      amountMinor: bigint;
+      currency: string;
+    },
+    order: { id: bigint; publicId: string; status: string; amountMinor: bigint; currency: string },
+    v: Verification,
+    now: Date,
+  ): Promise<CallbackResult["outcome"]> {
+    if (payment.status === "SUCCEEDED" || payment.status === "REFUND_REQUIRED") {
+      return order.status === "PAID" ? "success" : "review";
+    }
+    const exact =
+      v.amountMinor === payment.amountMinor &&
+      v.amountMinor === order.amountMinor &&
+      v.currency === payment.currency &&
+      v.currency === order.currency;
+    const paidFields = {
+      providerValId: v.valId,
+      bankTxnId: v.bankTxnId?.slice(0, 80) ?? null,
+      riskLevel: v.riskLevel,
+      method: v.method?.slice(0, 60) ?? null,
+      succeededAt: now,
+    };
+    if (!exact || (v.riskLevel ?? 0) !== 0 || order.status !== "PENDING_PAYMENT") {
+      // Money arrived but the order cannot simply be fulfilled: staff decide (refund or mark paid).
+      await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          ...paidFields,
+          status: order.status === "PENDING_PAYMENT" && exact ? "SUCCEEDED" : "REFUND_REQUIRED",
+          failureReason: !exact
+            ? "Paid amount or currency does not match the order"
+            : order.status !== "PENDING_PAYMENT"
+              ? `Paid after the order became ${order.status}`
+              : "Flagged by the payment provider",
+        },
+      });
+      await tx.outboxEvent.create({
+        data: {
+          eventType: "order.payment_review.staff",
+          aggregateType: "order",
+          aggregateId: order.publicId,
+          payload: { paymentId: payment.publicId },
+        },
+      });
+      return "review";
+    }
+    await tx.payment.update({
+      where: { id: payment.id },
+      data: { ...paidFields, status: "SUCCEEDED" },
+    });
+    const outcome = await this.fulfilment.markPaidInTx(tx, order.id, {}, now);
+    await this.audit.record(
+      {
+        actorType: "PAYMENT_PROVIDER",
+        actorUserId: null,
+        action: "order.paid",
+        targetType: "order",
+        targetId: order.publicId,
+        metadata: { paymentId: payment.publicId, outcome },
+      },
+      tx,
+    );
+    return "success";
+  }
+
+  /** Opens a hosted payment page for an unpaid order (offer or gift card) of this customer. */
+  async startOrderSession(
+    orderPublicId: string,
+    user: { id: bigint },
+    ip: string | null,
+    now: Date = new Date(),
+  ): Promise<PaymentSessionResponse> {
+    const provider = this.provider;
+    if (!provider) {
+      throw new ProblemException(
+        503,
+        "payments-unavailable",
+        "Online payment is not available yet",
+      );
+    }
+    const prepared = await this.db.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({
+        where: { publicId: orderPublicId, userId: user.id },
+        include: { offer: { select: { titleEn: true } } },
+      });
+      if (!order) throw new ProblemException(404, "order-not-found", "Order not found");
+      if (
+        order.status !== "PENDING_PAYMENT" ||
+        order.expiresAt.getTime() - now.getTime() < MIN_HOLD_LEFT_MS
+      ) {
+        throw new ProblemException(409, "order-not-payable", "This order cannot be paid");
+      }
+      const publicId = newPublicId();
+      await tx.payment.create({
+        data: {
+          publicId,
+          orderId: order.id,
+          provider: provider.name,
+          providerTxnId: publicId,
+          amountMinor: order.amountMinor,
+          currency: order.currency,
+        },
+      });
+      await this.audit.record(
+        {
+          actorType: "CUSTOMER",
+          actorUserId: user.id,
+          action: "payment.started",
+          targetType: "order",
+          targetId: order.publicId,
+          ipAddress: ip,
+          metadata: { paymentId: publicId, provider: provider.name },
+        },
+        tx,
+      );
+      return { order, paymentPublicId: publicId };
+    });
+    const base = this.config.PUBLIC_BASE_URL!.replace(/\/$/, "");
+    const callback = (path: string) => `${base}/api/v1/payments/${provider.name}/${path}`;
+    const o = prepared.order;
+    try {
+      const session = await provider.createSession({
+        tranId: prepared.paymentPublicId,
+        amountMinor: o.amountMinor,
+        currency: o.currency,
+        booking: {
+          reference: o.reference,
+          productName:
+            o.kind === "GIFT_CARD" ? "Pegah gift card" : (o.offer?.titleEn ?? "Pegah offer"),
+          productType: o.kind,
+        },
+        customer: { name: o.buyerName, email: o.buyerEmail, phone: o.buyerPhone },
+        urls: {
+          success: callback("return/success"),
+          fail: callback("return/fail"),
+          cancel: callback("return/cancel"),
+          ipn: callback("ipn"),
+        },
+      });
+      await this.db.payment.update({
+        where: { publicId: prepared.paymentPublicId },
+        data: { status: "PENDING", providerSession: session.sessionKey },
+      });
+      return {
+        paymentId: prepared.paymentPublicId,
+        provider: provider.name,
+        mode: provider.mode,
+        redirectUrl: session.redirectUrl,
+      };
+    } catch (error) {
+      const reason = error instanceof ProviderError ? error.message : "Provider call failed";
+      await this.db.payment.update({
+        where: { publicId: prepared.paymentPublicId },
+        data: { status: "FAILED", failureReason: reason.slice(0, 255) },
+      });
+      throw new ProblemException(502, "payment-provider-error", "Could not open the payment page");
     }
   }
 
@@ -309,9 +496,8 @@ export class PaymentService {
       await tx.$queryRaw`SELECT id FROM payments WHERE id = ${paymentId} FOR UPDATE`;
       const payment = await tx.payment.findUniqueOrThrow({
         where: { id: paymentId },
-        include: { booking: true },
+        include: { booking: true, order: true },
       });
-      const booking = payment.booking;
       if (v.tranId !== null && v.tranId !== payment.providerTxnId) return "unknown";
 
       if (v.status === "PENDING" || v.status === "UNKNOWN") return "pending";
@@ -328,6 +514,8 @@ export class PaymentService {
       }
 
       // VALID from here on.
+      if (payment.order) return this.applyOrderPayment(tx, payment, payment.order, v, now);
+      const booking = payment.booking!;
       if (payment.status === "SUCCEEDED" || payment.status === "REFUND_REQUIRED") {
         return booking.status === "CONFIRMED" ? "success" : "review";
       }

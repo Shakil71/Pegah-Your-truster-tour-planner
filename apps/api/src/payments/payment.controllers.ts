@@ -48,6 +48,8 @@ function bookingId(id: string): string {
 /** Where the customer lands after the payment page (a top-level GET, so their session cookie is sent). */
 function landing(config: AppConfig, result: CallbackResult): string {
   const base = (config.PUBLIC_BASE_URL ?? "").replace(/\/$/, "");
+  if (result.orderPublicId)
+    return `${base}/account/orders/${result.orderPublicId}?payment=${result.outcome}`;
   if (!result.bookingPublicId) return `${base}/account/bookings?payment=unknown`;
   const area = result.viaAgent ? "partner" : "account";
   return `${base}/${area}/bookings/${result.bookingPublicId}?payment=${result.outcome}`;
@@ -149,7 +151,10 @@ export class SimulatorController {
     this.sim(tranId);
     const payment = await this.db.payment.findFirst({
       where: { providerTxnId: tranId },
-      include: { booking: { select: { reference: true, productName: true } } },
+      include: {
+        booking: { select: { reference: true, productName: true } },
+        order: { select: { reference: true, kind: true } },
+      },
     });
     const amount = payment ? formatDecimal(payment.amountMinor) : "?";
     const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -160,7 +165,7 @@ export class SimulatorController {
 <title>Payment simulator</title></head><body>
 <h1>Payment simulator (development only)</h1>
 <p>No money moves. This page stands in for the provider's hosted checkout.</p>
-<p>Booking <b>${esc(payment?.booking.reference ?? "?")}</b> — ${esc(payment?.booking.productName ?? "")}<br>
+<p>${payment?.order ? "Order" : "Booking"} <b>${esc(payment?.booking?.reference ?? payment?.order?.reference ?? "?")}</b> — ${esc(payment?.booking?.productName ?? (payment?.order?.kind === "GIFT_CARD" ? "Gift card" : payment?.order ? "Offer" : ""))}<br>
 Amount: <b>${esc(payment?.currency ?? "BDT")} ${amount}</b></p>
 ${button("success", "Pay successfully")}${button("fail", "Payment fails")}${button("cancel", "Cancel")}
 </body></html>`);
@@ -210,7 +215,10 @@ export class AdminPaymentsController {
       where,
       orderBy: { id: "desc" },
       take: q.limit + 1,
-      include: { booking: { select: { publicId: true, reference: true } } },
+      include: {
+        booking: { select: { publicId: true, reference: true } },
+        order: { select: { publicId: true, reference: true } },
+      },
     });
     const page = rows.slice(0, q.limit);
     return {
@@ -223,8 +231,9 @@ export class AdminPaymentsController {
         failureReason: p.failureReason,
         createdAt: p.createdAt.toISOString(),
         succeededAt: p.succeededAt?.toISOString() ?? null,
-        bookingId: p.booking.publicId,
-        bookingReference: p.booking.reference,
+        bookingId: p.booking?.publicId ?? null,
+        orderId: p.order?.publicId ?? null,
+        bookingReference: p.booking?.reference ?? p.order?.reference ?? "",
         providerTxnId: p.providerTxnId,
         bankTxnId: p.bankTxnId,
         riskLevel: p.riskLevel,

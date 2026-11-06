@@ -136,7 +136,12 @@ export function DeparturesManager({
           <FormAlert tone={message.tone}>{message.text}</FormAlert>
         </div>
       )}
-      <div className="mt-4 overflow-x-auto">
+      <div
+        className="mt-4 overflow-x-auto"
+        tabIndex={0}
+        role="region"
+        aria-label="Table, scrolls sideways"
+      >
         <table className="w-full min-w-[820px] text-left text-[0.84rem]">
           <thead>
             <tr className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">

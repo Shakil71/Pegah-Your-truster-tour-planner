@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Hanken_Grotesk } from "next/font/google";
+import { savedTheme } from "@/lib/theme";
 import "./globals.css";
 
 const display = Bodoni_Moda({
@@ -18,9 +19,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${text.variable}`}>
+    <html
+      lang="en"
+      data-theme={await savedTheme()}
+      className={`${display.variable} ${text.variable}`}
+    >
       <body>{children}</body>
     </html>
   );

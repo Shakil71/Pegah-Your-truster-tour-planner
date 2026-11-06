@@ -567,3 +567,44 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   price from) instead of the sample cards and sample prices.
 - **Fallback:** a section left empty keeps the built-in content, so the home
   page is never blank while the catalog is being built.
+
+## ADR-0032 — Offers, ads, orders and gift cards
+
+- **Status:** Accepted (2026-11-06)
+- **Offers:** packages staff publish in the console (bilingual copy, price in
+  paisa, optional "was" price, stock, end date). Customers order them while
+  signed in; the server recomputes the total and answers 409 when the shown
+  total no longer matches. Stock is reserved by the order and released when it
+  is cancelled or expires (48 hours unpaid, reconciled with the provider first).
+- **Orders:** one `orders` table for offers and gift cards (`PO-` reference).
+  `payments` now target either a booking or an order (CHECK constraint;
+  foreign keys `ON UPDATE RESTRICT` because MySQL forbids CHECKs on cascading
+  FK columns). Paid online through the same hosted-payment flow, or marked paid
+  by staff with a reference (bKash, bank transfer, cash) — `order:manage`
+  (owner, admin, finance), audited.
+- **Emails:** every new order, payment and payment-review case is written to
+  the outbox for the buyer and for staff at the "Email for purchase alerts"
+  setting (default pegah.com.bd@gmail.com). Without SMTP they are recorded as
+  SKIPPED, never lost silently.
+- **Gift cards:** 16-character codes (no 0/O/1/I), stored as SHA-256 for
+  lookup plus an AES-256-GCM sealed copy (SETTINGS_ENCRYPTION_KEY) so staff can
+  resend; staff only see the last four characters. Sold only when the key is
+  configured. Every balance change is a ledger row (ISSUE, REDEEM, RELEASE,
+  VOID). Valid two years. Redemption at checkout is the next increment.
+- **Ads:** photo banners from the media library on three placements, scheduled
+  with start/end, at most two per placement.
+
+## ADR-0033 — Visitor-selectable light and dark theme
+
+- **Status:** Accepted (2026-11-06)
+- **Decision:** the tokens already define a dark palette for
+  `prefers-color-scheme: dark`; visitors and staff can now override it with a
+  toggle in the website, partner portal and console headers. The choice is a
+  `pg_theme` cookie (`light` | `dark`, one year, shared on the origin); the
+  root layouts render `data-theme` from it on the server, so there is no flash
+  of the wrong theme. No cookie means "follow the system".
+- **Styling:** components keep using tokens only. A Tailwind `dark:` variant
+  (`packages/design-tokens/theme.css`) matches both the explicit choice and the
+  system preference; it is used sparingly (the logo swaps to its light version).
+- **Verification:** the E2E suite runs the axe scan on website and console
+  pages in dark mode.

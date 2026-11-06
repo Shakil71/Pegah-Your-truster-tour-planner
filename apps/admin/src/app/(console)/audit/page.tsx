@@ -78,7 +78,12 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
         {page.items.length === 0 ? (
           <p className="px-6 py-14 text-center text-ink-2">No events recorded yet.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Table, scrolls sideways"
+          >
             <table className="w-full min-w-[860px] text-left text-[0.84rem]">
               <caption className="sr-only">Audit events, newest first</caption>
               <thead>

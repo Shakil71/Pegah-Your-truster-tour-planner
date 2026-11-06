@@ -20,7 +20,12 @@ export function BookingsTable({ rows, caption }: { rows: Row[]; caption: string 
     );
   }
   return (
-    <div className="overflow-x-auto">
+    <div
+      className="overflow-x-auto"
+      tabIndex={0}
+      role="region"
+      aria-label="Table, scrolls sideways"
+    >
       <table className="w-full min-w-[820px] text-left text-[0.86rem]">
         <caption className="sr-only">{caption}</caption>
         <thead>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
-import { Icon, cx } from "@pegah/ui";
+import { Icon, ThemeToggle, cx } from "@pegah/ui";
 import { browserApi, csrf } from "@/lib/api-browser";
 import { Sidebar } from "./sidebar";
 import { useStaff } from "./staff-context";
@@ -82,6 +82,7 @@ export function AdminShell({ children, today }: { children: ReactNode; today: st
             </form>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-[0.84rem] text-ink-2 sm:inline">{today} · Dhaka</span>
+              <ThemeToggle className="border border-rule bg-card hover:border-ink" />
               <Link
                 href="/account"
                 title="My account"

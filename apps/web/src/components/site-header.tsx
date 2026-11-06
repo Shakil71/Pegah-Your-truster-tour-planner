@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Icon, Logo, cx } from "@pegah/ui";
+import { Icon, Logo, ThemeToggle, cx } from "@pegah/ui";
 import { browserApi } from "@/lib/api-browser";
 import { useScrolledPast } from "@/lib/use-browser";
 import { LanguageSwitch } from "./language-switch";
@@ -11,7 +11,8 @@ import { LanguageSwitch } from "./language-switch";
 const nav = [
   { href: "/stays", key: "stays" },
   { href: "/tours", key: "tours" },
-  { href: "/#explore", key: "destinations" },
+  { href: "/offers", key: "offers" },
+  { href: "/gift-cards", key: "giftCards" },
   { href: "/about", key: "about" },
 ] as const;
 
@@ -43,11 +44,11 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
       <div className="mx-auto grid h-[72px] max-w-[1280px] grid-cols-[1fr_auto] items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
         <div className="justify-self-start">
           <Link href="/" aria-label={t("home")} className="no-underline">
-            <Logo tone={solid ? "dark" : "light"} className="h-11" />
+            <Logo tone={solid ? "auto" : "light"} className="h-11" />
           </Link>
         </div>
         <nav aria-label={t("mainNav")} className="hidden md:block">
-          <ul className="flex gap-8 text-[0.94rem] font-medium">
+          <ul className="flex gap-7 text-[0.94rem] font-medium">
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
@@ -58,17 +59,15 @@ export function SiteHeader({ solid: alwaysSolid = false }: { solid?: boolean }) 
                 </Link>
               </li>
             ))}
-            <li>
-              <span className="py-1.5 opacity-80">
-                {t("flights")}
-                <sup className="ml-1 text-[0.58rem] uppercase tracking-wider">{t("soon")}</sup>
-              </span>
-            </li>
           </ul>
         </nav>
         <div className="flex items-center gap-4 justify-self-end text-sm">
           <span className="tabular hidden md:inline">৳ BDT</span>
           <LanguageSwitch />
+          <ThemeToggle
+            labels={{ toDark: t("toDark"), toLight: t("toLight") }}
+            className={cx("-mx-2", solid ? "hover:bg-paper-2" : "hover:bg-white/15")}
+          />
           <Link
             href={name ? "/account/bookings" : "/login"}
             className={cx(

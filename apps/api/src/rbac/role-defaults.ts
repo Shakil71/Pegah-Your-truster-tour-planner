@@ -42,6 +42,7 @@ export const ROLE_DEFAULTS: Record<
       "booking:read",
       "payment:read",
       "refund:approve",
+      "order:manage",
       "audit:read",
       "report:read",
     ],

@@ -53,6 +53,8 @@ export default defineConfig({
         DATABASE_URL: stack.databaseUrl,
         SESSION_SECRET: randomBytes(32).toString("base64url"),
         PAYMENT_PROVIDER: "simulator",
+        // Throwaway per-run key so gift cards can be sold and their codes sealed.
+        SETTINGS_ENCRYPTION_KEY: randomBytes(32).toString("base64"),
         PUBLIC_BASE_URL: BASE,
         EMAIL_TRANSPORT: "none",
         APP_ORIGINS: "http://localhost:3000,http://localhost:3001",

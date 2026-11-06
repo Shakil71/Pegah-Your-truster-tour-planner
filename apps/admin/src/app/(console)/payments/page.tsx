@@ -69,7 +69,12 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
             docs/operations/SSLCOMMERZ_INTEGRATION.md).
           </p>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Table, scrolls sideways"
+          >
             <table className="w-full min-w-[900px] text-left text-[0.84rem]">
               <caption className="sr-only">Payments, newest first</caption>
               <thead>
@@ -102,7 +107,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
                     </td>
                     <td className="px-4 py-3">
                       <Link
-                        href={`/bookings/${p.bookingId}`}
+                        href={p.bookingId ? `/bookings/${p.bookingId}` : `/orders/${p.orderId}`}
                         className="tabular font-semibold hover:underline"
                       >
                         {p.bookingReference}

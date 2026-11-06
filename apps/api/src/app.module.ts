@@ -2,6 +2,16 @@ import { AdminMediaController, PublicMediaController } from "./media/media.contr
 import { MediaService } from "./media/media.service";
 import { AdminHomeController, PublicHomeController } from "./home/home.controllers";
 import { HomeService } from "./home/home.service";
+import { CommerceMailer } from "./commerce/commerce-mailer.service";
+import {
+  AdminCommerceController,
+  MyOrdersController,
+  PublicCommerceController,
+} from "./commerce/commerce.controllers";
+import { GiftCardService } from "./commerce/gift-card.service";
+import { OffersService } from "./commerce/offers.service";
+import { OrderFulfilment } from "./commerce/order-fulfilment.service";
+import { OrderService } from "./commerce/order.service";
 import { MetricsService } from "./metrics/metrics.service";
 import { RedisThrottlerStorage } from "./rbac/redis-throttler.storage";
 import { AdminSettingsController, PublicSiteController } from "./admin/settings.controller";
@@ -115,12 +125,20 @@ export class AppModule {
         PublicMediaController,
         AdminHomeController,
         PublicHomeController,
+        PublicCommerceController,
+        MyOrdersController,
+        AdminCommerceController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
         MetricsService,
         MediaService,
         HomeService,
+        GiftCardService,
+        OrderFulfilment,
+        OffersService,
+        OrderService,
+        CommerceMailer,
         // Registered so Nest closes the Redis connection on shutdown.
         ...(rateLimitStorage
           ? [{ provide: RedisThrottlerStorage, useValue: rateLimitStorage }]

@@ -63,7 +63,6 @@
     --pg-primary-soft: #3a2414;
     --pg-primary-ink: #ffa365;
     --pg-thread-ink: #d4b26a;
-    --pg-thread-ink: #d4b26a;
     --pg-good: #6fd3a0;
     --pg-good-soft: #143222;
     --pg-warn: #f0bf5a;
@@ -90,6 +89,7 @@
   --pg-night-2: #10153a;
   --pg-primary-soft: #3a2414;
   --pg-primary-ink: #ffa365;
+  --pg-thread-ink: #d4b26a;
   --pg-good: #6fd3a0;
   --pg-good-soft: #143222;
   --pg-warn: #f0bf5a;
