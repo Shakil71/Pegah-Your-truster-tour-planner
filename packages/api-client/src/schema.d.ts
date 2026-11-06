@@ -1652,6 +1652,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/bookings/{id}/gift-card": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyBookingGiftCardController_apply"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/bookings/{id}/gift-card/{paymentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["MyBookingGiftCardController_remove"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/offers": {
     parameters: {
       query?: never;
@@ -2257,6 +2289,8 @@ export interface components {
       promotionCode: string | null;
       payments: components["schemas"]["Payment_Output"][];
       canPay: boolean;
+      amountDue: components["schemas"]["Money_Output"];
+      canUseGiftCard: boolean;
       customer: {
         id: string;
         fullName: string;
@@ -3778,6 +3812,15 @@ export interface components {
       mode: "sandbox" | "live" | "simulator";
       /** Format: uri */
       redirectUrl: string;
+    };
+    ApplyGiftCardDto: {
+      code: string;
+    };
+    ApplyGiftCardResultDto_Output: {
+      applied: components["schemas"]["Money_Output"];
+      amountDue: components["schemas"]["Money_Output"];
+      cardBalance: components["schemas"]["Money_Output"];
+      bookingStatus: string;
     };
     AdminOfferListDto_Output: {
       items: {
@@ -6828,6 +6871,51 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["OrderPaymentSessionDto_Output"];
         };
+      };
+    };
+  };
+  MyBookingGiftCardController_apply: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApplyGiftCardDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApplyGiftCardResultDto_Output"];
+        };
+      };
+    };
+  };
+  MyBookingGiftCardController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        paymentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

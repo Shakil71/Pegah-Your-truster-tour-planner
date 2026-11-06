@@ -114,6 +114,13 @@ the inventory goes back on sale.
 | GET/POST            | /admin/gift-cards                      | payment:read / order:manage | List, issue without payment                  |
 | POST                | /admin/gift-cards/{id}/void, /resend   | order:manage                | Void, resend code                            |
 
+Gift cards at checkout (ADR-0034):
+
+| Method | Path                                    | Access                | Purpose                              |
+| ------ | --------------------------------------- | --------------------- | ------------------------------------ |
+| POST   | /me/bookings/{id}/gift-card             | customer, CSRF, 5/min | Apply a card to a held booking       |
+| DELETE | /me/bookings/{id}/gift-card/{paymentId} | customer, CSRF        | Remove it; money returns to the card |
+
 ## Console control (ADR-0029)
 
 | Method | Path                           | Permission       | Purpose                                 |

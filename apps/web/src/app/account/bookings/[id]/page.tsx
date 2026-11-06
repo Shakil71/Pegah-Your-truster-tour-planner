@@ -9,6 +9,7 @@ import { requireCustomer, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
 import { calendarDate, dhakaDateTime, money } from "@/lib/format";
 import { CancellationRequest } from "./cancellation-request";
+import { GiftCardBox } from "./gift-card-box";
 import { HoldPanel } from "./hold-panel";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -163,6 +164,18 @@ export default async function TripPage({
             holdExpiresAt={b.holdExpiresAt}
             csrfToken={session.csrfToken}
             canPay={b.canPay}
+            amountDue={b.amountDue.amountMinor !== b.price.total.amountMinor ? b.amountDue : null}
+          />
+        )}
+        {b.canUseGiftCard && (
+          <GiftCardBox
+            bookingId={b.id}
+            csrfToken={session.csrfToken}
+            total={b.price.total}
+            amountDue={b.amountDue}
+            applied={b.payments
+              .filter((p) => p.provider === "GIFT_CARD" && p.status === "SUCCEEDED")
+              .map((p) => ({ id: p.id, method: p.method, amount: p.amount }))}
           />
         )}
 

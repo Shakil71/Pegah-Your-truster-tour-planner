@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormAlert, Icon } from "@pegah/ui";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
+import { money } from "@/lib/format";
 
 function remaining(until: string): number {
   return Math.max(0, Math.floor((Date.parse(until) - Date.now()) / 1000));
@@ -17,6 +18,7 @@ export function HoldPanel({
   csrfToken,
   canPay,
   agent = false,
+  amountDue = null,
 }: {
   bookingId: string;
   holdExpiresAt: string;
@@ -25,6 +27,8 @@ export function HoldPanel({
   canPay: boolean;
   /** Partner agent view: pays through the partner API; no cancel (the client contacts Pegah). */
   agent?: boolean;
+  /** Set when gift cards cover part of the total: the button shows what is left to pay. */
+  amountDue?: Parameters<typeof money>[0] | null;
 }) {
   const t = useTranslations("hold");
   const router = useRouter();
@@ -120,7 +124,13 @@ export function HoldPanel({
             className="inline-flex h-11 items-center justify-center gap-2 rounded-control bg-primary px-5 font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-50"
           >
             <Icon name="card" className="size-[18px]" />
-            {canPay ? (paying ? t("opening") : t("payNow")) : t("payNowSoon")}
+            {canPay
+              ? paying
+                ? t("opening")
+                : amountDue
+                  ? t("payAmount", { amount: money(amountDue) })
+                  : t("payNow")
+              : t("payNowSoon")}
           </button>
           {!agent && (
             <button

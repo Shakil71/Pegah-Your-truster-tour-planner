@@ -7,7 +7,7 @@
 // The URL points at the server, not a database; the user needs rights on
 // `pegah_it_%` databases (the same grant the integration tests use).
 import { execFileSync } from "node:child_process";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes, randomInt } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
@@ -70,10 +70,51 @@ step("owner account", cli("create-staff"), [
   "owner",
 ]);
 
+// A gift card with a known code for the checkout test (ADR-0034). Codes normally
+// travel only by email; this one is random per run and stays in .state/.
+const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const giftCardCode = Array.from({ length: 16 }, () => ALPHABET[randomInt(ALPHABET.length)]).join(
+  "",
+);
+{
+  console.log("e2e prepare: gift card");
+  const gc = await mariadb.createConnection({
+    host: u.hostname,
+    port: Number(u.port || 3306),
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    database: DB_NAME,
+    allowPublicKeyRetrieval: true,
+  });
+  const amount = 10_000_000; // ৳100,000 in paisa: covers any demo stay.
+  const publicId =
+    "01E2EGC" +
+    randomBytes(10)
+      .toString("hex")
+      .toUpperCase()
+      .replace(/[ILOU]/g, "A")
+      .slice(0, 19);
+  const res = await gc.query(
+    "INSERT INTO gift_cards (public_id, code_hash, last4, initial_minor, balance_minor, currency, status, expires_at, recipient_name, recipient_email, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 'BDT', 'ACTIVE', DATE_ADD(UTC_TIMESTAMP(3), INTERVAL 1 YEAR), 'E2E Traveller', 'e2e@example.com', UTC_TIMESTAMP(3), UTC_TIMESTAMP(3))",
+    [
+      publicId,
+      createHash("sha256").update(giftCardCode).digest("hex"),
+      giftCardCode.slice(-4),
+      amount,
+      amount,
+    ],
+  );
+  await gc.query(
+    "INSERT INTO gift_card_txns (gift_card_id, kind, amount_minor, balance_after, note, created_at) VALUES (?, 'ISSUE', ?, ?, 'E2E fixture', UTC_TIMESTAMP(3))",
+    [res.insertId, amount, amount],
+  );
+  await gc.end();
+}
+
 mkdirSync(resolve(root, "e2e/.state"), { recursive: true });
 writeFileSync(
   resolve(root, "e2e/.state/stack.json"),
-  JSON.stringify({ databaseUrl, staffEmail, staffPassword }, null, 2),
+  JSON.stringify({ databaseUrl, staffEmail, staffPassword, giftCardCode }, null, 2),
   { mode: 0o600 },
 );
 console.log("e2e prepare: done");

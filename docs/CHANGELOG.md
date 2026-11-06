@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Gift cards at checkout (2026-11-06)
+
+- Customers apply a gift card on a held booking; the balance pays part or all
+  of it. Fully covered bookings are confirmed at once; otherwise Pay now asks
+  only for the rest (ADR-0034).
+- Money returns to the card if the booking expires or is cancelled before
+  confirmation, or when the customer removes the card.
+- Console gift card history shows the booking each redemption belongs to.
+
 ### Added — Offers, ads, orders, gift cards and dark mode (2026-11-06)
 
 - Website **Offers** (list and detail, order with quantity) and **Gift cards**

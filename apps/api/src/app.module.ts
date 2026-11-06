@@ -6,9 +6,11 @@ import { CommerceMailer } from "./commerce/commerce-mailer.service";
 import {
   AdminCommerceController,
   MyOrdersController,
+  MyBookingGiftCardController,
   PublicCommerceController,
 } from "./commerce/commerce.controllers";
 import { GiftCardService } from "./commerce/gift-card.service";
+import { GiftCardRedemption } from "./commerce/gift-card-redemption.service";
 import { OffersService } from "./commerce/offers.service";
 import { OrderFulfilment } from "./commerce/order-fulfilment.service";
 import { OrderService } from "./commerce/order.service";
@@ -127,6 +129,7 @@ export class AppModule {
         PublicHomeController,
         PublicCommerceController,
         MyOrdersController,
+        MyBookingGiftCardController,
         AdminCommerceController,
       ],
       providers: [
@@ -135,6 +138,7 @@ export class AppModule {
         MediaService,
         HomeService,
         GiftCardService,
+        GiftCardRedemption,
         OrderFulfilment,
         OffersService,
         OrderService,

@@ -8,6 +8,7 @@ import { newPublicId } from "../common/ids";
 import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
+import { GIFT_CARD_PROVIDER, giftCardAppliedMinor } from "../commerce/gift-card-ledger";
 import { OrderFulfilment } from "../commerce/order-fulfilment.service";
 import { IntegrationSettings } from "../settings/integration-settings.service";
 import { ProviderError, type PaymentProvider, type Verification } from "./provider";
@@ -102,7 +103,10 @@ export class PaymentService {
     const prepared = await this.db.$transaction(async (tx) => {
       const booking = await tx.booking.findFirst({
         where: { publicId: bookingPublicId, userId: user.id },
-        include: { payments: { select: { id: true } } },
+        // Online attempts only: gift card payments do not use up the one hold extension.
+        include: {
+          payments: { where: { provider: { not: GIFT_CARD_PROVIDER } }, select: { id: true } },
+        },
       });
       if (!booking) throw new ProblemException(404, "booking-not-found", "Booking not found");
       if (booking.status !== "PENDING_PAYMENT") {
@@ -138,6 +142,11 @@ export class PaymentService {
           data: { expiresAt: extended },
         });
       }
+      // Gift card money already applied is not charged again (ADR-0034).
+      const dueMinor = booking.totalMinor - (await giftCardAppliedMinor(tx, booking.id));
+      if (dueMinor <= 0n) {
+        throw new ProblemException(409, "booking-not-payable", "Nothing left to pay");
+      }
       const publicId = newPublicId();
       await tx.payment.create({
         data: {
@@ -145,7 +154,7 @@ export class PaymentService {
           bookingId: booking.id,
           provider: provider.name,
           providerTxnId: publicId,
-          amountMinor: booking.totalMinor,
+          amountMinor: dueMinor,
           currency: booking.currency,
         },
       });
@@ -161,7 +170,7 @@ export class PaymentService {
         },
         tx,
       );
-      return { booking, paymentPublicId: publicId };
+      return { booking, paymentPublicId: publicId, dueMinor };
     });
 
     // 2. Provider call, outside any transaction.
@@ -171,7 +180,7 @@ export class PaymentService {
     try {
       const session = await provider.createSession({
         tranId: prepared.paymentPublicId,
-        amountMinor: b.totalMinor,
+        amountMinor: prepared.dueMinor,
         currency: b.currency,
         booking: { reference: b.reference, productName: b.productName, productType: b.productType },
         customer: { name: b.contactName, email: b.contactEmail, phone: b.contactPhone },
@@ -519,8 +528,9 @@ export class PaymentService {
       if (payment.status === "SUCCEEDED" || payment.status === "REFUND_REQUIRED") {
         return booking.status === "CONFIRMED" ? "success" : "review";
       }
-      const amountOk =
-        v.amountMinor === payment.amountMinor && v.amountMinor === booking.totalMinor;
+      // The online part must equal what is due after gift card payments (ADR-0034).
+      const dueMinor = booking.totalMinor - (await giftCardAppliedMinor(tx, booking.id));
+      const amountOk = v.amountMinor === payment.amountMinor && v.amountMinor === dueMinor;
       const currencyOk = v.currency === payment.currency && v.currency === booking.currency;
       const riskOk = (v.riskLevel ?? 0) === 0;
       const payable = booking.status === "PENDING_PAYMENT";
@@ -596,22 +606,36 @@ export class PaymentService {
         );
         return "review";
       }
-      await this.status.transitionInTx(
-        tx,
-        {
-          bookingPublicId: booking.publicId,
-          to: "CONFIRMED",
-          expectedStatus: "PAYMENT_PROCESSING",
-          actor,
-          reason: "Payment received and verified",
-        },
-        now,
-      );
-      await this.recordPaymentEvent(tx, "booking.confirmed", booking.publicId, payment.publicId, {
-        totalMinor: booking.totalMinor.toString(),
-        currency: booking.currency,
-      });
+      await this.confirmInTx(tx, booking, payment.publicId, "Payment received and verified", now);
       return "success";
+    });
+  }
+
+  /**
+   * Fully paid: PAYMENT_PROCESSING → CONFIRMED (holds become sold) and the
+   * confirmation email. Also used when gift cards cover the whole total.
+   */
+  async confirmInTx(
+    tx: Tx,
+    booking: { publicId: string; totalMinor: bigint; currency: string },
+    paymentPublicId: string,
+    reason: string,
+    now: Date,
+  ): Promise<void> {
+    await this.status.transitionInTx(
+      tx,
+      {
+        bookingPublicId: booking.publicId,
+        to: "CONFIRMED",
+        expectedStatus: "PAYMENT_PROCESSING",
+        actor: { type: "PAYMENT_PROVIDER", userId: null },
+        reason,
+      },
+      now,
+    );
+    await this.recordPaymentEvent(tx, "booking.confirmed", booking.publicId, paymentPublicId, {
+      totalMinor: booking.totalMinor.toString(),
+      currency: booking.currency,
     });
   }
 

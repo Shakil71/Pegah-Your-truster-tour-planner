@@ -225,8 +225,9 @@ export function GiftCardsManager({
                         <td className="tabular py-2">{dhakaDateTime(t.at)}</td>
                         <td className="py-2">{TXN[t.kind].label}</td>
                         <td className="py-2 text-ink-2">
-                          {t.bookingReference ? `Booking ${t.bookingReference}` : ""}
-                          {t.note ?? ""}
+                          {[t.bookingReference && `Booking ${t.bookingReference}`, t.note]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </td>
                         <td className="tabular py-2 text-right">
                           {TXN[t.kind].sign}

@@ -147,7 +147,7 @@ export class GiftCardService {
 
   // ── Console ───────────────────────────────────────────────────────────────
 
-  private view(c: Row): AdminView {
+  private view(c: Row, refs: Map<bigint, string>): AdminView {
     return {
       id: c.publicId,
       last4: c.last4,
@@ -164,11 +164,24 @@ export class GiftCardService {
         // Absolute amount; the kind says whether it added (ISSUE, RELEASE) or took (REDEEM, VOID).
         amount: toMoney(t.amountMinor < 0n ? -t.amountMinor : t.amountMinor, c.currency),
         balanceAfter: toMoney(t.balanceAfter, c.currency),
-        bookingReference: null,
+        bookingReference: t.bookingId !== null ? (refs.get(t.bookingId) ?? null) : null,
         note: t.note,
         at: t.createdAt.toISOString(),
       })),
     };
+  }
+
+  /** Booking references for the ledger rows that redeemed or returned money. */
+  private async bookingRefs(cards: Row[]): Promise<Map<bigint, string>> {
+    const ids = [...new Set(cards.flatMap((c) => c.txns.map((t) => t.bookingId)))].filter(
+      (id): id is bigint => id !== null,
+    );
+    if (ids.length === 0) return new Map();
+    const rows = await this.db.booking.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, reference: true },
+    });
+    return new Map(rows.map((b) => [b.id, b.reference]));
   }
 
   async list(q: z.infer<typeof AdminGiftCardListQuerySchema>) {
@@ -190,8 +203,9 @@ export class GiftCardService {
       include: INCLUDE,
     });
     const page = rows.slice(0, q.limit);
+    const refs = await this.bookingRefs(page);
     return {
-      items: page.map((c) => this.view(c)),
+      items: page.map((c) => this.view(c, refs)),
       nextCursor:
         rows.length > q.limit && page.length > 0 ? encodeCursor(page[page.length - 1]!.id) : null,
     };
@@ -200,7 +214,7 @@ export class GiftCardService {
   async detail(publicId: string): Promise<AdminView> {
     const c = await this.db.giftCard.findUnique({ where: { publicId }, include: INCLUDE });
     if (!c) throw new ProblemException(404, "gift-card-not-found", "Gift card not found");
-    return this.view(c);
+    return this.view(c, await this.bookingRefs([c]));
   }
 
   /** Staff-issued card (compensation, promotion); delivered by email through the outbox. */

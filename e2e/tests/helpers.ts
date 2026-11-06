@@ -5,7 +5,7 @@ import { expect, type BrowserContext, type Page } from "@playwright/test";
 
 export const stack = JSON.parse(
   readFileSync(resolve(__dirname, "../.state/stack.json"), "utf8"),
-) as { staffEmail: string; staffPassword: string };
+) as { staffEmail: string; staffPassword: string; giftCardCode: string };
 
 /**
  * WCAG 2.1 A/AA scan of the current page. Fails on serious or critical

@@ -272,3 +272,16 @@ export const IssueGiftCardSchema = z.object({
 });
 export const VoidGiftCardSchema = z.object({ reason: Line(3, 200) });
 export const AdminGiftCardResultSchema = z.object({ giftCard: AdminGiftCardSchema });
+
+// ─── Gift card redemption (ADR-0034) ─────────────────────────────────────────
+
+export const ApplyGiftCardSchema = z.object({ code: GiftCardCodeSchema });
+export const ApplyGiftCardResultSchema = z.object({
+  /** Amount taken from the card for this booking. */
+  applied: MoneySchema,
+  /** Left to pay online; zero means the booking is confirmed. */
+  amountDue: MoneySchema,
+  /** Remaining balance on the card. */
+  cardBalance: MoneySchema,
+  bookingStatus: z.string(),
+});

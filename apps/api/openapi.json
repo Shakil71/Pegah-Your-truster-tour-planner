@@ -4417,6 +4417,83 @@
         "tags": ["orders"]
       }
     },
+    "/api/v1/me/bookings/{id}/gift-card": {
+      "post": {
+        "operationId": "MyBookingGiftCardController_apply",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplyGiftCardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyGiftCardResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["me"]
+      }
+    },
+    "/api/v1/me/bookings/{id}/gift-card/{paymentId}": {
+      "delete": {
+        "operationId": "MyBookingGiftCardController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["me"]
+      }
+    },
     "/api/v1/admin/offers": {
       "get": {
         "operationId": "AdminCommerceController_offerList",
@@ -6695,6 +6772,12 @@
           "canPay": {
             "type": "boolean"
           },
+          "amountDue": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "canUseGiftCard": {
+            "type": "boolean"
+          },
           "customer": {
             "type": "object",
             "properties": {
@@ -6826,6 +6909,8 @@
           "promotionCode",
           "payments",
           "canPay",
+          "amountDue",
+          "canUseGiftCard",
           "customer",
           "product",
           "refunds"
@@ -13687,6 +13772,34 @@
           }
         },
         "required": ["paymentId", "provider", "mode", "redirectUrl"],
+        "additionalProperties": false
+      },
+      "ApplyGiftCardDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": ["code"]
+      },
+      "ApplyGiftCardResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "applied": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "amountDue": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "cardBalance": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "bookingStatus": {
+            "type": "string"
+          }
+        },
+        "required": ["applied", "amountDue", "cardBalance", "bookingStatus"],
         "additionalProperties": false
       },
       "AdminOfferListDto_Output": {

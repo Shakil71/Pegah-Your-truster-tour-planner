@@ -578,6 +578,8 @@ model Payment {
   /// Exactly one of bookingId / orderId is set (CHECK payments_target_chk).
   bookingId       BigInt?       @map("booking_id") @db.UnsignedBigInt
   orderId         BigInt?       @map("order_id") @db.UnsignedBigInt
+  /// Set exactly when provider = "GIFT_CARD" (CHECK payments_gift_card_chk).
+  giftCardId      BigInt?       @map("gift_card_id") @db.UnsignedBigInt
   provider        String        @db.VarChar(30)
   /// Our transaction id sent to the provider (SSLCOMMERZ tran_id).
   providerTxnId   String        @map("provider_txn_id") @db.VarChar(64)
@@ -597,13 +599,15 @@ model Payment {
   createdAt       DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
-  booking Booking?       @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  order   Order?         @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  events  PaymentEvent[]
+  booking  Booking?       @relation(fields: [bookingId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  order    Order?         @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  giftCard GiftCard?      @relation(fields: [giftCardId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  events   PaymentEvent[]
 
   @@unique([provider, providerTxnId])
   @@index([bookingId])
   @@index([orderId])
+  @@index([giftCardId])
   @@index([status, createdAt])
   @@map("payments")
 }
@@ -1071,8 +1075,9 @@ model GiftCard {
   createdAt      DateTime       @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt      DateTime       @updatedAt @map("updated_at") @db.DateTime(3)
 
-  order Order?        @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  txns  GiftCardTxn[]
+  order    Order?        @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  txns     GiftCardTxn[]
+  payments Payment[]
 
   @@index([status, expiresAt])
   @@map("gift_cards")

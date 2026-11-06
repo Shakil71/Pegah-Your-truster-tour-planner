@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { BookingStatus } from "@pegah/contracts";
 import { AuditService } from "../audit/audit.service";
+import { releaseGiftCardPayments } from "../commerce/gift-card-ledger";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { canTransition, type BookingActor } from "./booking-state-machine";
@@ -24,6 +25,16 @@ const RELEASES_HOLDS: ReadonlySet<BookingStatus> = new Set([
   "FAILED",
   "REFUND_PENDING",
 ]);
+
+/** Before a booking is confirmed, gift card money is only lent to it (ADR-0034). */
+const UNCONFIRMED: ReadonlySet<BookingStatus> = new Set([
+  "DRAFT",
+  "PENDING_AVAILABILITY",
+  "PENDING_PAYMENT",
+  "PAYMENT_PROCESSING",
+  "MANUAL_REVIEW",
+]);
+const ENDS_UNSOLD: ReadonlySet<BookingStatus> = new Set(["EXPIRED", "CANCELLED", "FAILED"]);
 
 /**
  * The only code path that changes an existing booking's status. It validates
@@ -96,6 +107,11 @@ export class BookingStatusService {
     const released = RELEASES_HOLDS.has(cmd.to) ? await releaseActiveHolds(tx, booking.id, now) : 0;
     // A confirmed booking owns its inventory: held units become sold.
     const converted = cmd.to === "CONFIRMED" ? await convertActiveHolds(tx, booking.id) : 0;
+    // Never sold: gift card money goes back to the cards.
+    const giftCardsReleased =
+      UNCONFIRMED.has(from) && ENDS_UNSOLD.has(cmd.to)
+        ? await releaseGiftCardPayments(tx, booking.id, `Booking ${cmd.to.toLowerCase()}`)
+        : 0;
 
     if (cmd.actor.type !== "SYSTEM") {
       await this.audit.record(
@@ -112,6 +128,7 @@ export class BookingStatusService {
             reason: cmd.reason,
             holdsReleased: released,
             holdsConverted: converted,
+            giftCardsReleased,
           },
         },
         tx,

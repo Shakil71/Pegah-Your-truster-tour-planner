@@ -288,6 +288,10 @@ export const BookingDetailSchema = BookingSummarySchema.extend({
   payments: z.array(PaymentViewSchema),
   /** True when online payment is enabled and this booking can be paid now. */
   canPay: z.boolean(),
+  /** Total minus gift card payments: what is left to pay online (ADR-0034). */
+  amountDue: MoneySchema,
+  /** True while a gift card can be applied (awaiting payment, hold not about to end). */
+  canUseGiftCard: z.boolean(),
   /** The account that made the booking. */
   customer: z.object({ id: PublicIdSchema, fullName: z.string(), email: z.string() }),
   /** What was booked, for linking to the hotel/tour (and departure). */

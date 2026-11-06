@@ -37,6 +37,8 @@ export interface Harness {
       body?: unknown;
       headers?: Record<string, string>;
       form?: Record<string, string>;
+      /** Client address, for tests that need their own rate-limit budget. */
+      remoteAddress?: string;
     },
   ) => ReturnType<NestFastifyApplication["inject"]>;
   register: (email: string) => Promise<Session>;
@@ -168,6 +170,7 @@ export async function createHarness(env: Record<string, string> = {}): Promise<H
         ...(opts.form ? { "content-type": "application/x-www-form-urlencoded" } : {}),
         ...opts.headers,
       },
+      ...(opts.remoteAddress ? { remoteAddress: opts.remoteAddress } : {}),
       ...(opts.form
         ? { payload: new URLSearchParams(opts.form).toString() }
         : opts.body !== undefined

@@ -392,7 +392,8 @@
     "payNow": "Pay now",
     "payNowSoon": "Pay now · coming soon",
     "cancelling": "Cancelling…",
-    "cancelHold": "Cancel hold"
+    "cancelHold": "Cancel hold",
+    "payAmount": "Pay {amount}"
   },
   "voucher": {
     "title": "Voucher and invoice",
@@ -630,5 +631,17 @@
     "paymentFailed": "The payment did not go through. You can try again.",
     "paymentReceived": "Payment received.",
     "paymentWaiting": "Waiting for the payment provider to confirm. Refresh in a minute."
+  },
+  "giftRedeem": {
+    "title": "Have a gift card?",
+    "intro": "Use your Pegah gift card balance for this booking. Anything left is paid online.",
+    "code": "Gift card code",
+    "apply": "Apply",
+    "applying": "Applying…",
+    "remove": "Remove",
+    "removing": "Removing…",
+    "due": "Left to pay (total {total})",
+    "appliedNote": "{amount} taken from your gift card. Left to pay: {due}.",
+    "confirmed": "Your gift card covered the full amount. Your booking is confirmed."
   }
 }

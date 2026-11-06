@@ -27,6 +27,8 @@ import {
   AdminOrderListQuerySchema,
   AdminOrderListSchema,
   AdminOrderSchema,
+  ApplyGiftCardResultSchema,
+  ApplyGiftCardSchema,
   CancelOrderSchema,
   CreateGiftCardOrderSchema,
   CreateOfferOrderSchema,
@@ -56,6 +58,7 @@ import type { AuthContext } from "../auth/auth.types";
 import { CurrentAuth, Public, RequirePermissions } from "../auth/decorators";
 import { ProblemException } from "../common/problem";
 import { PaymentService } from "../payments/payment.service";
+import { GiftCardRedemption } from "./gift-card-redemption.service";
 import { GiftCardService } from "./gift-card.service";
 import { OffersService } from "./offers.service";
 import { OrderService } from "./order.service";
@@ -75,6 +78,8 @@ class MyOrderDto extends createZodDto(OrderViewSchema) {}
 class CreateOfferOrderDto extends createZodDto(CreateOfferOrderSchema) {}
 class CreateGiftCardOrderDto extends createZodDto(CreateGiftCardOrderSchema) {}
 class OrderPaymentSessionDto extends createZodDto(PaymentSessionResponseSchema) {}
+class ApplyGiftCardDto extends createZodDto(ApplyGiftCardSchema) {}
+class ApplyGiftCardResultDto extends createZodDto(ApplyGiftCardResultSchema) {}
 class AdminOfferListDto extends createZodDto(AdminOfferListSchema) {}
 class AdminOfferResultDto extends createZodDto(AdminOfferResultSchema) {}
 class AdminOfferInputDto extends createZodDto(OfferInputSchema) {}
@@ -205,6 +210,40 @@ export class MyOrdersController {
   @ZodResponse({ status: 201, type: OrderPaymentSessionDto })
   pay(@CurrentAuth() a: AuthContext, @Param("id") id: string, @Req() r: FastifyRequest) {
     return this.payments.startOrderSession(pid(id, "order"), a.user, ip(r));
+  }
+}
+
+/** Paying for a held booking with a gift card (ADR-0034). */
+@ApiTags("me")
+@ApiCookieAuth("customer")
+@Controller("me/bookings")
+export class MyBookingGiftCardController {
+  constructor(@Inject(GiftCardRedemption) private readonly redemption: GiftCardRedemption) {}
+
+  // Strict limit: codes cannot be guessed by trying many against one booking.
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post(":id/gift-card")
+  @HttpCode(200)
+  @ApiBody({ type: ApplyGiftCardDto })
+  @ZodResponse({ status: 200, type: ApplyGiftCardResultDto })
+  apply(
+    @CurrentAuth() a: AuthContext,
+    @Param("id") id: string,
+    @Body(new ZodValidationPipe(ApplyGiftCardSchema)) body: z.infer<typeof ApplyGiftCardSchema>,
+    @Req() r: FastifyRequest,
+  ) {
+    return this.redemption.apply(pid(id, "booking"), body.code, a.user, ip(r));
+  }
+
+  @Delete(":id/gift-card/:paymentId")
+  @HttpCode(204)
+  async remove(
+    @CurrentAuth() a: AuthContext,
+    @Param("id") id: string,
+    @Param("paymentId") paymentId: string,
+    @Req() r: FastifyRequest,
+  ): Promise<void> {
+    await this.redemption.remove(pid(id, "booking"), pid(paymentId, "payment"), a.user, ip(r));
   }
 }
 

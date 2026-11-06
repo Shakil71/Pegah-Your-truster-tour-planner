@@ -8,6 +8,7 @@ import { PRISMA, type Db } from "../prisma/prisma.service";
 import { allowedTransitions, type BookingActor } from "./booking-state-machine";
 import { decodeCursor, encodeCursor, toBookingSummary } from "./booking.mappers";
 import { breakdown } from "./offer";
+import { GIFT_CARD_PROVIDER } from "../commerce/gift-card-ledger";
 
 export interface BookingPage {
   items: BookingSummary[];
@@ -130,6 +131,17 @@ export class BookingQueryService {
       })),
       canPay:
         this.integrations.paymentProvider() !== null &&
+        booking.status === "PENDING_PAYMENT" &&
+        booking.holdExpiresAt !== null &&
+        booking.holdExpiresAt.getTime() - Date.now() > 60_000,
+      amountDue: toMoney(
+        booking.totalMinor -
+          booking.payments
+            .filter((p) => p.provider === GIFT_CARD_PROVIDER && p.status === "SUCCEEDED")
+            .reduce((a, p) => a + p.amountMinor, 0n),
+        booking.currency,
+      ),
+      canUseGiftCard:
         booking.status === "PENDING_PAYMENT" &&
         booking.holdExpiresAt !== null &&
         booking.holdExpiresAt.getTime() - Date.now() > 60_000,

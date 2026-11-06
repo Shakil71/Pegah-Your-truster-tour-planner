@@ -608,3 +608,32 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   system preference; it is used sparingly (the logo swaps to its light version).
 - **Verification:** the E2E suite runs the axe scan on website and console
   pages in dark mode.
+
+## ADR-0034 — Paying for bookings with gift cards
+
+- **Status:** Accepted (2026-11-06)
+- **Model:** applying a card to a held booking debits the card (REDEEM ledger
+  row) and writes a `payments` row with `provider = 'GIFT_CARD'` and
+  `gift_card_id` (CHECK `payments_gift_card_chk` ties the two). The rest of the
+  system — refund ceilings, the payments list, the booking page — sees it as a
+  verified payment. Booking and card rows are locked `FOR UPDATE` in one
+  transaction.
+- **Amount due:** total minus applied gift card money. Online payment is
+  opened for that amount only, and verification requires the provider amount
+  to equal it. Applying or removing a card cancels any open payment page, so a
+  page opened for the old amount can never confirm the booking (a late payment
+  on it goes to manual review as a refund case, unless it again equals the
+  amount due).
+- **Full coverage:** when cards cover the total, the booking moves
+  PENDING_PAYMENT → PAYMENT_PROCESSING → CONFIRMED through the state machine
+  (actor PAYMENT_PROVIDER, Pegah being the authority for its own stored value),
+  holds become sold and the confirmation email is queued.
+- **Unsold bookings:** when an unconfirmed booking expires, fails or is
+  cancelled, `BookingStatusService` returns the money to the cards (RELEASE
+  rows; gift card payments become CANCELLED). Customers can also remove a card
+  while the booking awaits payment. A card voided meanwhile is not refilled.
+- **After confirmation:** a cancellation refund that should go back to a card
+  is handled by staff issuing a new card from the console (Gift cards → Issue);
+  automatic re-crediting is a later improvement.
+- **Abuse:** applying is limited to 5 attempts per minute per address, and
+  unknown, void and expired codes get the same answer.
