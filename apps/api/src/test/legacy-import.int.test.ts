@@ -262,7 +262,9 @@ describe.skipIf(!ADMIN_URL)("old website import against MySQL 8.4", () => {
   it("shows the archive in the console to owners only, with search", async () => {
     const owner = await h.staff("owner");
     const support = await h.staff("support");
-    expect((await h.call("GET", "/admin/legacy/tables", { session: support })).statusCode).toBe(403);
+    expect((await h.call("GET", "/admin/legacy/tables", { session: support })).statusCode).toBe(
+      403,
+    );
 
     const tables = await h.call("GET", "/admin/legacy/tables", { session: owner });
     expect(tables.statusCode).toBe(200);

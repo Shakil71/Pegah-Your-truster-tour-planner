@@ -7,8 +7,22 @@ import { createHash } from "node:crypto";
 import { createPrismaClient } from "@pegah/db";
 import { parseDump } from "../dist/legacy/sql-dump.js";
 
-const SKIP = new Set(["sessions", "otp_sent_mobiles", "password_resets", "jobs", "failed_jobs", "migrations"]);
-const SECRET = new Set(["password", "remember_token", "session_id", "otp_code", "national_id", "passport_number"]);
+const SKIP = new Set([
+  "sessions",
+  "otp_sent_mobiles",
+  "password_resets",
+  "jobs",
+  "failed_jobs",
+  "migrations",
+]);
+const SECRET = new Set([
+  "password",
+  "remember_token",
+  "session_id",
+  "otp_code",
+  "national_id",
+  "passport_number",
+]);
 const dump = parseDump(readFileSync(process.argv[2], "utf8"));
 const db = createPrismaClient({ url: process.env.DATABASE_URL, connectionLimit: 2 });
 let problems = 0;
@@ -25,7 +39,12 @@ for (const [table, list] of Object.entries(dump)) {
   if (SKIP.has(table)) continue;
   for (const r of list) {
     rows++;
-    const id = r.id ?? createHash("sha256").update(`${table}:${JSON.stringify(r)}`).digest("hex").slice(0, 32);
+    const id =
+      r.id ??
+      createHash("sha256")
+        .update(`${table}:${JSON.stringify(r)}`)
+        .digest("hex")
+        .slice(0, 32);
     const rec = byKey.get(`${table}:${id}`);
     if (!rec) {
       fail(`missing ${table}:${id}`);
@@ -58,9 +77,12 @@ for (const r of records) {
   linked++;
   const find = finders[r.targetType];
   if (!find) fail(`unknown target type ${r.targetType}`);
-  else if (!(await find(r.targetId))) fail(`${r.sourceTable}:${r.sourceId} → ${r.targetType} ${r.targetId} not found`);
+  else if (!(await find(r.targetId)))
+    fail(`${r.sourceTable}:${r.sourceId} → ${r.targetType} ${r.targetId} not found`);
 }
-console.log(`source rows checked: ${rows}, fields compared: ${fields}, archive rows: ${records.length}, linked rows: ${linked}`);
+console.log(
+  `source rows checked: ${rows}, fields compared: ${fields}, archive rows: ${records.length}, linked rows: ${linked}`,
+);
 console.log(problems === 0 ? "OK: nothing missing, nothing changed." : `${problems} problem(s).`);
 await db.$disconnect();
 process.exit(problems === 0 ? 0 : 1);
