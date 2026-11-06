@@ -41,6 +41,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <a href={`mailto:${c.email}`} className="hover:underline">
               {c.email}
             </a>
+            {c.emailVerified ? " (confirmed)" : " (not confirmed yet)"}
             {c.phone && (
               <>
                 {" · "}

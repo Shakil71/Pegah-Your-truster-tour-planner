@@ -4,6 +4,13 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Email verification (2026-11-06)
+
+- New customer accounts get a confirmation link by email; account pages show
+  a reminder with "Send the link again" (English and Bangla) (ADR-0035).
+- Console setting to require a confirmed email before holds and orders (off by
+  default; only active while SMTP works). Customer list shows who confirmed.
+
 ### Added — Gift cards at checkout (2026-11-06)
 
 - Customers apply a gift card on a held booking; the balance pays part or all

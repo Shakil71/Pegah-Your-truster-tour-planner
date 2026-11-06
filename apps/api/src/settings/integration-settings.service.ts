@@ -157,6 +157,10 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
   paymentExtensionMinutes(): number {
     return this.booking.paymentExtensionMinutes;
   }
+  /** Verified email required to book or order; only while SMTP can deliver the link (ADR-0035). */
+  requireVerifiedEmail(): boolean {
+    return this.booking.requireVerifiedEmail === true && this.email.transport === "smtp";
+  }
   /** Address for staff alerts about purchases. */
   notificationEmail(): string {
     return this.general.notificationEmail || this.general.supportEmail || "pegah.com.bd@gmail.com";

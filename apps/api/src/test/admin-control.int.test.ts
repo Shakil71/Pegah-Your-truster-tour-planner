@@ -93,7 +93,8 @@ describe.skipIf(!ADMIN_URL)("admin control against MySQL 8.4", () => {
     expect(again.statusCode).toBe(200);
 
     const audit = await h.db.auditEvent.findMany({
-      where: { targetId: id },
+      // Staff actions only (sign-up also records the verification email, ADR-0035).
+      where: { targetId: id, action: { startsWith: "customer." } },
       orderBy: { id: "asc" },
     });
     expect(audit.map((a) => a.action)).toEqual(["customer.disabled", "customer.enabled"]);

@@ -121,6 +121,13 @@ Gift cards at checkout (ADR-0034):
 | POST   | /me/bookings/{id}/gift-card             | customer, CSRF, 5/min | Apply a card to a held booking       |
 | DELETE | /me/bookings/{id}/gift-card/{paymentId} | customer, CSRF        | Remove it; money returns to the card |
 
+Email verification (ADR-0035):
+
+| Method | Path                   | Access                | Purpose                              |
+| ------ | ---------------------- | --------------------- | ------------------------------------ |
+| POST   | /me/email-verification | customer, CSRF, 3/min | Email a new confirmation link        |
+| POST   | /auth/verify-email     | public, 10/min        | Confirm with the token from the link |
+
 ## Console control (ADR-0029)
 
 | Method | Path                           | Permission       | Purpose                                 |

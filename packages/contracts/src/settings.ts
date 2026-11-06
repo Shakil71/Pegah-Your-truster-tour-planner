@@ -38,6 +38,11 @@ export const BookingSettingsSchema = z.object({
   holdMinutes: z.number().int().min(5).max(60),
   /** Extra time granted once when the customer opens the payment page. */
   paymentExtensionMinutes: z.number().int().min(0).max(60),
+  /**
+   * Customers must verify their email before holding or ordering (ADR-0035).
+   * Applies only while email sending (SMTP) works, so nobody is locked out.
+   */
+  requireVerifiedEmail: z.boolean().optional(),
 });
 export type BookingSettings = z.infer<typeof BookingSettingsSchema>;
 

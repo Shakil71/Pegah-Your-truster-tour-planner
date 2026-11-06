@@ -54,6 +54,7 @@ import {
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { createZodDto, ZodResponse, ZodValidationPipe } from "nestjs-zod";
 import { z } from "zod";
+import { EmailVerificationService } from "../account/email-verification.service";
 import type { AuthContext } from "../auth/auth.types";
 import { CurrentAuth, Public, RequirePermissions } from "../auth/decorators";
 import { ProblemException } from "../common/problem";
@@ -163,6 +164,7 @@ export class MyOrdersController {
   constructor(
     @Inject(OrderService) private readonly orders: OrderService,
     @Inject(PaymentService) private readonly payments: PaymentService,
+    @Inject(EmailVerificationService) private readonly verification: EmailVerificationService,
   ) {}
 
   @Get()
@@ -190,7 +192,8 @@ export class MyOrdersController {
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @Post("offer")
   @ZodResponse({ status: 201, type: MyOrderDto })
-  offer(@CurrentAuth() a: AuthContext, @Body() body: CreateOfferOrderDto) {
+  async offer(@CurrentAuth() a: AuthContext, @Body() body: CreateOfferOrderDto) {
+    await this.verification.assertVerified(a.user.id);
     return this.orders.createOfferOrder(body, a);
   }
 
@@ -198,10 +201,11 @@ export class MyOrdersController {
   @Post("gift-card")
   @ApiBody({ type: CreateGiftCardOrderDto })
   @ZodResponse({ status: 201, type: MyOrderDto })
-  giftCard(
+  async giftCard(
     @CurrentAuth() a: AuthContext,
     @Body(new ZodValidationPipe(CreateGiftCardOrderSchema)) body: z.infer<typeof GiftOrder>,
   ) {
+    await this.verification.assertVerified(a.user.id);
     return this.orders.createGiftCardOrder(body, a);
   }
 

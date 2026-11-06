@@ -29,6 +29,7 @@ import {
   TravellerListSchema,
   TravellerSchema,
   UpdateProfileSchema,
+  VerifyEmailSchema,
 } from "@pegah/contracts";
 import type { Prisma } from "@pegah/db";
 import type { FastifyReply, FastifyRequest } from "fastify";
@@ -43,6 +44,7 @@ import { toMoney } from "../common/money";
 import { ProblemException } from "../common/problem";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 import { AccountService } from "./account.service";
+import { EmailVerificationService } from "./email-verification.service";
 import { CancellationService } from "./cancellation.service";
 
 class ProfileDto extends createZodDto(ProfileSchema) {}
@@ -50,6 +52,7 @@ class UpdateProfileDto extends createZodDto(UpdateProfileSchema) {}
 class ChangePasswordDto extends createZodDto(ChangePasswordSchema) {}
 class PasswordResetRequestDto extends createZodDto(PasswordResetRequestSchema) {}
 class PasswordResetConfirmDto extends createZodDto(PasswordResetConfirmSchema) {}
+class VerifyEmailDto extends createZodDto(VerifyEmailSchema) {}
 class TravellerInputDto extends createZodDto(TravellerInputSchema) {}
 class TravellerListDto extends createZodDto(TravellerListSchema) {}
 class TravellerResultDto extends createZodDto(z.object({ traveller: TravellerSchema })) {}
@@ -75,6 +78,7 @@ export class AccountController {
     @Inject(AccountService) private readonly account: AccountService,
     @Inject(CancellationService) private readonly cancellations: CancellationService,
     @Inject(BookingQueryService) private readonly bookings: BookingQueryService,
+    @Inject(EmailVerificationService) private readonly verification: EmailVerificationService,
   ) {}
 
   @Get("profile")
@@ -92,6 +96,14 @@ export class AccountController {
     @Req() r: FastifyRequest,
   ) {
     return this.account.updateProfile(auth, body, ip(r));
+  }
+
+  /** Emails a new verification link (ADR-0035). */
+  @Throttle({ default: { limit: 3, ttl: 60_000 } })
+  @Post("email-verification")
+  @HttpCode(202)
+  async sendVerification(@CurrentAuth() auth: AuthContext, @Req() r: FastifyRequest) {
+    await this.verification.send(auth.user.id, ip(r));
   }
 
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
@@ -174,6 +186,22 @@ export class PasswordResetController {
   @HttpCode(204)
   async confirm(@Body() body: PasswordResetConfirmDto, @Req() r: FastifyRequest) {
     await this.account.confirmPasswordReset(body, ip(r));
+  }
+}
+
+@ApiTags("auth")
+@Public()
+@Controller("auth/verify-email")
+export class VerifyEmailController {
+  constructor(
+    @Inject(EmailVerificationService) private readonly verification: EmailVerificationService,
+  ) {}
+
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post()
+  @HttpCode(204)
+  async verify(@Body() body: VerifyEmailDto, @Req() r: FastifyRequest) {
+    await this.verification.verify(body.token, ip(r));
   }
 }
 

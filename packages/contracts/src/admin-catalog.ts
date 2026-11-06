@@ -306,6 +306,7 @@ export const AdminCustomerSchema = z
     fullName: z.string(),
     phone: nullableText(20),
     status: z.enum(["ACTIVE", "DISABLED"]),
+    emailVerified: z.boolean(),
     bookingCount: z.number().int(),
     lastLoginAt: InstantSchema.nullable(),
     createdAt: InstantSchema,

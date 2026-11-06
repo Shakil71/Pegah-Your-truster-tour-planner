@@ -1,3 +1,4 @@
+import { EmailVerificationService } from "../account/email-verification.service";
 import {
   Body,
   Controller,
@@ -147,6 +148,7 @@ export class BookingsController {
     @Inject(BookingCreateService) private readonly creator: BookingCreateService,
     @Inject(BookingQueryService) private readonly bookings: BookingQueryService,
     @Inject(IdempotencyService) private readonly idempotency: IdempotencyService,
+    @Inject(EmailVerificationService) private readonly verification: EmailVerificationService,
   ) {}
 
   /**
@@ -167,6 +169,7 @@ export class BookingsController {
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
     const key = parseIdempotencyKey(request.headers[IDEMPOTENCY_HEADER]);
+    await this.verification.assertVerified(auth.user.id);
     const result = await this.idempotency.execute(
       { actorKey: auth.user.publicId, key, route: "POST /bookings", body },
       async () => {

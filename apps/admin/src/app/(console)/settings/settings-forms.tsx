@@ -205,11 +205,13 @@ export function AnnouncementForm({ view, csrfToken }: { view: View; csrfToken: s
 export function BookingForm({ view, csrfToken }: { view: View; csrfToken: string }) {
   const [hold, setHold] = useState(String(view.booking.holdMinutes));
   const [ext, setExt] = useState(String(view.booking.paymentExtensionMinutes));
+  const [verified, setVerified] = useState(view.booking.requireVerifiedEmail === true);
+  const smtpOn = view.email.transport === "smtp";
   const { busy, note, save } = useSave(csrfToken);
   return (
     <Section
-      title="Booking times"
-      intro="How long a hold keeps rooms or seats, and the extra time given once when the customer opens the payment page. Applies to new holds."
+      title="Booking rules"
+      intro="How long a hold keeps rooms or seats, the extra time given once when the customer opens the payment page, and whether a confirmed email is required. Applies to new holds."
     >
       <div className="grid gap-3 md:grid-cols-2">
         <TextField
@@ -229,6 +231,16 @@ export function BookingForm({ view, csrfToken }: { view: View; csrfToken: string
           onChange={(e) => setExt(e.target.value)}
         />
       </div>
+      <Toggle
+        label="Customers must confirm their email before holding a booking or placing an order"
+        checked={verified}
+        onChange={setVerified}
+        hint={
+          smtpOn
+            ? "New accounts get a confirmation link by email."
+            : "Takes effect only after email sending (SMTP) is set up below, so nobody is locked out."
+        }
+      />
       {note && <FormAlert tone={note.tone}>{note.text}</FormAlert>}
       <button
         type="button"
@@ -237,11 +249,12 @@ export function BookingForm({ view, csrfToken }: { view: View; csrfToken: string
           save("/api/v1/admin/settings/booking", {
             holdMinutes: Number(hold),
             paymentExtensionMinutes: Number(ext),
+            requireVerifiedEmail: verified,
           })
         }
         className={buttonClass("primary", "sm", "justify-self-start")}
       >
-        {busy ? "Saving…" : "Save booking times"}
+        {busy ? "Saving…" : "Save booking rules"}
       </button>
     </Section>
   );

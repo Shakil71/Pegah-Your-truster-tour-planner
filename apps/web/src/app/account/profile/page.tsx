@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { AccountTabs } from "@/components/shop/account-tabs";
+import { VerifyEmailBanner } from "@/components/shop/verify-email-banner";
 import { PageShell } from "@/components/shop/page-shell";
 import { ensure, requireCustomer, serverApi } from "@/lib/api-server";
 import { PasswordForm, ProfileForm } from "./profile-forms";
@@ -31,6 +32,7 @@ export default async function ProfilePage() {
           </h1>
         </div>
         <AccountTabs active="profile" />
+        <VerifyEmailBanner />
         <div className="grid gap-6 lg:grid-cols-2">
           <ProfileForm profile={profile} csrfToken={session.csrfToken} />
           <PasswordForm csrfToken={session.csrfToken} />

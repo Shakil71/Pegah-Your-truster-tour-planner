@@ -820,6 +820,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/email-verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AccountController_sendVerification"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/password": {
     parameters: {
       query?: never;
@@ -910,6 +926,22 @@ export interface paths {
     get?: never;
     put?: never;
     post: operations["PasswordResetController_confirm"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/verify-email": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["VerifyEmailController_verify"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2939,6 +2971,7 @@ export interface components {
       phone: string | null;
       /** @enum {string} */
       status: "ACTIVE" | "DISABLED";
+      emailVerified: boolean;
       bookingCount: number;
       lastLoginAt: string | null;
       /** Format: date-time */
@@ -2955,6 +2988,7 @@ export interface components {
       phone: string | null;
       /** @enum {string} */
       status: "ACTIVE" | "DISABLED";
+      emailVerified: boolean;
       bookingCount: number;
       lastLoginAt: string | null;
       /** Format: date-time */
@@ -2975,6 +3009,7 @@ export interface components {
       email: string;
       fullName: string;
       phone: string | null;
+      emailVerified: boolean;
       /** Format: date-time */
       createdAt: string;
     };
@@ -3016,6 +3051,9 @@ export interface components {
     PasswordResetConfirmDto: {
       token: string;
       newPassword: string;
+    };
+    VerifyEmailDto: {
+      token: string;
     };
     CancellationDecisionDto: {
       approve: boolean;
@@ -3455,6 +3493,7 @@ export interface components {
       booking: {
         holdMinutes: number;
         paymentExtensionMinutes: number;
+        requireVerifiedEmail?: boolean;
       };
       payments: {
         /** @enum {string} */
@@ -3500,6 +3539,7 @@ export interface components {
     AdminBookingSettingsDto: {
       holdMinutes: number;
       paymentExtensionMinutes: number;
+      requireVerifiedEmail?: boolean;
     };
     AdminPaymentSettingsDto: {
       /** @enum {string} */
@@ -5484,6 +5524,23 @@ export interface operations {
       };
     };
   };
+  AccountController_sendVerification: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   AccountController_changePassword: {
     parameters: {
       query?: never;
@@ -5647,6 +5704,27 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["PasswordResetConfirmDto"];
+      };
+    };
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  VerifyEmailController_verify: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VerifyEmailDto"];
       };
     };
     responses: {

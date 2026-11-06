@@ -88,7 +88,14 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
                       <Link href={`/customers/${c.id}`} className="font-semibold hover:underline">
                         {c.fullName}
                       </Link>
-                      <p className="text-[0.76rem] text-ink-3">{c.email}</p>
+                      <p className="text-[0.76rem] text-ink-3">
+                        {c.email}
+                        {c.emailVerified ? (
+                          <span className="ml-1.5 font-semibold text-good">· verified</span>
+                        ) : (
+                          <span className="ml-1.5">· not confirmed</span>
+                        )}
+                      </p>
                     </td>
                     <td className="tabular px-4 py-3">{c.phone ?? "—"}</td>
                     <td className="px-4 py-3">{c.bookingCount}</td>

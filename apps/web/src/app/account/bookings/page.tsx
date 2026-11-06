@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon, buttonClass } from "@pegah/ui";
 import { AccountTabs } from "@/components/shop/account-tabs";
+import { VerifyEmailBanner } from "@/components/shop/verify-email-banner";
 import { BookingStatusBadge } from "@/components/shop/booking-status";
 import { PageShell } from "@/components/shop/page-shell";
 import { SignOutButton } from "@/components/shop/sign-out-button";
@@ -48,6 +49,7 @@ export default async function MyTripsPage({
           <SignOutButton csrfToken={session.csrfToken} />
         </div>
         <AccountTabs active="trips" />
+        <VerifyEmailBanner />
 
         {page.items.length === 0 ? (
           <section className="panel px-6 py-16 text-center">

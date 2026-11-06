@@ -25,8 +25,10 @@ import {
   AccountController,
   AdminRefundsController,
   PasswordResetController,
+  VerifyEmailController,
 } from "./account/account.controllers";
 import { AccountService } from "./account/account.service";
+import { EmailVerificationService } from "./account/email-verification.service";
 import { CancellationService } from "./account/cancellation.service";
 import { AdminController } from "./admin/admin.controllers";
 import { AuditQueryService } from "./admin/audit-query.service";
@@ -116,6 +118,7 @@ export class AppModule {
         CatalogAdminController,
         AccountController,
         PasswordResetController,
+        VerifyEmailController,
         AdminRefundsController,
         GrowthAdminController,
         PublicPagesController,
@@ -170,6 +173,7 @@ export class AppModule {
         EmailService,
         OutboxDispatcher,
         AccountService,
+        EmailVerificationService,
         CancellationService,
         PromotionService,
         GrowthService,

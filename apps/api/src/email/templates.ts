@@ -129,6 +129,24 @@ export const templates = {
       "Thank you for travelling with Pegah.",
       "View booking",
     ),
+  emailVerification: (name: string, link: string): RenderedEmail => ({
+    subject: "Confirm your email for Pegah",
+    text: `Hello ${name},
+
+Welcome to Pegah. Please confirm this is your email address (the link works for 48 hours):
+${link}
+
+If you did not create an account, ignore this email.`,
+    html: layout(
+      "Confirm your email",
+      [
+        esc(`Hello ${name},`),
+        "Welcome to Pegah. Please confirm this is your email address. The button works for 48 hours.",
+        "If you did not create an account, ignore this email.",
+      ],
+      { label: "Confirm my email", href: link },
+    ),
+  }),
   passwordReset: (name: string, link: string): RenderedEmail => ({
     subject: "Reset your Pegah password",
     text: `Hello ${name},\n\nUse this link within 30 minutes to choose a new password:\n${link}\n\nIf you did not ask for this, ignore this email; your password stays the same.`,

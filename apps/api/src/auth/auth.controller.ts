@@ -5,6 +5,7 @@ import { ChangePasswordSchema, type SessionKind, type SessionResponse } from "@p
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { createZodDto, ZodResponse } from "nestjs-zod";
 import { AccountService } from "../account/account.service";
+import { EmailVerificationService } from "../account/email-verification.service";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { LoginRequestDto, RegisterRequestDto, SessionResponseDto } from "./auth.dto";
 import { AuthService, type IssuedSession } from "./auth.service";
@@ -56,6 +57,7 @@ export class AuthController extends SessionCookieController {
     @Inject(AuthService) auth: AuthService,
     @Inject(SessionService) sessions: SessionService,
     @Inject(APP_CONFIG) config: AppConfig,
+    @Inject(EmailVerificationService) private readonly verification: EmailVerificationService,
   ) {
     super(auth, sessions, config);
   }
@@ -74,7 +76,9 @@ export class AuthController extends SessionCookieController {
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
   ) {
-    return this.issue(reply, "CUSTOMER", await this.auth.register(body, sessionMeta(request)));
+    const issued = await this.auth.register(body, sessionMeta(request));
+    await this.verification.sendAfterRegister(issued.response.user.id, request.ip ?? null);
+    return this.issue(reply, "CUSTOMER", issued);
   }
 
   @Public()

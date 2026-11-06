@@ -32,28 +32,31 @@ enum UserStatus {
 }
 
 model User {
-  id           BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
-  publicId     String     @unique @map("public_id") @db.Char(26)
-  email        String     @unique @db.VarChar(254)
-  passwordHash String     @map("password_hash") @db.VarChar(255)
-  fullName     String     @map("full_name") @db.VarChar(120)
-  phone        String?    @db.VarChar(20)
-  kind         UserKind   @default(CUSTOMER)
+  id              BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId        String     @unique @map("public_id") @db.Char(26)
+  email           String     @unique @db.VarChar(254)
+  passwordHash    String     @map("password_hash") @db.VarChar(255)
+  fullName        String     @map("full_name") @db.VarChar(120)
+  phone           String?    @db.VarChar(20)
+  kind            UserKind   @default(CUSTOMER)
   /// Set only for PARTNER users: the company they act for.
-  partnerId    BigInt?    @map("partner_id") @db.UnsignedBigInt
-  status       UserStatus @default(ACTIVE)
-  lastLoginAt  DateTime?  @map("last_login_at") @db.DateTime(3)
-  createdAt    DateTime   @default(now()) @map("created_at") @db.DateTime(3)
-  updatedAt    DateTime   @updatedAt @map("updated_at") @db.DateTime(3)
+  partnerId       BigInt?    @map("partner_id") @db.UnsignedBigInt
+  status          UserStatus @default(ACTIVE)
+  /// When the customer proved they own the email address (ADR-0035).
+  emailVerifiedAt DateTime?  @map("email_verified_at") @db.DateTime(3)
+  lastLoginAt     DateTime?  @map("last_login_at") @db.DateTime(3)
+  createdAt       DateTime   @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.DateTime(3)
 
-  roles        UserRole[]           @relation("UserRoles")
-  rolesGranted UserRole[]           @relation("RoleGrants")
+  roles        UserRole[]               @relation("UserRoles")
+  rolesGranted UserRole[]               @relation("RoleGrants")
   sessions     Session[]
   bookings     Booking[]
   orders       Order[]
   travellers   TravellerProfile[]
   resetTokens  PasswordResetToken[]
-  partner      Partner?             @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  verifyTokens EmailVerificationToken[]
+  partner      Partner?                 @relation(fields: [partnerId], references: [id], onDelete: Restrict)
 
   @@index([partnerId])
   @@map("users")
@@ -796,6 +799,21 @@ model TravellerProfile {
 
   @@index([userId])
   @@map("traveller_profiles")
+}
+
+/// Single-use email verification link (ADR-0035). Only the SHA-256 of the token is stored.
+model EmailVerificationToken {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenHash String    @unique @map("token_hash") @db.Char(64)
+  userId    BigInt    @map("user_id") @db.UnsignedBigInt
+  expiresAt DateTime  @map("expires_at") @db.DateTime(3)
+  usedAt    DateTime? @map("used_at") @db.DateTime(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.DateTime(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
 }
 
 /// Single-use password reset. Only the SHA-256 of the token is stored.

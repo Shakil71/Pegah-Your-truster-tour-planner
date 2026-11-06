@@ -637,3 +637,22 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   automatic re-crediting is a later improvement.
 - **Abuse:** applying is limited to 5 attempts per minute per address, and
   unknown, void and expired codes get the same answer.
+
+## ADR-0035 — Email verification for customer accounts
+
+- **Status:** Accepted (2026-11-06)
+- **Flow:** sign-up emails a single-use link (48 hours; only its SHA-256 is
+  stored in `email_verification_tokens`; sent directly, never through the
+  outbox, because the link is a credential). A new link replaces older ones.
+  Customers resend it from the banner on their account pages (3 per minute).
+- **Landing page:** `/verify-email` verifies only when the person presses the
+  button, so mail-system link scanners cannot verify on their behalf.
+- **Enforcement:** the console setting "Customers must confirm their email
+  before holding a booking or placing an order" (Settings → Booking rules) is
+  off by default and takes effect only while SMTP is configured — without
+  working email nobody could verify, so nobody is locked out. When on, holds
+  and orders by unverified customers answer 403 `email-not-verified`.
+- **Visibility:** staff see "verified / not confirmed" in the customer list and
+  detail. Existing accounts start unverified.
+- **Not changed:** registration still answers 409 for an existing email
+  (known issue); removing that needs a check-your-email sign-up flow.

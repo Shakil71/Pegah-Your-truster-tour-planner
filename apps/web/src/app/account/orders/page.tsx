@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Icon, buttonClass, cx } from "@pegah/ui";
 import { AccountTabs } from "@/components/shop/account-tabs";
+import { VerifyEmailBanner } from "@/components/shop/verify-email-banner";
 import { PageShell } from "@/components/shop/page-shell";
 import type { Locale } from "@/i18n/locales";
 import { ensure, requireCustomer, serverApi } from "@/lib/api-server";
@@ -28,6 +29,7 @@ export default async function MyOrdersPage() {
           {t("heading")}
         </h1>
         <AccountTabs active="orders" />
+        <VerifyEmailBanner />
         {page.items.length === 0 ? (
           <section className="panel px-6 py-14 text-center">
             <Icon name="tag" className="mx-auto size-9 text-ink-3" />

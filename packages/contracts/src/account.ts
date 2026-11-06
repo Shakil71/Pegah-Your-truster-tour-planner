@@ -17,6 +17,8 @@ export const ProfileSchema = z.object({
   email: z.string(),
   fullName: z.string(),
   phone: nullableText(20),
+  /** The customer opened the link sent to their email (ADR-0035). */
+  emailVerified: z.boolean(),
   createdAt: InstantSchema,
 });
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -131,3 +133,7 @@ export const EmailLogItemSchema = z
     at: InstantSchema,
   })
   .meta({ id: "EmailLogItem" });
+
+/** POST /auth/verify-email: the token from the link in the verification email. */
+export const VerifyEmailSchema = z.object({ token: z.string().min(20).max(200) });
+export type VerifyEmail = z.infer<typeof VerifyEmailSchema>;

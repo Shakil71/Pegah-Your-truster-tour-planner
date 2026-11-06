@@ -643,5 +643,19 @@
     "due": "Left to pay (total {total})",
     "appliedNote": "{amount} taken from your gift card. Left to pay: {due}.",
     "confirmed": "Your gift card covered the full amount. Your booking is confirmed."
+  },
+  "verifyEmail": {
+    "title": "Confirm your email",
+    "intro": "Press the button to confirm this email address belongs to you.",
+    "confirm": "Confirm my email",
+    "confirming": "Confirming…",
+    "done": "Thank you. Your email is confirmed.",
+    "toAccount": "Go to my account",
+    "incomplete": "This link is incomplete. Copy the whole link from the email, or ask for a new one from <link>your account</link>.",
+    "bannerLabel": "Email confirmation",
+    "banner": "Please confirm your email. We sent a link to <b>{email}</b>.",
+    "resend": "Send the link again",
+    "sending": "Sending…",
+    "sent": "Link sent"
   }
 }

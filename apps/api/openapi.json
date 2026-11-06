@@ -2245,6 +2245,23 @@
         "tags": ["account"]
       }
     },
+    "/api/v1/me/email-verification": {
+      "post": {
+        "operationId": "AccountController_sendVerification",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["account"]
+      }
+    },
     "/api/v1/me/password": {
       "post": {
         "operationId": "AccountController_changePassword",
@@ -2470,6 +2487,28 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/PasswordResetConfirmDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "post": {
+        "operationId": "VerifyEmailController_verify",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
               }
             }
           }
@@ -9854,6 +9893,9 @@
             "type": "string",
             "enum": ["ACTIVE", "DISABLED"]
           },
+          "emailVerified": {
+            "type": "boolean"
+          },
           "bookingCount": {
             "type": "integer",
             "minimum": -9007199254740991,
@@ -9883,6 +9925,7 @@
           "fullName",
           "phone",
           "status",
+          "emailVerified",
           "bookingCount",
           "lastLoginAt",
           "createdAt"
@@ -9941,6 +9984,9 @@
             "type": "string",
             "enum": ["ACTIVE", "DISABLED"]
           },
+          "emailVerified": {
+            "type": "boolean"
+          },
           "bookingCount": {
             "type": "integer",
             "minimum": -9007199254740991,
@@ -9979,6 +10025,7 @@
           "fullName",
           "phone",
           "status",
+          "emailVerified",
           "bookingCount",
           "lastLoginAt",
           "createdAt",
@@ -10037,13 +10084,16 @@
               }
             ]
           },
+          "emailVerified": {
+            "type": "boolean"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           }
         },
-        "required": ["id", "email", "fullName", "phone", "createdAt"],
+        "required": ["id", "email", "fullName", "phone", "emailVerified", "createdAt"],
         "additionalProperties": false
       },
       "UpdateProfileDto": {
@@ -10222,6 +10272,17 @@
           }
         },
         "required": ["token", "newPassword"]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 200
+          }
+        },
+        "required": ["token"]
       },
       "CancellationDecisionDto": {
         "type": "object",
@@ -12015,6 +12076,9 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 60
+              },
+              "requireVerifiedEmail": {
+                "type": "boolean"
               }
             },
             "required": ["holdMinutes", "paymentExtensionMinutes"],
@@ -12214,6 +12278,9 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 60
+          },
+          "requireVerifiedEmail": {
+            "type": "boolean"
           }
         },
         "required": ["holdMinutes", "paymentExtensionMinutes"]

@@ -33,7 +33,7 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
   (`operations/SSLCOMMERZ_INTEGRATION.md`).
 - ✅ Booking voucher and invoice (printable, confirmed bookings only).
 - ✅ Cancellation request, staff decision, refund workflow (money returned in the provider panel).
-- ✅ Password reset and password change. ⬜ Email verification at sign-up.
+- ✅ Password reset and password change. ✅ Email verification at sign-up (ADR-0035).
 - ✅ Transactional email via the outbox. ⛔ Real sending needs SMTP credentials.
 - ✅ Traveller profiles and account profile editing.
 

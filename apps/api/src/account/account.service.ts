@@ -44,6 +44,7 @@ export class AccountService {
       email: u.email,
       fullName: u.fullName,
       phone: u.phone,
+      emailVerified: u.emailVerifiedAt !== null,
       createdAt: u.createdAt.toISOString(),
     };
   }
