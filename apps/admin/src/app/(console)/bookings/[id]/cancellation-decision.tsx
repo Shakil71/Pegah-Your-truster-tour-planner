@@ -100,7 +100,7 @@ export function CancellationDecision({
           inputMode="decimal"
           value={refund}
           onChange={(e) => setRefund(e.target.value)}
-          hint="0 when the policy gives no refund. Finance pays it from the Refunds page."
+          hint="0 when the policy gives no refund. Any gift card share goes back to the card at once; finance pays the rest from the Refunds page."
         />
       )}
       <TextAreaField

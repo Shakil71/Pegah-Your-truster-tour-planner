@@ -2250,6 +2250,7 @@ export interface components {
       status: "PENDING" | "PAID";
       reason: string;
       providerRef: string | null;
+      giftCardLast4: string | null;
       /** Format: date-time */
       createdAt: string;
       paidAt: string | null;
@@ -3074,6 +3075,7 @@ export interface components {
         status: "PENDING" | "PAID";
         reason: string;
         providerRef: string | null;
+        giftCardLast4: string | null;
         /** Format: date-time */
         createdAt: string;
         paidAt: string | null;
@@ -4125,7 +4127,7 @@ export interface components {
         createdAt: string;
         txns: {
           /** @enum {string} */
-          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID";
+          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID" | "REFUND";
           amount: components["schemas"]["Money_Output"];
           balanceAfter: components["schemas"]["Money_Output"];
           bookingReference: string | null;
@@ -4160,7 +4162,7 @@ export interface components {
         createdAt: string;
         txns: {
           /** @enum {string} */
-          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID";
+          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID" | "REFUND";
           amount: components["schemas"]["Money_Output"];
           balanceAfter: components["schemas"]["Money_Output"];
           bookingReference: string | null;

@@ -4,6 +4,18 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Refunds back to gift cards (2026-11-06)
+
+- When a confirmed booking paid with a gift card is cancelled with a refund,
+  the gift card share is credited back to the card at once; only the rest
+  waits for finance. Fully card-paid bookings close as REFUNDED immediately
+  (ADR-0037). Console, customer booking page and cancellation email show it.
+
+### Changed — Home hero (2026-11-06)
+
+- Removed the "Stays · Tours · Planning across Bangladesh" line above the
+  home page headline, as requested by the owner.
+
 ### Added — Bangla partner portal (2026-11-06)
 
 - The supplier and agent portal (sign-in, overview, room calendar and rate

@@ -672,6 +672,32 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   email is fully Bangla and that the honesty rules ("not confirmed until
   payment") hold in both languages.
 
+## ADR-0037 — Refunds of gift-card-paid bookings go back to the card
+
+- **Status:** Accepted (2026-11-06)
+- **Context:** before this, cancelling a confirmed booking paid (partly) by
+  gift card produced one manual refund for finance, and staff had to issue a
+  new card by hand for the gift card share.
+- **Decision:** when staff approve a cancellation with a refund, the refund is
+  applied to the gift cards first (oldest card payment first). Each card gets
+  back at most what it paid for that booking, minus earlier refunds to it.
+  Each credit writes a `REFUND` ledger row (`gift_card_txns.kind`) and a
+  refund row that is already `PAID` with `providerRef = 'GIFT_CARD'` and
+  `refunds.gift_card_id` set (CHECK `refunds_gift_card_paid_chk`: a gift
+  card refund is never pending). Whatever is left becomes the usual PENDING
+  refund for finance. If nothing is left, the booking goes CANCELLED →
+  REFUND_PENDING → REFUNDED in the same transaction.
+- **Card first** because gift card money is Pegah credit with no payout cost,
+  and the customer keeps it to spend; cash refunds still cover everything paid
+  by other methods.
+- **Exceptions:** a void or expired card, or one in another currency, is
+  skipped, so its share stays a manual refund (never lost, never credited to
+  a dead card).
+- **Visibility:** `Refund.giftCardLast4` in the API; the console booking page
+  and Refunds list say "Credited to gift card ••••1234"; the customer booking
+  page says "Added back to gift card"; the cancellation email (English and
+  Bangla) says how much went to the card.
+
 ### ADR-0028 update (2026-11-06)
 
 The partner portal now uses the same next-intl messages (`partner`

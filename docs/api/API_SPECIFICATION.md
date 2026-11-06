@@ -205,6 +205,12 @@ Quotes and `POST /bookings` accept an optional `promoCode`; quotes return
 | GET        | /admin/refunds                             | payment:read                   | Refunds to pay / paid                    |
 | POST       | /admin/refunds/{id}/paid                   | refund:approve + CSRF          | Record the provider/bank reference       |
 
+Refunds to gift cards (ADR-0037): an approved refund is credited to the
+booking's gift cards first. Those refund rows are created `PAID` with
+`providerRef: "GIFT_CARD"` and `giftCardLast4` set (marking them paid again
+answers 409); only the remainder is a `PENDING` refund. With no remainder the
+booking ends `REFUNDED` in the same request.
+
 ## Operations admin (ADR-0023)
 
 | Method   | Path                                              | Permission                      | Purpose                                  |

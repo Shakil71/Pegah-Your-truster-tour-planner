@@ -5,6 +5,7 @@ import { AuditService } from "../audit/audit.service";
 import type { AuthContext } from "../auth/auth.types";
 import { BookingStatusService } from "../booking/booking-status.service";
 import type { Tx } from "../booking/inventory";
+import { refundToGiftCards } from "../commerce/gift-card-ledger";
 import { newPublicId } from "../common/ids";
 import { ProblemException } from "../common/problem";
 import { dhakaToday } from "../common/time";
@@ -17,6 +18,9 @@ import { PRISMA, type Db } from "../prisma/prisma.service";
  *  staff approves (→ CANCELLED, sold inventory released; refund > 0 →
  *  REFUND_PENDING + refund row) or rejects (→ CONFIRMED) →
  *  finance marks the refund paid (→ REFUNDED when nothing is pending).
+ * The gift card share of a refund is credited to the card at approval and
+ * recorded as a PAID refund (ADR-0037); if nothing else is owed, the booking
+ * goes straight to REFUNDED.
  * Every step uses the booking state machine, is audited, and writes an
  * outbox event for the customer email, all in one transaction.
  */
@@ -142,17 +146,30 @@ export class CancellationService {
         },
         now,
       );
-      if (refundMinor > 0n) {
+      // The gift card share goes straight back to the card(s) (ADR-0037); the rest is a manual refund.
+      const giftCardMinor = await refundToGiftCards(
+        tx,
+        b,
+        refundMinor,
+        input.reason,
+        auth.user.id,
+        now,
+        newPublicId,
+      );
+      const manualMinor = refundMinor - giftCardMinor;
+      if (manualMinor > 0n) {
         await tx.refund.create({
           data: {
             publicId: newPublicId(),
             bookingId: b.id,
-            amountMinor: refundMinor,
+            amountMinor: manualMinor,
             currency: b.currency,
             reason: input.reason,
             approvedById: auth.user.id,
           },
         });
+      }
+      if (refundMinor > 0n) {
         await this.status.transitionInTx(
           tx,
           {
@@ -165,9 +182,24 @@ export class CancellationService {
           },
           now,
         );
+        if (manualMinor === 0n) {
+          await this.status.transitionInTx(
+            tx,
+            {
+              bookingPublicId,
+              to: "REFUNDED",
+              expectedStatus: "REFUND_PENDING",
+              actor,
+              reason: "Refund credited to the gift card",
+              ipAddress: ip,
+            },
+            now,
+          );
+        }
       }
       await outbox(tx, "booking.cancelled", bookingPublicId, {
         refundMinor: refundMinor.toString(),
+        giftCardMinor: giftCardMinor.toString(),
         currency: b.currency,
       });
     });

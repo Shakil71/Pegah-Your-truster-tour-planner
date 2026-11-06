@@ -243,7 +243,10 @@ export class AdminRefundsController {
       where,
       orderBy: { id: "desc" },
       take: q.limit + 1,
-      include: { booking: { select: { publicId: true, reference: true, contactName: true } } },
+      include: {
+        booking: { select: { publicId: true, reference: true, contactName: true } },
+        giftCard: { select: { last4: true } },
+      },
     });
     const page = rows.slice(0, q.limit);
     return {
@@ -253,6 +256,7 @@ export class AdminRefundsController {
         status: x.status,
         reason: x.reason,
         providerRef: x.providerRef,
+        giftCardLast4: x.giftCard?.last4 ?? null,
         createdAt: x.createdAt.toISOString(),
         paidAt: x.paidAt?.toISOString() ?? null,
         bookingId: x.booking.publicId,

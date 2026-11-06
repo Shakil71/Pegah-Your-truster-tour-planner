@@ -16,7 +16,8 @@ supplier contracts.
 ## Completed
 
 - Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);
-  light/dark theme toggle (ADR-0033); gift cards at checkout (ADR-0034).
+  light/dark theme toggle (ADR-0033); gift cards at checkout (ADR-0034);
+  refunds back to gift cards (ADR-0037).
   Email verification at sign-up (ADR-0035); Bangla emails (ADR-0036) and
   Bangla partner portal (ADR-0028 extended).
 
@@ -92,8 +93,7 @@ that need a contract or a second server.
 --remove`), choose a domain and trusted certificate, add a staging instance,
 run a backup restore drill.
 
-**Later improvements:** refunds of gift-card-paid bookings back to the card
-(today staff issue a new card), alert notifications (need a destination), Loki
+**Later improvements:** alert notifications (need a destination), Loki
 (needs a second server), agent net rates (when a contract needs them).
 
 ## Blockers
@@ -120,7 +120,7 @@ run a backup restore drill.
 | Check                       | Result                                                           |
 | --------------------------- | ---------------------------------------------------------------- |
 | Unit tests (`npm test`)     | 109 passed                                                       |
-| MySQL 8.4 integration tests | 96 passed (15 files)                                             |
+| MySQL 8.4 integration tests | 101 passed (16 files)                                            |
 | `turbo run lint typecheck`  | 13/13 tasks passed                                               |
 | Playwright + axe end to end | 33 passed (desktop + mobile, light and dark themes, Bangla)      |
 | GitHub Actions              | verify, database integration and end-to-end jobs green on `main` |

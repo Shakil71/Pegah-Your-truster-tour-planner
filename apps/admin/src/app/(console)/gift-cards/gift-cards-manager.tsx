@@ -15,6 +15,7 @@ const TXN: Record<Card["txns"][number]["kind"], { label: string; sign: string }>
   REDEEM: { label: "Used", sign: "−" },
   RELEASE: { label: "Returned", sign: "+" },
   VOID: { label: "Voided", sign: "−" },
+  REFUND: { label: "Refunded", sign: "+" },
 };
 
 export function GiftCardsManager({

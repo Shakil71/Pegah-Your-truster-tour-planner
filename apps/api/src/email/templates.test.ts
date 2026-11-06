@@ -35,6 +35,15 @@ describe("email templates", () => {
       "refund of ৳ 10,000 has been approved",
     );
     expect(templates.bookingCancelled(facts, null).text).toContain("no refund is due");
+    expect(templates.bookingCancelled(facts, "৳ 10,000", "en", "৳ 10,000").text).toContain(
+      "added back to your gift card",
+    );
+    expect(templates.bookingCancelled(facts, "৳ 10,000", "en", "৳ 4,000").text).toContain(
+      "৳ 4,000 of it has been added back to your gift card; the rest",
+    );
+    expect(templates.bookingCancelled(facts, "৳ 10,000", "bn", "৳ 4,000").text).toContain(
+      "গিফট কার্ডে ফেরত জমা হয়েছে",
+    );
   });
 });
 

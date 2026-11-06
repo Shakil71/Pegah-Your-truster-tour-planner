@@ -354,6 +354,7 @@
     "refunds": "রিফান্ড",
     "refundSent": "পাঠানো হয়েছে {date}",
     "refundApproved": "অনুমোদিত, প্রক্রিয়াধীন",
+    "refundToCard": "গিফট কার্ড ••••{last4}-এ ফেরত জমা হয়েছে",
     "trip": "ভ্রমণ",
     "checkIn": "চেক-ইন",
     "departs": "যাত্রা",

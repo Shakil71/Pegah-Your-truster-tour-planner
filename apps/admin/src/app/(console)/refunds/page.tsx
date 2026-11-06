@@ -79,8 +79,10 @@ export default async function RefundsPage({
                   <p className="text-[0.82rem] text-ink-2">{r.reason}</p>
                   <p className="text-[0.76rem] text-ink-3">
                     Approved {dhakaDateTime(r.createdAt)}
-                    {r.status === "PAID" &&
-                      ` · paid ${r.paidAt ? dhakaDateTime(r.paidAt) : ""} · ref ${r.providerRef}`}
+                    {r.giftCardLast4
+                      ? ` · credited to gift card ••••${r.giftCardLast4}`
+                      : r.status === "PAID" &&
+                        ` · paid ${r.paidAt ? dhakaDateTime(r.paidAt) : ""} · ref ${r.providerRef}`}
                   </p>
                 </div>
                 {r.status === "PENDING" && canPay && (

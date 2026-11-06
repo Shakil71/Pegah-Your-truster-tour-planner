@@ -243,8 +243,8 @@ export const AdminGiftCardSchema = z.object({
   createdAt: InstantSchema,
   txns: z.array(
     z.object({
-      kind: z.enum(["ISSUE", "REDEEM", "RELEASE", "VOID"]),
-      /** Absolute amount: ISSUE and RELEASE add to the balance, REDEEM and VOID take from it. */
+      kind: z.enum(["ISSUE", "REDEEM", "RELEASE", "VOID", "REFUND"]),
+      /** Absolute amount: ISSUE, RELEASE and REFUND add to the balance, REDEEM and VOID take from it. */
       amount: MoneySchema,
       balanceAfter: MoneySchema,
       bookingReference: nullableText(12),

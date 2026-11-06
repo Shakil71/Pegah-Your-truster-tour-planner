@@ -132,9 +132,11 @@ export default async function TripPage({
               {b.refunds.map((r) => (
                 <li key={r.id} className="flex justify-between gap-3">
                   <span>
-                    {r.status === "PAID"
-                      ? t("refundSent", { date: r.paidAt ? dhakaDateTime(r.paidAt, locale) : "" })
-                      : t("refundApproved")}
+                    {r.giftCardLast4
+                      ? t("refundToCard", { last4: r.giftCardLast4 })
+                      : r.status === "PAID"
+                        ? t("refundSent", { date: r.paidAt ? dhakaDateTime(r.paidAt, locale) : "" })
+                        : t("refundApproved")}
                   </span>
                   <span className="tabular font-semibold">{money(r.amount)}</span>
                 </li>

@@ -274,9 +274,11 @@ export default async function BookingDetailPage({ params }: { params: Promise<{ 
                 {b.refunds.map((r) => (
                   <li key={r.id} className="flex justify-between gap-3">
                     <span>
-                      {r.status === "PAID"
-                        ? `Paid ${r.paidAt ? dhakaDateTime(r.paidAt) : ""} · ${r.providerRef ?? ""}`
-                        : "Pending (finance)"}
+                      {r.giftCardLast4
+                        ? `Credited to gift card ••••${r.giftCardLast4} · ${r.paidAt ? dhakaDateTime(r.paidAt) : ""}`
+                        : r.status === "PAID"
+                          ? `Paid ${r.paidAt ? dhakaDateTime(r.paidAt) : ""} · ${r.providerRef ?? ""}`
+                          : "Pending (finance)"}
                     </span>
                     <span className="tabular font-semibold">{money(r.amount)}</span>
                   </li>

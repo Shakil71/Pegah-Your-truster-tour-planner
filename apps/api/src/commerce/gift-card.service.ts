@@ -161,7 +161,7 @@ export class GiftCardService {
       createdAt: c.createdAt.toISOString(),
       txns: c.txns.map((t) => ({
         kind: t.kind,
-        // Absolute amount; the kind says whether it added (ISSUE, RELEASE) or took (REDEEM, VOID).
+        // Absolute amount; the kind says whether it added (ISSUE, RELEASE, REFUND) or took (REDEEM, VOID).
         amount: toMoney(t.amountMinor < 0n ? -t.amountMinor : t.amountMinor, c.currency),
         balanceAfter: toMoney(t.balanceAfter, c.currency),
         bookingReference: t.bookingId !== null ? (refs.get(t.bookingId) ?? null) : null,

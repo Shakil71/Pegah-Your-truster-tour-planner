@@ -354,6 +354,7 @@
     "refunds": "Refunds",
     "refundSent": "Sent {date}",
     "refundApproved": "Approved, being processed",
+    "refundToCard": "Added back to gift card ••••{last4}",
     "trip": "Trip",
     "checkIn": "Check-in",
     "departs": "Departs",

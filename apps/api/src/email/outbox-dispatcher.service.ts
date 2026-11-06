@@ -140,6 +140,9 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
                 ? taka(payload.refundMinor, String(payload.currency ?? "BDT"))
                 : null,
               l,
+              typeof payload.giftCardMinor === "string" && payload.giftCardMinor !== "0"
+                ? taka(payload.giftCardMinor, String(payload.currency ?? "BDT"))
+                : null,
             ),
           };
         case "booking.cancellation_rejected":

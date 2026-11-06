@@ -165,22 +165,39 @@ export const templates = {
       b,
       l,
     ),
-  bookingCancelled: (b: BookingFacts, refundText: string | null, l: EmailLocale = "en") =>
+  /**
+   * `giftCardText`: the part of the refund already credited back to the
+   * customer's gift card (ADR-0037); the rest goes to the original payment.
+   */
+  bookingCancelled: (
+    b: BookingFacts,
+    refundText: string | null,
+    l: EmailLocale = "en",
+    giftCardText: string | null = null,
+  ) =>
     render(
       l === "bn"
         ? {
             title: "বুকিং বাতিল হয়েছে",
-            intro: refundText
-              ? `আপনার বুকিং বাতিল হয়েছে। ${refundText} রিফান্ড অনুমোদিত হয়েছে, যা আপনার মূল পেমেন্ট মাধ্যমে ফেরত যাবে।`
-              : "আপনার বুকিং বাতিল হয়েছে। বাতিল নীতিমালা অনুযায়ী কোনো রিফান্ড প্রযোজ্য নয়।",
+            intro: !refundText
+              ? "আপনার বুকিং বাতিল হয়েছে। বাতিল নীতিমালা অনুযায়ী কোনো রিফান্ড প্রযোজ্য নয়।"
+              : giftCardText === refundText
+                ? `আপনার বুকিং বাতিল হয়েছে। ${refundText} রিফান্ড অনুমোদিত হয়েছে এবং আপনার গিফট কার্ডে ফেরত জমা হয়েছে।`
+                : giftCardText
+                  ? `আপনার বুকিং বাতিল হয়েছে। ${refundText} রিফান্ড অনুমোদিত হয়েছে। এর মধ্যে ${giftCardText} আপনার গিফট কার্ডে ফেরত জমা হয়েছে; বাকিটা আপনার মূল পেমেন্ট মাধ্যমে ফেরত যাবে।`
+                  : `আপনার বুকিং বাতিল হয়েছে। ${refundText} রিফান্ড অনুমোদিত হয়েছে, যা আপনার মূল পেমেন্ট মাধ্যমে ফেরত যাবে।`,
             outro: "আরেকটি ভ্রমণে আপনাকে স্বাগত জানানোর অপেক্ষায় রইলাম।",
             cta: VIEW.bn,
           }
         : {
             title: "Booking cancelled",
-            intro: refundText
-              ? `Your booking is cancelled. A refund of ${refundText} has been approved and will be returned to your original payment method.`
-              : "Your booking is cancelled. Under the cancellation policy no refund is due.",
+            intro: !refundText
+              ? "Your booking is cancelled. Under the cancellation policy no refund is due."
+              : giftCardText === refundText
+                ? `Your booking is cancelled. A refund of ${refundText} has been approved and added back to your gift card.`
+                : giftCardText
+                  ? `Your booking is cancelled. A refund of ${refundText} has been approved. ${giftCardText} of it has been added back to your gift card; the rest will be returned to your original payment method.`
+                  : `Your booking is cancelled. A refund of ${refundText} has been approved and will be returned to your original payment method.`,
             outro: "We hope to welcome you on another trip.",
             cta: VIEW.en,
           },

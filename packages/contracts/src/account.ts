@@ -101,6 +101,8 @@ export const RefundViewSchema = z
     status: z.enum(["PENDING", "PAID"]),
     reason: z.string(),
     providerRef: nullableText(120),
+    /** Last 4 characters of the gift card this refund was credited to (ADR-0037); null for manual refunds. */
+    giftCardLast4: nullableText(4),
     createdAt: InstantSchema,
     paidAt: InstantSchema.nullable(),
   })

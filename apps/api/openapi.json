@@ -6597,6 +6597,17 @@
               }
             ]
           },
+          "giftCardLast4": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -6615,7 +6626,16 @@
             ]
           }
         },
-        "required": ["id", "amount", "status", "reason", "providerRef", "createdAt", "paidAt"],
+        "required": [
+          "id",
+          "amount",
+          "status",
+          "reason",
+          "providerRef",
+          "giftCardLast4",
+          "createdAt",
+          "paidAt"
+        ],
         "additionalProperties": false
       },
       "EmailLogItem_Output": {
@@ -10346,6 +10366,17 @@
                     }
                   ]
                 },
+                "giftCardLast4": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 4
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time",
@@ -10380,6 +10411,7 @@
                 "status",
                 "reason",
                 "providerRef",
+                "giftCardLast4",
                 "createdAt",
                 "paidAt",
                 "bookingId",
@@ -15212,7 +15244,7 @@
                     "properties": {
                       "kind": {
                         "type": "string",
-                        "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID"]
+                        "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID", "REFUND"]
                       },
                       "amount": {
                         "$ref": "#/components/schemas/Money_Output"
@@ -15376,7 +15408,7 @@
                   "properties": {
                     "kind": {
                       "type": "string",
-                      "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID"]
+                      "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID", "REFUND"]
                     },
                     "amount": {
                       "$ref": "#/components/schemas/Money_Output"
