@@ -4,6 +4,19 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Photo galleries, facilities and full details (2026-11-06)
+
+- Hotel pages show a photo gallery with a full-screen viewer, facilities by
+  group, distances, nearby places and house policies; room cards show a photo,
+  facilities, air conditioning and extra beds. Tour pages show the gallery,
+  day-by-day itinerary, pick-up points, transport, facilities, policies and
+  travel tips (English and Bangla labels).
+- Console: hotel, room and tour forms edit these fields, the gallery (add
+  several photos, reorder, remove) and facilities (pick or add new). Old
+  website prices are shown as reference only.
+- Room limits widened to 30 adults / 20 children and list items to 300
+  characters so imported records can be saved.
+
 ### Added — Old website import (2026-11-06)
 
 - Importer for the previous Pegah website: 45 hotels with 169 rooms, 16 tours,

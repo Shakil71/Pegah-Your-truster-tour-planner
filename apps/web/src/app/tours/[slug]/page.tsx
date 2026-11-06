@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
+import { PhotoGallery } from "@/components/shop/photo-gallery";
+import { TextBlocks } from "@/components/shop/text-blocks";
 import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
 import { localName } from "@/lib/format";
@@ -19,6 +21,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const api = await serverApi();
   const { data } = await api.GET("/api/v1/tours/{slug}", { params: { path: { slug } } });
   return { title: data?.title ?? (await getTranslations("tour"))("fallbackTitle") };
+}
+
+function Section({ title, text }: { title: string; text: string | null }) {
+  if (!text) return null;
+  return (
+    <section className="panel p-5 md:p-6">
+      <h2 className="text-[1rem] font-semibold">{title}</h2>
+      <TextBlocks text={text} className="mt-2 grid gap-3 text-[0.92rem] text-ink-2" />
+    </section>
+  );
 }
 
 function List({ title, items, icon }: { title: string; items: string[]; icon: "check" | "x" }) {
@@ -48,6 +60,14 @@ export default async function TourPage({ params }: Props) {
   const locale = (await getLocale()) as Locale;
   const tour = ensure(await api.GET("/api/v1/tours/{slug}", { params: { path: { slug } } }));
   const isAgent = (await getPartner())?.user.partner?.kind === "AGENT";
+  const galleryLabels = {
+    title: t("photos", { name: tour.title }),
+    open: t("openPhoto"),
+    close: t("closePhotos"),
+    previous: t("previousPhoto"),
+    next: t("nextPhoto"),
+    count: t("photoCount"),
+  };
 
   return (
     <PageShell>
@@ -86,13 +106,28 @@ export default async function TourPage({ params }: Props) {
           </div>
         </section>
 
+        {tour.gallery.length > 1 && <PhotoGallery photos={tour.gallery} labels={galleryLabels} />}
+
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div className="grid content-start gap-5">
             <section className="panel p-5 md:p-6">
               <h2 className="text-[1rem] font-semibold">{t("theTrip")}</h2>
-              <p className="mt-2 whitespace-pre-line text-[0.95rem] text-ink-2">
-                {tour.description}
-              </p>
+              <TextBlocks
+                text={tour.description}
+                className="mt-2 grid gap-3 text-[0.95rem] text-ink-2"
+              />
+              {tour.tags.length > 0 && (
+                <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={t("tags")}>
+                  {tour.tags.map((tag) => (
+                    <li
+                      key={tag}
+                      className="rounded-full bg-paper-2 px-2.5 py-1 text-[0.76rem] font-semibold text-ink-2"
+                    >
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              )}
               <p className="mt-4 flex items-center gap-2 text-[0.9rem]">
                 <Icon name="pin" className="size-4 text-primary-ink" />{" "}
                 {t("meetAt", { place: tour.meetingPoint })}
@@ -103,6 +138,14 @@ export default async function TourPage({ params }: Props) {
               <List title={t("included")} items={tour.includes} icon="check" />
               <List title={t("notIncluded")} items={tour.excludes} icon="x" />
             </div>
+            <Section title={t("itinerary")} text={tour.itinerary} />
+            <List title={t("pickupPoints")} items={tour.pickupPoints} icon="check" />
+            <Section title={t("transport")} text={tour.transport} />
+            <List title={t("facilities")} items={tour.amenities.map((a) => a.name)} icon="check" />
+            <Section title={t("policy")} text={tour.policy} />
+            <Section title={t("cancellation")} text={tour.cancellationPolicy} />
+            <Section title={t("travelTips")} text={tour.travelTips} />
+            <Section title={t("moreInfo")} text={tour.additionalInfo} />
           </div>
           <aside className="grid content-start gap-4 lg:sticky lg:top-[96px]">
             <DeparturePicker departures={tour.departures} isAgent={isAgent} />

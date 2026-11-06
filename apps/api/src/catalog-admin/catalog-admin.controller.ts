@@ -42,6 +42,10 @@ import {
   SlugSchema,
   TourInputSchema,
   UpdateDepartureSchema,
+  AdminAmenityListSchema,
+  AdminAmenitySchema,
+  AmenityListQuerySchema,
+  CreateAmenitySchema,
 } from "@pegah/contracts";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { createZodDto, ZodResponse } from "nestjs-zod";
@@ -83,6 +87,10 @@ class AdminDepartureResultDto extends createZodDto(z.object({ departure: AdminDe
 class AdminCustomerListDto extends createZodDto(CustomerListSchema) {}
 class AdminCustomerDetailDto extends createZodDto(CustomerDetailSchema) {}
 class AdminCustomerStatusDto extends createZodDto(CustomerStatusUpdateSchema) {}
+class AdminAmenityListDto extends createZodDto(AdminAmenityListSchema) {}
+class AdminAmenityResultDto extends createZodDto(z.object({ amenity: AdminAmenitySchema })) {}
+class AdminAmenityListQueryDto extends createZodDto(AmenityListQuerySchema) {}
+class AdminCreateAmenityDto extends createZodDto(CreateAmenitySchema) {}
 class AdminCustomerSignOutDto extends createZodDto(CustomerSignOutResultSchema) {}
 
 function slug(value: string, what: string): string {
@@ -106,6 +114,29 @@ export class CatalogAdminController {
     @Inject(CatalogAdminService) private readonly catalog: CatalogAdminService,
     @Inject(CustomerAdminService) private readonly customers: CustomerAdminService,
   ) {}
+
+  // Amenities (facilities)
+  @RequirePermissions("catalog:read")
+  @Get("amenities")
+  @ZodResponse({ status: 200, type: AdminAmenityListDto })
+  async amenities(
+    @Query() q: AdminAmenityListQueryDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    noStore(reply);
+    return this.catalog.listAmenities(q.scope);
+  }
+
+  @RequirePermissions("catalog:manage")
+  @Post("amenities")
+  @ZodResponse({ status: 201, type: AdminAmenityResultDto })
+  async createAmenity(
+    @Body() body: AdminCreateAmenityDto,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    return { amenity: await this.catalog.createAmenity(body, a, ip(r)) };
+  }
 
   // Destinations
   @RequirePermissions("catalog:read")

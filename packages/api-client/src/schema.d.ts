@@ -612,6 +612,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/amenities": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["CatalogAdminController_amenities"];
+    put?: never;
+    post: operations["CatalogAdminController_createAmenity"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/destinations": {
     parameters: {
       query?: never;
@@ -2102,6 +2118,27 @@ export interface components {
       /** Format: date-time */
       pricedAt: string;
     };
+    Amenity_Output: {
+      slug: string;
+      name: string;
+      group: string | null;
+      icon: components["schemas"]["Media_Output"] | null;
+    };
+    RoomDetail_Output: {
+      id: string;
+      name: string;
+      description: string;
+      maxAdults: number;
+      maxChildren: number;
+      bedType: string;
+      sizeSqm: number | null;
+      roomType: string | null;
+      details: string | null;
+      airConditioned: boolean | null;
+      extraBeds: number;
+      gallery: components["schemas"]["Media_Output"][];
+      amenities: components["schemas"]["Amenity_Output"][];
+    };
     HotelDetailDto_Output: {
       id: string;
       slug: string;
@@ -2119,7 +2156,18 @@ export interface components {
       checkInTime: string;
       checkOutTime: string;
       cancellationPolicy: string;
-      rooms: components["schemas"]["Room_Output"][];
+      propertyType: ("HOTEL" | "RESORT" | "HOTEL_RESORT") | null;
+      distanceFromCity: string | null;
+      distanceFromSpot: string | null;
+      childPolicy: string | null;
+      petPolicy: string | null;
+      houseRules: string | null;
+      breakfast: string | null;
+      specialNote: string | null;
+      nearbyPlaces: string[];
+      gallery: components["schemas"]["Media_Output"][];
+      amenities: components["schemas"]["Amenity_Output"][];
+      rooms: components["schemas"]["RoomDetail_Output"][];
     };
     HotelRoomOffer_Output: {
       room: components["schemas"]["Room_Output"];
@@ -2169,6 +2217,20 @@ export interface components {
       highlights: string[];
       includes: string[];
       excludes: string[];
+      tourType: string | null;
+      overview: string | null;
+      itinerary: string | null;
+      policy: string | null;
+      cancellationPolicy: string | null;
+      travelTips: string | null;
+      additionalInfo: string | null;
+      timing: string | null;
+      transport: string | null;
+      pickupPoints: string[];
+      tags: string[];
+      minAdults: number | null;
+      gallery: components["schemas"]["Media_Output"][];
+      amenities: components["schemas"]["Amenity_Output"][];
       departures: components["schemas"]["TourDeparture_Output"][];
     };
     BookingSummary_Output: {
@@ -2703,6 +2765,23 @@ export interface components {
       }[];
       nextCursor: string | null;
     };
+    AdminAmenity_Output: {
+      slug: string;
+      name: string;
+      group: string | null;
+    };
+    AdminAmenityListDto_Output: {
+      items: components["schemas"]["AdminAmenity_Output"][];
+    };
+    AdminCreateAmenityDto: {
+      /** @enum {string} */
+      scope: "HOTEL" | "ROOM" | "TOUR";
+      name: string;
+      group?: string | null;
+    };
+    AdminAmenityResultDto_Output: {
+      amenity: components["schemas"]["AdminAmenity_Output"];
+    };
     AdminDestination_Output: {
       slug: string;
       name: string;
@@ -2785,9 +2864,21 @@ export interface components {
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
       heroMedia?: string | null;
+      propertyType?: ("HOTEL" | "RESORT" | "HOTEL_RESORT") | null;
+      distanceFromCity?: string | null;
+      distanceFromSpot?: string | null;
+      childPolicy?: string | null;
+      petPolicy?: string | null;
+      houseRules?: string | null;
+      breakfast?: string | null;
+      specialNote?: string | null;
+      nearbyPlaces?: string[];
+      gallery?: string[];
+      amenities?: string[];
       slug: string;
     };
     AdminRoom_Output: {
+      id: string;
       name: string;
       description: string;
       maxAdults: number;
@@ -2795,7 +2886,19 @@ export interface components {
       bedType: string;
       sizeSqm: number | null;
       isActive: boolean;
-      id: string;
+      roomType: string | null;
+      details: string | null;
+      airConditioned: boolean | null;
+      extraBeds: number;
+      rackRate: components["schemas"]["Money_Output"] | null;
+      discountRate: components["schemas"]["Money_Output"] | null;
+      units: number | null;
+      gallery: {
+        key: string;
+        url: string;
+        alt: string;
+      }[];
+      amenities: string[];
     };
     AdminHotelDetailDto_Output: {
       id: string;
@@ -2830,6 +2933,21 @@ export interface components {
         url: string;
         alt: string;
       } | null;
+      propertyType: ("HOTEL" | "RESORT" | "HOTEL_RESORT") | null;
+      distanceFromCity: string | null;
+      distanceFromSpot: string | null;
+      childPolicy: string | null;
+      petPolicy: string | null;
+      houseRules: string | null;
+      breakfast: string | null;
+      specialNote: string | null;
+      nearbyPlaces: string[];
+      gallery: {
+        key: string;
+        url: string;
+        alt: string;
+      }[];
+      amenities: string[];
       rooms: components["schemas"]["AdminRoom_Output"][];
     };
     AdminHotelInputDto: {
@@ -2849,6 +2967,17 @@ export interface components {
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
       heroMedia?: string | null;
+      propertyType?: ("HOTEL" | "RESORT" | "HOTEL_RESORT") | null;
+      distanceFromCity?: string | null;
+      distanceFromSpot?: string | null;
+      childPolicy?: string | null;
+      petPolicy?: string | null;
+      houseRules?: string | null;
+      breakfast?: string | null;
+      specialNote?: string | null;
+      nearbyPlaces?: string[];
+      gallery?: string[];
+      amenities?: string[];
     };
     AdminRoomInputDto: {
       name: string;
@@ -2858,6 +2987,13 @@ export interface components {
       bedType: string;
       sizeSqm: number | null;
       isActive: boolean;
+      roomType?: string | null;
+      details?: string | null;
+      /** @enum {string} */
+      airConditioned?: "YES" | "NO" | "UNKNOWN";
+      extraBeds?: number;
+      gallery?: string[];
+      amenities?: string[];
     };
     AdminRoomResultDto_Output: {
       room: components["schemas"]["AdminRoom_Output"];
@@ -2931,6 +3067,20 @@ export interface components {
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
       heroMedia?: string | null;
+      tourType?: string | null;
+      overview?: string | null;
+      itinerary?: string | null;
+      policy?: string | null;
+      cancellationPolicy?: string | null;
+      travelTips?: string | null;
+      additionalInfo?: string | null;
+      timing?: string | null;
+      transport?: string | null;
+      pickupPoints?: string[];
+      tags?: string[];
+      minAdults?: number | null;
+      gallery?: string[];
+      amenities?: string[];
       slug: string;
     };
     AdminDeparture_Output: {
@@ -2981,6 +3131,26 @@ export interface components {
         url: string;
         alt: string;
       } | null;
+      tourType: string | null;
+      overview: string | null;
+      itinerary: string | null;
+      policy: string | null;
+      cancellationPolicy: string | null;
+      travelTips: string | null;
+      additionalInfo: string | null;
+      timing: string | null;
+      transport: string | null;
+      pickupPoints: string[];
+      tags: string[];
+      minAdults: number | null;
+      listPrice: components["schemas"]["Money_Output"] | null;
+      salePrice: components["schemas"]["Money_Output"] | null;
+      gallery: {
+        key: string;
+        url: string;
+        alt: string;
+      }[];
+      amenities: string[];
       departures: components["schemas"]["AdminDeparture_Output"][];
     };
     AdminTourInputDto: {
@@ -3001,6 +3171,20 @@ export interface components {
       status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
       supplierId?: string | null;
       heroMedia?: string | null;
+      tourType?: string | null;
+      overview?: string | null;
+      itinerary?: string | null;
+      policy?: string | null;
+      cancellationPolicy?: string | null;
+      travelTips?: string | null;
+      additionalInfo?: string | null;
+      timing?: string | null;
+      transport?: string | null;
+      pickupPoints?: string[];
+      tags?: string[];
+      minAdults?: number | null;
+      gallery?: string[];
+      amenities?: string[];
     };
     AdminCreateDepartureDto: {
       /** Format: date-time */
@@ -5101,6 +5285,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AdminPaymentListResponseDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_amenities: {
+    parameters: {
+      query: {
+        scope: "HOTEL" | "ROOM" | "TOUR";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminAmenityListDto_Output"];
+        };
+      };
+    };
+  };
+  CatalogAdminController_createAmenity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateAmenityDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminAmenityResultDto_Output"];
         };
       };
     };

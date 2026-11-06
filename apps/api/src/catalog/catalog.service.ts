@@ -19,12 +19,21 @@ import { parseStay } from "../common/stay-dates";
 import { stayNights } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
-import { stringList, toHotelSummary, toMedia } from "./catalog.mappers";
+import { stringList, toAmenities, toGallery, toHotelSummary, toMedia } from "./catalog.mappers";
 import { evaluateRoom } from "./hotel-search";
 
 const MEDIA_SELECT = {
   select: { storageKey: true, altText: true, credit: true, width: true, height: true },
 } as const;
+const GALLERY = { orderBy: { sortOrder: "asc" }, include: { media: MEDIA_SELECT } } as const;
+const AMENITIES = {
+  include: {
+    amenity: {
+      select: { slug: true, name: true, groupName: true, sortOrder: true, icon: MEDIA_SELECT },
+    },
+  },
+} as const;
+const PROPERTY_TYPES = ["HOTEL", "RESORT", "HOTEL_RESORT"] as const;
 const UPCOMING_DEPARTURES = (now: Date) =>
   ({
     where: { status: "SCHEDULED", departsAt: { gt: now } },
@@ -119,7 +128,13 @@ export class CatalogService {
       include: {
         destination: { select: { slug: true, name: true } },
         hero: MEDIA_SELECT,
-        rooms: { where: { isActive: true }, orderBy: { maxAdults: "asc" } },
+        gallery: GALLERY,
+        amenities: AMENITIES,
+        rooms: {
+          where: { isActive: true },
+          orderBy: { maxAdults: "asc" },
+          include: { gallery: GALLERY, amenities: AMENITIES },
+        },
       },
     });
     if (!h) throw new ProblemException(404, "hotel-not-found", "Hotel not found");
@@ -130,6 +145,17 @@ export class CatalogService {
       checkInTime: h.checkInTime,
       checkOutTime: h.checkOutTime,
       cancellationPolicy: h.cancellationPolicy,
+      propertyType: PROPERTY_TYPES.find((p) => p === h.propertyType) ?? null,
+      distanceFromCity: h.distanceFromCity,
+      distanceFromSpot: h.distanceFromSpot,
+      childPolicy: h.childPolicy,
+      petPolicy: h.petPolicy,
+      houseRules: h.houseRules,
+      breakfast: h.breakfast,
+      specialNote: h.specialNote,
+      nearbyPlaces: stringList(h.nearbyPlaces),
+      gallery: toGallery(h.gallery, this.media),
+      amenities: toAmenities(h.amenities, this.media),
       rooms: h.rooms.map((r) => ({
         id: r.publicId,
         name: r.name,
@@ -138,6 +164,12 @@ export class CatalogService {
         maxChildren: r.maxChildren,
         bedType: r.bedType,
         sizeSqm: r.sizeSqm,
+        roomType: r.roomType,
+        details: r.details,
+        airConditioned: r.airConditioned,
+        extraBeds: r.extraBeds,
+        gallery: toGallery(r.gallery, this.media),
+        amenities: toAmenities(r.amenities, this.media),
       })),
     };
   }
@@ -333,6 +365,8 @@ export class CatalogService {
         destination: { select: { slug: true, name: true } },
         hero: MEDIA_SELECT,
         schedules: UPCOMING_DEPARTURES(now),
+        gallery: GALLERY,
+        amenities: AMENITIES,
       },
     });
     if (!t) throw new ProblemException(404, "tour-not-found", "Tour not found");
@@ -344,6 +378,20 @@ export class CatalogService {
       highlights: stringList(t.highlights),
       includes: stringList(t.includes),
       excludes: stringList(t.excludes),
+      tourType: t.tourType,
+      overview: t.overview,
+      itinerary: t.itinerary,
+      policy: t.policy,
+      cancellationPolicy: t.cancellationPolicy,
+      travelTips: t.travelTips,
+      additionalInfo: t.additionalInfo,
+      timing: t.timing,
+      transport: t.transport,
+      pickupPoints: stringList(t.pickupPoints),
+      tags: stringList(t.tags),
+      minAdults: t.minAdults,
+      gallery: toGallery(t.gallery, this.media),
+      amenities: toAmenities(t.amenities, this.media),
       departures: t.schedules.map((s) => ({
         id: s.publicId,
         departsAt: s.departsAt.toISOString(),

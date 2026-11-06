@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass } from "@pegah/ui";
+import { AmenityPicker, GalleryPicker } from "@/components/gallery-picker";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { bpsToPercent, percentToBps } from "@/lib/money-input";
@@ -25,6 +26,15 @@ type Values = {
   serviceCharge: string;
   vat: string;
   status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+  propertyType: "" | "HOTEL" | "RESORT" | "HOTEL_RESORT";
+  distanceFromCity: string;
+  distanceFromSpot: string;
+  childPolicy: string;
+  petPolicy: string;
+  houseRules: string;
+  breakfast: string;
+  specialNote: string;
+  nearbyPlaces: string;
 };
 
 /**
@@ -44,6 +54,8 @@ export function HotelForm({
 }) {
   const router = useRouter();
   const [hero, setHero] = useState<HeroRef | null>(hotel?.hero ?? null);
+  const [gallery, setGallery] = useState<HeroRef[]>(hotel?.gallery ?? []);
+  const [amenities, setAmenities] = useState<string[]>(hotel?.amenities ?? []);
   const [message, setMessage] = useState<{ tone: "good" | "critical"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { register, handleSubmit, formState } = useForm<Values>({
@@ -62,6 +74,15 @@ export function HotelForm({
       serviceCharge: bpsToPercent(hotel?.serviceChargeBps ?? 1000),
       vat: bpsToPercent(hotel?.vatBps ?? 1500),
       status: hotel?.status ?? "DRAFT",
+      propertyType: hotel?.propertyType ?? "",
+      distanceFromCity: hotel?.distanceFromCity ?? "",
+      distanceFromSpot: hotel?.distanceFromSpot ?? "",
+      childPolicy: hotel?.childPolicy ?? "",
+      petPolicy: hotel?.petPolicy ?? "",
+      houseRules: hotel?.houseRules ?? "",
+      breakfast: hotel?.breakfast ?? "",
+      specialNote: hotel?.specialNote ?? "",
+      nearbyPlaces: (hotel?.nearbyPlaces ?? []).join("\n"),
     },
   });
 
@@ -92,6 +113,20 @@ export function HotelForm({
       vatBps: vat,
       status: v.status,
       heroMedia: hero?.key ?? null,
+      propertyType: v.propertyType || null,
+      distanceFromCity: v.distanceFromCity,
+      distanceFromSpot: v.distanceFromSpot,
+      childPolicy: v.childPolicy,
+      petPolicy: v.petPolicy,
+      houseRules: v.houseRules,
+      breakfast: v.breakfast,
+      specialNote: v.specialNote,
+      nearbyPlaces: v.nearbyPlaces
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean),
+      gallery: gallery.map((g) => g.key),
+      amenities,
     };
     const result = hotel
       ? await browserApi.PUT("/api/v1/admin/hotels/{slug}", {
@@ -210,6 +245,68 @@ export function HotelForm({
           className="md:col-span-2"
           error={err("cancellationPolicy")}
           {...register("cancellationPolicy")}
+        />
+      </fieldset>
+      <GalleryPicker
+        value={gallery}
+        onChange={setGallery}
+        csrfToken={csrfToken}
+        readOnly={readOnly}
+      />
+      <AmenityPicker
+        scope="HOTEL"
+        value={amenities}
+        onChange={setAmenities}
+        csrfToken={csrfToken}
+        readOnly={readOnly}
+      />
+      <fieldset disabled={readOnly} className="grid gap-4 border-t border-rule pt-4 md:grid-cols-2">
+        <legend className="mb-2 text-[0.84rem] font-semibold">Location and house policies</legend>
+        <SelectField
+          label="Property type"
+          error={err("propertyType")}
+          {...register("propertyType")}
+        >
+          <option value="">Not set</option>
+          <option value="HOTEL">Hotel</option>
+          <option value="RESORT">Resort</option>
+          <option value="HOTEL_RESORT">Hotel and resort</option>
+        </SelectField>
+        <TextField
+          label="Breakfast"
+          hint="e.g. Yes, buffet"
+          error={err("breakfast")}
+          {...register("breakfast")}
+        />
+        <TextField
+          label="Distance from the city"
+          error={err("distanceFromCity")}
+          {...register("distanceFromCity")}
+        />
+        <TextField
+          label="Distance from the main sights"
+          error={err("distanceFromSpot")}
+          {...register("distanceFromSpot")}
+        />
+        <TextAreaField
+          label="Nearby places (one per line)"
+          className="md:col-span-2"
+          error={err("nearbyPlaces")}
+          {...register("nearbyPlaces")}
+        />
+        <TextAreaField label="Children" error={err("childPolicy")} {...register("childPolicy")} />
+        <TextField label="Pets" error={err("petPolicy")} {...register("petPolicy")} />
+        <TextAreaField
+          label="House rules"
+          className="md:col-span-2"
+          error={err("houseRules")}
+          {...register("houseRules")}
+        />
+        <TextAreaField
+          label="Good to know"
+          className="md:col-span-2"
+          error={err("specialNote")}
+          {...register("specialNote")}
         />
       </fieldset>
       {message && <FormAlert tone={message.tone}>{message.text}</FormAlert>}

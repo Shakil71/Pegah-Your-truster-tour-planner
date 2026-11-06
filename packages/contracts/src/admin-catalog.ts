@@ -30,7 +30,26 @@ const OptionalText = (max: number) =>
     .optional();
 const Bps = z.number().int().min(0).max(3000);
 const ClockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (24-hour)");
-const StringList = z.array(Text(1, 200)).max(20);
+const StringList = z.array(Text(1, 300)).max(30);
+/** Photo gallery as media-library keys, in display order; omitted keeps the current one. */
+const GalleryKeys = z.array(MediaKeySchema).max(40).optional();
+const AmenitySlugs = z
+  .array(z.string().regex(/^[a-z0-9-]{1,80}$/))
+  .max(100)
+  .optional();
+const LongText = (max: number) => OptionalText(max);
+
+export const AmenityScopeSchema = z.enum(["HOTEL", "ROOM", "TOUR"]);
+export const AdminAmenitySchema = z
+  .object({ slug: z.string(), name: z.string(), group: nullableText(80) })
+  .meta({ id: "AdminAmenity" });
+export const AdminAmenityListSchema = z.object({ items: z.array(AdminAmenitySchema) });
+export const AmenityListQuerySchema = z.object({ scope: AmenityScopeSchema });
+export const CreateAmenitySchema = z.object({
+  scope: AmenityScopeSchema,
+  name: Text(2, 120),
+  group: OptionalText(80),
+});
 
 // ─── Destinations ───────────────────────────────────────────────────────────
 
@@ -89,6 +108,17 @@ export const HotelInputSchema = z.object({
   supplierId: PublicIdSchema.nullable().optional(),
   /** Main photo from the media library (key); null removes it, omitted keeps it. */
   heroMedia: MediaKeySchema.nullable().optional(),
+  propertyType: z.enum(["HOTEL", "RESORT", "HOTEL_RESORT"]).nullable().optional(),
+  distanceFromCity: OptionalText(120),
+  distanceFromSpot: OptionalText(160),
+  childPolicy: LongText(5000),
+  petPolicy: OptionalText(255),
+  houseRules: LongText(5000),
+  breakfast: OptionalText(120),
+  specialNote: LongText(5000),
+  nearbyPlaces: StringList.optional(),
+  gallery: GalleryKeys,
+  amenities: AmenitySlugs,
 });
 export type HotelInput = z.infer<typeof HotelInputSchema>;
 export const CreateHotelSchema = HotelInputSchema.extend({ slug: SlugSchema });
@@ -97,17 +127,43 @@ export type CreateHotel = z.infer<typeof CreateHotelSchema>;
 export const RoomInputSchema = z.object({
   name: Text(2, 120),
   description: Text(2, 500),
-  maxAdults: z.number().int().min(1).max(10),
-  maxChildren: z.number().int().min(0).max(10),
+  maxAdults: z.number().int().min(1).max(30),
+  maxChildren: z.number().int().min(0).max(20),
   bedType: Text(2, 60),
-  sizeSqm: z.number().int().min(5).max(2000).nullable(),
+  sizeSqm: z.number().int().min(1).max(2000).nullable(),
   isActive: z.boolean(),
+  roomType: OptionalText(80),
+  details: LongText(5000),
+  /** YES, NO or UNKNOWN (not stated). */
+  airConditioned: z.enum(["YES", "NO", "UNKNOWN"]).optional(),
+  extraBeds: z.number().int().min(0).max(10).optional(),
+  gallery: GalleryKeys,
+  amenities: AmenitySlugs,
 });
 export type RoomInput = z.infer<typeof RoomInputSchema>;
 
-export const AdminRoomSchema = RoomInputSchema.extend({ id: PublicIdSchema }).meta({
-  id: "AdminRoom",
-});
+export const AdminRoomSchema = z
+  .object({
+    id: PublicIdSchema,
+    name: z.string(),
+    description: z.string(),
+    maxAdults: z.number().int(),
+    maxChildren: z.number().int(),
+    bedType: z.string(),
+    sizeSqm: z.number().int().nullable(),
+    isActive: z.boolean(),
+    roomType: nullableText(80),
+    details: nullableText(5000),
+    airConditioned: z.boolean().nullable(),
+    extraBeds: z.number().int(),
+    /** Reference prices from the old website (not charged; rates come from the calendar). */
+    rackRate: MoneySchema.nullable(),
+    discountRate: MoneySchema.nullable(),
+    units: z.number().int().nullable(),
+    gallery: z.array(HeroRefSchema),
+    amenities: z.array(z.string()),
+  })
+  .meta({ id: "AdminRoom" });
 export type AdminRoom = z.infer<typeof AdminRoomSchema>;
 
 export const AdminHotelSummarySchema = z
@@ -139,6 +195,17 @@ export const AdminHotelDetailSchema = AdminHotelSummarySchema.extend({
   vatBps: z.number().int(),
   supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
   hero: HeroRefSchema.nullable(),
+  propertyType: z.enum(["HOTEL", "RESORT", "HOTEL_RESORT"]).nullable(),
+  distanceFromCity: nullableText(120),
+  distanceFromSpot: nullableText(160),
+  childPolicy: nullableText(5000),
+  petPolicy: nullableText(255),
+  houseRules: nullableText(5000),
+  breakfast: nullableText(120),
+  specialNote: nullableText(5000),
+  nearbyPlaces: z.array(z.string()),
+  gallery: z.array(HeroRefSchema),
+  amenities: z.array(z.string()),
   rooms: z.array(AdminRoomSchema),
 });
 export type AdminHotelDetail = z.infer<typeof AdminHotelDetailSchema>;
@@ -209,6 +276,20 @@ export const TourInputSchema = z.object({
   status: PublishStatusSchema,
   supplierId: PublicIdSchema.nullable().optional(),
   heroMedia: MediaKeySchema.nullable().optional(),
+  tourType: OptionalText(80),
+  overview: LongText(10000),
+  itinerary: LongText(10000),
+  policy: LongText(10000),
+  cancellationPolicy: LongText(5000),
+  travelTips: LongText(10000),
+  additionalInfo: LongText(10000),
+  timing: OptionalText(120),
+  transport: LongText(5000),
+  pickupPoints: StringList.optional(),
+  tags: StringList.optional(),
+  minAdults: z.number().int().min(1).max(50).nullable().optional(),
+  gallery: GalleryKeys,
+  amenities: AmenitySlugs,
 });
 export type TourInput = z.infer<typeof TourInputSchema>;
 export const CreateTourSchema = TourInputSchema.extend({ slug: SlugSchema });
@@ -259,6 +340,23 @@ export const AdminTourDetailSchema = AdminTourSummarySchema.extend({
   vatBps: z.number().int(),
   supplier: z.object({ id: PublicIdSchema, name: z.string() }).nullable(),
   hero: HeroRefSchema.nullable(),
+  tourType: nullableText(80),
+  overview: nullableText(10000),
+  itinerary: nullableText(10000),
+  policy: nullableText(10000),
+  cancellationPolicy: nullableText(5000),
+  travelTips: nullableText(10000),
+  additionalInfo: nullableText(10000),
+  timing: nullableText(120),
+  transport: nullableText(5000),
+  pickupPoints: z.array(z.string()),
+  tags: z.array(z.string()),
+  minAdults: z.number().int().nullable(),
+  /** Reference prices from the old website; departures carry the real price. */
+  listPrice: MoneySchema.nullable(),
+  salePrice: MoneySchema.nullable(),
+  gallery: z.array(HeroRefSchema),
+  amenities: z.array(z.string()),
   departures: z.array(AdminDepartureSchema),
 });
 export type AdminTourDetail = z.infer<typeof AdminTourDetailSchema>;

@@ -64,6 +64,22 @@ function uniqueViolation(error: unknown): boolean {
  *  - price and rate changes affect new bookings only (bookings keep snapshots);
  *  - every change is audited with the staff member and IP.
  */
+const GALLERY = {
+  orderBy: { sortOrder: "asc" },
+  include: { media: { select: { storageKey: true, altText: true } } },
+} as const;
+const PROPERTY_TYPES = ["HOTEL", "RESORT", "HOTEL_RESORT"] as const;
+type RoomWithMedia = Prisma.HotelRoomGetPayload<{
+  include: {
+    gallery: typeof GALLERY;
+    amenities: { select: { amenity: { select: { slug: true } } } };
+  };
+}>;
+const airConditionedField = (v: "YES" | "NO" | "UNKNOWN" | undefined) =>
+  v === undefined ? {} : { airConditioned: v === "UNKNOWN" ? null : v === "YES" };
+const stringArray = (v: unknown) =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+
 @Injectable()
 export class CatalogAdminService {
   constructor(
@@ -96,6 +112,133 @@ export class CatalogAdminService {
       );
     }
     return { heroMediaId: m.id };
+  }
+
+  /** Replaces a gallery with the given media keys (in order); undefined keeps it. */
+  private async setGallery(
+    tx: Tx,
+    kind: "hotel" | "room" | "tour",
+    ownerId: bigint,
+    keys: string[] | undefined,
+  ) {
+    if (keys === undefined) return;
+    const unique = [...new Set(keys)];
+    const media = await tx.mediaAsset.findMany({
+      where: { storageKey: { in: unique } },
+      select: { id: true, storageKey: true },
+    });
+    if (media.length !== unique.length) {
+      throw new ProblemException(
+        422,
+        "unknown-media",
+        "Unknown image",
+        "Pick images from the media library.",
+      );
+    }
+    const id = new Map(media.map((m) => [m.storageKey, m.id]));
+    const rows = unique.map((k, sortOrder) => ({ mediaId: id.get(k)!, sortOrder }));
+    if (kind === "hotel") {
+      await tx.hotelMedia.deleteMany({ where: { hotelId: ownerId } });
+      await tx.hotelMedia.createMany({ data: rows.map((r) => ({ ...r, hotelId: ownerId })) });
+    } else if (kind === "room") {
+      await tx.roomMedia.deleteMany({ where: { roomId: ownerId } });
+      await tx.roomMedia.createMany({ data: rows.map((r) => ({ ...r, roomId: ownerId })) });
+    } else {
+      await tx.tourMedia.deleteMany({ where: { tourId: ownerId } });
+      await tx.tourMedia.createMany({ data: rows.map((r) => ({ ...r, tourId: ownerId })) });
+    }
+  }
+
+  /** Replaces the amenities (by slug within the scope); undefined keeps them. */
+  private async setAmenities(
+    tx: Tx,
+    kind: "hotel" | "room" | "tour",
+    ownerId: bigint,
+    slugs: string[] | undefined,
+  ) {
+    if (slugs === undefined) return;
+    const scope = kind === "hotel" ? "HOTEL" : kind === "room" ? "ROOM" : "TOUR";
+    const unique = [...new Set(slugs)];
+    const found = await tx.amenity.findMany({
+      where: { scope, slug: { in: unique } },
+      select: { id: true },
+    });
+    if (found.length !== unique.length) {
+      throw new ProblemException(
+        422,
+        "unknown-amenity",
+        "Unknown facility",
+        "Pick facilities from the list.",
+      );
+    }
+    if (kind === "hotel") {
+      await tx.hotelAmenity.deleteMany({ where: { hotelId: ownerId } });
+      await tx.hotelAmenity.createMany({
+        data: found.map((a) => ({ hotelId: ownerId, amenityId: a.id })),
+      });
+    } else if (kind === "room") {
+      await tx.roomAmenity.deleteMany({ where: { roomId: ownerId } });
+      await tx.roomAmenity.createMany({
+        data: found.map((a) => ({ roomId: ownerId, amenityId: a.id })),
+      });
+    } else {
+      await tx.tourAmenity.deleteMany({ where: { tourId: ownerId } });
+      await tx.tourAmenity.createMany({
+        data: found.map((a) => ({ tourId: ownerId, amenityId: a.id })),
+      });
+    }
+  }
+
+  private galleryRefs(rows: Array<{ media: { storageKey: string; altText: string } }>) {
+    return rows.map((r) => this.heroRef(r.media)!);
+  }
+
+  // ─── Amenities ────────────────────────────────────────────────────────────
+
+  async listAmenities(scope: "HOTEL" | "ROOM" | "TOUR") {
+    const rows = await this.db.amenity.findMany({
+      where: { scope },
+      orderBy: [{ groupName: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+    });
+    return { items: rows.map((a) => ({ slug: a.slug, name: a.name, group: a.groupName })) };
+  }
+
+  async createAmenity(
+    input: { scope: "HOTEL" | "ROOM" | "TOUR"; name: string; group?: string | null },
+    actor: AuthContext,
+    ip: string | null,
+  ) {
+    const slug =
+      input.name
+        .toLowerCase()
+        .replace(/['’]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80) || "facility";
+    return this.db.$transaction(async (tx) => {
+      const existing = await tx.amenity.findUnique({
+        where: { scope_slug: { scope: input.scope, slug } },
+      });
+      const a =
+        existing ??
+        (await tx.amenity.create({
+          data: { scope: input.scope, slug, name: input.name, groupName: input.group ?? null },
+        }));
+      if (!existing) {
+        await this.record(
+          tx,
+          actor,
+          ip,
+          "catalog.amenity.created",
+          "amenity",
+          `${input.scope}:${slug}`,
+          {
+            name: input.name,
+          },
+        );
+      }
+      return { slug: a.slug, name: a.name, group: a.groupName };
+    });
   }
 
   // ─── Destinations ─────────────────────────────────────────────────────────
@@ -213,7 +356,15 @@ export class CatalogAdminService {
         destination: { select: { slug: true, name: true } },
         partner: { select: { publicId: true, name: true } },
         hero: { select: { storageKey: true, altText: true } },
-        rooms: { orderBy: [{ isActive: "desc" }, { maxAdults: "asc" }, { name: "asc" }] },
+        gallery: GALLERY,
+        amenities: { select: { amenity: { select: { slug: true } } } },
+        rooms: {
+          orderBy: [{ isActive: "desc" }, { maxAdults: "asc" }, { name: "asc" }],
+          include: {
+            gallery: GALLERY,
+            amenities: { select: { amenity: { select: { slug: true } } } },
+          },
+        },
       },
     });
     if (!h) throw notFound("hotel");
@@ -239,16 +390,27 @@ export class CatalogAdminService {
       vatBps: h.vatBps,
       supplier: h.partner ? { id: h.partner.publicId, name: h.partner.name } : null,
       hero: this.heroRef(h.hero),
-      rooms: h.rooms.map(toAdminRoom),
+      propertyType: PROPERTY_TYPES.find((x) => x === h.propertyType) ?? null,
+      distanceFromCity: h.distanceFromCity,
+      distanceFromSpot: h.distanceFromSpot,
+      childPolicy: h.childPolicy,
+      petPolicy: h.petPolicy,
+      houseRules: h.houseRules,
+      breakfast: h.breakfast,
+      specialNote: h.specialNote,
+      nearbyPlaces: stringArray(h.nearbyPlaces),
+      gallery: this.galleryRefs(h.gallery),
+      amenities: h.amenities.map((a) => a.amenity.slug),
+      rooms: h.rooms.map((r) => this.adminRoom(r)),
     };
   }
 
   async createHotel(input: CreateHotel, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
     try {
       await this.db.$transaction(async (tx) => {
         const destinationId = await this.destinationId(tx, destinationSlug);
-        await tx.hotel.create({
+        const created = await tx.hotel.create({
           data: {
             ...fields,
             publicId: newPublicId(),
@@ -259,6 +421,8 @@ export class CatalogAdminService {
             description: fields.description ?? null,
           },
         });
+        await this.setGallery(tx, "hotel", created.id, gallery);
+        await this.setAmenities(tx, "hotel", created.id, amenities);
         await this.record(tx, actor, ip, "catalog.hotel.created", "hotel", input.slug, {
           name: input.name,
           status: input.status,
@@ -272,7 +436,7 @@ export class CatalogAdminService {
   }
 
   async updateHotel(slug: string, input: HotelInput, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
     await this.db.$transaction(async (tx) => {
       const found = await tx.hotel.findUnique({ where: { slug } });
       if (!found) throw notFound("hotel");
@@ -288,8 +452,14 @@ export class CatalogAdminService {
           description: fields.description ?? null,
         },
       });
+      await this.setGallery(tx, "hotel", found.id, gallery);
+      await this.setAmenities(tx, "hotel", found.id, amenities);
       await this.record(tx, actor, ip, "catalog.hotel.updated", "hotel", slug, {
-        changed: changedKeys(found, { ...fields, destinationId }),
+        changed: [
+          ...changedKeys(found, { ...fields, destinationId }),
+          ...(gallery !== undefined ? ["gallery"] : []),
+          ...(amenities !== undefined ? ["amenities"] : []),
+        ],
       });
     });
     return this.hotel(slug);
@@ -305,14 +475,18 @@ export class CatalogAdminService {
           select: { id: true },
         });
         if (!hotel) throw notFound("hotel");
+        const { gallery, amenities, airConditioned, ...rest } = input;
+        const fields = { ...rest, ...airConditionedField(airConditioned) };
         const room = await tx.hotelRoom.create({
-          data: { ...input, publicId: newPublicId(), hotelId: hotel.id },
+          data: { ...fields, publicId: newPublicId(), hotelId: hotel.id },
         });
+        await this.setGallery(tx, "room", room.id, gallery);
+        await this.setAmenities(tx, "room", room.id, amenities);
         await this.record(tx, actor, ip, "catalog.room.created", "room", room.publicId, {
           hotel: hotelSlug,
           name: input.name,
         });
-        return toAdminRoom(room);
+        return this.adminRoom(await this.roomWithMedia(tx, room.id));
       });
     } catch (error) {
       if (uniqueViolation(error)) throw roomNameTaken();
@@ -325,16 +499,53 @@ export class CatalogAdminService {
       return await this.db.$transaction(async (tx) => {
         const found = await tx.hotelRoom.findUnique({ where: { publicId: roomId } });
         if (!found) throw notFound("room");
-        const room = await tx.hotelRoom.update({ where: { id: found.id }, data: input });
+        const { gallery, amenities, airConditioned, ...rest } = input;
+        const fields = { ...rest, ...airConditionedField(airConditioned) };
+        await tx.hotelRoom.update({ where: { id: found.id }, data: fields });
+        await this.setGallery(tx, "room", found.id, gallery);
+        await this.setAmenities(tx, "room", found.id, amenities);
         await this.record(tx, actor, ip, "catalog.room.updated", "room", roomId, {
-          changed: changedKeys(found, input),
+          changed: [
+            ...changedKeys(found, fields),
+            ...(gallery !== undefined ? ["gallery"] : []),
+            ...(amenities !== undefined ? ["amenities"] : []),
+          ],
         });
-        return toAdminRoom(room);
+        return this.adminRoom(await this.roomWithMedia(tx, found.id));
       });
     } catch (error) {
       if (uniqueViolation(error)) throw roomNameTaken();
       throw error;
     }
+  }
+
+  private roomWithMedia(tx: Tx, id: bigint) {
+    return tx.hotelRoom.findUniqueOrThrow({
+      where: { id },
+      include: { gallery: GALLERY, amenities: { select: { amenity: { select: { slug: true } } } } },
+    });
+  }
+
+  private adminRoom(r: RoomWithMedia): AdminRoom {
+    return {
+      id: r.publicId,
+      name: r.name,
+      description: r.description,
+      maxAdults: r.maxAdults,
+      maxChildren: r.maxChildren,
+      bedType: r.bedType,
+      sizeSqm: r.sizeSqm,
+      isActive: r.isActive,
+      roomType: r.roomType,
+      details: r.details,
+      airConditioned: r.airConditioned,
+      extraBeds: r.extraBeds,
+      rackRate: r.rackRateMinor !== null ? toMoney(r.rackRateMinor, "BDT") : null,
+      discountRate: r.discountRateMinor !== null ? toMoney(r.discountRateMinor, "BDT") : null,
+      units: r.units,
+      gallery: this.galleryRefs(r.gallery),
+      amenities: r.amenities.map((a) => a.amenity.slug),
+    };
   }
 
   // ─── Inventory and rate calendar ─────────────────────────────────────────
@@ -512,6 +723,8 @@ export class CatalogAdminService {
         partner: { select: { publicId: true, name: true } },
         hero: { select: { storageKey: true, altText: true } },
         schedules: { orderBy: { departsAt: "asc" } },
+        gallery: GALLERY,
+        amenities: { select: { amenity: { select: { slug: true } } } },
       },
     });
     if (!t) throw notFound("tour");
@@ -541,16 +754,32 @@ export class CatalogAdminService {
       vatBps: t.vatBps,
       supplier: t.partner ? { id: t.partner.publicId, name: t.partner.name } : null,
       hero: this.heroRef(t.hero),
+      tourType: t.tourType,
+      overview: t.overview,
+      itinerary: t.itinerary,
+      policy: t.policy,
+      cancellationPolicy: t.cancellationPolicy,
+      travelTips: t.travelTips,
+      additionalInfo: t.additionalInfo,
+      timing: t.timing,
+      transport: t.transport,
+      pickupPoints: list(t.pickupPoints),
+      tags: list(t.tags),
+      minAdults: t.minAdults,
+      listPrice: t.listPriceMinor !== null ? toMoney(t.listPriceMinor, t.currency) : null,
+      salePrice: t.salePriceMinor !== null ? toMoney(t.salePriceMinor, t.currency) : null,
+      gallery: this.galleryRefs(t.gallery),
+      amenities: t.amenities.map((a) => a.amenity.slug),
       departures: t.schedules.map(toAdminDeparture),
     };
   }
 
   async createTour(input: CreateTour, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
     try {
       await this.db.$transaction(async (tx) => {
         const destinationId = await this.destinationId(tx, destinationSlug);
-        await tx.tour.create({
+        const created = await tx.tour.create({
           data: {
             ...fields,
             publicId: newPublicId(),
@@ -560,6 +789,8 @@ export class CatalogAdminService {
             titleBn: fields.titleBn ?? null,
           },
         });
+        await this.setGallery(tx, "tour", created.id, gallery);
+        await this.setAmenities(tx, "tour", created.id, amenities);
         await this.record(tx, actor, ip, "catalog.tour.created", "tour", input.slug, {
           title: input.title,
           status: input.status,
@@ -573,7 +804,7 @@ export class CatalogAdminService {
   }
 
   async updateTour(slug: string, input: TourInput, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, ...fields } = input;
+    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
     await this.db.$transaction(async (tx) => {
       const found = await tx.tour.findUnique({ where: { slug } });
       if (!found) throw notFound("tour");
@@ -588,8 +819,14 @@ export class CatalogAdminService {
           titleBn: fields.titleBn ?? null,
         },
       });
+      await this.setGallery(tx, "tour", found.id, gallery);
+      await this.setAmenities(tx, "tour", found.id, amenities);
       await this.record(tx, actor, ip, "catalog.tour.updated", "tour", slug, {
-        changed: changedKeys(found, { ...fields, destinationId }),
+        changed: [
+          ...changedKeys(found, { ...fields, destinationId }),
+          ...(gallery !== undefined ? ["gallery"] : []),
+          ...(amenities !== undefined ? ["amenities"] : []),
+        ],
       });
     });
     return this.tour(slug);
@@ -773,28 +1010,6 @@ export class CatalogAdminService {
       tx,
     );
   }
-}
-
-function toAdminRoom(r: {
-  publicId: string;
-  name: string;
-  description: string;
-  maxAdults: number;
-  maxChildren: number;
-  bedType: string;
-  sizeSqm: number | null;
-  isActive: boolean;
-}): AdminRoom {
-  return {
-    id: r.publicId,
-    name: r.name,
-    description: r.description,
-    maxAdults: r.maxAdults,
-    maxChildren: r.maxChildren,
-    bedType: r.bedType,
-    sizeSqm: r.sizeSqm,
-    isActive: r.isActive,
-  };
 }
 
 function toAdminDeparture(s: {

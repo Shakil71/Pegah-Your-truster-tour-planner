@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, TextField, buttonClass, cx } from "@pegah/ui";
+import { AmenityPicker, GalleryPicker } from "@/components/gallery-picker";
+import type { HeroRef } from "@/components/media-picker";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
+import { money } from "@/lib/format";
 
 type Room = Schemas["AdminRoom_Output"];
 type Draft = {
@@ -16,6 +19,12 @@ type Draft = {
   bedType: string;
   sizeSqm: string;
   isActive: boolean;
+  roomType: string;
+  details: string;
+  airConditioned: "" | "yes" | "no";
+  extraBeds: string;
+  gallery: HeroRef[];
+  amenities: string[];
 };
 
 const toDraft = (r?: Room): Draft => ({
@@ -26,6 +35,12 @@ const toDraft = (r?: Room): Draft => ({
   bedType: r?.bedType ?? "",
   sizeSqm: r?.sizeSqm ? String(r.sizeSqm) : "",
   isActive: r?.isActive ?? true,
+  roomType: r?.roomType ?? "",
+  details: r?.details ?? "",
+  airConditioned: r?.airConditioned === true ? "yes" : r?.airConditioned === false ? "no" : "",
+  extraBeds: String(r?.extraBeds ?? 0),
+  gallery: r?.gallery ?? [],
+  amenities: r?.amenities ?? [],
 });
 
 /** Room types of one hotel: list, inline edit, add, and a link to each room's calendar. */
@@ -67,6 +82,17 @@ export function RoomsEditor({
       bedType: draft.bedType,
       sizeSqm: draft.sizeSqm ? Number(draft.sizeSqm) : null,
       isActive: draft.isActive,
+      roomType: draft.roomType,
+      details: draft.details,
+      airConditioned:
+        draft.airConditioned === ""
+          ? ("UNKNOWN" as const)
+          : draft.airConditioned === "yes"
+            ? ("YES" as const)
+            : ("NO" as const),
+      extraBeds: Number(draft.extraBeds) || 0,
+      gallery: draft.gallery.map((g) => g.key),
+      amenities: draft.amenities,
     };
     const result =
       editing === "new"
@@ -92,7 +118,7 @@ export function RoomsEditor({
   const field = (key: keyof Draft, label: string, props: Record<string, unknown> = {}) => (
     <TextField
       label={label}
-      value={String(draft[key])}
+      value={String(draft[key] as string)}
       onChange={(e) => setDraft((d) => ({ ...d, [key]: e.target.value }))}
       {...props}
     />
@@ -103,8 +129,24 @@ export function RoomsEditor({
       {field("name", "Room type name")}
       {field("bedType", "Beds", { placeholder: "1 King" })}
       {field("sizeSqm", "Size m² (optional)", { inputMode: "numeric" })}
-      {field("maxAdults", "Max adults", { type: "number", min: 1, max: 10 })}
-      {field("maxChildren", "Max children", { type: "number", min: 0, max: 10 })}
+      {field("maxAdults", "Max adults", { type: "number", min: 1, max: 30 })}
+      {field("maxChildren", "Max children", { type: "number", min: 0, max: 20 })}
+      {field("roomType", "Room category (optional)", { placeholder: "Couple Deluxe" })}
+      {field("extraBeds", "Extra beds", { type: "number", min: 0, max: 10 })}
+      <label className="grid gap-1 text-[0.84rem] font-semibold">
+        Air conditioning
+        <select
+          value={draft.airConditioned}
+          onChange={(e) =>
+            setDraft((d) => ({ ...d, airConditioned: e.target.value as Draft["airConditioned"] }))
+          }
+          className="h-11 rounded-md border border-rule bg-card px-3 font-normal"
+        >
+          <option value="">Not stated</option>
+          <option value="yes">Air-conditioned</option>
+          <option value="no">No air conditioning</option>
+        </select>
+      </label>
       <label className="flex items-center gap-2 self-end pb-3 text-[0.88rem]">
         <input
           type="checkbox"
@@ -115,6 +157,31 @@ export function RoomsEditor({
         On sale (active)
       </label>
       <div className="md:col-span-3">{field("description", "Short description")}</div>
+      <label className="grid gap-1 text-[0.84rem] font-semibold md:col-span-3">
+        Full details (optional)
+        <textarea
+          value={draft.details}
+          onChange={(e) => setDraft((d) => ({ ...d, details: e.target.value }))}
+          rows={4}
+          className="rounded-md border border-rule bg-card px-3 py-2 font-normal"
+        />
+      </label>
+      <div className="md:col-span-3">
+        <GalleryPicker
+          label="Room photos"
+          value={draft.gallery}
+          onChange={(g) => setDraft((d) => ({ ...d, gallery: g }))}
+          csrfToken={csrfToken}
+        />
+      </div>
+      <div className="md:col-span-3">
+        <AmenityPicker
+          scope="ROOM"
+          value={draft.amenities}
+          onChange={(a) => setDraft((d) => ({ ...d, amenities: a }))}
+          csrfToken={csrfToken}
+        />
+      </div>
       {error && (
         <div className="md:col-span-3">
           <FormAlert>{error}</FormAlert>
@@ -187,7 +254,17 @@ export function RoomsEditor({
                   {r.bedType} · up to {r.maxAdults} adults
                   {r.maxChildren ? ` + ${r.maxChildren} children` : ""}
                   {r.sizeSqm ? ` · ${r.sizeSqm} m²` : ""}
+                  {r.gallery.length ? ` · ${r.gallery.length} photos` : ""}
+                  {r.amenities.length ? ` · ${r.amenities.length} facilities` : ""}
                 </p>
+                {(r.rackRate || r.discountRate) && (
+                  <p className="text-[0.76rem] text-ink-3">
+                    Old website price: {r.rackRate ? money(r.rackRate) : "—"}
+                    {r.discountRate ? ` (offer ${money(r.discountRate)})` : ""}
+                    {r.units ? ` · ${r.units} rooms` : ""} — reference only; set rates in the
+                    calendar.
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {canInventory && (

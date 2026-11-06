@@ -1436,6 +1436,12 @@ Customers whose email already exists are linked, never overwritten.
   website)" and the licence note "Old website; verify before publishing".
   Staff confirm each supplier allowed use before publishing a listing.
 - **Runbook:** `docs/operations/LEGACY_IMPORT.md`.
+- **Display (same day):** the public hotel/tour APIs return `gallery`,
+  `amenities` and the long-form fields (`RoomDetail` on the hotel page only;
+  search keeps the compact `Room`). Hotel phone and email are kept for staff
+  and never exposed publicly. Console inputs treat `gallery`/`amenities` as
+  replace-when-sent, keep-when-omitted; unknown keys or facilities answer 422
+  and change nothing. `airConditioned` is sent as YES/NO/UNKNOWN.
 
 ### ADR-0028 update (2026-11-06)
 

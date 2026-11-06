@@ -5,7 +5,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass } from "@pegah/ui";
+import { AmenityPicker, GalleryPicker } from "@/components/gallery-picker";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
+import { money } from "@/lib/format";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { bpsToPercent, percentToBps } from "@/lib/money-input";
 
@@ -26,6 +28,18 @@ type Values = {
   excludes: string;
   vat: string;
   status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+  tourType: string;
+  timing: string;
+  overview: string;
+  itinerary: string;
+  transport: string;
+  policy: string;
+  cancellationPolicy: string;
+  travelTips: string;
+  additionalInfo: string;
+  pickupPoints: string;
+  tags: string;
+  minAdults: string;
 };
 
 const lines = (text: string) =>
@@ -47,6 +61,8 @@ export function TourForm({
 }) {
   const router = useRouter();
   const [hero, setHero] = useState<HeroRef | null>(tour?.hero ?? null);
+  const [gallery, setGallery] = useState<HeroRef[]>(tour?.gallery ?? []);
+  const [amenities, setAmenities] = useState<string[]>(tour?.amenities ?? []);
   const [message, setMessage] = useState<{ tone: "good" | "critical"; text: string } | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { register, handleSubmit, formState } = useForm<Values>({
@@ -66,6 +82,18 @@ export function TourForm({
       excludes: (tour?.excludes ?? []).join("\n"),
       vat: bpsToPercent(tour?.vatBps ?? 500),
       status: tour?.status ?? "DRAFT",
+      tourType: tour?.tourType ?? "",
+      timing: tour?.timing ?? "",
+      overview: tour?.overview ?? "",
+      itinerary: tour?.itinerary ?? "",
+      transport: tour?.transport ?? "",
+      policy: tour?.policy ?? "",
+      cancellationPolicy: tour?.cancellationPolicy ?? "",
+      travelTips: tour?.travelTips ?? "",
+      additionalInfo: tour?.additionalInfo ?? "",
+      pickupPoints: (tour?.pickupPoints ?? []).join("\n"),
+      tags: (tour?.tags ?? []).join("\n"),
+      minAdults: tour?.minAdults ? String(tour.minAdults) : "",
     },
   });
 
@@ -93,6 +121,20 @@ export function TourForm({
       vatBps: vat,
       status: v.status,
       heroMedia: hero?.key ?? null,
+      tourType: v.tourType,
+      timing: v.timing,
+      overview: v.overview,
+      itinerary: v.itinerary,
+      transport: v.transport,
+      policy: v.policy,
+      cancellationPolicy: v.cancellationPolicy,
+      travelTips: v.travelTips,
+      additionalInfo: v.additionalInfo,
+      pickupPoints: lines(v.pickupPoints),
+      tags: lines(v.tags),
+      minAdults: v.minAdults ? Number(v.minAdults) : null,
+      gallery: gallery.map((g) => g.key),
+      amenities,
     };
     const result = tour
       ? await browserApi.PUT("/api/v1/admin/tours/{slug}", {
@@ -209,6 +251,85 @@ export function TourForm({
           <option value="PUBLISHED">Live on site</option>
           <option value="SUSPENDED">Suspended (hidden)</option>
         </SelectField>
+      </fieldset>
+      <GalleryPicker
+        value={gallery}
+        onChange={setGallery}
+        csrfToken={csrfToken}
+        readOnly={readOnly}
+      />
+      <AmenityPicker
+        scope="TOUR"
+        value={amenities}
+        onChange={setAmenities}
+        csrfToken={csrfToken}
+        readOnly={readOnly}
+      />
+      <fieldset disabled={readOnly} className="grid gap-4 border-t border-rule pt-4 md:grid-cols-2">
+        <legend className="mb-2 text-[0.84rem] font-semibold">Trip details</legend>
+        {(tour?.listPrice || tour?.salePrice) && (
+          <p className="text-[0.8rem] text-ink-3 md:col-span-2">
+            Old website price: {tour.listPrice ? money(tour.listPrice) : "—"}
+            {tour.salePrice ? ` (offer ${money(tour.salePrice)})` : ""} — reference only; departures
+            carry the real price.
+          </p>
+        )}
+        <TextField label="Tour type" error={err("tourType")} {...register("tourType")} />
+        <TextField label="Timing" error={err("timing")} {...register("timing")} />
+        <TextAreaField
+          label="Overview"
+          className="md:col-span-2"
+          error={err("overview")}
+          {...register("overview")}
+        />
+        <TextAreaField
+          label="Day-by-day itinerary"
+          className="md:col-span-2"
+          error={err("itinerary")}
+          {...register("itinerary")}
+        />
+        <TextAreaField
+          label="Transport"
+          className="md:col-span-2"
+          error={err("transport")}
+          {...register("transport")}
+        />
+        <TextAreaField
+          label="Tour policy"
+          className="md:col-span-2"
+          error={err("policy")}
+          {...register("policy")}
+        />
+        <TextAreaField
+          label="Cancellation policy"
+          className="md:col-span-2"
+          error={err("cancellationPolicy")}
+          {...register("cancellationPolicy")}
+        />
+        <TextAreaField
+          label="Travel tips"
+          className="md:col-span-2"
+          error={err("travelTips")}
+          {...register("travelTips")}
+        />
+        <TextAreaField
+          label="More information"
+          className="md:col-span-2"
+          error={err("additionalInfo")}
+          {...register("additionalInfo")}
+        />
+        <TextAreaField
+          label="Pick-up points (one per line)"
+          error={err("pickupPoints")}
+          {...register("pickupPoints")}
+        />
+        <TextAreaField label="Tags (one per line)" error={err("tags")} {...register("tags")} />
+        <TextField
+          label="Minimum adults"
+          inputMode="numeric"
+          error={err("minAdults")}
+          {...register("minAdults")}
+        />
       </fieldset>
       {message && <FormAlert tone={message.tone}>{message.text}</FormAlert>}
       {!readOnly && (

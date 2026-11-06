@@ -46,6 +46,26 @@ export const RoomSchema = z
   })
   .meta({ id: "Room" });
 
+export const AmenitySchema = z
+  .object({
+    slug: z.string(),
+    name: z.string(),
+    group: nullableText(80),
+    icon: MediaSchema.nullable(),
+  })
+  .meta({ id: "Amenity" });
+export type Amenity = z.infer<typeof AmenitySchema>;
+
+/** Room as shown on the hotel page: photos, facilities and details (ADR-0038). */
+export const RoomDetailSchema = RoomSchema.extend({
+  roomType: nullableText(80),
+  details: nullableText(),
+  airConditioned: z.boolean().nullable(),
+  extraBeds: z.number().int(),
+  gallery: z.array(MediaSchema),
+  amenities: z.array(AmenitySchema),
+}).meta({ id: "RoomDetail" });
+
 export const HotelSummarySchema = z
   .object({
     id: PublicIdSchema,
@@ -66,7 +86,18 @@ export const HotelDetailSchema = HotelSummarySchema.extend({
   checkInTime: z.string(),
   checkOutTime: z.string(),
   cancellationPolicy: z.string(),
-  rooms: z.array(RoomSchema),
+  propertyType: z.enum(["HOTEL", "RESORT", "HOTEL_RESORT"]).nullable(),
+  distanceFromCity: nullableText(120),
+  distanceFromSpot: nullableText(160),
+  childPolicy: nullableText(),
+  petPolicy: nullableText(255),
+  houseRules: nullableText(),
+  breakfast: nullableText(120),
+  specialNote: nullableText(),
+  nearbyPlaces: z.array(z.string()),
+  gallery: z.array(MediaSchema),
+  amenities: z.array(AmenitySchema),
+  rooms: z.array(RoomDetailSchema),
 });
 export type HotelDetail = z.infer<typeof HotelDetailSchema>;
 
@@ -165,6 +196,20 @@ export const TourDetailSchema = TourSummarySchema.extend({
   highlights: z.array(z.string()),
   includes: z.array(z.string()),
   excludes: z.array(z.string()),
+  tourType: nullableText(80),
+  overview: nullableText(),
+  itinerary: nullableText(),
+  policy: nullableText(),
+  cancellationPolicy: nullableText(),
+  travelTips: nullableText(),
+  additionalInfo: nullableText(),
+  timing: nullableText(120),
+  transport: nullableText(),
+  pickupPoints: z.array(z.string()),
+  tags: z.array(z.string()),
+  minAdults: z.number().int().nullable(),
+  gallery: z.array(MediaSchema),
+  amenities: z.array(AmenitySchema),
   departures: z.array(TourDepartureSchema),
 });
 export type TourDetail = z.infer<typeof TourDetailSchema>;

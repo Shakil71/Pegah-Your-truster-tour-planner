@@ -1489,6 +1489,72 @@
         "tags": ["admin"]
       }
     },
+    "/api/v1/admin/amenities": {
+      "get": {
+        "operationId": "CatalogAdminController_amenities",
+        "parameters": [
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["HOTEL", "ROOM", "TOUR"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAmenityListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-catalog"]
+      },
+      "post": {
+        "operationId": "CatalogAdminController_createAmenity",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreateAmenityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAmenityResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-catalog"]
+      }
+    },
     "/api/v1/admin/destinations": {
       "get": {
         "operationId": "CatalogAdminController_destinations",
@@ -5966,6 +6032,138 @@
         "required": ["query", "offers", "pricedAt"],
         "additionalProperties": false
       },
+      "Amenity_Output": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "icon": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Media_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["slug", "name", "group", "icon"],
+        "additionalProperties": false
+      },
+      "RoomDetail_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "maxAdults": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "maxChildren": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "bedType": {
+            "type": "string"
+          },
+          "sizeSqm": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "roomType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "airConditioned": {
+            "type": ["boolean", "null"]
+          },
+          "extraBeds": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media_Output"
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Amenity_Output"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "maxAdults",
+          "maxChildren",
+          "bedType",
+          "sizeSqm",
+          "roomType",
+          "details",
+          "airConditioned",
+          "extraBeds",
+          "gallery",
+          "amenities"
+        ],
+        "additionalProperties": false
+      },
       "HotelDetailDto_Output": {
         "type": "object",
         "properties": {
@@ -6057,10 +6255,116 @@
           "cancellationPolicy": {
             "type": "string"
           },
+          "propertyType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["HOTEL", "RESORT", "HOTEL_RESORT"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromCity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromSpot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "childPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "petPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "houseRules": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "breakfast": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specialNote": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nearbyPlaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media_Output"
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Amenity_Output"
+            }
+          },
           "rooms": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Room_Output"
+              "$ref": "#/components/schemas/RoomDetail_Output"
             }
           }
         },
@@ -6078,6 +6382,17 @@
           "checkInTime",
           "checkOutTime",
           "cancellationPolicy",
+          "propertyType",
+          "distanceFromCity",
+          "distanceFromSpot",
+          "childPolicy",
+          "petPolicy",
+          "houseRules",
+          "breakfast",
+          "specialNote",
+          "nearbyPlaces",
+          "gallery",
+          "amenities",
           "rooms"
         ],
         "additionalProperties": false
@@ -6320,6 +6635,141 @@
               "type": "string"
             }
           },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "itinerary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancellationPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "travelTips": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "additionalInfo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pickupPoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minAdults": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media_Output"
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Amenity_Output"
+            }
+          },
           "departures": {
             "type": "array",
             "items": {
@@ -6345,6 +6795,20 @@
           "highlights",
           "includes",
           "excludes",
+          "tourType",
+          "overview",
+          "itinerary",
+          "policy",
+          "cancellationPolicy",
+          "travelTips",
+          "additionalInfo",
+          "timing",
+          "transport",
+          "pickupPoints",
+          "tags",
+          "minAdults",
+          "gallery",
+          "amenities",
           "departures"
         ],
         "additionalProperties": false
@@ -8423,6 +8887,79 @@
         "required": ["items", "nextCursor"],
         "additionalProperties": false
       },
+      "AdminAmenity_Output": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["slug", "name", "group"],
+        "additionalProperties": false
+      },
+      "AdminAmenityListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminAmenity_Output"
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "AdminCreateAmenityDto": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": ["HOTEL", "ROOM", "TOUR"]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["scope", "name"]
+      },
+      "AdminAmenityResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "amenity": {
+            "$ref": "#/components/schemas/AdminAmenity_Output"
+          }
+        },
+        "required": ["amenity"],
+        "additionalProperties": false
+      },
       "AdminDestination_Output": {
         "type": "object",
         "properties": {
@@ -8846,6 +9383,119 @@
               }
             ]
           },
+          "propertyType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["HOTEL", "RESORT", "HOTEL_RESORT"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromCity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromSpot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "childPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "petPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "houseRules": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "breakfast": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specialNote": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nearbyPlaces": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "gallery": {
+            "maxItems": 40,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{24}\\.webp$"
+            }
+          },
+          "amenities": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,80}$"
+            }
+          },
           "slug": {
             "type": "string",
             "minLength": 2,
@@ -8871,37 +9521,35 @@
       "AdminRoom_Output": {
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string",
-            "minLength": 2,
-            "maxLength": 120
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "name": {
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 500
+            "type": "string"
           },
           "maxAdults": {
             "type": "integer",
-            "minimum": 1,
-            "maximum": 10
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
           },
           "maxChildren": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 10
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
           },
           "bedType": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 60
+            "type": "string"
           },
           "sizeSqm": {
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 5,
-                "maximum": 2000
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
               },
               {
                 "type": "null"
@@ -8911,12 +9559,97 @@
           "isActive": {
             "type": "boolean"
           },
-          "id": {
-            "type": "string",
-            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          "roomType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "airConditioned": {
+            "type": ["boolean", "null"]
+          },
+          "extraBeds": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "rackRate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "discountRate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "units": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{24}\\.webp$"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                }
+              },
+              "required": ["key", "url", "alt"],
+              "additionalProperties": false
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
+          "id",
           "name",
           "description",
           "maxAdults",
@@ -8924,7 +9657,15 @@
           "bedType",
           "sizeSqm",
           "isActive",
-          "id"
+          "roomType",
+          "details",
+          "airConditioned",
+          "extraBeds",
+          "rackRate",
+          "discountRate",
+          "units",
+          "gallery",
+          "amenities"
         ],
         "additionalProperties": false
       },
@@ -9083,6 +9824,126 @@
               }
             ]
           },
+          "propertyType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["HOTEL", "RESORT", "HOTEL_RESORT"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromCity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromSpot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "childPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "petPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "houseRules": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "breakfast": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specialNote": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nearbyPlaces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{24}\\.webp$"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                }
+              },
+              "required": ["key", "url", "alt"],
+              "additionalProperties": false
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "rooms": {
             "type": "array",
             "items": {
@@ -9111,6 +9972,17 @@
           "vatBps",
           "supplier",
           "hero",
+          "propertyType",
+          "distanceFromCity",
+          "distanceFromSpot",
+          "childPolicy",
+          "petPolicy",
+          "houseRules",
+          "breakfast",
+          "specialNote",
+          "nearbyPlaces",
+          "gallery",
+          "amenities",
           "rooms"
         ],
         "additionalProperties": false
@@ -9221,6 +10093,119 @@
                 "type": "null"
               }
             ]
+          },
+          "propertyType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["HOTEL", "RESORT", "HOTEL_RESORT"]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromCity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "distanceFromSpot": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "childPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "petPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 255
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "houseRules": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "breakfast": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "specialNote": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nearbyPlaces": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "gallery": {
+            "maxItems": 40,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{24}\\.webp$"
+            }
+          },
+          "amenities": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,80}$"
+            }
           }
         },
         "required": [
@@ -9253,12 +10238,12 @@
           "maxAdults": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 10
+            "maximum": 30
           },
           "maxChildren": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 10
+            "maximum": 20
           },
           "bedType": {
             "type": "string",
@@ -9269,7 +10254,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 5,
+                "minimum": 1,
                 "maximum": 2000
               },
               {
@@ -9279,6 +10264,53 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "roomType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "airConditioned": {
+            "type": "string",
+            "enum": ["YES", "NO", "UNKNOWN"]
+          },
+          "extraBeds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "gallery": {
+            "maxItems": 40,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{24}\\.webp$"
+            }
+          },
+          "amenities": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,80}$"
+            }
           }
         },
         "required": [
@@ -9576,30 +10608,30 @@
             "maximum": 500
           },
           "highlights": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "includes": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "excludes": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "vatBps": {
@@ -9632,6 +10664,151 @@
                 "type": "null"
               }
             ]
+          },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "itinerary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancellationPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "travelTips": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "additionalInfo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pickupPoints": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "tags": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "minAdults": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gallery": {
+            "maxItems": 40,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{24}\\.webp$"
+            }
+          },
+          "amenities": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,80}$"
+            }
           },
           "slug": {
             "type": "string",
@@ -9867,6 +11044,175 @@
               }
             ]
           },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "itinerary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancellationPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "travelTips": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "additionalInfo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pickupPoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minAdults": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "listPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "salePrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{24}\\.webp$"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "alt": {
+                  "type": "string"
+                }
+              },
+              "required": ["key", "url", "alt"],
+              "additionalProperties": false
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "departures": {
             "type": "array",
             "items": {
@@ -9896,6 +11242,22 @@
           "vatBps",
           "supplier",
           "hero",
+          "tourType",
+          "overview",
+          "itinerary",
+          "policy",
+          "cancellationPolicy",
+          "travelTips",
+          "additionalInfo",
+          "timing",
+          "transport",
+          "pickupPoints",
+          "tags",
+          "minAdults",
+          "listPrice",
+          "salePrice",
+          "gallery",
+          "amenities",
           "departures"
         ],
         "additionalProperties": false
@@ -9956,30 +11318,30 @@
             "maximum": 500
           },
           "highlights": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "includes": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "excludes": {
-            "maxItems": 20,
+            "maxItems": 30,
             "type": "array",
             "items": {
               "type": "string",
               "minLength": 1,
-              "maxLength": 200
+              "maxLength": 300
             }
           },
           "vatBps": {
@@ -10012,6 +11374,151 @@
                 "type": "null"
               }
             ]
+          },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "overview": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "itinerary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cancellationPolicy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "travelTips": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "additionalInfo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "transport": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pickupPoints": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "tags": {
+            "maxItems": 30,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 300
+            }
+          },
+          "minAdults": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 50
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gallery": {
+            "maxItems": 40,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{24}\\.webp$"
+            }
+          },
+          "amenities": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]{1,80}$"
+            }
           }
         },
         "required": [

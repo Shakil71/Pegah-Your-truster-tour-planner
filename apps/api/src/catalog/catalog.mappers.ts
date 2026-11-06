@@ -30,6 +30,36 @@ export function toHotelSummary(
   };
 }
 
+type AmenityRow = {
+  slug: string;
+  name: string;
+  groupName: string | null;
+  sortOrder: number;
+  icon: MediaLike | null;
+};
+
+/** Amenities in a stable order: group, then sort order, then name. */
+export function toAmenities(rows: Array<{ amenity: AmenityRow }>, mediaBaseUrl: string) {
+  return rows
+    .map((r) => r.amenity)
+    .sort(
+      (a, b) =>
+        (a.groupName ?? "~").localeCompare(b.groupName ?? "~") ||
+        a.sortOrder - b.sortOrder ||
+        a.name.localeCompare(b.name),
+    )
+    .map((a) => ({
+      slug: a.slug,
+      name: a.name,
+      group: a.groupName,
+      icon: toMedia(a.icon, mediaBaseUrl),
+    }));
+}
+
+export function toGallery(rows: Array<{ media: MediaLike }>, mediaBaseUrl: string) {
+  return rows.map((r) => toMedia(r.media, mediaBaseUrl)!);
+}
+
 /** Tour highlight/include lists are stored as JSON arrays of strings. */
 export function stringList(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
