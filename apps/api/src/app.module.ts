@@ -31,6 +31,7 @@ import { AccountService } from "./account/account.service";
 import { EmailVerificationService } from "./account/email-verification.service";
 import { CancellationService } from "./account/cancellation.service";
 import { AdminController } from "./admin/admin.controllers";
+import { LegacyAdminController } from "./legacy/legacy.controller";
 import { AuditQueryService } from "./admin/audit-query.service";
 import { DashboardService } from "./admin/dashboard.service";
 import { StaffService } from "./admin/staff.service";
@@ -111,6 +112,7 @@ export class AppModule {
         BookingsController,
         QuotesController,
         AdminController,
+        LegacyAdminController,
         MyPaymentsController,
         PaymentCallbacksController,
         SimulatorController,

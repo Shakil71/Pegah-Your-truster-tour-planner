@@ -81,6 +81,12 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { href: "/staff", label: "Staff and roles", icon: "key", permission: "user:manage" },
       { href: "/audit", label: "Audit log", icon: "log", permission: "audit:read" },
+      {
+        href: "/old-website",
+        label: "Old website data",
+        icon: "log",
+        permission: "legacy:read",
+      },
       { href: "/settings", label: "Settings", icon: "settings", permission: "settings:read" },
     ],
   },

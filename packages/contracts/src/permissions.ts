@@ -27,6 +27,7 @@ export const PERMISSIONS = {
   "settings:read": "View system settings and integration status (no secrets)",
   "settings:manage": "Edit contact details, the announcement banner and booking times (audited)",
   "settings:secrets": "Configure payment and email credentials (owner; audited)",
+  "legacy:read": "View data imported from the old website, including customer details",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;

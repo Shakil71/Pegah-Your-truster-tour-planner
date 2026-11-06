@@ -4,6 +4,20 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Old website import (2026-11-06)
+
+- Importer for the previous Pegah website: 45 hotels with 169 rooms, 16 tours,
+  8 packages, destinations, amenities, photo galleries, customers, coupons and
+  pages, all as drafts for review; every original row kept verbatim and
+  browsable in Console → Old website data (ADR-0038,
+  `docs/operations/LEGACY_IMPORT.md`).
+- New catalog fields: hotel contact, map, distances, policies and nearby
+  places; room details, beds, size, extra beds and reference prices; tour
+  overview, itinerary, policies, tips, pickup points, transport and tags;
+  galleries and amenities for hotels, rooms and tours.
+- Customers from the old site can sign in with their old password once; it is
+  then upgraded to Argon2id.
+
 ### Added — Refunds back to gift cards (2026-11-06)
 
 - When a confirmed booking paid with a gift card is cancelled with a refund,

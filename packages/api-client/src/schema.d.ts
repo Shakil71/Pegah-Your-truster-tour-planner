@@ -548,6 +548,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/legacy/tables": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["LegacyAdminController_tables"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/legacy/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["LegacyAdminController_records"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/bookings/{id}/payment-session": {
     parameters: {
       query?: never;
@@ -1943,6 +1975,7 @@ export interface components {
         | "settings:read"
         | "settings:manage"
         | "settings:secrets"
+        | "legacy:read"
       )[];
       partner: {
         id: string;
@@ -2558,6 +2591,7 @@ export interface components {
         | "settings:read"
         | "settings:manage"
         | "settings:secrets"
+        | "legacy:read"
       )[];
       memberCount: number;
     };
@@ -2616,6 +2650,28 @@ export interface components {
     };
     AuditListResponseDto_Output: {
       items: components["schemas"]["AuditEvent_Output"][];
+      nextCursor: string | null;
+    };
+    LegacyTablesDto_Output: {
+      tables: {
+        table: string;
+        rows: number;
+        linked: number;
+      }[];
+      total: number;
+    };
+    LegacyRecordsDto_Output: {
+      items: {
+        id: string;
+        sourceId: string;
+        targetType: string | null;
+        targetId: string | null;
+        payload: {
+          [key: string]: string | null;
+        };
+        /** Format: date-time */
+        importedAt: string;
+      }[];
       nextCursor: string | null;
     };
     PaymentSessionResponseDto_Output: {
@@ -4958,6 +5014,49 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AuditListResponseDto_Output"];
+        };
+      };
+    };
+  };
+  LegacyAdminController_tables: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LegacyTablesDto_Output"];
+        };
+      };
+    };
+  };
+  LegacyAdminController_records: {
+    parameters: {
+      query: {
+        table: string;
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LegacyRecordsDto_Output"];
         };
       };
     };

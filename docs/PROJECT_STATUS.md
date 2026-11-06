@@ -15,6 +15,11 @@ supplier contracts.
 
 ## Completed
 
+- Old website import (ADR-0038): schema for galleries, amenities and the old
+  fields; importer + verifier rehearsed locally (nothing missing, nothing
+  changed). **Not yet run on the server** — needs owner approval and a
+  backup first (`docs/operations/LEGACY_IMPORT.md`).
+
 - Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);
   light/dark theme toggle (ADR-0033); gift cards at checkout (ADR-0034);
   refunds back to gift cards (ADR-0037).
@@ -88,6 +93,9 @@ that need a contract or a second server.
 4. SSLCOMMERZ sandbox credentials → sandbox checklist
    (`docs/operations/SSLCOMMERZ_INTEGRATION.md`) → live approval.
 5. Change the owner's console password; create personal staff accounts.
+6. Old website import on the server (approval + backup), then review the
+   45 draft hotels, 16 tours and 8 packages: confirm photo permissions, set
+   real rates and departures, translate offer text, publish.
 
 **Before real customers:** remove demo data (`seed-sample.js --demo
 --remove`), choose a domain and trusted certificate, add a staging instance,
@@ -128,4 +136,5 @@ run a backup restore drill.
 ## Approvals required
 
 - Owner configuration listed above (SMTP, SSLCOMMERZ, key rotation).
+- Running the old website import on the server.
 - Before real customers: remove demo data, choose a domain, add staging.

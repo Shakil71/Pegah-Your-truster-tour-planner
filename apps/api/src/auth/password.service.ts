@@ -1,6 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import * as argon2 from "argon2";
+import bcrypt from "bcryptjs";
 import { APP_CONFIG, type AppConfig } from "../config/config";
+
+/** Laravel bcrypt hashes ($2y$/$2b$/$2a$, cost 10–12) from the old website. */
+export const isLegacyBcrypt = (hash: string) => /^\$2[aby]\$\d{2}\$.{53}$/.test(hash);
 
 /** Argon2id password hashing (docs/security/SECURITY_MODEL.md). */
 @Injectable()
@@ -24,6 +28,10 @@ export class PasswordService {
 
   async verify(hash: string, password: string): Promise<boolean> {
     try {
+      if (isLegacyBcrypt(hash)) {
+        // Customers imported from the old website (ADR-0038); upgraded to Argon2id on login.
+        return await bcrypt.compare(password, hash.replace(/^\$2y\$/, "$2b$"));
+      }
       return await argon2.verify(hash, password);
     } catch {
       return false;
@@ -31,6 +39,7 @@ export class PasswordService {
   }
 
   needsRehash(hash: string): boolean {
+    if (isLegacyBcrypt(hash)) return true;
     return argon2.needsRehash(hash, this.costs);
   }
 

@@ -171,6 +171,11 @@ model MediaAsset {
   ads          Ad[]
   destinations Destination[]
   hotels       Hotel[]
+  hotelGallery HotelMedia[]
+  roomGallery  RoomMedia[]
+  tourGallery  TourMedia[]
+  offerGallery OfferMedia[]
+  amenityIcons Amenity[]
   tours        Tour[]
 
   @@map("media_assets")
@@ -200,6 +205,8 @@ model Destination {
   nameBn      String?       @map("name_bn") @db.VarChar(120)
   region      String        @db.VarChar(80)
   summary     String        @db.VarChar(500)
+  /// Long guide text (e.g. imported tourist spot pages, ADR-0038).
+  description String?       @db.Text
   heroMediaId BigInt?       @map("hero_media_id") @db.UnsignedBigInt
   status      PublishStatus @default(DRAFT)
   sortOrder   Int           @default(0) @map("sort_order")
@@ -234,17 +241,36 @@ model Hotel {
   serviceChargeBps   Int           @default(0) @map("service_charge_bps") @db.UnsignedSmallInt
   /// VAT in basis points, applied on base + service charge.
   vatBps             Int           @default(0) @map("vat_bps") @db.UnsignedSmallInt
+  /// HOTEL | RESORT | HOTEL_RESORT (CHECK hotels_property_type_chk).
+  propertyType       String?       @map("property_type") @db.VarChar(20)
+  phone              String?       @db.VarChar(40)
+  email              String?       @db.VarChar(254)
+  mapUrl             String?       @map("map_url") @db.Text
+  distanceFromCity   String?       @map("distance_from_city") @db.VarChar(120)
+  distanceFromSpot   String?       @map("distance_from_spot") @db.VarChar(160)
+  floors             Int?          @db.UnsignedSmallInt
+  roomCount          Int?          @map("room_count") @db.UnsignedSmallInt
+  childPolicy        String?       @map("child_policy") @db.Text
+  petPolicy          String?       @map("pet_policy") @db.VarChar(255)
+  houseRules         String?       @map("house_rules") @db.Text
+  breakfast          String?       @db.VarChar(120)
+  specialNote        String?       @map("special_note") @db.Text
+  /// JSON array of place names.
+  nearbyPlaces       Json?         @map("nearby_places")
+  sortOrder          Int           @default(0) @map("sort_order")
   heroMediaId        BigInt?       @map("hero_media_id") @db.UnsignedBigInt
   status             PublishStatus @default(DRAFT)
   createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
   /// Supplier that manages this hotel in the partner portal (optional).
-  partnerId   BigInt?     @map("partner_id") @db.UnsignedBigInt
-  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Restrict)
-  hero        MediaAsset? @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+  partnerId   BigInt?        @map("partner_id") @db.UnsignedBigInt
+  destination Destination    @relation(fields: [destinationId], references: [id], onDelete: Restrict)
+  hero        MediaAsset?    @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+  gallery     HotelMedia[]
+  amenities   HotelAmenity[]
   rooms       HotelRoom[]
-  partner     Partner?    @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  partner     Partner?       @relation(fields: [partnerId], references: [id], onDelete: SetNull)
 
   @@index([destinationId, status])
   @@index([heroMediaId])
@@ -252,20 +278,38 @@ model Hotel {
 }
 
 model HotelRoom {
-  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
-  publicId    String   @unique @map("public_id") @db.Char(26)
-  hotelId     BigInt   @map("hotel_id") @db.UnsignedBigInt
-  name        String   @db.VarChar(120)
-  description String   @db.VarChar(500)
-  maxAdults   Int      @map("max_adults") @db.UnsignedTinyInt
-  maxChildren Int      @default(0) @map("max_children") @db.UnsignedTinyInt
-  bedType     String   @map("bed_type") @db.VarChar(60)
-  sizeSqm     Int?     @map("size_sqm") @db.UnsignedSmallInt
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at") @db.DateTime(3)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+  id                 BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId           String   @unique @map("public_id") @db.Char(26)
+  hotelId            BigInt   @map("hotel_id") @db.UnsignedBigInt
+  name               String   @db.VarChar(120)
+  description        String   @db.VarChar(500)
+  maxAdults          Int      @map("max_adults") @db.UnsignedTinyInt
+  maxChildren        Int      @default(0) @map("max_children") @db.UnsignedTinyInt
+  bedType            String   @map("bed_type") @db.VarChar(60)
+  sizeSqm            Int?     @map("size_sqm") @db.UnsignedSmallInt
+  roomType           String?  @map("room_type") @db.VarChar(80)
+  roomNumber         String?  @map("room_number") @db.VarChar(40)
+  floor              String?  @db.VarChar(40)
+  details            String?  @db.Text
+  note               String?  @db.VarChar(255)
+  sizeLabel          String?  @map("size_label") @db.VarChar(40)
+  /// JSON: { total, single, double, triple } bed counts.
+  beds               Json?
+  airConditioned     Boolean? @map("air_conditioned")
+  /// Number of rooms of this type (used to fill the inventory calendar).
+  units              Int?     @db.UnsignedSmallInt
+  extraBeds          Int      @default(0) @map("extra_beds") @db.UnsignedTinyInt
+  extraBedPriceMinor BigInt?  @map("extra_bed_price_minor")
+  /// Reference prices from the old website; never charged (rates come from room_rates).
+  rackRateMinor      BigInt?  @map("rack_rate_minor")
+  discountRateMinor  BigInt?  @map("discount_rate_minor")
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
   hotel        Hotel           @relation(fields: [hotelId], references: [id], onDelete: Restrict)
+  gallery      RoomMedia[]
+  amenities    RoomAmenity[]
   inventory    RoomInventory[]
   rates        RoomRate[]
   bookingItems BookingItem[]
@@ -314,32 +358,52 @@ model RoomRate {
 // ─── Tours ───────────────────────────────────────────────────────────────────
 
 model Tour {
-  id             BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
-  publicId       String        @unique @map("public_id") @db.Char(26)
-  slug           String        @unique @db.VarChar(80)
-  destinationId  BigInt        @map("destination_id") @db.UnsignedBigInt
-  title          String        @db.VarChar(160)
-  titleBn        String?       @map("title_bn") @db.VarChar(160)
-  summary        String        @db.VarChar(500)
-  description    String        @db.Text
-  durationDays   Int           @map("duration_days") @db.UnsignedTinyInt
-  durationNights Int           @map("duration_nights") @db.UnsignedTinyInt
-  meetingPoint   String        @map("meeting_point") @db.VarChar(255)
-  groupSizeMax   Int           @map("group_size_max") @db.UnsignedSmallInt
+  id                 BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId           String        @unique @map("public_id") @db.Char(26)
+  slug               String        @unique @db.VarChar(80)
+  destinationId      BigInt        @map("destination_id") @db.UnsignedBigInt
+  title              String        @db.VarChar(160)
+  titleBn            String?       @map("title_bn") @db.VarChar(160)
+  summary            String        @db.VarChar(500)
+  description        String        @db.Text
+  durationDays       Int           @map("duration_days") @db.UnsignedTinyInt
+  durationNights     Int           @map("duration_nights") @db.UnsignedTinyInt
+  meetingPoint       String        @map("meeting_point") @db.VarChar(255)
+  groupSizeMax       Int           @map("group_size_max") @db.UnsignedSmallInt
   /// JSON arrays of strings.
-  highlights     Json
-  includes       Json
-  excludes       Json
-  currency       String        @default("BDT") @db.Char(3)
-  vatBps         Int           @default(0) @map("vat_bps") @db.UnsignedSmallInt
-  heroMediaId    BigInt?       @map("hero_media_id") @db.UnsignedBigInt
-  status         PublishStatus @default(DRAFT)
-  createdAt      DateTime      @default(now()) @map("created_at") @db.DateTime(3)
-  updatedAt      DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+  highlights         Json
+  includes           Json
+  excludes           Json
+  currency           String        @default("BDT") @db.Char(3)
+  vatBps             Int           @default(0) @map("vat_bps") @db.UnsignedSmallInt
+  tourType           String?       @map("tour_type") @db.VarChar(80)
+  overview           String?       @db.Text
+  itinerary          String?       @db.Text
+  policy             String?       @db.Text
+  cancellationPolicy String?       @map("cancellation_policy") @db.Text
+  travelTips         String?       @map("travel_tips") @db.Text
+  additionalInfo     String?       @map("additional_info") @db.Text
+  timing             String?       @db.VarChar(120)
+  transport          String?       @db.Text
+  /// JSON arrays of strings.
+  pickupPoints       Json?         @map("pickup_points")
+  tags               Json?
+  mapUrl             String?       @map("map_url") @db.Text
+  minAdults          Int?          @map("min_adults") @db.UnsignedTinyInt
+  bookingCutoffDays  Int?          @map("booking_cutoff_days") @db.UnsignedSmallInt
+  /// Reference prices from the old website; departures carry the real price.
+  listPriceMinor     BigInt?       @map("list_price_minor")
+  salePriceMinor     BigInt?       @map("sale_price_minor")
+  heroMediaId        BigInt?       @map("hero_media_id") @db.UnsignedBigInt
+  status             PublishStatus @default(DRAFT)
+  createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
   partnerId   BigInt?        @map("partner_id") @db.UnsignedBigInt
   destination Destination    @relation(fields: [destinationId], references: [id], onDelete: Restrict)
   hero        MediaAsset?    @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+  gallery     TourMedia[]
+  amenities   TourAmenity[]
   schedules   TourSchedule[]
   partner     Partner?       @relation(fields: [partnerId], references: [id], onDelete: SetNull)
 
@@ -986,8 +1050,9 @@ model Offer {
   createdAt          DateTime      @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt          DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
 
-  hero   MediaAsset? @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
-  orders Order[]
+  hero    MediaAsset?  @relation(fields: [heroMediaId], references: [id], onDelete: SetNull)
+  gallery OfferMedia[]
+  orders  Order[]
 
   @@index([status, sortOrder])
   @@map("offers")
@@ -1134,4 +1199,131 @@ model GiftCardTxn {
   @@index([giftCardId, createdAt])
   @@index([bookingId])
   @@map("gift_card_txns")
+}
+
+// ─── Old website import (ADR-0038) ───────────────────────────────────────────
+
+/// Every row imported from the old Pegah website, verbatim except credentials,
+/// so no source field is lost. target_* points at the row it became, if any.
+model LegacyRecord {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  sourceTable String   @map("source_table") @db.VarChar(64)
+  sourceId    String   @map("source_id") @db.VarChar(64)
+  payload     Json
+  targetType  String?  @map("target_type") @db.VarChar(40)
+  targetId    BigInt?  @map("target_id") @db.UnsignedBigInt
+  importedAt  DateTime @default(now()) @map("imported_at") @db.DateTime(3)
+
+  @@unique([sourceTable, sourceId])
+  @@index([targetType, targetId])
+  @@map("legacy_records")
+}
+
+model HotelMedia {
+  hotelId   BigInt     @map("hotel_id") @db.UnsignedBigInt
+  mediaId   BigInt     @map("media_id") @db.UnsignedBigInt
+  sortOrder Int        @default(0) @map("sort_order")
+  hotel     Hotel      @relation(fields: [hotelId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([hotelId, mediaId])
+  @@index([mediaId])
+  @@map("hotel_media")
+}
+
+model RoomMedia {
+  roomId    BigInt     @map("room_id") @db.UnsignedBigInt
+  mediaId   BigInt     @map("media_id") @db.UnsignedBigInt
+  sortOrder Int        @default(0) @map("sort_order")
+  room      HotelRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([roomId, mediaId])
+  @@index([mediaId])
+  @@map("room_media")
+}
+
+model TourMedia {
+  tourId    BigInt     @map("tour_id") @db.UnsignedBigInt
+  mediaId   BigInt     @map("media_id") @db.UnsignedBigInt
+  sortOrder Int        @default(0) @map("sort_order")
+  tour      Tour       @relation(fields: [tourId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([tourId, mediaId])
+  @@index([mediaId])
+  @@map("tour_media")
+}
+
+model OfferMedia {
+  offerId   BigInt     @map("offer_id") @db.UnsignedBigInt
+  mediaId   BigInt     @map("media_id") @db.UnsignedBigInt
+  sortOrder Int        @default(0) @map("sort_order")
+  offer     Offer      @relation(fields: [offerId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([offerId, mediaId])
+  @@index([mediaId])
+  @@map("offer_media")
+}
+
+enum AmenityScope {
+  HOTEL
+  ROOM
+  TOUR
+}
+
+/// A facility shown on hotel, room or tour pages (Wi-Fi, parking, guide…).
+model Amenity {
+  id          BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  scope       AmenityScope
+  slug        String       @db.VarChar(80)
+  name        String       @db.VarChar(120)
+  groupName   String?      @map("group_name") @db.VarChar(80)
+  iconMediaId BigInt?      @map("icon_media_id") @db.UnsignedBigInt
+  sortOrder   Int          @default(0) @map("sort_order")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.DateTime(3)
+
+  icon   MediaAsset?    @relation(fields: [iconMediaId], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  hotels HotelAmenity[]
+  rooms  RoomAmenity[]
+  tours  TourAmenity[]
+
+  @@unique([scope, slug])
+  @@index([iconMediaId])
+  @@map("amenities")
+}
+
+model HotelAmenity {
+  hotelId   BigInt  @map("hotel_id") @db.UnsignedBigInt
+  amenityId BigInt  @map("amenity_id") @db.UnsignedBigInt
+  hotel     Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([hotelId, amenityId])
+  @@index([amenityId])
+  @@map("hotel_amenities")
+}
+
+model RoomAmenity {
+  roomId    BigInt    @map("room_id") @db.UnsignedBigInt
+  amenityId BigInt    @map("amenity_id") @db.UnsignedBigInt
+  room      HotelRoom @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  amenity   Amenity   @relation(fields: [amenityId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([roomId, amenityId])
+  @@index([amenityId])
+  @@map("room_amenities")
+}
+
+model TourAmenity {
+  tourId    BigInt  @map("tour_id") @db.UnsignedBigInt
+  amenityId BigInt  @map("amenity_id") @db.UnsignedBigInt
+  tour      Tour    @relation(fields: [tourId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  amenity   Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([tourId, amenityId])
+  @@index([amenityId])
+  @@map("tour_amenities")
 }

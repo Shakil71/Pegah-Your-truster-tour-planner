@@ -25,6 +25,15 @@ licensed photography, and keep this file current.
 | panam-city.jpg                                  | Main street of Panam City, Sonargaon               | নাফিউল আহমেদ রাফি (Nafiul Ahmed Rafi)       | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Historic_Main_Street_of_Panam_City_Sonargaon_2021.jpg                            |
 | lawachara-mist.jpg                              | Misty forest, Lawachara National Park              | Abdulmominbd                                | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Lawachara_Forest.jpg                                                             |
 
+## Photos imported from the old website (ADR-0038)
+
+Hotel, room, tour, package and destination photos from the previous Pegah
+website are stored in the media library (`media_assets`), not in the
+repository. Each carries its credit (e.g. "Provided by Sayeman Beach Resort
+(old Pegah website)") and the licence note "Old website; verify before
+publishing". Before a listing is published, staff confirm the hotel or
+photographer allowed Pegah to use those photos, or replace them.
+
 Note: `hero-ratargul-boatman.jpg` is 1.4 MB. Before production, serve all
 photos through Next.js image optimisation (AVIF/WebP, responsive sizes).
 
