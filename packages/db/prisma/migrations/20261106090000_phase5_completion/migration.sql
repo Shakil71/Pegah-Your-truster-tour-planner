@@ -20,7 +20,7 @@ CREATE TABLE `refunds` (
     INDEX `refunds_booking_id_idx`(`booking_id`),
     INDEX `refunds_status_created_at_idx`(`status`, `created_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `traveller_profiles` (
@@ -37,7 +37,7 @@ CREATE TABLE `traveller_profiles` (
     UNIQUE INDEX `traveller_profiles_public_id_key`(`public_id`),
     INDEX `traveller_profiles_user_id_idx`(`user_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `password_reset_tokens` (
@@ -51,7 +51,7 @@ CREATE TABLE `password_reset_tokens` (
     UNIQUE INDEX `password_reset_tokens_token_hash_key`(`token_hash`),
     INDEX `password_reset_tokens_user_id_idx`(`user_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `email_messages` (
@@ -69,7 +69,7 @@ CREATE TABLE `email_messages` (
     INDEX `email_messages_booking_id_idx`(`booking_id`),
     INDEX `email_messages_status_created_at_idx`(`status`, `created_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `refunds` ADD CONSTRAINT `refunds_booking_id_fkey` FOREIGN KEY (`booking_id`) REFERENCES `bookings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

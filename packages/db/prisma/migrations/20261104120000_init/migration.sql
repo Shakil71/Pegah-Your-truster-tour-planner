@@ -15,7 +15,7 @@ CREATE TABLE `users` (
     UNIQUE INDEX `users_public_id_key`(`public_id`),
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `roles` (
@@ -29,7 +29,7 @@ CREATE TABLE `roles` (
 
     UNIQUE INDEX `roles_key_key`(`key`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `permissions` (
@@ -41,7 +41,7 @@ CREATE TABLE `permissions` (
 
     UNIQUE INDEX `permissions_key_key`(`key`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `role_permissions` (
@@ -51,7 +51,7 @@ CREATE TABLE `role_permissions` (
 
     INDEX `role_permissions_permission_id_idx`(`permission_id`),
     PRIMARY KEY (`role_id`, `permission_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `user_roles` (
@@ -63,7 +63,7 @@ CREATE TABLE `user_roles` (
     INDEX `user_roles_role_id_idx`(`role_id`),
     INDEX `user_roles_granted_by_id_idx`(`granted_by_id`),
     PRIMARY KEY (`user_id`, `role_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `sessions` (
@@ -83,7 +83,7 @@ CREATE TABLE `sessions` (
     INDEX `sessions_user_id_idx`(`user_id`),
     INDEX `sessions_expires_at_idx`(`expires_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `media_assets` (
@@ -99,7 +99,7 @@ CREATE TABLE `media_assets` (
 
     UNIQUE INDEX `media_assets_storage_key_key`(`storage_key`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `destinations` (
@@ -119,7 +119,7 @@ CREATE TABLE `destinations` (
     INDEX `destinations_status_sort_order_idx`(`status`, `sort_order`),
     INDEX `destinations_hero_media_id_idx`(`hero_media_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `hotels` (
@@ -149,7 +149,7 @@ CREATE TABLE `hotels` (
     INDEX `hotels_destination_id_status_idx`(`destination_id`, `status`),
     INDEX `hotels_hero_media_id_idx`(`hero_media_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `hotel_rooms` (
@@ -169,7 +169,7 @@ CREATE TABLE `hotel_rooms` (
     UNIQUE INDEX `hotel_rooms_public_id_key`(`public_id`),
     UNIQUE INDEX `hotel_rooms_hotel_id_name_key`(`hotel_id`, `name`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `room_inventory` (
@@ -185,7 +185,7 @@ CREATE TABLE `room_inventory` (
     INDEX `room_inventory_stay_date_idx`(`stay_date`),
     UNIQUE INDEX `room_inventory_room_id_stay_date_key`(`room_id`, `stay_date`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `room_rates` (
@@ -199,7 +199,7 @@ CREATE TABLE `room_rates` (
 
     UNIQUE INDEX `room_rates_room_id_stay_date_key`(`room_id`, `stay_date`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `tours` (
@@ -230,7 +230,7 @@ CREATE TABLE `tours` (
     INDEX `tours_destination_id_status_idx`(`destination_id`, `status`),
     INDEX `tours_hero_media_id_idx`(`hero_media_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `tour_schedules` (
@@ -252,7 +252,7 @@ CREATE TABLE `tour_schedules` (
     UNIQUE INDEX `tour_schedules_public_id_key`(`public_id`),
     INDEX `tour_schedules_tour_id_departs_at_idx`(`tour_id`, `departs_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `bookings` (
@@ -284,7 +284,7 @@ CREATE TABLE `bookings` (
     INDEX `bookings_status_created_at_idx`(`status`, `created_at`),
     INDEX `bookings_created_at_idx`(`created_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `booking_items` (
@@ -305,7 +305,7 @@ CREATE TABLE `booking_items` (
     INDEX `booking_items_hotel_room_id_idx`(`hotel_room_id`),
     INDEX `booking_items_tour_schedule_id_idx`(`tour_schedule_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `booking_guests` (
@@ -319,7 +319,7 @@ CREATE TABLE `booking_guests` (
 
     INDEX `booking_guests_booking_id_idx`(`booking_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `inventory_holds` (
@@ -342,7 +342,7 @@ CREATE TABLE `inventory_holds` (
     INDEX `inventory_holds_hotel_room_id_stay_date_idx`(`hotel_room_id`, `stay_date`),
     INDEX `inventory_holds_tour_schedule_id_idx`(`tour_schedule_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `booking_status_history` (
@@ -357,7 +357,7 @@ CREATE TABLE `booking_status_history` (
 
     INDEX `booking_status_history_booking_id_created_at_idx`(`booking_id`, `created_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `idempotency_keys` (
@@ -376,7 +376,7 @@ CREATE TABLE `idempotency_keys` (
     INDEX `idempotency_keys_expires_at_idx`(`expires_at`),
     UNIQUE INDEX `idempotency_keys_actor_key_key_route_key`(`actor_key`, `key`, `route`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `outbox_events` (
@@ -395,7 +395,7 @@ CREATE TABLE `outbox_events` (
 
     INDEX `outbox_events_status_available_at_idx`(`status`, `available_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `audit_events` (
@@ -414,7 +414,7 @@ CREATE TABLE `audit_events` (
     INDEX `audit_events_action_created_at_idx`(`action`, `created_at`),
     INDEX `audit_events_created_at_idx`(`created_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `role_permissions` ADD CONSTRAINT `role_permissions_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

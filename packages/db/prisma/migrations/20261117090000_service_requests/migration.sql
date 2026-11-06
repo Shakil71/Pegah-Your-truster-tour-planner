@@ -25,7 +25,7 @@ CREATE TABLE `visa_products` (
     INDEX `visa_products_status_sort_order_idx`(`status`, `sort_order`),
     INDEX `visa_products_hero_media_id_idx`(`hero_media_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `visa_products` ADD CONSTRAINT `visa_products_fee_chk` CHECK (`fee_minor` >= 0);
 
@@ -62,7 +62,7 @@ CREATE TABLE `service_requests` (
     INDEX `service_requests_visa_product_id_idx`(`visa_product_id`),
     INDEX `service_requests_closed_at_idx`(`closed_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `service_requests` ADD CONSTRAINT `service_requests_quote_chk`
     CHECK (`quote_minor` IS NULL OR `quote_minor` > 0);
@@ -88,7 +88,7 @@ CREATE TABLE `service_request_events` (
 
     INDEX `service_request_events_request_id_id_idx`(`request_id`, `id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Uploaded documents: metadata here, AES-256-GCM ciphertext in service_document_blobs.
 CREATE TABLE `service_documents` (
@@ -110,14 +110,14 @@ CREATE TABLE `service_documents` (
     UNIQUE INDEX `service_documents_public_id_key`(`public_id`),
     INDEX `service_documents_request_id_idx`(`request_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `service_document_blobs` (
     `document_id` BIGINT UNSIGNED NOT NULL,
     `ciphertext` LONGBLOB NOT NULL,
 
     PRIMARY KEY (`document_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `visa_products` ADD CONSTRAINT `visa_products_hero_media_id_fkey` FOREIGN KEY (`hero_media_id`) REFERENCES `media_assets`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `service_requests` ADD CONSTRAINT `service_requests_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;

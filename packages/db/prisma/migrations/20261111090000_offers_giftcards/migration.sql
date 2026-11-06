@@ -32,7 +32,7 @@ CREATE TABLE `offers` (
     UNIQUE INDEX `offers_slug_key`(`slug`),
     INDEX `offers_status_sort_order_idx`(`status`, `sort_order`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `ads` (
@@ -55,7 +55,7 @@ CREATE TABLE `ads` (
     UNIQUE INDEX `ads_public_id_key`(`public_id`),
     INDEX `ads_placement_active_idx`(`placement`, `active`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `orders` (
@@ -87,7 +87,7 @@ CREATE TABLE `orders` (
     INDEX `orders_user_id_created_at_idx`(`user_id`, `created_at`),
     INDEX `orders_status_expires_at_idx`(`status`, `expires_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `gift_cards` (
@@ -113,7 +113,7 @@ CREATE TABLE `gift_cards` (
     UNIQUE INDEX `gift_cards_order_id_key`(`order_id`),
     INDEX `gift_cards_status_expires_at_idx`(`status`, `expires_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `gift_card_txns` (
@@ -129,7 +129,7 @@ CREATE TABLE `gift_card_txns` (
     INDEX `gift_card_txns_gift_card_id_created_at_idx`(`gift_card_id`, `created_at`),
     INDEX `gift_card_txns_booking_id_idx`(`booking_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateIndex
 CREATE INDEX `payments_order_id_idx` ON `payments`(`order_id`);

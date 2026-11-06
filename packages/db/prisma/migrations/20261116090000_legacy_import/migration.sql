@@ -14,7 +14,7 @@ CREATE TABLE `legacy_records` (
     UNIQUE INDEX `legacy_records_source_table_source_id_key`(`source_table`, `source_id`),
     INDEX `legacy_records_target_type_target_id_idx`(`target_type`, `target_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Destinations: long description (tourist spot guides).
 ALTER TABLE `destinations` ADD COLUMN `description` TEXT NULL;
@@ -92,7 +92,7 @@ CREATE TABLE `hotel_media` (
 
     INDEX `hotel_media_media_id_idx`(`media_id`),
     PRIMARY KEY (`hotel_id`, `media_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `room_media` (
     `room_id` BIGINT UNSIGNED NOT NULL,
@@ -101,7 +101,7 @@ CREATE TABLE `room_media` (
 
     INDEX `room_media_media_id_idx`(`media_id`),
     PRIMARY KEY (`room_id`, `media_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `tour_media` (
     `tour_id` BIGINT UNSIGNED NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE `tour_media` (
 
     INDEX `tour_media_media_id_idx`(`media_id`),
     PRIMARY KEY (`tour_id`, `media_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `offer_media` (
     `offer_id` BIGINT UNSIGNED NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE `offer_media` (
 
     INDEX `offer_media_media_id_idx`(`media_id`),
     PRIMARY KEY (`offer_id`, `media_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Amenities (facilities) for hotels, rooms and tours.
 CREATE TABLE `amenities` (
@@ -136,7 +136,7 @@ CREATE TABLE `amenities` (
     UNIQUE INDEX `amenities_scope_slug_key`(`scope`, `slug`),
     INDEX `amenities_icon_media_id_idx`(`icon_media_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `hotel_amenities` (
     `hotel_id` BIGINT UNSIGNED NOT NULL,
@@ -144,7 +144,7 @@ CREATE TABLE `hotel_amenities` (
 
     INDEX `hotel_amenities_amenity_id_idx`(`amenity_id`),
     PRIMARY KEY (`hotel_id`, `amenity_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `room_amenities` (
     `room_id` BIGINT UNSIGNED NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE `room_amenities` (
 
     INDEX `room_amenities_amenity_id_idx`(`amenity_id`),
     PRIMARY KEY (`room_id`, `amenity_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE `tour_amenities` (
     `tour_id` BIGINT UNSIGNED NOT NULL,
@@ -160,7 +160,7 @@ CREATE TABLE `tour_amenities` (
 
     INDEX `tour_amenities_amenity_id_idx`(`amenity_id`),
     PRIMARY KEY (`tour_id`, `amenity_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `hotel_media` ADD CONSTRAINT `hotel_media_hotel_id_fkey` FOREIGN KEY (`hotel_id`) REFERENCES `hotels`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 ALTER TABLE `hotel_media` ADD CONSTRAINT `hotel_media_media_id_fkey` FOREIGN KEY (`media_id`) REFERENCES `media_assets`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;

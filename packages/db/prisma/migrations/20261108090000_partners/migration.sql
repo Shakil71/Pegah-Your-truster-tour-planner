@@ -39,7 +39,7 @@ CREATE TABLE `partners` (
     UNIQUE INDEX `partners_public_id_key`(`public_id`),
     INDEX `partners_kind_status_idx`(`kind`, `status`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateIndex
 CREATE INDEX `users_partner_id_idx` ON `users`(`partner_id`);

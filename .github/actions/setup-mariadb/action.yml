@@ -4,7 +4,8 @@ description: >
   cached), starts it as a plain process on 127.0.0.1:3308 and exports
   PEGAH_IT_DATABASE_URL for a user limited to `pegah_it_%` databases. Used to
   prove the schema and queries also work on cPanel hosts that run MariaDB
-  (ADR-0040).
+  (ADR-0040). The default storage engine is set to MyISAM on purpose, as some
+  shared hosts do: every table must still be created as InnoDB.
 runs:
   using: composite
   steps:
@@ -30,6 +31,7 @@ runs:
           --datadir="$data" --user="$(whoami)" --auth-root-authentication-method=normal >/dev/null
         ~/mariadb/bin/mariadbd --no-defaults --basedir="$HOME/mariadb" --datadir="$data" \
           --user="$(whoami)" --port=3308 --bind-address=127.0.0.1 \
+          --default-storage-engine=MyISAM \
           --socket="$RUNNER_TEMP/mariadb.sock" --log-error="$RUNNER_TEMP/mariadbd.err" &
         for _ in $(seq 1 60); do
           ~/mariadb/bin/mariadb-admin --no-defaults -uroot -h127.0.0.1 -P3308 ping >/dev/null 2>&1 && break

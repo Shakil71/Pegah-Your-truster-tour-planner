@@ -25,7 +25,7 @@ CREATE TABLE `payments` (
     INDEX `payments_status_created_at_idx`(`status`, `created_at`),
     UNIQUE INDEX `payments_provider_provider_txn_id_key`(`provider`, `provider_txn_id`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `payment_events` (
@@ -43,7 +43,7 @@ CREATE TABLE `payment_events` (
     INDEX `payment_events_payment_id_idx`(`payment_id`),
     UNIQUE INDEX `payment_events_provider_event_key_key`(`provider`, `event_key`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `payments` ADD CONSTRAINT `payments_booking_id_fkey` FOREIGN KEY (`booking_id`) REFERENCES `bookings`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

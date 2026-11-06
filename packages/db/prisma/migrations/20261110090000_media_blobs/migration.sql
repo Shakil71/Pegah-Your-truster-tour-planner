@@ -9,7 +9,7 @@ CREATE TABLE `media_blobs` (
     `bytes` LONGBLOB NOT NULL,
 
     PRIMARY KEY (`asset_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `media_blobs` ADD CONSTRAINT `media_blobs_asset_id_fkey` FOREIGN KEY (`asset_id`) REFERENCES `media_assets`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

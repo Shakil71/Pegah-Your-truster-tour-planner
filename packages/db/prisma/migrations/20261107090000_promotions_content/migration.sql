@@ -29,7 +29,7 @@ CREATE TABLE `promotions` (
     UNIQUE INDEX `promotions_code_key`(`code`),
     INDEX `promotions_status_starts_at_ends_at_idx`(`status`, `starts_at`, `ends_at`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `content_pages` (
@@ -45,7 +45,7 @@ CREATE TABLE `content_pages` (
 
     UNIQUE INDEX `content_pages_slug_key`(`slug`),
     PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
 ALTER TABLE `bookings` ADD CONSTRAINT `bookings_promotion_id_fkey` FOREIGN KEY (`promotion_id`) REFERENCES `promotions`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
