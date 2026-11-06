@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**", "src/generated/**"],
-      "env": ["API_INTERNAL_URL", "ADMIN_INTERNAL_URL"]
+      "env": ["API_INTERNAL_URL", "ADMIN_INTERNAL_URL", "NEXT_OUTPUT"]
     },
     "lint": {
       "dependsOn": ["^build"]

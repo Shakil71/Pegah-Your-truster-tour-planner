@@ -1,0 +1,56 @@
+name: cPanel bundle
+
+# Builds the upload bundle for cPanel shared hosting (ADR-0040) as a workflow
+# artifact. It never deploys: the owner downloads it and uploads it in cPanel.
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: Public site address (https://…)
+        default: https://pegah.com.bd
+        required: true
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpanel-bundle-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    name: Build cPanel bundle
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Assemble
+        env:
+          SITE_URL: ${{ inputs.site_url || 'https://pegah.com.bd' }}
+        run: bash infra/cpanel/assemble-bundle.sh
+
+      - name: Smoke test the bundle
+        run: |
+          cd .cpanel/pegah
+          test -f api/dist/main.js && test -f api/dist/cli/run-jobs.js
+          test -f web/server.js && test -f web/apps/web/server.js && test -d web/apps/web/.next/static
+          test -f admin/server.js && test -f admin/apps/admin/server.js
+          test -d migrate/prisma/migrations
+          # The API must load its dependencies from the bundle alone.
+          (cd api && node -e "require('@pegah/db'); require('@pegah/contracts'); require('argon2'); require('sharp'); require('bcryptjs'); console.log('api deps ok')")
+          ! grep -rIl --exclude-dir=node_modules -E "(BEGIN [A-Z ]*PRIVATE KEY|DATABASE_URL=mysql://[^ ]+:[^ ]+@)" . || (echo "secret-like content found" && exit 1)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pegah-cpanel-${{ github.sha }}
+          path: pegah-cpanel-*.tar.gz
+          retention-days: 14
+          if-no-files-found: error

@@ -1481,6 +1481,36 @@ Customers whose email already exists are linked, never overwritten.
 - **Not done:** live fares, automatic ticketing, embassy integrations —
   these need contracts (Phase 8).
 
+## ADR-0040 — cPanel shared hosting as a supported deployment target
+
+- **Status:** Accepted (2026-11-06, owner request). Amends the fixed stack in
+  CLAUDE.md: the RHEL server stays the reference, cPanel shared hosting
+  becomes a second, supported target.
+- **Context:** the owner wants the public site on their existing cPanel
+  shared hosting (Setup Node.js App and SSH available, MariaDB database, DNS
+  managed elsewhere). The pre-launch RHEL server is on the office network.
+- **Decision:**
+  - The same code runs as three Passenger apps on one domain: website `/`,
+    console `/admin`, API `/api`. Next.js builds a standalone server
+    (`NEXT_OUTPUT=standalone`) so nothing is built on the host.
+  - GitHub Actions (`cpanel-bundle.yml`) assembles
+    `pegah-cpanel-<sha>.tar.gz` on Linux x64 with the production
+    dependencies of the API and the migrations; it never deploys and contains
+    no secrets. Migrations run on the host with the Prisma CLI installed
+    there, so the engine matches the host OS.
+  - No long-lived worker: `dist/cli/run-jobs.js` runs every background job
+    once (hold expiry with payment reconciliation, order expiry, outbox
+    emails, document retention) from a one-minute cron, guarded by a lock
+    file; the API runs with `RUN_BACKGROUND_JOBS=false`.
+  - MariaDB: a CI job runs the whole integration suite on MariaDB 11.4 LTS
+    (official tarball, plain process); the test harness collation is
+    configurable because MariaDB has no utf8mb4_0900 collations.
+  - Without Redis, rate limits are per process (documented trade-off).
+- **Trade-offs accepted by the owner:** shared CPU/RAM limits, no SELinux or
+  firewall control, host-managed TLS (AutoSSL) and backups, jobs at most one
+  minute late, request body limits set by the host.
+- **Runbook:** `docs/operations/CPANEL_DEPLOYMENT.md`.
+
 ### ADR-0028 update (2026-11-06)
 
 The partner portal now uses the same next-intl messages (`partner`

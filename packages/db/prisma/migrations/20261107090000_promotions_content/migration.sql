@@ -61,7 +61,7 @@ ALTER TABLE `promotions`
     ADD CONSTRAINT `promotions_limits_chk` CHECK (`min_spend_minor` >= 0 AND (`max_discount_minor` IS NULL OR `max_discount_minor` > 0));
 
 -- Total now subtracts the promotion discount (taxes are computed on the discounted base).
-ALTER TABLE `bookings` DROP CHECK `bookings_amounts_chk`;
+ALTER TABLE `bookings` DROP CONSTRAINT `bookings_amounts_chk`;
 ALTER TABLE `bookings`
     ADD CONSTRAINT `bookings_amounts_chk` CHECK (
         `base_minor` >= 0 AND `service_charge_minor` >= 0 AND `vat_minor` >= 0

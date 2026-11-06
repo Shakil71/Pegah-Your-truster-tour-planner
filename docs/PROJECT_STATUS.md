@@ -15,6 +15,9 @@ supplier contracts.
 
 ## Completed
 
+- cPanel shared hosting support prepared (ADR-0040): bundle workflow, cron job
+  runner, MariaDB CI job, runbook. First deploy pending (owner + Claude).
+
 - Visa services and flight requests with encrypted document upload
   (ADR-0039). Owner: add `DOCUMENT_ENCRYPTION_KEY` and reload Nginx with
   the new config to switch uploads on; add the visas Pegah offers in

@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
   },
   poweredByHeader: false,
+  // Self-contained server bundle for hosts without a build step (cPanel, ADR-0040).
+  ...(process.env.NEXT_OUTPUT === "standalone"
+    ? { output: "standalone" as const, outputFileTracingRoot: path.join(__dirname, "../..") }
+    : {}),
   turbopack: {
     root: path.join(__dirname, "../.."),
   },

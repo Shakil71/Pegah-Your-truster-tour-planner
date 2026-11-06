@@ -4,6 +4,12 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — cPanel shared hosting support (2026-11-06)
+
+- Upload bundle built by GitHub Actions (cPanel bundle workflow), standalone
+  Next.js servers, one-shot background job runner for cron, MariaDB 11.4 CI
+  job and a step-by-step runbook (ADR-0040, docs/operations/CPANEL_DEPLOYMENT.md).
+
 ### Added — Visa services and flight requests (2026-11-06)
 
 - `/visa`: visas Pegah handles, with processing time, starting price and
