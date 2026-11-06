@@ -4,16 +4,14 @@ _Last updated: 2026-11-06_
 
 ## Current phase
 
-**Phases 3 and 4 are implemented and verified locally.** The back office runs
-on live API data behind staff sign-in. Customers can search stays and tours,
-see server-computed prices, sign in, and hold a room or seats for 15 minutes
-with an idempotent, lock-protected booking. Payment is Phase 5, so no booking
-can become CONFIRMED until a payment provider is switched on.
-
-**Payment module (Phase 5 foundation) is built and switched off.** SSLCOMMERZ
-is implemented behind a provider port and verified with a simulator end to
-end; it needs sandbox credentials and the checklist in
-`docs/operations/SSLCOMMERZ_INTEGRATION.md` before use (ADR-0022).
+**Phases 1–7 and the cross-cutting work are built, tested and deployed** to
+the pre-launch server: catalog, search, holds and bookings, payments
+(simulator verified; SSLCOMMERZ waits for credentials), cancellations and
+refunds, console control, media library, home editor, partner portals,
+offers, ads, orders, gift cards (including paying for bookings), email
+verification, Bangla website, emails and partner portal, light and dark
+themes, worker, Redis and monitoring. Phase 8 (third-party supply) waits for
+supplier contracts.
 
 ## Completed
 
@@ -73,59 +71,61 @@ end; it needs sandbox credentials and the checklist in
 
 ## Next recommended actions
 
-1. **Owner:** run `sudo bash /home/pegah/pegah-infra/server/enable-https.sh`
-   once (HTTPS on :8443; sign-in needs it).
-2. **Owner:** create your own staff account on the server
-   (`staff:create`, command in DEPLOYMENT.md). The password is typed into a
-   hidden prompt and never shared in chat.
-3. Switch on SSLCOMMERZ when credentials exist: follow
-   `docs/operations/SSLCOMMERZ_INTEGRATION.md` (sandbox checklist first).
-   Then: refunds via API, vouchers and confirmation email.
-4. Move the hold sweeper and outbox to `apps/worker` once Redis/Valkey exists
-   for Pegah (ADR-0018).
-5. Browser automation: Playwright + axe in CI for the booking flow.
-6. Before launch: `seed-sample.js --demo --remove`, real domain + certificate,
-   staging instance (ADR-0017).
+All software phases that do not depend on outside parties are built,
+tested and deployed. What remains is configuration by the owner and items
+that need a contract or a second server.
+
+**Owner configuration (one session, with Claude's help):**
+
+1. Rotate `SETTINGS_ENCRYPTION_KEY` **before the first gift card is sold**
+   (after that, rotating breaks resending existing codes). The key is set on
+   the server only; never paste it in chat.
+2. Email (SMTP) in Console → Settings → Email. Until then customer emails and
+   purchase alerts to pegah.com.bd@gmail.com are recorded as SKIPPED.
+3. After SMTP works: decide whether to switch on "Customers must confirm their
+   email" (Settings → Booking rules).
+4. SSLCOMMERZ sandbox credentials → sandbox checklist
+   (`docs/operations/SSLCOMMERZ_INTEGRATION.md`) → live approval.
+5. Change the owner's console password; create personal staff accounts.
+
+**Before real customers:** remove demo data (`seed-sample.js --demo
+--remove`), choose a domain and trusted certificate, add a staging instance,
+run a backup restore drill.
+
+**Later improvements:** refunds of gift-card-paid bookings back to the card
+(today staff issue a new card), alert notifications (need a destination), Loki
+(needs a second server), agent net rates (when a contract needs them).
 
 ## Blockers
 
-| Blocker                           | Blocks                                 | Owner                                |
-| --------------------------------- | -------------------------------------- | ------------------------------------ |
-| HTTPS script not run yet          | Sign-in on the server (Secure cookies) | Owner: run `enable-https.sh` as root |
-| No Redis/Valkey for Pegah         | Worker, distributed rate limits        | Owner: approve a Pegah-only Valkey   |
-| Root password exposed in chat     | Server security                        | Owner: rotate, `PermitRootLogin no`  |
-| `pegah` password shared in chat   | Server security                        | Owner: `passwd -l pegah` (keys only) |
-| No SSLCOMMERZ sandbox credentials | Payments (Phase 5)                     | Owner                                |
-| No flight supplier contract       | Flights                                | Owner                                |
-| Domain not chosen                 | Trusted TLS, email DNS, cookie origin  | Owner                                |
+| Blocker                              | Blocks                                        | Owner          |
+| ------------------------------------ | --------------------------------------------- | -------------- |
+| No SMTP account                      | All customer emails, purchase alerts          | Owner          |
+| No SSLCOMMERZ credentials            | Online payment (offline "Mark as paid" works) | Owner          |
+| Domain not chosen                    | Trusted TLS, email DNS, cookie origin         | Owner          |
+| No flight / bedbank contract         | Flights, third-party hotels                   | Owner          |
+| Secure document storage not designed | Visa services                                 | Owner + Claude |
 
 ## Known issues
 
 - The server certificate is self-signed: browsers warn once per device.
 - Demo listings are on the pre-launch server by owner approval (ADR-0021).
-- Listing photos are licensed stock matched by destination until the media
-  pipeline exists (no uploads yet).
-- Rate limits are in-memory per API process until Redis exists.
-- Registration reveals whether an email exists (409) until email verification.
+- Registration answers 409 for an existing email (ADR-0035 notes the fix).
 - `npm audit --omit=dev`: 2 low (`deepmerge` via `nestjs-zod`).
 - Node 26 prints a `module.register` deprecation warning locally; CI uses 22.
 - Repository name contains the typo "truster".
 
-## Latest validation results (2026-11-04, local, Node 26.13)
+## Latest validation results (2026-11-06, local and CI)
 
-| Check                                   | Result                                                                                                                                                                                               |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm test` (unit + HTTP on fake DB)     | 77 passed (integration suite skipped without a DB URL)                                                                                                                                               |
-| MySQL 8.4.13 integration tests          | 9/9 passed: last-room race (one 201, one 409), idempotent replay/reuse/missing key, price change, party validation, cancel and expiry release holds, CHECK constraint, dashboard, staff rules, audit |
-| `turbo run lint typecheck`              | 13/13 tasks passed                                                                                                                                                                                   |
-| `turbo run build`                       | Passed (web, admin, api, packages)                                                                                                                                                                   |
-| Prettier `--check`                      | Passed                                                                                                                                                                                               |
-| OpenAPI export                          | 29 paths; nullable fields now correct                                                                                                                                                                |
-| End-to-end smoke (web origin, real API) | 22/22: pages, sign-in gate, register, results, property, checkout, hold, replay, My trips (never "Confirmed"), cancel, staff login, all admin pages, dashboard shows the booking                     |
-| axe / Lighthouse / Playwright           | Not run yet                                                                                                                                                                                          |
-| GitHub Actions                          | Pending this push                                                                                                                                                                                    |
+| Check                       | Result                                                           |
+| --------------------------- | ---------------------------------------------------------------- |
+| Unit tests (`npm test`)     | 109 passed                                                       |
+| MySQL 8.4 integration tests | 96 passed (15 files)                                             |
+| `turbo run lint typecheck`  | 13/13 tasks passed                                               |
+| Playwright + axe end to end | 33 passed (desktop + mobile, light and dark themes, Bangla)      |
+| GitHub Actions              | verify, database integration and end-to-end jobs green on `main` |
 
 ## Approvals required
 
-- Run `enable-https.sh` on the server (root).
+- Owner configuration listed above (SMTP, SSLCOMMERZ, key rotation).
 - Before real customers: remove demo data, choose a domain, add staging.
