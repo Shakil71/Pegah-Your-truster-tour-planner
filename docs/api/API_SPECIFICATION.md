@@ -96,6 +96,24 @@ recomputes the price and answers `409 price-changed` if it differs,
 `PENDING_PAYMENT` and `holdExpiresAt`. Unpaid holds expire to `EXPIRED` and
 the inventory goes back on sale.
 
+## Offers, orders and gift cards (ADR-0032)
+
+| Method              | Path                                   | Access                      | Purpose                                      |
+| ------------------- | -------------------------------------- | --------------------------- | -------------------------------------------- |
+| GET                 | /offers, /offers/{slug}                | public                      | Published offers                             |
+| GET                 | /ads?placement=                        | public                      | Live banners for a placement                 |
+| GET                 | /gift-cards/availability               | public                      | Whether gift cards are on sale               |
+| GET                 | /gift-cards/balance?code=              | public, rate limited        | Balance by code                              |
+| GET                 | /me/orders, /me/orders/{id}            | customer                    | Own orders                                   |
+| POST                | /me/orders/offer, /me/orders/gift-card | customer, CSRF              | Place an order (server recomputes the total) |
+| POST                | /me/orders/{id}/payment-session        | customer, CSRF              | Start hosted payment                         |
+| GET/POST/PUT        | /admin/offers[/{id}]                   | promotion:manage            | Manage offers                                |
+| GET/POST/PUT/DELETE | /admin/ads[/{id}]                      | promotion:manage            | Manage ads                                   |
+| GET                 | /admin/orders[/{id}]                   | payment:read                | Orders                                       |
+| POST                | /admin/orders/{id}/mark-paid, /cancel  | order:manage                | Offline payment, cancel                      |
+| GET/POST            | /admin/gift-cards                      | payment:read / order:manage | List, issue without payment                  |
+| POST                | /admin/gift-cards/{id}/void, /resend   | order:manage                | Void, resend code                            |
+
 ## Console control (ADR-0029)
 
 | Method | Path                           | Permission       | Purpose                                 |

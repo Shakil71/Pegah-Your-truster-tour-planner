@@ -15,3 +15,4 @@ export * from "./partner";
 export * from "./settings";
 export * from "./media";
 export * from "./home";
+export * from "./commerce";

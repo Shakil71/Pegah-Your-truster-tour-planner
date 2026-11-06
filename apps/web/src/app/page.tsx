@@ -1,5 +1,6 @@
 import { getLocale } from "next-intl/server";
 import { currentRitu } from "@pegah/shared";
+import { AdBanner } from "@/components/ad-banner";
 import { FeaturedDestinations, FeaturedStays, FeaturedTours } from "@/components/featured";
 import { HeroSlideshow } from "@/components/hero-slideshow";
 import { MoodMosaic } from "@/components/mood-mosaic";
@@ -45,6 +46,7 @@ export default async function HomePage() {
           <SearchPanel />
           <div className="mx-auto max-w-[1280px]">
             <SiteNotice className="mt-6" />
+            <AdBanner placement="HOME_TOP" className="mt-6" />
           </div>
         </div>
         {home?.destinations.length ? (
@@ -53,6 +55,11 @@ export default async function HomePage() {
           <TrendingRail season={season} />
         )}
         <MoodMosaic />
+        <div className="px-[max(16px,env(safe-area-inset-left,0px))] pt-16">
+          <div className="mx-auto max-w-[1280px]">
+            <AdBanner placement="HOME_MIDDLE" />
+          </div>
+        </div>
         {home?.hotels.length ? <FeaturedStays items={home.hotels} /> : <StaysGrid />}
         <SeasonsPanel current={ritu.key} />
         {home?.tours.length ? <FeaturedTours items={home.tours} /> : <ToursSection />}

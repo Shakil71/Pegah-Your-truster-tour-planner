@@ -1492,6 +1492,342 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/offers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/offers/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_one"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ads": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_ads"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gift-cards/availability": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_availability"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/gift-cards/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_balance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["MyOrdersController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/orders/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["MyOrdersController_one"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/orders/offer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyOrdersController_offer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/orders/gift-card": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyOrdersController_giftCard"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/orders/{id}/payment-session": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyOrdersController_pay"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/offers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_offerList"];
+    put?: never;
+    post: operations["AdminCommerceController_createOffer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/offers/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminCommerceController_updateOffer"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_adList"];
+    put?: never;
+    post: operations["AdminCommerceController_createAd"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/ads/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminCommerceController_updateAd"];
+    post?: never;
+    delete: operations["AdminCommerceController_deleteAd"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_orderList"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/orders/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_order"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/orders/{id}/mark-paid": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminCommerceController_markPaid"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/orders/{id}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminCommerceController_cancelOrder"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gift-cards": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_giftCardList"];
+    put?: never;
+    post: operations["AdminCommerceController_issue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gift-cards/{id}/void": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminCommerceController_voidCard"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gift-cards/{id}/resend": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminCommerceController_resend"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1530,6 +1866,7 @@ export interface components {
         | "catalog:manage"
         | "inventory:manage"
         | "customer:read"
+        | "order:manage"
         | "customer:manage"
         | "payment:read"
         | "refund:approve"
@@ -2141,6 +2478,7 @@ export interface components {
         | "catalog:manage"
         | "inventory:manage"
         | "customer:read"
+        | "order:manage"
         | "customer:manage"
         | "payment:read"
         | "refund:approve"
@@ -2233,7 +2571,8 @@ export interface components {
         /** Format: date-time */
         createdAt: string;
         succeededAt: string | null;
-        bookingId: string;
+        bookingId: string | null;
+        orderId: string | null;
         bookingReference: string;
         providerTxnId: string;
         bankTxnId: string | null;
@@ -3262,6 +3601,490 @@ export interface components {
         bodyEn: string;
         bodyBn: string;
       }[];
+    };
+    PublicOfferListDto_Output: {
+      items: {
+        id: string;
+        slug: string;
+        titleEn: string;
+        titleBn: string;
+        summaryEn: string;
+        summaryBn: string;
+        price: components["schemas"]["Money_Output"];
+        originalPrice: components["schemas"]["Money_Output"] | null;
+        hero: {
+          key: string;
+          url: string;
+          alt: string;
+        } | null;
+        validUntil: string | null;
+        remaining: number | null;
+        available: boolean;
+      }[];
+    };
+    PublicOfferDto_Output: {
+      id: string;
+      slug: string;
+      titleEn: string;
+      titleBn: string;
+      summaryEn: string;
+      summaryBn: string;
+      price: components["schemas"]["Money_Output"];
+      originalPrice: components["schemas"]["Money_Output"] | null;
+      hero: {
+        key: string;
+        url: string;
+        alt: string;
+      } | null;
+      validUntil: string | null;
+      remaining: number | null;
+      detailsEn: string;
+      detailsBn: string;
+      available: boolean;
+    };
+    PublicAdListDto_Output: {
+      items: {
+        id: string;
+        titleEn: string;
+        titleBn: string;
+        textEn: string;
+        textBn: string;
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+        };
+        linkHref: string;
+        /** @enum {string} */
+        placement: "HOME_TOP" | "HOME_MIDDLE" | "OFFERS_TOP";
+      }[];
+    };
+    GiftCardAvailabilityDto_Output: {
+      available: boolean;
+      minTaka: number;
+      maxTaka: number;
+    };
+    GiftCardBalanceDto_Output: {
+      last4: string;
+      balance: components["schemas"]["Money_Output"];
+      /** Format: date-time */
+      expiresAt: string;
+      usable: boolean;
+    };
+    MyOrderListDto_Output: {
+      items: {
+        id: string;
+        reference: string;
+        /** @enum {string} */
+        kind: "OFFER" | "GIFT_CARD";
+        /** @enum {string} */
+        status: "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED";
+        title: string;
+        titleBn: string;
+        quantity: number;
+        total: components["schemas"]["Money_Output"];
+        buyer: {
+          name: string;
+          email: string;
+          phone: string;
+        };
+        recipient: {
+          name: string;
+          email: string;
+        } | null;
+        giftMessage: string | null;
+        note: string | null;
+        /** Format: date-time */
+        expiresAt: string;
+        paidAt: string | null;
+        paidOffline: string | null;
+        canPay: boolean;
+        giftCard: {
+          last4: string;
+          balance: components["schemas"]["Money_Output"];
+          /** Format: date-time */
+          expiresAt: string;
+          status: string;
+        } | null;
+        /** Format: date-time */
+        createdAt: string;
+      }[];
+      nextCursor: string | null;
+    };
+    MyOrderDto_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      kind: "OFFER" | "GIFT_CARD";
+      /** @enum {string} */
+      status: "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED";
+      title: string;
+      titleBn: string;
+      quantity: number;
+      total: components["schemas"]["Money_Output"];
+      buyer: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      recipient: {
+        name: string;
+        email: string;
+      } | null;
+      giftMessage: string | null;
+      note: string | null;
+      /** Format: date-time */
+      expiresAt: string;
+      paidAt: string | null;
+      paidOffline: string | null;
+      canPay: boolean;
+      giftCard: {
+        last4: string;
+        balance: components["schemas"]["Money_Output"];
+        /** Format: date-time */
+        expiresAt: string;
+        status: string;
+      } | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CreateOfferOrderDto: {
+      offerId: string;
+      quantity: number;
+      buyer: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      note?: string;
+      expectedTotal: components["schemas"]["Money"];
+    };
+    CreateGiftCardOrderDto: {
+      amountTaka: number;
+      buyer: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      forSelf: boolean;
+      recipientName?: string;
+      recipientEmail?: string;
+      message?: string;
+    };
+    OrderPaymentSessionDto_Output: {
+      paymentId: string;
+      provider: string;
+      /** @enum {string} */
+      mode: "sandbox" | "live" | "simulator";
+      /** Format: uri */
+      redirectUrl: string;
+    };
+    AdminOfferListDto_Output: {
+      items: {
+        id: string;
+        slug: string;
+        titleEn: string;
+        titleBn: string;
+        summaryEn: string;
+        summaryBn: string;
+        price: components["schemas"]["Money_Output"];
+        originalPrice: components["schemas"]["Money_Output"] | null;
+        hero: {
+          key: string;
+          url: string;
+          alt: string;
+        } | null;
+        validUntil: string | null;
+        remaining: number | null;
+        detailsEn: string;
+        detailsBn: string;
+        available: boolean;
+        /** @enum {string} */
+        status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+        stock: number | null;
+        sold: number;
+        sortOrder: number;
+        /** Format: date-time */
+        updatedAt: string;
+      }[];
+    };
+    AdminCreateOfferDto: {
+      titleEn: string;
+      titleBn: string;
+      summaryEn: string;
+      summaryBn: string;
+      detailsEn: string;
+      detailsBn: string;
+      priceMinor: number;
+      originalPriceMinor: number | null;
+      heroMedia: string | null;
+      validUntil: string | null;
+      stock: number | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+      slug: string;
+    };
+    AdminOfferResultDto_Output: {
+      offer: {
+        id: string;
+        slug: string;
+        titleEn: string;
+        titleBn: string;
+        summaryEn: string;
+        summaryBn: string;
+        price: components["schemas"]["Money_Output"];
+        originalPrice: components["schemas"]["Money_Output"] | null;
+        hero: {
+          key: string;
+          url: string;
+          alt: string;
+        } | null;
+        validUntil: string | null;
+        remaining: number | null;
+        detailsEn: string;
+        detailsBn: string;
+        available: boolean;
+        /** @enum {string} */
+        status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+        stock: number | null;
+        sold: number;
+        sortOrder: number;
+        /** Format: date-time */
+        updatedAt: string;
+      };
+    };
+    AdminOfferInputDto: {
+      titleEn: string;
+      titleBn: string;
+      summaryEn: string;
+      summaryBn: string;
+      detailsEn: string;
+      detailsBn: string;
+      priceMinor: number;
+      originalPriceMinor: number | null;
+      heroMedia: string | null;
+      validUntil: string | null;
+      stock: number | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+    };
+    AdminAdListDto_Output: {
+      items: {
+        id: string;
+        titleEn: string;
+        titleBn: string;
+        textEn: string;
+        textBn: string;
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+        };
+        linkHref: string;
+        /** @enum {string} */
+        placement: "HOME_TOP" | "HOME_MIDDLE" | "OFFERS_TOP";
+        startsAt: string | null;
+        endsAt: string | null;
+        active: boolean;
+        sortOrder: number;
+        live: boolean;
+      }[];
+    };
+    AdminAdInputDto: {
+      titleEn: string;
+      titleBn: string;
+      textEn: string;
+      textBn: string;
+      media: string;
+      linkHref: string | "";
+      /** @enum {string} */
+      placement: "HOME_TOP" | "HOME_MIDDLE" | "OFFERS_TOP";
+      startsAt: string | null;
+      endsAt: string | null;
+      active: boolean;
+      sortOrder: number;
+    };
+    AdminAdResultDto_Output: {
+      ad: {
+        id: string;
+        titleEn: string;
+        titleBn: string;
+        textEn: string;
+        textBn: string;
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+        };
+        linkHref: string;
+        /** @enum {string} */
+        placement: "HOME_TOP" | "HOME_MIDDLE" | "OFFERS_TOP";
+        startsAt: string | null;
+        endsAt: string | null;
+        active: boolean;
+        sortOrder: number;
+        live: boolean;
+      };
+    };
+    AdminOrderListDto_Output: {
+      items: {
+        id: string;
+        reference: string;
+        /** @enum {string} */
+        kind: "OFFER" | "GIFT_CARD";
+        /** @enum {string} */
+        status: "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED";
+        title: string;
+        titleBn: string;
+        quantity: number;
+        total: components["schemas"]["Money_Output"];
+        buyer: {
+          name: string;
+          email: string;
+          phone: string;
+        };
+        recipient: {
+          name: string;
+          email: string;
+        } | null;
+        giftMessage: string | null;
+        note: string | null;
+        /** Format: date-time */
+        expiresAt: string;
+        paidAt: string | null;
+        paidOffline: string | null;
+        canPay: boolean;
+        giftCard: {
+          last4: string;
+          balance: components["schemas"]["Money_Output"];
+          /** Format: date-time */
+          expiresAt: string;
+          status: string;
+        } | null;
+        /** Format: date-time */
+        createdAt: string;
+        customer: {
+          id: string;
+          fullName: string;
+          email: string;
+        };
+      }[];
+      nextCursor: string | null;
+    };
+    AdminOrderDto_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      kind: "OFFER" | "GIFT_CARD";
+      /** @enum {string} */
+      status: "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED";
+      title: string;
+      titleBn: string;
+      quantity: number;
+      total: components["schemas"]["Money_Output"];
+      buyer: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      recipient: {
+        name: string;
+        email: string;
+      } | null;
+      giftMessage: string | null;
+      note: string | null;
+      /** Format: date-time */
+      expiresAt: string;
+      paidAt: string | null;
+      paidOffline: string | null;
+      canPay: boolean;
+      giftCard: {
+        last4: string;
+        balance: components["schemas"]["Money_Output"];
+        /** Format: date-time */
+        expiresAt: string;
+        status: string;
+      } | null;
+      /** Format: date-time */
+      createdAt: string;
+      customer: {
+        id: string;
+        fullName: string;
+        email: string;
+      };
+    };
+    AdminMarkPaidDto: {
+      reference: string;
+    };
+    AdminCancelOrderDto: {
+      reason: string;
+    };
+    AdminGiftCardListDto_Output: {
+      items: {
+        id: string;
+        last4: string;
+        initial: components["schemas"]["Money_Output"];
+        balance: components["schemas"]["Money_Output"];
+        /** @enum {string} */
+        status: "ACTIVE" | "VOID";
+        /** Format: date-time */
+        expiresAt: string;
+        recipientName: string;
+        recipientEmail: string;
+        orderReference: string | null;
+        /** Format: date-time */
+        createdAt: string;
+        txns: {
+          /** @enum {string} */
+          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID";
+          amount: components["schemas"]["Money_Output"];
+          balanceAfter: components["schemas"]["Money_Output"];
+          bookingReference: string | null;
+          note: string | null;
+          /** Format: date-time */
+          at: string;
+        }[];
+      }[];
+      nextCursor: string | null;
+    };
+    AdminIssueGiftCardDto: {
+      amountTaka: number;
+      recipientName: string;
+      recipientEmail: string;
+      message?: string;
+      reason: string;
+    };
+    AdminGiftCardResultDto_Output: {
+      giftCard: {
+        id: string;
+        last4: string;
+        initial: components["schemas"]["Money_Output"];
+        balance: components["schemas"]["Money_Output"];
+        /** @enum {string} */
+        status: "ACTIVE" | "VOID";
+        /** Format: date-time */
+        expiresAt: string;
+        recipientName: string;
+        recipientEmail: string;
+        orderReference: string | null;
+        /** Format: date-time */
+        createdAt: string;
+        txns: {
+          /** @enum {string} */
+          kind: "ISSUE" | "REDEEM" | "RELEASE" | "VOID";
+          amount: components["schemas"]["Money_Output"];
+          balanceAfter: components["schemas"]["Money_Output"];
+          bookingReference: string | null;
+          note: string | null;
+          /** Format: date-time */
+          at: string;
+        }[];
+      };
+    };
+    AdminVoidGiftCardDto: {
+      reason: string;
     };
   };
   responses: never;
@@ -5794,6 +6617,555 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["PublicHomeDto_Output"];
         };
+      };
+    };
+  };
+  PublicCommerceController_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicOfferListDto_Output"];
+        };
+      };
+    };
+  };
+  PublicCommerceController_one: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicOfferDto_Output"];
+        };
+      };
+    };
+  };
+  PublicCommerceController_ads: {
+    parameters: {
+      query: {
+        placement: "HOME_TOP" | "HOME_MIDDLE" | "OFFERS_TOP";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicAdListDto_Output"];
+        };
+      };
+    };
+  };
+  PublicCommerceController_availability: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GiftCardAvailabilityDto_Output"];
+        };
+      };
+    };
+  };
+  PublicCommerceController_balance: {
+    parameters: {
+      query: {
+        code: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GiftCardBalanceDto_Output"];
+        };
+      };
+    };
+  };
+  MyOrdersController_list: {
+    parameters: {
+      query?: {
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MyOrderListDto_Output"];
+        };
+      };
+    };
+  };
+  MyOrdersController_one: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MyOrderDto_Output"];
+        };
+      };
+    };
+  };
+  MyOrdersController_offer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateOfferOrderDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MyOrderDto_Output"];
+        };
+      };
+    };
+  };
+  MyOrdersController_giftCard: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGiftCardOrderDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MyOrderDto_Output"];
+        };
+      };
+    };
+  };
+  MyOrdersController_pay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OrderPaymentSessionDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_offerList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOfferListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_createOffer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCreateOfferDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOfferResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_updateOffer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminOfferInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOfferResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_adList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminAdListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_createAd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminAdInputDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminAdResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_updateAd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminAdInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminAdResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_deleteAd: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminCommerceController_orderList: {
+    parameters: {
+      query?: {
+        status?: "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED";
+        kind?: "OFFER" | "GIFT_CARD";
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOrderListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_order: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOrderDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_markPaid: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminMarkPaidDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOrderDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_cancelOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminCancelOrderDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminOrderDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_giftCardList: {
+    parameters: {
+      query?: {
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_issue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminIssueGiftCardDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_voidCard: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminVoidGiftCardDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_resend: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

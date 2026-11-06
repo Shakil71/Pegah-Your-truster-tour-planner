@@ -4114,6 +4114,867 @@
         },
         "tags": ["site"]
       }
+    },
+    "/api/v1/offers": {
+      "get": {
+        "operationId": "PublicCommerceController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicOfferListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
+    "/api/v1/offers/{slug}": {
+      "get": {
+        "operationId": "PublicCommerceController_one",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicOfferDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
+    "/api/v1/ads": {
+      "get": {
+        "operationId": "PublicCommerceController_ads",
+        "parameters": [
+          {
+            "name": "placement",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["HOME_TOP", "HOME_MIDDLE", "OFFERS_TOP"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicAdListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
+    "/api/v1/gift-cards/availability": {
+      "get": {
+        "operationId": "PublicCommerceController_availability",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCardAvailabilityDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
+    "/api/v1/gift-cards/balance": {
+      "get": {
+        "operationId": "PublicCommerceController_balance",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GiftCardBalanceDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
+    "/api/v1/me/orders": {
+      "get": {
+        "operationId": "MyOrdersController_list",
+        "parameters": [
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrderListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["orders"]
+      }
+    },
+    "/api/v1/me/orders/{id}": {
+      "get": {
+        "operationId": "MyOrdersController_one",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["orders"]
+      }
+    },
+    "/api/v1/me/orders/offer": {
+      "post": {
+        "operationId": "MyOrdersController_offer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfferOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["orders"]
+      }
+    },
+    "/api/v1/me/orders/gift-card": {
+      "post": {
+        "operationId": "MyOrdersController_giftCard",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGiftCardOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["orders"]
+      }
+    },
+    "/api/v1/me/orders/{id}/payment-session": {
+      "post": {
+        "operationId": "MyOrdersController_pay",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderPaymentSessionDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "customer": []
+          }
+        ],
+        "tags": ["orders"]
+      }
+    },
+    "/api/v1/admin/offers": {
+      "get": {
+        "operationId": "AdminCommerceController_offerList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfferListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "post": {
+        "operationId": "AdminCommerceController_createOffer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCreateOfferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfferResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/offers/{id}": {
+      "put": {
+        "operationId": "AdminCommerceController_updateOffer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminOfferInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfferResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/ads": {
+      "get": {
+        "operationId": "AdminCommerceController_adList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAdListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "post": {
+        "operationId": "AdminCommerceController_createAd",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminAdInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAdResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/ads/{id}": {
+      "put": {
+        "operationId": "AdminCommerceController_updateAd",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminAdInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAdResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "delete": {
+        "operationId": "AdminCommerceController_deleteAd",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/orders": {
+      "get": {
+        "operationId": "AdminCommerceController_orderList",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]
+            }
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["OFFER", "GIFT_CARD"]
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/orders/{id}": {
+      "get": {
+        "operationId": "AdminCommerceController_order",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/orders/{id}/mark-paid": {
+      "post": {
+        "operationId": "AdminCommerceController_markPaid",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminMarkPaidDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/orders/{id}/cancel": {
+      "post": {
+        "operationId": "AdminCommerceController_cancelOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminCancelOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrderDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/gift-cards": {
+      "get": {
+        "operationId": "AdminCommerceController_giftCardList",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "post": {
+        "operationId": "AdminCommerceController_issue",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminIssueGiftCardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/gift-cards/{id}/void": {
+      "post": {
+        "operationId": "AdminCommerceController_voidCard",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminVoidGiftCardDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/gift-cards/{id}/resend": {
+      "post": {
+        "operationId": "AdminCommerceController_resend",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
     }
   },
   "info": {
@@ -4257,6 +5118,7 @@
                 "catalog:manage",
                 "inventory:manage",
                 "customer:read",
+                "order:manage",
                 "customer:manage",
                 "payment:read",
                 "refund:approve",
@@ -6700,6 +7562,7 @@
                 "catalog:manage",
                 "inventory:manage",
                 "customer:read",
+                "order:manage",
                 "customer:manage",
                 "payment:read",
                 "refund:approve",
@@ -7129,8 +7992,26 @@
                   ]
                 },
                 "bookingId": {
-                  "type": "string",
-                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "orderId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "bookingReference": {
                   "type": "string"
@@ -7172,6 +8053,7 @@
                 "createdAt",
                 "succeededAt",
                 "bookingId",
+                "orderId",
                 "bookingReference",
                 "providerTxnId",
                 "bankTxnId",
@@ -11989,6 +12871,2393 @@
         },
         "required": ["slides", "destinations", "hotels", "tours", "promises"],
         "additionalProperties": false
+      },
+      "PublicOfferListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "slug": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "titleEn": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "summaryEn": {
+                  "type": "string"
+                },
+                "summaryBn": {
+                  "type": "string"
+                },
+                "price": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "originalPrice": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Money_Output"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "hero": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{24}\\.webp$"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["key", "url", "alt"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "validUntil": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "remaining": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "available": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "slug",
+                "titleEn",
+                "titleBn",
+                "summaryEn",
+                "summaryBn",
+                "price",
+                "originalPrice",
+                "hero",
+                "validUntil",
+                "remaining",
+                "available"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "PublicOfferDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "titleEn": {
+            "type": "string"
+          },
+          "titleBn": {
+            "type": "string"
+          },
+          "summaryEn": {
+            "type": "string"
+          },
+          "summaryBn": {
+            "type": "string"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "originalPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "hero": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{24}\\.webp$"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string"
+                  }
+                },
+                "required": ["key", "url", "alt"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "remaining": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "detailsEn": {
+            "type": "string"
+          },
+          "detailsBn": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "titleEn",
+          "titleBn",
+          "summaryEn",
+          "summaryBn",
+          "price",
+          "originalPrice",
+          "hero",
+          "validUntil",
+          "remaining",
+          "detailsEn",
+          "detailsBn",
+          "available"
+        ],
+        "additionalProperties": false
+      },
+      "PublicAdListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "titleEn": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "textEn": {
+                  "type": "string"
+                },
+                "textBn": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{24}\\.webp$"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["key", "url", "alt"],
+                  "additionalProperties": false
+                },
+                "linkHref": {
+                  "type": "string"
+                },
+                "placement": {
+                  "type": "string",
+                  "enum": ["HOME_TOP", "HOME_MIDDLE", "OFFERS_TOP"]
+                }
+              },
+              "required": [
+                "id",
+                "titleEn",
+                "titleBn",
+                "textEn",
+                "textBn",
+                "image",
+                "linkHref",
+                "placement"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "GiftCardAvailabilityDto_Output": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "minTaka": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "maxTaka": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["available", "minTaka", "maxTaka"],
+        "additionalProperties": false
+      },
+      "GiftCardBalanceDto_Output": {
+        "type": "object",
+        "properties": {
+          "last4": {
+            "type": "string"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "usable": {
+            "type": "boolean"
+          }
+        },
+        "required": ["last4", "balance", "expiresAt", "usable"],
+        "additionalProperties": false
+      },
+      "MyOrderListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": ["OFFER", "GIFT_CARD"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "total": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "buyer": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["name", "email", "phone"],
+                  "additionalProperties": false
+                },
+                "recipient": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["name", "email"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "giftMessage": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 300
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "note": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 500
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "paidAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "paidOffline": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "canPay": {
+                  "type": "boolean"
+                },
+                "giftCard": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "last4": {
+                          "type": "string"
+                        },
+                        "balance": {
+                          "$ref": "#/components/schemas/Money_Output"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["last4", "balance", "expiresAt", "status"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "kind",
+                "status",
+                "title",
+                "titleBn",
+                "quantity",
+                "total",
+                "buyer",
+                "recipient",
+                "giftMessage",
+                "note",
+                "expiresAt",
+                "paidAt",
+                "paidOffline",
+                "canPay",
+                "giftCard",
+                "createdAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["items", "nextCursor"],
+        "additionalProperties": false
+      },
+      "MyOrderDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["OFFER", "GIFT_CARD"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "titleBn": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "buyer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "email", "phone"],
+            "additionalProperties": false
+          },
+          "recipient": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name", "email"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "giftMessage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "paidAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "paidOffline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "canPay": {
+            "type": "boolean"
+          },
+          "giftCard": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "last4": {
+                    "type": "string"
+                  },
+                  "balance": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": ["last4", "balance", "expiresAt", "status"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "kind",
+          "status",
+          "title",
+          "titleBn",
+          "quantity",
+          "total",
+          "buyer",
+          "recipient",
+          "giftMessage",
+          "note",
+          "expiresAt",
+          "paidAt",
+          "paidOffline",
+          "canPay",
+          "giftCard",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "CreateOfferOrderDto": {
+        "type": "object",
+        "properties": {
+          "offerId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "buyer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^\\+8801[3-9]\\d{8}$"
+              }
+            },
+            "required": ["name", "email", "phone"]
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "expectedTotal": {
+            "$ref": "#/components/schemas/Money"
+          }
+        },
+        "required": ["offerId", "quantity", "buyer", "expectedTotal"]
+      },
+      "CreateGiftCardOrderDto": {
+        "type": "object",
+        "properties": {
+          "amountTaka": {
+            "type": "integer",
+            "minimum": 500,
+            "maximum": 100000
+          },
+          "buyer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 120
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "pattern": "^\\+8801[3-9]\\d{8}$"
+              }
+            },
+            "required": ["name", "email", "phone"]
+          },
+          "forSelf": {
+            "type": "boolean"
+          },
+          "recipientName": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "recipientEmail": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "required": ["amountTaka", "buyer", "forSelf"]
+      },
+      "OrderPaymentSessionDto_Output": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["sandbox", "live", "simulator"]
+          },
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["paymentId", "provider", "mode", "redirectUrl"],
+        "additionalProperties": false
+      },
+      "AdminOfferListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "slug": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "titleEn": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "summaryEn": {
+                  "type": "string"
+                },
+                "summaryBn": {
+                  "type": "string"
+                },
+                "price": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "originalPrice": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Money_Output"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "hero": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{24}\\.webp$"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["key", "url", "alt"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "validUntil": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "remaining": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "detailsEn": {
+                  "type": "string"
+                },
+                "detailsBn": {
+                  "type": "string"
+                },
+                "available": {
+                  "type": "boolean"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+                },
+                "stock": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "sold": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "slug",
+                "titleEn",
+                "titleBn",
+                "summaryEn",
+                "summaryBn",
+                "price",
+                "originalPrice",
+                "hero",
+                "validUntil",
+                "remaining",
+                "detailsEn",
+                "detailsBn",
+                "available",
+                "status",
+                "stock",
+                "sold",
+                "sortOrder",
+                "updatedAt"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "AdminCreateOfferDto": {
+        "type": "object",
+        "properties": {
+          "titleEn": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "titleBn": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "summaryEn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300
+          },
+          "summaryBn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300
+          },
+          "detailsEn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 5000
+          },
+          "detailsBn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 5000
+          },
+          "priceMinor": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000000
+          },
+          "originalPriceMinor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "heroMedia": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{24}\\.webp$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stock": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        },
+        "required": [
+          "titleEn",
+          "titleBn",
+          "summaryEn",
+          "summaryBn",
+          "detailsEn",
+          "detailsBn",
+          "priceMinor",
+          "originalPriceMinor",
+          "heroMedia",
+          "validUntil",
+          "stock",
+          "status",
+          "sortOrder",
+          "slug"
+        ]
+      },
+      "AdminOfferResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "offer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "slug": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 80,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "titleEn": {
+                "type": "string"
+              },
+              "titleBn": {
+                "type": "string"
+              },
+              "summaryEn": {
+                "type": "string"
+              },
+              "summaryBn": {
+                "type": "string"
+              },
+              "price": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "originalPrice": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Money_Output"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "hero": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{24}\\.webp$"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "alt": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["key", "url", "alt"],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "validUntil": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "remaining": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "detailsEn": {
+                "type": "string"
+              },
+              "detailsBn": {
+                "type": "string"
+              },
+              "available": {
+                "type": "boolean"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+              },
+              "stock": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sold": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "sortOrder": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
+            },
+            "required": [
+              "id",
+              "slug",
+              "titleEn",
+              "titleBn",
+              "summaryEn",
+              "summaryBn",
+              "price",
+              "originalPrice",
+              "hero",
+              "validUntil",
+              "remaining",
+              "detailsEn",
+              "detailsBn",
+              "available",
+              "status",
+              "stock",
+              "sold",
+              "sortOrder",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": ["offer"],
+        "additionalProperties": false
+      },
+      "AdminOfferInputDto": {
+        "type": "object",
+        "properties": {
+          "titleEn": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "titleBn": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 160
+          },
+          "summaryEn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300
+          },
+          "summaryBn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300
+          },
+          "detailsEn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 5000
+          },
+          "detailsBn": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 5000
+          },
+          "priceMinor": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 1000000000
+          },
+          "originalPriceMinor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 1000000000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "heroMedia": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{24}\\.webp$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stock": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "SUSPENDED"]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "titleEn",
+          "titleBn",
+          "summaryEn",
+          "summaryBn",
+          "detailsEn",
+          "detailsBn",
+          "priceMinor",
+          "originalPriceMinor",
+          "heroMedia",
+          "validUntil",
+          "stock",
+          "status",
+          "sortOrder"
+        ]
+      },
+      "AdminAdListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "titleEn": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "textEn": {
+                  "type": "string"
+                },
+                "textBn": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{24}\\.webp$"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["key", "url", "alt"],
+                  "additionalProperties": false
+                },
+                "linkHref": {
+                  "type": "string"
+                },
+                "placement": {
+                  "type": "string",
+                  "enum": ["HOME_TOP", "HOME_MIDDLE", "OFFERS_TOP"]
+                },
+                "startsAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "endsAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "active": {
+                  "type": "boolean"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "live": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "titleEn",
+                "titleBn",
+                "textEn",
+                "textBn",
+                "image",
+                "linkHref",
+                "placement",
+                "startsAt",
+                "endsAt",
+                "active",
+                "sortOrder",
+                "live"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "AdminAdInputDto": {
+        "type": "object",
+        "properties": {
+          "titleEn": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "titleBn": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "textEn": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "textBn": {
+            "type": "string",
+            "maxLength": 240
+          },
+          "media": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{24}\\.webp$"
+          },
+          "linkHref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(\\/[\\w\\-./?=&#%]*|https:\\/\\/\\S+)$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          },
+          "placement": {
+            "type": "string",
+            "enum": ["HOME_TOP", "HOME_MIDDLE", "OFFERS_TOP"]
+          },
+          "startsAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endsAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "titleEn",
+          "titleBn",
+          "textEn",
+          "textBn",
+          "media",
+          "linkHref",
+          "placement",
+          "startsAt",
+          "endsAt",
+          "active",
+          "sortOrder"
+        ]
+      },
+      "AdminAdResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "ad": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "titleEn": {
+                "type": "string"
+              },
+              "titleBn": {
+                "type": "string"
+              },
+              "textEn": {
+                "type": "string"
+              },
+              "textBn": {
+                "type": "string"
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{24}\\.webp$"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string"
+                  }
+                },
+                "required": ["key", "url", "alt"],
+                "additionalProperties": false
+              },
+              "linkHref": {
+                "type": "string"
+              },
+              "placement": {
+                "type": "string",
+                "enum": ["HOME_TOP", "HOME_MIDDLE", "OFFERS_TOP"]
+              },
+              "startsAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "endsAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "sortOrder": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "live": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "titleEn",
+              "titleBn",
+              "textEn",
+              "textBn",
+              "image",
+              "linkHref",
+              "placement",
+              "startsAt",
+              "endsAt",
+              "active",
+              "sortOrder",
+              "live"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": ["ad"],
+        "additionalProperties": false
+      },
+      "AdminOrderListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": ["OFFER", "GIFT_CARD"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]
+                },
+                "title": {
+                  "type": "string"
+                },
+                "titleBn": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "total": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "buyer": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["name", "email", "phone"],
+                  "additionalProperties": false
+                },
+                "recipient": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["name", "email"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "giftMessage": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 300
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "note": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 500
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "paidAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "paidOffline": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 200
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "canPay": {
+                  "type": "boolean"
+                },
+                "giftCard": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "last4": {
+                          "type": "string"
+                        },
+                        "balance": {
+                          "$ref": "#/components/schemas/Money_Output"
+                        },
+                        "expiresAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": ["last4", "balance", "expiresAt", "status"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "customer": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                    },
+                    "fullName": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "fullName", "email"],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "kind",
+                "status",
+                "title",
+                "titleBn",
+                "quantity",
+                "total",
+                "buyer",
+                "recipient",
+                "giftMessage",
+                "note",
+                "expiresAt",
+                "paidAt",
+                "paidOffline",
+                "canPay",
+                "giftCard",
+                "createdAt",
+                "customer"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["items", "nextCursor"],
+        "additionalProperties": false
+      },
+      "AdminOrderDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["OFFER", "GIFT_CARD"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "titleBn": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "total": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "buyer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "email", "phone"],
+            "additionalProperties": false
+          },
+          "recipient": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name", "email"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "giftMessage": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "paidAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "paidOffline": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "canPay": {
+            "type": "boolean"
+          },
+          "giftCard": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "last4": {
+                    "type": "string"
+                  },
+                  "balance": {
+                    "$ref": "#/components/schemas/Money_Output"
+                  },
+                  "expiresAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": ["last4", "balance", "expiresAt", "status"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "customer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "fullName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "fullName", "email"],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "kind",
+          "status",
+          "title",
+          "titleBn",
+          "quantity",
+          "total",
+          "buyer",
+          "recipient",
+          "giftMessage",
+          "note",
+          "expiresAt",
+          "paidAt",
+          "paidOffline",
+          "canPay",
+          "giftCard",
+          "createdAt",
+          "customer"
+        ],
+        "additionalProperties": false
+      },
+      "AdminMarkPaidDto": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200
+          }
+        },
+        "required": ["reference"]
+      },
+      "AdminCancelOrderDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 300
+          }
+        },
+        "required": ["reason"]
+      },
+      "AdminGiftCardListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "last4": {
+                  "type": "string"
+                },
+                "initial": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "balance": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["ACTIVE", "VOID"]
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "recipientName": {
+                  "type": "string"
+                },
+                "recipientEmail": {
+                  "type": "string"
+                },
+                "orderReference": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 12
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "txns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID"]
+                      },
+                      "amount": {
+                        "$ref": "#/components/schemas/Money_Output"
+                      },
+                      "balanceAfter": {
+                        "$ref": "#/components/schemas/Money_Output"
+                      },
+                      "bookingReference": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 12
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "note": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 200
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "amount",
+                      "balanceAfter",
+                      "bookingReference",
+                      "note",
+                      "at"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "last4",
+                "initial",
+                "balance",
+                "status",
+                "expiresAt",
+                "recipientName",
+                "recipientEmail",
+                "orderReference",
+                "createdAt",
+                "txns"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["items", "nextCursor"],
+        "additionalProperties": false
+      },
+      "AdminIssueGiftCardDto": {
+        "type": "object",
+        "properties": {
+          "amountTaka": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 100000
+          },
+          "recipientName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "recipientEmail": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200
+          }
+        },
+        "required": ["amountTaka", "recipientName", "recipientEmail", "reason"]
+      },
+      "AdminGiftCardResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "giftCard": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "last4": {
+                "type": "string"
+              },
+              "initial": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "balance": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["ACTIVE", "VOID"]
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "recipientName": {
+                "type": "string"
+              },
+              "recipientEmail": {
+                "type": "string"
+              },
+              "orderReference": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 12
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              "txns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": ["ISSUE", "REDEEM", "RELEASE", "VOID"]
+                    },
+                    "amount": {
+                      "$ref": "#/components/schemas/Money_Output"
+                    },
+                    "balanceAfter": {
+                      "$ref": "#/components/schemas/Money_Output"
+                    },
+                    "bookingReference": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 12
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "note": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 200
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": ["kind", "amount", "balanceAfter", "bookingReference", "note", "at"],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "id",
+              "last4",
+              "initial",
+              "balance",
+              "status",
+              "expiresAt",
+              "recipientName",
+              "recipientEmail",
+              "orderReference",
+              "createdAt",
+              "txns"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": ["giftCard"],
+        "additionalProperties": false
+      },
+      "AdminVoidGiftCardDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 200
+          }
+        },
+        "required": ["reason"]
       }
     }
   }

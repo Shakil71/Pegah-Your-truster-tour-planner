@@ -3,10 +3,11 @@ import { useTranslations } from "next-intl";
 import { cx } from "@pegah/ui";
 
 /** Account sub-navigation shared by My trips and Profile. */
-export function AccountTabs({ active }: { active: "trips" | "profile" }) {
+export function AccountTabs({ active }: { active: "trips" | "orders" | "profile" }) {
   const t = useTranslations("account");
   const tabs = [
     { key: "trips", href: "/account/bookings", label: t("myTrips") },
+    { key: "orders", href: "/account/orders", label: t("ordersTab") },
     { key: "profile", href: "/account/profile", label: t("profileTab") },
   ] as const;
   return (

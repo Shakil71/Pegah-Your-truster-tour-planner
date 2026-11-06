@@ -80,6 +80,13 @@ export function mapSslcommerzRecord(r: Record<string, unknown>): Verification {
   };
 }
 
+const CATEGORY = {
+  HOTEL: "Hotel",
+  TOUR: "Tour",
+  OFFER: "Travel package",
+  GIFT_CARD: "Gift card",
+} as const;
+
 export class SslcommerzProvider implements PaymentProvider {
   readonly name = "sslcommerz" as const;
   readonly mode: "sandbox" | "live";
@@ -116,7 +123,7 @@ export class SslcommerzProvider implements PaymentProvider {
       shipping_method: "NO",
       num_of_item: "1",
       product_name: `${req.booking.reference} ${req.booking.productName}`.slice(0, 255),
-      product_category: req.booking.productType === "HOTEL" ? "Hotel" : "Tour",
+      product_category: CATEGORY[req.booking.productType],
       product_profile: this.options.productProfile,
       // Echoed back on callbacks; lets support match a payment to a booking.
       value_a: req.booking.reference,

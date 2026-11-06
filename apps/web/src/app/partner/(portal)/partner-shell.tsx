@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { Logo, cx } from "@pegah/ui";
+import { Logo, ThemeToggle, cx } from "@pegah/ui";
 import { browserApi, csrf } from "@/lib/api-browser";
 
 export function PartnerShell({
@@ -74,6 +74,7 @@ export function PartnerShell({
           <span className="text-[0.8rem] text-white/70">
             {userName} · {partnerName}
           </span>
+          <ThemeToggle className="size-8 hover:bg-white/15" />
           <button
             type="button"
             onClick={signOut}

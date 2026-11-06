@@ -14,6 +14,7 @@ export const PERMISSIONS = {
   "catalog:manage": "Create and edit destinations, hotels, rooms and tours",
   "inventory:manage": "Edit room inventory, rates and tour capacity",
   "customer:read": "View customer profiles",
+  "order:manage": "Record offline payments, cancel orders, issue and void gift cards (audited)",
   "customer:manage": "Disable or enable customer accounts and sign them out (audited)",
   "payment:read": "View payments and payment events",
   "refund:approve": "Approve or reject refunds (audited)",

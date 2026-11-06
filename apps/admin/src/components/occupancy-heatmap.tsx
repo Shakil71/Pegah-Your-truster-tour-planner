@@ -46,7 +46,12 @@ export function OccupancyHeatmap({
         </p>
       </div>
 
-      <div className="mt-4 overflow-x-auto">
+      <div
+        className="mt-4 overflow-x-auto"
+        tabIndex={0}
+        role="region"
+        aria-label="Table, scrolls sideways"
+      >
         <table
           className="w-full min-w-[640px] border-separate border-spacing-[3px]"
           onMouseLeave={() => setHover(null)}

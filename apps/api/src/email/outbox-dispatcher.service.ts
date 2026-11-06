@@ -1,3 +1,5 @@
+import { taka } from "./taka";
+import { CommerceMailer } from "../commerce/commerce-mailer.service";
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { formatCalendarDate } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
@@ -28,6 +30,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
     @Inject(PRISMA) private readonly db: Db,
     @Inject(EmailService) private readonly email: EmailService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    @Inject(CommerceMailer) private readonly commerce: CommerceMailer,
   ) {}
 
   onModuleInit(): void {
@@ -103,6 +106,8 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   }
 
   private async handle(type: string, bookingPublicId: string, payload: Payload) {
+    // Offers and gift cards (ADR-0032).
+    if (this.commerce.handles(type)) return this.commerce.handle(type, bookingPublicId, payload);
     const render = (b: BookingFacts): { template: string; mail: RenderedEmail } | null => {
       switch (type) {
         case "booking.held":
@@ -172,17 +177,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
   }
 }
 
-/** "2150550" paisa → "৳ 21,505.50" (integer arithmetic; South Asian grouping for BDT). */
-export function taka(minor: string, currency: string): string {
-  const v = /^\d+$/.test(minor) ? BigInt(minor) : 0n;
-  const whole = (v / 100n).toString();
-  const frac = (v % 100n).toString().padStart(2, "0");
-  const grouped =
-    currency === "BDT" && whole.length > 3
-      ? `${whole.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ",")},${whole.slice(-3)}`
-      : whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return `${currency === "BDT" ? "৳" : "$"} ${grouped}${frac === "00" ? "" : `.${frac}`}`;
-}
+export { taka } from "./taka";
 
 function dhakaTime(iso: string): string {
   const d = new Date(iso);

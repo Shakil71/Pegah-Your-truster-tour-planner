@@ -4,6 +4,23 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Offers, ads, orders, gift cards and dark mode (2026-11-06)
+
+- Website **Offers** (list and detail, order with quantity) and **Gift cards**
+  (preset or custom amount, for yourself or someone else, balance check), and
+  **My account → Orders** with Pay now (ADR-0032).
+- Console **Offers**, **Ads** (scheduled photo banners on the home and Offers
+  pages), **Orders** (filters, Mark as paid with reference, Cancel) and
+  **Gift cards** (search, history, issue without payment, resend, void).
+- Every order and payment is emailed to the purchase-alert address
+  (default pegah.com.bd@gmail.com) once SMTP is configured.
+- Light/dark theme toggle on the website, partner portal and console,
+  remembered per visitor (ADR-0033).
+
+### Fixed
+
+- Console tables that scroll sideways are keyboard-focusable.
+
 ### Added — Brand and About page (2026-11-05)
 
 - Owner-supplied Pegah logo across website, console and partner portal, with a

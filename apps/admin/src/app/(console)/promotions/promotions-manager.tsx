@@ -244,7 +244,12 @@ export function PromotionsManager({ items, csrfToken }: { items: Promotion[]; cs
         {items.length === 0 ? (
           <p className="px-6 py-14 text-center text-ink-2">No promotions yet.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto"
+            tabIndex={0}
+            role="region"
+            aria-label="Table, scrolls sideways"
+          >
             <table className="w-full min-w-[900px] text-left text-[0.86rem]">
               <thead>
                 <tr className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">

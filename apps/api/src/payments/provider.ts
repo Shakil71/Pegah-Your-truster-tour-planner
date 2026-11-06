@@ -11,7 +11,12 @@ export interface SessionRequest {
   tranId: string;
   amountMinor: bigint;
   currency: string;
-  booking: { reference: string; productName: string; productType: "HOTEL" | "TOUR" };
+  /** What is being paid for: a booking or an order (offer, gift card). */
+  booking: {
+    reference: string;
+    productName: string;
+    productType: "HOTEL" | "TOUR" | "OFFER" | "GIFT_CARD";
+  };
   customer: { name: string; email: string; phone: string };
   urls: { success: string; fail: string; cancel: string; ipn: string };
 }

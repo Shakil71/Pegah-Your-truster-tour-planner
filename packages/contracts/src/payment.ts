@@ -51,7 +51,10 @@ export type AdminPaymentListQuery = z.infer<typeof AdminPaymentListQuerySchema>;
 export const AdminPaymentListResponseSchema = z.object({
   items: z.array(
     PaymentViewSchema.extend({
-      bookingId: PublicIdSchema,
+      /** Exactly one of bookingId / orderId is set (offers and gift cards are orders). */
+      bookingId: PublicIdSchema.nullable(),
+      orderId: PublicIdSchema.nullable(),
+      /** Booking or order reference. */
       bookingReference: z.string(),
       providerTxnId: z.string(),
       bankTxnId: nullableText(80),

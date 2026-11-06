@@ -110,7 +110,12 @@ export function DestinationManager({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <section className="panel overflow-hidden" aria-label="Destinations">
-        <div className="overflow-x-auto">
+        <div
+          className="overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="Table, scrolls sideways"
+        >
           <table className="w-full min-w-[640px] text-left text-[0.86rem]">
             <thead>
               <tr className="text-[0.7rem] uppercase tracking-[0.08em] text-ink-3">
