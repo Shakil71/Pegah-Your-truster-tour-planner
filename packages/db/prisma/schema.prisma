@@ -50,15 +50,16 @@ model User {
   createdAt       DateTime   @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt       DateTime   @updatedAt @map("updated_at") @db.DateTime(3)
 
-  roles        UserRole[]               @relation("UserRoles")
-  rolesGranted UserRole[]               @relation("RoleGrants")
-  sessions     Session[]
-  bookings     Booking[]
-  orders       Order[]
-  travellers   TravellerProfile[]
-  resetTokens  PasswordResetToken[]
-  verifyTokens EmailVerificationToken[]
-  partner      Partner?                 @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  roles           UserRole[]               @relation("UserRoles")
+  rolesGranted    UserRole[]               @relation("RoleGrants")
+  sessions        Session[]
+  bookings        Booking[]
+  serviceRequests ServiceRequest[]
+  orders          Order[]
+  travellers      TravellerProfile[]
+  resetTokens     PasswordResetToken[]
+  verifyTokens    EmailVerificationToken[]
+  partner         Partner?                 @relation(fields: [partnerId], references: [id], onDelete: Restrict)
 
   @@index([partnerId])
   @@map("users")
@@ -176,6 +177,7 @@ model MediaAsset {
   tourGallery  TourMedia[]
   offerGallery OfferMedia[]
   amenityIcons Amenity[]
+  visaProducts VisaProduct[]
   tours        Tour[]
 
   @@map("media_assets")
@@ -1326,4 +1328,158 @@ model TourAmenity {
   @@id([tourId, amenityId])
   @@index([amenityId])
   @@map("tour_amenities")
+}
+
+// ─── Visa services and flight requests (ADR-0039) ────────────────────────────
+
+/// A visa Pegah handles for customers (country + type), with the documents needed.
+/// CHECK (fee_minor >= 0) in migration SQL.
+model VisaProduct {
+  id             BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId       String        @unique @map("public_id") @db.Char(26)
+  slug           String        @unique @db.VarChar(80)
+  country        String        @db.VarChar(80)
+  countryBn      String?       @map("country_bn") @db.VarChar(80)
+  visaType       String        @map("visa_type") @db.VarChar(80)
+  summary        String        @db.VarChar(300)
+  processingTime String        @map("processing_time") @db.VarChar(80)
+  validity       String?       @db.VarChar(80)
+  /// Price from (service + embassy fees), per traveller; the final price is quoted.
+  feeMinor       BigInt        @map("fee_minor")
+  currency       String        @default("BDT") @db.Char(3)
+  /// JSON array of strings: documents the applicant must provide.
+  requirements   Json
+  notes          String?       @db.Text
+  heroMediaId    BigInt?       @map("hero_media_id") @db.UnsignedBigInt
+  status         PublishStatus @default(DRAFT)
+  sortOrder      Int           @default(0) @map("sort_order")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  hero     MediaAsset?      @relation(fields: [heroMediaId], references: [id], onDelete: SetNull, onUpdate: Restrict)
+  requests ServiceRequest[]
+
+  @@index([status, sortOrder])
+  @@index([heroMediaId])
+  @@map("visa_products")
+}
+
+enum ServiceKind {
+  VISA
+  FLIGHT
+}
+
+enum ServiceRequestStatus {
+  /// Waiting for staff.
+  SUBMITTED
+  /// Staff asked the customer for documents or information.
+  NEEDS_INFO
+  /// Staff sent a price; waiting for payment.
+  QUOTED
+  /// Payment received (recorded by staff).
+  PAID
+  /// Being processed (embassy, airline).
+  IN_PROGRESS
+  /// Delivered (visa issued, ticket issued). Set by staff only.
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+/// A visa application or flight request handled by Pegah staff
+/// (state machine and CHECKs in ADR-0039 / migration SQL).
+model ServiceRequest {
+  id                BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId          String               @unique @map("public_id") @db.Char(26)
+  reference         String               @unique @db.VarChar(12)
+  kind              ServiceKind
+  status            ServiceRequestStatus @default(SUBMITTED)
+  userId            BigInt               @map("user_id") @db.UnsignedBigInt
+  visaProductId     BigInt?              @map("visa_product_id") @db.UnsignedBigInt
+  contactName       String               @map("contact_name") @db.VarChar(120)
+  contactEmail      String               @map("contact_email") @db.VarChar(254)
+  contactPhone      String               @map("contact_phone") @db.VarChar(20)
+  travellers        Int                  @db.UnsignedSmallInt
+  /// Kind-specific answers (validated by the contracts package).
+  details           Json
+  note              String?              @db.VarChar(1000)
+  quoteMinor        BigInt?              @map("quote_minor")
+  currency          String               @default("BDT") @db.Char(3)
+  quoteNote         String?              @map("quote_note") @db.VarChar(1000)
+  quotedAt          DateTime?            @map("quoted_at") @db.DateTime(3)
+  paidAt            DateTime?            @map("paid_at") @db.DateTime(3)
+  paidOffline       String?              @map("paid_offline") @db.VarChar(200)
+  /// When it reached COMPLETED, REJECTED or CANCELLED (starts the document retention clock).
+  closedAt          DateTime?            @map("closed_at") @db.DateTime(3)
+  documentsPurgedAt DateTime?            @map("documents_purged_at") @db.DateTime(3)
+  createdAt         DateTime             @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt         DateTime             @updatedAt @map("updated_at") @db.DateTime(3)
+
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  visaProduct VisaProduct?          @relation(fields: [visaProductId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  events      ServiceRequestEvent[]
+  documents   ServiceDocument[]
+
+  @@index([userId, createdAt])
+  @@index([status, updatedAt])
+  @@index([kind, status])
+  @@index([visaProductId])
+  @@index([closedAt])
+  @@map("service_requests")
+}
+
+enum ServiceActor {
+  CUSTOMER
+  STAFF
+  SYSTEM
+}
+
+model ServiceRequestEvent {
+  id                BigInt         @id @default(autoincrement()) @db.UnsignedBigInt
+  requestId         BigInt         @map("request_id") @db.UnsignedBigInt
+  actorType         ServiceActor   @map("actor_type")
+  actorUserId       BigInt?        @map("actor_user_id") @db.UnsignedBigInt
+  fromStatus        String?        @map("from_status") @db.VarChar(20)
+  toStatus          String?        @map("to_status") @db.VarChar(20)
+  message           String?        @db.VarChar(2000)
+  visibleToCustomer Boolean        @default(true) @map("visible_to_customer")
+  createdAt         DateTime       @default(now()) @map("created_at") @db.DateTime(3)
+  request           ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@index([requestId, id])
+  @@map("service_request_events")
+}
+
+/// An uploaded document (passport scan, photo, statement). Encrypted with
+/// AES-256-GCM under DOCUMENT_ENCRYPTION_KEY; the ciphertext lives in
+/// service_document_blobs so listing never loads file bytes.
+model ServiceDocument {
+  id              BigInt               @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId        String               @unique @map("public_id") @db.Char(26)
+  requestId       BigInt               @map("request_id") @db.UnsignedBigInt
+  label           String               @db.VarChar(80)
+  fileName        String               @map("file_name") @db.VarChar(160)
+  mime            String               @db.VarChar(60)
+  byteSize        Int                  @map("byte_size") @db.UnsignedInt
+  /// SHA-256 of the plaintext (integrity check after decryption).
+  sha256          String               @db.Char(64)
+  keyId           String               @map("key_id") @db.VarChar(16)
+  iv              Bytes                @db.VarBinary(12)
+  authTag         Bytes                @map("auth_tag") @db.VarBinary(16)
+  uploadedByStaff Boolean              @default(false) @map("uploaded_by_staff")
+  uploadedById    BigInt               @map("uploaded_by_id") @db.UnsignedBigInt
+  createdAt       DateTime             @default(now()) @map("created_at") @db.DateTime(3)
+  request         ServiceRequest       @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  blob            ServiceDocumentBlob?
+
+  @@index([requestId])
+  @@map("service_documents")
+}
+
+model ServiceDocumentBlob {
+  documentId BigInt          @id @map("document_id") @db.UnsignedBigInt
+  ciphertext Bytes           @db.LongBlob
+  document   ServiceDocument @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@map("service_document_blobs")
 }

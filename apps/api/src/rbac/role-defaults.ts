@@ -32,6 +32,7 @@ export const ROLE_DEFAULTS: Record<
       "inventory:manage",
       "customer:read",
       "report:read",
+      "service:manage",
     ],
   },
   finance: {
@@ -61,6 +62,6 @@ export const ROLE_DEFAULTS: Record<
   support: {
     name: "Customer support",
     description: "Looks up bookings and customers to help travellers.",
-    permissions: ["dashboard:read", "booking:read", "customer:read"],
+    permissions: ["dashboard:read", "booking:read", "customer:read", "service:manage"],
   },
 };

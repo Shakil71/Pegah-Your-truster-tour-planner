@@ -95,6 +95,19 @@ overrides, staff logins) write append-only `audit_events`.
 - Commission is computed on the server at booking time and constrained by a
   database CHECK; partner input never sets it.
 
+## Travel documents (ADR-0039)
+
+- Visa and ticket documents are encrypted at rest (AES-256-GCM,
+  `DOCUMENT_ENCRYPTION_KEY` in api.env only; document id bound as associated
+  data; plaintext SHA-256 verified on read). A database dump alone reveals
+  nothing.
+- Only the customer who owns the request and staff with `service:manage`
+  can download; responses are `no-store`, `nosniff` and attachments.
+  Every staff view or upload is in the audit log. Document contents and
+  names are never logged.
+- File type is checked from the bytes (PDF, JPEG, PNG only); 5 MB limit;
+  20 files per request. Files are deleted 90 days after the request closes.
+
 ## Console credentials (ADR-0029)
 
 - Payment and SMTP passwords entered in the console are sealed with

@@ -1443,6 +1443,44 @@ Customers whose email already exists are linked, never overwritten.
   replace-when-sent, keep-when-omitted; unknown keys or facilities answer 422
   and change nothing. `airConditioned` is sent as YES/NO/UNKNOWN.
 
+## ADR-0039 — Visa services and flight requests, with encrypted documents
+
+- **Status:** Accepted (2026-11-06; decisions delegated by the owner)
+- **Context:** customers asked for visa help and air tickets. There is no
+  airline or GDS contract, and the rules forbid unverified supplier
+  integrations and confirmations Pegah cannot honour. Visa work needs
+  passport scans and statements, which had no secure storage design.
+- **Decision — staff-handled requests:** one `service_requests` table for
+  both kinds (`VISA`, `FLIGHT`; kind-specific answers in `details` JSON,
+  validated by the contracts). States: SUBMITTED → NEEDS_INFO ↔ SUBMITTED →
+  QUOTED → PAID → IN_PROGRESS → COMPLETED, plus REJECTED / CANCELLED.
+  Customers may cancel until they pay. Staff actions carry
+  `expectedStatus` and run under `SELECT … FOR UPDATE`; each writes a
+  timeline event, an audit entry and an outbox email in one transaction.
+  Payment is recorded by staff (reference required), as for offline orders;
+  online payment can be added when SSLCOMMERZ is live. COMPLETED is set only
+  by staff (visa issued, ticket issued), so nothing is ever confirmed
+  automatically. CHECKs: price positive, paid states need a price and a
+  payment time, a visa product only on visa requests.
+- **Visa catalogue:** `visa_products` (country, type, processing time,
+  validity, price from, required documents, notes, photo) managed under
+  catalog permissions; only PUBLISHED ones are listed at `/visa`.
+- **Documents:** PDF/JPEG/PNG, recognised by their first bytes (never by
+  name or header), at most 5 MB and 20 per request. Each file is encrypted
+  with AES-256-GCM under `DOCUMENT_ENCRYPTION_KEY` (32 bytes, server env
+  only, separate from SETTINGS_ENCRYPTION_KEY), with the document id as
+  associated data and a SHA-256 of the plaintext checked after decryption.
+  Ciphertext lives in `service_document_blobs` so lists never load bytes.
+  Downloads: owner or `service:manage` staff only, `no-store`,
+  `nosniff`, `attachment`; staff views are audited. Without the key,
+  uploads answer 503 and the site says to send documents by email.
+  Documents are deleted `DOCUMENT_RETENTION_DAYS` (default 90) after a
+  request closes (hourly sweep in the worker), and the timeline says so.
+  Nginx allows 6 MB only on the two upload routes; everything else keeps 1 MB.
+- **Permissions:** `service:manage` (owner, admin, operations, support).
+- **Not done:** live fares, automatic ticketing, embassy integrations —
+  these need contracts (Phase 8).
+
 ### ADR-0028 update (2026-11-06)
 
 The partner portal now uses the same next-intl messages (`partner`

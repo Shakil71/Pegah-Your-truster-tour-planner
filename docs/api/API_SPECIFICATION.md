@@ -250,3 +250,24 @@ outcome with the provider server-to-server. `503 payments-unavailable` while
 | ------ | --------------------------- | -------------------- |
 | POST   | /admin/payments/{id}/refund | Refund via the API   |
 | POST   | /bookings/{id}/cancellation | Request cancellation |
+
+## Visa services and flight requests (ADR-0039)
+
+| Method   | Path                                     | Access                   | Purpose                                                                                   |
+| -------- | ---------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------- |
+| GET      | /visas, /visas/{slug}                    | public                   | Published visa services                                                                   |
+| POST     | /me/requests/visa, /me/requests/flight   | customer + CSRF (10/min) | New request (201); verified email when required                                           |
+| GET      | /me/requests, /me/requests/{id}          | customer (own only)      | List / detail with timeline and documents                                                 |
+| POST     | /me/requests/{id}/reply                  | customer + CSRF          | Message; NEEDS_INFO → SUBMITTED                                                           |
+| POST     | /me/requests/{id}/cancel                 | customer + CSRF          | Until paid                                                                                |
+| POST     | /me/requests/{id}/documents?label=&name= | customer + CSRF (20/min) | Raw `application/octet-stream`, PDF/JPEG/PNG ≤ 5 MB                                       |
+| GET      | /me/requests/{id}/documents/{doc}        | customer (own only)      | Decrypted download (`no-store`, attachment)                                               |
+| GET      | /admin/requests, /admin/requests/{id}    | service:manage           | Queue (kind, status, search) / detail incl. internal                                      |
+| POST     | /admin/requests/{id}/actions             | service:manage + CSRF    | NEEDS_INFO, QUOTE, MARK_PAID, START, COMPLETE, REJECT, CANCEL, NOTE with `expectedStatus` |
+| POST     | /admin/requests/{id}/documents           | service:manage + CSRF    | Staff upload (e-visa, ticket); audited                                                    |
+| GET      | /admin/requests/{id}/documents/{doc}     | service:manage           | Download; audited                                                                         |
+| GET      | /admin/visa-products                     | catalog:read             | Visa catalogue with open request counts                                                   |
+| POST/PUT | /admin/visa-products[/{slug}]            | catalog:manage + CSRF    | Create / edit                                                                             |
+
+Uploads answer 503 `uploads-off` while `DOCUMENT_ENCRYPTION_KEY` is unset,
+415 for other file types, 413 above 5 MB, 409 once the request is closed.

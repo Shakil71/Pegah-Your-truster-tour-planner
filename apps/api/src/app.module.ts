@@ -32,6 +32,14 @@ import { EmailVerificationService } from "./account/email-verification.service";
 import { CancellationService } from "./account/cancellation.service";
 import { AdminController } from "./admin/admin.controllers";
 import { LegacyAdminController } from "./legacy/legacy.controller";
+import { ServiceMailer } from "./services/service-mailer.service";
+import { ServiceRequestService } from "./services/service-request.service";
+import {
+  AdminRequestsController,
+  MyRequestsController,
+  PublicVisasController,
+} from "./services/services.controllers";
+import { VisaProductsService } from "./services/visa-products.service";
 import { AuditQueryService } from "./admin/audit-query.service";
 import { DashboardService } from "./admin/dashboard.service";
 import { StaffService } from "./admin/staff.service";
@@ -136,6 +144,9 @@ export class AppModule {
         MyOrdersController,
         MyBookingGiftCardController,
         AdminCommerceController,
+        PublicVisasController,
+        MyRequestsController,
+        AdminRequestsController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -148,6 +159,9 @@ export class AppModule {
         OffersService,
         OrderService,
         CommerceMailer,
+        ServiceRequestService,
+        VisaProductsService,
+        ServiceMailer,
         // Registered so Nest closes the Redis connection on shutdown.
         ...(rateLimitStorage
           ? [{ provide: RedisThrottlerStorage, useValue: rateLimitStorage }]

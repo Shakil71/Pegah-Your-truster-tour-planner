@@ -112,6 +112,17 @@ export const EnvSchema = z.object({
     .string()
     .refine((v) => Buffer.from(v, "base64").length === 32, "Must be 32 bytes, base64")
     .optional(),
+  /**
+   * 32 random bytes, base64 — encrypts visa and travel documents customers
+   * upload (AES-256-GCM, ADR-0039). Unset = uploads are switched off.
+   * Separate from SETTINGS_ENCRYPTION_KEY so either can rotate on its own.
+   */
+  DOCUMENT_ENCRYPTION_KEY: z
+    .string()
+    .refine((v) => Buffer.from(v, "base64").length === 32, "Must be 32 bytes, base64")
+    .optional(),
+  /** Days after a request closes before its documents are deleted. */
+  DOCUMENT_RETENTION_DAYS: z.coerce.number().int().min(1).max(3650).default(90),
   /** Loopback port for Prometheus metrics (0 = off). Never exposed through Nginx. */
   METRICS_PORT: z.coerce.number().int().min(0).max(65535).default(0),
 });

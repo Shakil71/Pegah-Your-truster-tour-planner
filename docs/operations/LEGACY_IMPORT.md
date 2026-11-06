@@ -43,31 +43,48 @@ supplier must have allowed their use) and text, then publish.
 
 ## Steps (server; owner approval required)
 
-1. Back up the database (`docs/operations/BACKUP_RECOVERY.md`) and confirm the
-   backup file exists.
-2. Copy the dump and the images folder to the server (e.g. `/var/tmp/pegah-legacy/`,
-   mode 0700, owned by the deploy user).
+1. Back up the database and check the file (server, as your admin user):
+
+   ```bash
+   sudo systemctl start pegah-backup.service
+   sudo ls -lh /databackup/mysql-backups | tail -3
+   ```
+
+2. Copy the dump and the images folder from the Windows PC (PowerShell):
+
+   ```powershell
+   ssh <you>@192.168.197.100 "mkdir -p /tmp/pegah-legacy && chmod 700 /tmp/pegah-legacy"
+   scp "D:\Github Code\pegaoafz_db.sql" <you>@192.168.197.100:/tmp/pegah-legacy/
+   scp -r "D:\Github Code\images" <you>@192.168.197.100:/tmp/pegah-legacy/
+   ```
+
+   Then on the server hand them to the service user:
+
+   ```bash
+   sudo mkdir -p /opt/pegah/shared/legacy
+   sudo mv /tmp/pegah-legacy/* /opt/pegah/shared/legacy/
+   sudo chown -R pegah:pegah /opt/pegah/shared/legacy && sudo chmod -R go-rwx /opt/pegah/shared/legacy
+   ```
+
 3. Dry run — checks everything, writes nothing:
 
    ```bash
-   cd /opt/pegah/current
-   (set -a; . /etc/pegah/api.env; set +a
-    node apps/api/dist/cli/import-legacy.js \
-      --dump /var/tmp/pegah-legacy/pegaoafz_db.sql \
-      --images /var/tmp/pegah-legacy/images --dry-run)
+   sudo -u pegah bash -c 'cd /opt/pegah/current && set -a && . /opt/pegah/shared/env/api.env && set +a &&
+     node apps/api/dist/cli/import-legacy.js --dump /opt/pegah/shared/legacy/pegaoafz_db.sql \
+       --images /opt/pegah/shared/legacy/images --dry-run'
    ```
 
-4. Import (same command with `--confirm-production` instead of `--dry-run`).
+4. Import: the same command with `--confirm-production` instead of `--dry-run`.
 5. Verify — every source row and field is present and unchanged:
 
    ```bash
-   (set -a; . /etc/pegah/api.env; set +a
-    node apps/api/scripts/verify-legacy-import.mjs /var/tmp/pegah-legacy/pegaoafz_db.sql)
+   sudo -u pegah bash -c 'cd /opt/pegah/current/apps/api && set -a && . /opt/pegah/shared/env/api.env && set +a &&
+     node scripts/verify-legacy-import.mjs /opt/pegah/shared/legacy/pegaoafz_db.sql'
    ```
 
    Expected: `OK: nothing missing, nothing changed.`
 
-6. Delete `/var/tmp/pegah-legacy/`.
+6. Delete the copies: `sudo rm -rf /opt/pegah/shared/legacy /tmp/pegah-legacy`.
 
 Running the import again is safe: rows already in `legacy_records` are skipped.
 

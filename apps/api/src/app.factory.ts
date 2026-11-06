@@ -10,6 +10,7 @@ import { randomUUID } from "node:crypto";
 import { AppModule } from "./app.module";
 import type { AppConfig } from "./config/config";
 import { MEDIA_MAX_BYTES } from "./media/media.service";
+import { DOCUMENT_MAX_BYTES } from "./services/document-vault";
 import { httpDuration } from "./metrics/metrics.service";
 
 export const API_PREFIX = "api/v1";
@@ -89,6 +90,15 @@ export async function createApp({
     .addContentTypeParser(
       ["image/jpeg", "image/png", "image/webp"],
       { parseAs: "buffer", bodyLimit: MEDIA_MAX_BYTES + 64 * 1024 },
+      (_req, body, done) => done(null, body),
+    );
+  // Visa and travel documents (ADR-0039): raw bytes, type checked from the content.
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addContentTypeParser(
+      "application/octet-stream",
+      { parseAs: "buffer", bodyLimit: DOCUMENT_MAX_BYTES + 64 * 1024 },
       (_req, body, done) => done(null, body),
     );
 

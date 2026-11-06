@@ -15,6 +15,11 @@ supplier contracts.
 
 ## Completed
 
+- Visa services and flight requests with encrypted document upload
+  (ADR-0039). Owner: add `DOCUMENT_ENCRYPTION_KEY` and reload Nginx with
+  the new config to switch uploads on; add the visas Pegah offers in
+  Console → Visa services.
+
 - Old website import (ADR-0038): schema for galleries, amenities and the old
   fields; importer + verifier rehearsed locally (nothing missing, nothing
   changed). **Not yet run on the server** — needs owner approval and a
@@ -93,7 +98,9 @@ that need a contract or a second server.
 4. SSLCOMMERZ sandbox credentials → sandbox checklist
    (`docs/operations/SSLCOMMERZ_INTEGRATION.md`) → live approval.
 5. Change the owner's console password; create personal staff accounts.
-6. Old website import on the server (approval + backup), then review the
+6. `DOCUMENT_ENCRYPTION_KEY` in api.env and the new Nginx config (document
+   uploads up to 5 MB), then add visa services in the console.
+7. Old website import on the server (approval + backup), then review the
    45 draft hotels, 16 tours and 8 packages: confirm photo permissions, set
    real rates and departures, translate offer text, publish.
 

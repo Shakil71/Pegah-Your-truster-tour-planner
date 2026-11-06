@@ -11,6 +11,8 @@ import { LanguageSwitch } from "./language-switch";
 const nav = [
   { href: "/stays", key: "stays" },
   { href: "/tours", key: "tours" },
+  { href: "/flights", key: "flights" },
+  { href: "/visa", key: "visa" },
   { href: "/offers", key: "offers" },
   { href: "/gift-cards", key: "giftCards" },
   { href: "/about", key: "about" },

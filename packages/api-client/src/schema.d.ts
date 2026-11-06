@@ -1940,6 +1940,278 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/visas": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicVisasController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/visas/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicVisasController_one"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["MyRequestsController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/visa": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyRequestsController_visa"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/flight": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyRequestsController_flight"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["MyRequestsController_one"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/{id}/reply": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyRequestsController_reply"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/{id}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyRequestsController_cancel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/{id}/documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["MyRequestsController_upload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/requests/{id}/documents/{doc}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["MyRequestsController_download"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminRequestsController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/requests/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminRequestsController_one"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/requests/{id}/actions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminRequestsController_act"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/requests/{id}/documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["AdminRequestsController_upload"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/requests/{id}/documents/{doc}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminRequestsController_download"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/visa-products": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminRequestsController_visaProducts"];
+    put?: never;
+    post: operations["AdminRequestsController_createVisa"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/visa-products/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminRequestsController_updateVisa"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1991,6 +2263,7 @@ export interface components {
         | "settings:read"
         | "settings:manage"
         | "settings:secrets"
+        | "service:manage"
         | "legacy:read"
       )[];
       partner: {
@@ -2653,6 +2926,7 @@ export interface components {
         | "settings:read"
         | "settings:manage"
         | "settings:secrets"
+        | "service:manage"
         | "legacy:read"
       )[];
       memberCount: number;
@@ -4414,6 +4688,419 @@ export interface components {
     };
     AdminVoidGiftCardDto: {
       reason: string;
+    };
+    VisaProductSummary_Output: {
+      slug: string;
+      country: string;
+      countryBn: string | null;
+      visaType: string;
+      summary: string;
+      processingTime: string;
+      validity: string | null;
+      fee: components["schemas"]["Money_Output"];
+      hero: components["schemas"]["Media_Output"] | null;
+    };
+    VisaProductListDto_Output: {
+      items: components["schemas"]["VisaProductSummary_Output"][];
+    };
+    VisaProductDetailDto_Output: {
+      slug: string;
+      country: string;
+      countryBn: string | null;
+      visaType: string;
+      summary: string;
+      processingTime: string;
+      validity: string | null;
+      fee: components["schemas"]["Money_Output"];
+      hero: components["schemas"]["Media_Output"] | null;
+      requirements: string[];
+      notes: string | null;
+    };
+    ServiceRequestSummary_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      kind: "VISA" | "FLIGHT";
+      /** @enum {string} */
+      status:
+        | "SUBMITTED"
+        | "NEEDS_INFO"
+        | "QUOTED"
+        | "PAID"
+        | "IN_PROGRESS"
+        | "COMPLETED"
+        | "REJECTED"
+        | "CANCELLED";
+      title: string;
+      travellers: number;
+      quote: components["schemas"]["Money_Output"] | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    ServiceRequestListDto_Output: {
+      items: components["schemas"]["ServiceRequestSummary_Output"][];
+      nextCursor: string | null;
+    };
+    CreateVisaRequestDto: {
+      visaProductSlug: string;
+      travellers: number;
+      details: {
+        /** Format: date */
+        travelDate: string;
+        /** @enum {string} */
+        purpose: "TOURISM" | "BUSINESS" | "FAMILY" | "STUDY" | "MEDICAL" | "OTHER";
+        /** @default BD */
+        nationality: string;
+      };
+      contact: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      note?: string | null;
+    };
+    ServiceEvent_Output: {
+      /** Format: date-time */
+      at: string;
+      /** @enum {string} */
+      actor: "CUSTOMER" | "STAFF" | "SYSTEM";
+      toStatus:
+        | (
+            | "SUBMITTED"
+            | "NEEDS_INFO"
+            | "QUOTED"
+            | "PAID"
+            | "IN_PROGRESS"
+            | "COMPLETED"
+            | "REJECTED"
+            | "CANCELLED"
+          )
+        | null;
+      message: string | null;
+    };
+    ServiceDocument_Output: {
+      id: string;
+      label: string;
+      fileName: string;
+      mime: string;
+      byteSize: number;
+      uploadedByStaff: boolean;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    ServiceRequestDetailDto_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      kind: "VISA" | "FLIGHT";
+      /** @enum {string} */
+      status:
+        | "SUBMITTED"
+        | "NEEDS_INFO"
+        | "QUOTED"
+        | "PAID"
+        | "IN_PROGRESS"
+        | "COMPLETED"
+        | "REJECTED"
+        | "CANCELLED";
+      title: string;
+      travellers: number;
+      quote: components["schemas"]["Money_Output"] | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      visa: {
+        /** Format: date */
+        travelDate: string;
+        /** @enum {string} */
+        purpose: "TOURISM" | "BUSINESS" | "FAMILY" | "STUDY" | "MEDICAL" | "OTHER";
+        /** @default BD */
+        nationality: string;
+      } | null;
+      flight: {
+        /** @enum {string} */
+        tripType: "ONE_WAY" | "ROUND_TRIP";
+        from: string;
+        to: string;
+        /** Format: date */
+        departDate: string;
+        returnDate: string | null;
+        adults: number;
+        children: number;
+        infants: number;
+        /** @enum {string} */
+        cabin: "ECONOMY" | "PREMIUM_ECONOMY" | "BUSINESS" | "FIRST";
+        preferredAirline: string | null;
+      } | null;
+      visaProduct: {
+        slug: string;
+        country: string;
+        visaType: string;
+        requirements: string[];
+      } | null;
+      contactName: string;
+      contactEmail: string;
+      contactPhone: string;
+      note: string | null;
+      quoteNote: string | null;
+      quotedAt: string | null;
+      paidAt: string | null;
+      events: components["schemas"]["ServiceEvent_Output"][];
+      documents: components["schemas"]["ServiceDocument_Output"][];
+      documentsPurged: boolean;
+      uploadsEnabled: boolean;
+      canCancel: boolean;
+      canReply: boolean;
+      canUpload: boolean;
+    };
+    CreateFlightRequestDto: {
+      details: {
+        /** @enum {string} */
+        tripType: "ONE_WAY" | "ROUND_TRIP";
+        from: string;
+        to: string;
+        /** Format: date */
+        departDate: string;
+        returnDate: string | null;
+        adults: number;
+        children: number;
+        infants: number;
+        /** @enum {string} */
+        cabin: "ECONOMY" | "PREMIUM_ECONOMY" | "BUSINESS" | "FIRST";
+        preferredAirline?: string | null;
+      };
+      contact: {
+        name: string;
+        email: string;
+        phone: string;
+      };
+      note?: string | null;
+    };
+    ServiceReplyDto: {
+      message: string;
+    };
+    ServiceCancelDto: {
+      reason?: string | null;
+    };
+    AdminServiceListDto_Output: {
+      items: {
+        id: string;
+        reference: string;
+        /** @enum {string} */
+        kind: "VISA" | "FLIGHT";
+        /** @enum {string} */
+        status:
+          | "SUBMITTED"
+          | "NEEDS_INFO"
+          | "QUOTED"
+          | "PAID"
+          | "IN_PROGRESS"
+          | "COMPLETED"
+          | "REJECTED"
+          | "CANCELLED";
+        title: string;
+        travellers: number;
+        quote: components["schemas"]["Money_Output"] | null;
+        /** Format: date-time */
+        createdAt: string;
+        /** Format: date-time */
+        updatedAt: string;
+        customerName: string;
+        contactPhone: string;
+      }[];
+      nextCursor: string | null;
+    };
+    AdminServiceRequestDto_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      kind: "VISA" | "FLIGHT";
+      /** @enum {string} */
+      status:
+        | "SUBMITTED"
+        | "NEEDS_INFO"
+        | "QUOTED"
+        | "PAID"
+        | "IN_PROGRESS"
+        | "COMPLETED"
+        | "REJECTED"
+        | "CANCELLED";
+      title: string;
+      travellers: number;
+      quote: components["schemas"]["Money_Output"] | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      visa: {
+        /** Format: date */
+        travelDate: string;
+        /** @enum {string} */
+        purpose: "TOURISM" | "BUSINESS" | "FAMILY" | "STUDY" | "MEDICAL" | "OTHER";
+        /** @default BD */
+        nationality: string;
+      } | null;
+      flight: {
+        /** @enum {string} */
+        tripType: "ONE_WAY" | "ROUND_TRIP";
+        from: string;
+        to: string;
+        /** Format: date */
+        departDate: string;
+        returnDate: string | null;
+        adults: number;
+        children: number;
+        infants: number;
+        /** @enum {string} */
+        cabin: "ECONOMY" | "PREMIUM_ECONOMY" | "BUSINESS" | "FIRST";
+        preferredAirline: string | null;
+      } | null;
+      visaProduct: {
+        slug: string;
+        country: string;
+        visaType: string;
+        requirements: string[];
+      } | null;
+      contactName: string;
+      contactEmail: string;
+      contactPhone: string;
+      note: string | null;
+      quoteNote: string | null;
+      quotedAt: string | null;
+      paidAt: string | null;
+      events: components["schemas"]["ServiceEvent_Output"][];
+      documents: components["schemas"]["ServiceDocument_Output"][];
+      documentsPurged: boolean;
+      uploadsEnabled: boolean;
+      canCancel: boolean;
+      canReply: boolean;
+      canUpload: boolean;
+      customer: {
+        id: string;
+        name: string;
+        email: string;
+      };
+      paidOffline: string | null;
+      staffEvents: {
+        /** Format: date-time */
+        at: string;
+        /** @enum {string} */
+        actor: "CUSTOMER" | "STAFF" | "SYSTEM";
+        toStatus:
+          | (
+              | "SUBMITTED"
+              | "NEEDS_INFO"
+              | "QUOTED"
+              | "PAID"
+              | "IN_PROGRESS"
+              | "COMPLETED"
+              | "REJECTED"
+              | "CANCELLED"
+            )
+          | null;
+        message: string | null;
+        actorName: string | null;
+        internal: boolean;
+        fromStatus:
+          | (
+              | "SUBMITTED"
+              | "NEEDS_INFO"
+              | "QUOTED"
+              | "PAID"
+              | "IN_PROGRESS"
+              | "COMPLETED"
+              | "REJECTED"
+              | "CANCELLED"
+            )
+          | null;
+      }[];
+    };
+    ServiceActionDto: {
+      /** @enum {string} */
+      action:
+        | "NEEDS_INFO"
+        | "QUOTE"
+        | "MARK_PAID"
+        | "START"
+        | "COMPLETE"
+        | "REJECT"
+        | "CANCEL"
+        | "NOTE";
+      /** @enum {string} */
+      expectedStatus:
+        | "SUBMITTED"
+        | "NEEDS_INFO"
+        | "QUOTED"
+        | "PAID"
+        | "IN_PROGRESS"
+        | "COMPLETED"
+        | "REJECTED"
+        | "CANCELLED";
+      message?: string | null;
+      amount?: components["schemas"]["Money"];
+      paymentReference?: string | null;
+      internal?: boolean;
+    };
+    AdminVisaProduct_Output: {
+      id: string;
+      slug: string;
+      country: string;
+      countryBn: string | null;
+      visaType: string;
+      summary: string;
+      processingTime: string;
+      validity: string | null;
+      fee: components["schemas"]["Money_Output"];
+      requirements: string[];
+      notes: string | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      sortOrder: number;
+      hero: {
+        key: string;
+        url: string;
+        alt: string;
+      } | null;
+      openRequests: number;
+    };
+    AdminVisaProductListDto_Output: {
+      items: components["schemas"]["AdminVisaProduct_Output"][];
+    };
+    CreateVisaProductDto: {
+      country: string;
+      countryBn?: string | null;
+      visaType: string;
+      summary: string;
+      processingTime: string;
+      validity?: string | null;
+      fee: components["schemas"]["Money"];
+      requirements: string[];
+      notes?: string | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      /** @default 0 */
+      sortOrder: number;
+      heroMedia?: string | null;
+      slug: string;
+    };
+    VisaProductInputDto: {
+      country: string;
+      countryBn?: string | null;
+      visaType: string;
+      summary: string;
+      processingTime: string;
+      validity?: string | null;
+      fee: components["schemas"]["Money"];
+      requirements: string[];
+      notes?: string | null;
+      /** @enum {string} */
+      status: "DRAFT" | "PUBLISHED" | "SUSPENDED";
+      /** @default 0 */
+      sortOrder: number;
+      heroMedia?: string | null;
     };
   };
   responses: never;
@@ -7665,6 +8352,426 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  PublicVisasController_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisaProductListDto_Output"];
+        };
+      };
+    };
+  };
+  PublicVisasController_one: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisaProductDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_list: {
+    parameters: {
+      query?: {
+        cursor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestListDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_visa: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateVisaRequestDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_flight: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateFlightRequestDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_one: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_reply: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ServiceReplyDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_cancel: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ServiceCancelDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_upload: {
+    parameters: {
+      query: {
+        label: string;
+        name: string;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/octet-stream": string;
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceRequestDetailDto_Output"];
+        };
+      };
+    };
+  };
+  MyRequestsController_download: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        doc: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminRequestsController_list: {
+    parameters: {
+      query?: {
+        kind?: "VISA" | "FLIGHT";
+        status?:
+          | "SUBMITTED"
+          | "NEEDS_INFO"
+          | "QUOTED"
+          | "PAID"
+          | "IN_PROGRESS"
+          | "COMPLETED"
+          | "REJECTED"
+          | "CANCELLED";
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminServiceListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_one: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminServiceRequestDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_act: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ServiceActionDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminServiceRequestDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_upload: {
+    parameters: {
+      query: {
+        label: string;
+        name: string;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/octet-stream": string;
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminServiceRequestDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_download: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        doc: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminRequestsController_visaProducts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminVisaProductListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_createVisa: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateVisaProductDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminVisaProductListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminRequestsController_updateVisa: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VisaProductInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminVisaProductListDto_Output"];
+        };
       };
     };
   };

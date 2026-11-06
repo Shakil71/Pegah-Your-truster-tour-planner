@@ -17,3 +17,4 @@ export * from "./media";
 export * from "./home";
 export * from "./commerce";
 export * from "./legacy";
+export * from "./services";

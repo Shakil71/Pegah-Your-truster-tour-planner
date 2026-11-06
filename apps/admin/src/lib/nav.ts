@@ -53,6 +53,18 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     ],
   },
   {
+    title: "Services",
+    items: [
+      {
+        href: "/requests",
+        label: "Visa and flight requests",
+        icon: "ticket",
+        permission: "service:manage",
+      },
+      { href: "/visa-products", label: "Visa services", icon: "doc", permission: "catalog:read" },
+    ],
+  },
+  {
     title: "Growth",
     items: [
       { href: "/orders", label: "Orders", icon: "bag", permission: "payment:read" },

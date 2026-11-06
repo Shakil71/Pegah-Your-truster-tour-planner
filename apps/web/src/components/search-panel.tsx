@@ -3,6 +3,7 @@
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { dhakaDate } from "@pegah/shared";
@@ -134,16 +135,10 @@ export function SearchPanel() {
           <Tabs.Trigger value="flights" className={tabClass}>
             <Icon name="plane" />
             {t("flights")}
-            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
-              {t("soon")}
-            </small>
           </Tabs.Trigger>
           <Tabs.Trigger value="visa" className={tabClass}>
             <Icon name="doc" />
             {t("visa")}
-            <small className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-thread-ink">
-              {t("soon")}
-            </small>
           </Tabs.Trigger>
         </Tabs.List>
 
@@ -326,10 +321,66 @@ export function SearchPanel() {
         </Tabs.Content>
 
         <Tabs.Content value="flights">
-          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">{t("flightsSoon")}</p>
+          <form
+            action="/flights"
+            method="get"
+            className="grid gap-3 border-t border-rule px-6 pb-6 pt-5 md:grid-cols-[1fr_1fr_200px_auto] md:items-end"
+          >
+            <label className="grid gap-1 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-ink-3">
+              {t("flightFrom")}
+              <input
+                name="from"
+                defaultValue="Dhaka (DAC)"
+                list="pg-air"
+                className="h-12 rounded-[12px] border border-rule bg-card px-3 text-[1rem] font-medium normal-case tracking-normal text-ink"
+              />
+            </label>
+            <label className="grid gap-1 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-ink-3">
+              {t("flightTo")}
+              <input
+                name="to"
+                list="pg-air"
+                placeholder="Cox's Bazar (CXB)"
+                className="h-12 rounded-[12px] border border-rule bg-card px-3 text-[1rem] font-medium normal-case tracking-normal text-ink"
+              />
+            </label>
+            <label className="grid gap-1 text-[0.72rem] font-bold uppercase tracking-[0.1em] text-ink-3">
+              {t("flightDate")}
+              <input
+                name="date"
+                type="date"
+                className="h-12 rounded-[12px] border border-rule bg-card px-3 text-[1rem] font-medium normal-case tracking-normal text-ink"
+              />
+            </label>
+            <button type="submit" className={buttonClass("primary", "lg", "h-12")}>
+              {t("flightCta")} <Icon name="arrowRight" />
+            </button>
+            <datalist id="pg-air">
+              {[
+                "Dhaka (DAC)",
+                "Chattogram (CGP)",
+                "Cox's Bazar (CXB)",
+                "Sylhet (ZYL)",
+                "Jashore (JSR)",
+                "Saidpur (SPD)",
+                "Bangkok (BKK)",
+                "Kolkata (CCU)",
+                "Kuala Lumpur (KUL)",
+                "Dubai (DXB)",
+              ].map((a) => (
+                <option key={a} value={a} />
+              ))}
+            </datalist>
+            <p className="m-0 text-[0.84rem] text-ink-2 md:col-span-4">{t("flightsSoon")}</p>
+          </form>
         </Tabs.Content>
         <Tabs.Content value="visa">
-          <p className="m-0 border-t border-rule px-6 pb-6 pt-5 text-ink-2">{t("visaSoon")}</p>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-rule px-6 pb-6 pt-5">
+            <p className="m-0 max-w-[60ch] text-ink-2">{t("visaSoon")}</p>
+            <Link href="/visa" className={buttonClass("primary", "lg", "h-12 no-underline")}>
+              {t("visaCta")} <Icon name="arrowRight" />
+            </Link>
+          </div>
         </Tabs.Content>
 
         <datalist id="pg-places">

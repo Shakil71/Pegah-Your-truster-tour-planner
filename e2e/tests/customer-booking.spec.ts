@@ -104,7 +104,13 @@ test("a gift card pays for a held tour and confirms it", async ({ page }) => {
   const code = stack.giftCardCode.toLowerCase().match(/.{4}/g)!.join("-");
   await page.getByLabel("Gift card code").fill(code);
   await page.getByRole("button", { name: "Apply" }).click();
-  await expect(page.getByText("Your gift card covered the full amount.")).toBeVisible();
+  // The success note is replaced as soon as the page refreshes into the confirmed state.
+  await expect(
+    page
+      .getByText("Your gift card covered the full amount.")
+      .or(page.getByText("Paid in full by gift card"))
+      .first(),
+  ).toBeVisible();
   await expect(page.getByText("Confirmed", { exact: true }).first()).toBeVisible();
   await expect(page.getByText(/Gift card ••/).first()).toBeVisible();
 });

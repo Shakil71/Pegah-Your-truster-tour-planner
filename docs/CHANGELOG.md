@@ -4,6 +4,20 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Visa services and flight requests (2026-11-06)
+
+- `/visa`: visas Pegah handles, with processing time, starting price and
+  the documents needed; customers apply online. `/flights`: request a price
+  for domestic or international tickets. The home page Flights and Visa tabs
+  are live.
+- My account → Visa & flights: status timeline, price, messages with the
+  team, secure document upload (encrypted, deleted 90 days after closing)
+  and cancellation before payment.
+- Console → Services: request queue with filters and search, one-step
+  actions (ask customer, send price, record payment, start, complete,
+  reject, cancel, notes incl. internal), staff document upload; visa
+  catalogue editor. Customer and staff emails for every step (ADR-0039).
+
 ### Added — Photo galleries, facilities and full details (2026-11-06)
 
 - Hotel pages show a photo gallery with a full-screen viewer, facilities by

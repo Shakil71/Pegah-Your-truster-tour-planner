@@ -14,8 +14,8 @@ const columns: { title: string; links: { key: string; href: string | null }[] }[
       { key: "destinations", href: "/#explore" },
       { key: "offers", href: "/offers" },
       { key: "giftCards", href: "/gift-cards" },
-      { key: "flightsSoon", href: null },
-      { key: "visaSoon", href: null },
+      { key: "flightsSoon", href: "/flights" },
+      { key: "visaSoon", href: "/visa" },
     ],
   },
   {

@@ -218,6 +218,15 @@ in `/opt/pegah/shared/env/api.env` lets the owner save payment and email
 passwords in the console. Keep a copy in the owner's password manager:
 without it, saved passwords must be entered again. Never commit it.
 
+### Document key and upload size (ADR-0039)
+
+- `DOCUMENT_ENCRYPTION_KEY` (32 random bytes, base64: `openssl rand -base64 32`)
+  in `/opt/pegah/shared/env/api.env` switches on visa/ticket document
+  uploads. Keep a copy in the owner's password manager: without it, stored
+  documents cannot be opened. Optional: `DOCUMENT_RETENTION_DAYS` (default 90).
+- Copy the updated `infra/nginx/pegah.conf` (6 MB only on the document
+  upload routes), then `sudo nginx -t && sudo systemctl reload nginx`.
+
 ### Worker, Redis and monitoring (ADR-0027) — run once
 
 See `docs/operations/MONITORING.md`: `enable-worker-redis.sh`, then

@@ -3,17 +3,18 @@ import { useTranslations } from "next-intl";
 import { cx } from "@pegah/ui";
 
 /** Account sub-navigation shared by My trips and Profile. */
-export function AccountTabs({ active }: { active: "trips" | "orders" | "profile" }) {
+export function AccountTabs({ active }: { active: "trips" | "orders" | "requests" | "profile" }) {
   const t = useTranslations("account");
   const tabs = [
     { key: "trips", href: "/account/bookings", label: t("myTrips") },
     { key: "orders", href: "/account/orders", label: t("ordersTab") },
+    { key: "requests", href: "/account/requests", label: t("requestsTab") },
     { key: "profile", href: "/account/profile", label: t("profileTab") },
   ] as const;
   return (
     <nav
       aria-label={t("label")}
-      className="flex gap-1 rounded-full border border-rule bg-card p-1 sm:w-fit"
+      className="flex flex-wrap gap-1 rounded-[22px] border border-rule bg-card p-1 sm:w-fit"
     >
       {tabs.map((tab) => (
         <Link
