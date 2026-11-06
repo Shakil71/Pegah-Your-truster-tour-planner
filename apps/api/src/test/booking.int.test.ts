@@ -489,7 +489,7 @@ describe.skipIf(!ADMIN_URL)("booking engine against MySQL 8.4", () => {
         where: { roomId: ids.lastRoomDbId },
         data: { held: { increment: 5 } },
       }),
-    ).rejects.toThrow(/3819|check constraint/i);
+    ).rejects.toThrow(/3819|4025|check constraint|CONSTRAINT `[a-z_]+` failed/i);
   });
 
   it("serves the staff dashboard, staff management and audit log from MySQL", async () => {
