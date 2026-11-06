@@ -78,10 +78,7 @@ export function HeroSlideshow({ slides: fromConsole }: { slides?: HeroSlide[] })
 
       <div className="absolute inset-x-0 top-[120px] z-[2] px-[max(16px,env(safe-area-inset-left,0px))] md:top-auto md:bottom-[150px]">
         <div className="mx-auto max-w-[1280px]">
-          <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary">
-            {t("eyebrow")}
-          </p>
-          <h1 className="mt-3.5 max-w-[12ch] font-display text-[clamp(2.9rem,7.4vw,6.6rem)] font-medium leading-[0.95] tracking-[-0.03em] [text-shadow:0_2px_30px_rgb(0_0_0/0.25)]">
+          <h1 className="max-w-[12ch] font-display text-[clamp(2.9rem,7.4vw,6.6rem)] font-medium leading-[0.95] tracking-[-0.03em] [text-shadow:0_2px_30px_rgb(0_0_0/0.25)]">
             {t.rich("title", { em: (chunks) => <em className="text-primary">{chunks}</em> })}
           </h1>
           <p className="mt-[18px] max-w-[40ch] text-[1.1rem] text-white/90">{t("intro")}</p>
