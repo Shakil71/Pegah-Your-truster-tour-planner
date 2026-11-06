@@ -146,8 +146,8 @@ events sent, documents purged.
 - App shows "Incomplete response" / 503: open `~/pegah/<app>/stderr.log` (the
   Node.js app writes it there) and send the last lines to Claude (remove any
   passwords first).
-- `argon2` or `sharp` fails to load: in the API's virtual environment run
-  `cd ~/pegah/api && npm rebuild argon2 sharp`.
+- A native module fails with `GLIBC_2.xx not found`: the bundle check in CI
+  allows nothing newer than glibc 2.28 (CloudLinux 8); report the module name.
 - `/admin` shows the website's 404: the Console app's URL must be exactly
   `pegah.com.bd/admin`.
 - Uploads over 1–2 MB fail: ask the host for a higher request body limit, or

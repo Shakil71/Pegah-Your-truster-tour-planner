@@ -28,4 +28,19 @@ describe("PasswordService with old-website hashes (ADR-0038)", () => {
     expect(await svc.verify("!legacy-no-password", "")).toBe(false);
     expect(await svc.verify("!legacy-no-password", "!legacy-no-password")).toBe(false);
   });
+
+  it("still verifies hashes made by the previous library (node-argon2)", async () => {
+    // Created with node-argon2 0.45 (argon2id, m=19456, t=2, p=1) before the switch.
+    const old =
+      "$argon2id$v=19$m=19456,p=1,t=2$ANtecTOtr8aJq/OUNvmUXg$YrmwMmWfdnpPAZldL31GAdNX+j2IOgLlb3ECy2UesUk";
+    expect(await svc.verify(old, "legacy-node-argon2-pass")).toBe(true);
+    expect(await svc.verify(old, "wrong")).toBe(false);
+    const prod = new PasswordService({
+      ARGON2_MEMORY_KIB: 19456,
+      ARGON2_TIME_COST: 2,
+      ARGON2_PARALLELISM: 1,
+    } as AppConfig);
+    expect(prod.needsRehash(old)).toBe(false);
+    expect(svc.needsRehash(old)).toBe(true); // different costs → upgraded at next sign-in
+  });
 });
