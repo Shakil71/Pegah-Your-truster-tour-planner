@@ -1,13 +1,18 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { buttonClass } from "@pegah/ui";
+import type { Locale } from "@/i18n/locales";
 import { ensure, serverApi } from "@/lib/api-server";
 import { dhakaDateTime, money } from "@/lib/format";
 import { DepartureControls } from "./departure-controls";
 
 export default async function PartnerOverview() {
+  const t = await getTranslations("partner");
+  const locale = (await getLocale()) as Locale;
   const api = await serverApi();
   const o = ensure(await api.GET("/api/v1/partner/overview"));
   const session = ensure(await api.GET("/api/v1/partner/auth/session"));
+  const pct = (o.partner.commissionBps / 100).toFixed(o.partner.commissionBps % 100 ? 2 : 0);
 
   return (
     <div className="grid gap-6">
@@ -16,7 +21,7 @@ export default async function PartnerOverview() {
           {o.partner.name}
         </p>
         <h1 className="mt-1 font-display text-[clamp(1.9rem,3vw,2.5rem)] font-medium leading-tight">
-          Overview
+          {t("nav.overview")}
         </h1>
       </div>
 
@@ -24,9 +29,9 @@ export default async function PartnerOverview() {
         <>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              ["Bookings, last 30 days", String(o.agent.bookings30d)],
-              ["Commission earned", money(o.agent.commissionEarned)],
-              ["Commission pending payment", money(o.agent.commissionPending)],
+              [t("overview.bookings30d"), String(o.agent.bookings30d)],
+              [t("overview.earned"), money(o.agent.commissionEarned)],
+              [t("overview.pending"), money(o.agent.commissionPending)],
             ].map(([label, value]) => (
               <div key={label} className="panel p-4">
                 <p className="text-[0.78rem] font-semibold text-ink-2">{label}</p>
@@ -35,19 +40,16 @@ export default async function PartnerOverview() {
             ))}
           </div>
           <section className="panel p-5 md:p-6">
-            <h2 className="text-[1rem] font-semibold">Book for a client</h2>
+            <h2 className="text-[1rem] font-semibold">{t("overview.bookTitle")}</h2>
             <p className="mt-1 text-[0.9rem] text-ink-2">
-              Find a stay or tour, then choose <b>Book for a client</b> on its page. You earn{" "}
-              {(o.partner.commissionBps / 100).toFixed(o.partner.commissionBps % 100 ? 2 : 0)}%
-              commission on the total once the booking is confirmed. The client receives the booking
-              emails.
+              {t.rich("overview.bookIntro", { pct, b: (c) => <b>{c}</b> })}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link href="/stays" className={buttonClass("primary", "md", "no-underline")}>
-                Find stays
+                {t("nav.findStays")}
               </Link>
               <Link href="/tours" className={buttonClass("outline", "md", "no-underline")}>
-                Find tours
+                {t("nav.findTours")}
               </Link>
             </div>
           </section>
@@ -58,7 +60,7 @@ export default async function PartnerOverview() {
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="panel p-4">
-              <p className="text-[0.78rem] font-semibold text-ink-2">Upcoming reservations</p>
+              <p className="text-[0.78rem] font-semibold text-ink-2">{t("overview.upcoming")}</p>
               <p className="tabular mt-1 font-display text-[1.7rem] font-medium">
                 {o.supplier.upcomingReservations}
               </p>
@@ -66,12 +68,12 @@ export default async function PartnerOverview() {
                 href="/partner/reservations"
                 className="text-[0.84rem] font-semibold text-primary-ink"
               >
-                See reservations →
+                {t("overview.seeReservations")}
               </Link>
             </div>
             <div className="panel p-4">
               <p className="text-[0.78rem] font-semibold text-ink-2">
-                Confirmed value, last 30 days
+                {t("overview.confirmed30d")}
               </p>
               <p className="tabular mt-1 font-display text-[1.7rem] font-medium">
                 {money(o.supplier.confirmedValue30d)}
@@ -80,16 +82,14 @@ export default async function PartnerOverview() {
           </div>
 
           {o.supplier.hotels.length === 0 && o.supplier.tours.length === 0 && (
-            <p className="panel p-6 text-ink-2">
-              No hotels or tours are assigned to you yet. The Pegah team will add them.
-            </p>
+            <p className="panel p-6 text-ink-2">{t("overview.nothingAssigned")}</p>
           )}
 
           {o.supplier.hotels.map((h) => (
             <section key={h.slug} className="panel p-5 md:p-6">
               <h2 className="text-[1.05rem] font-semibold">{h.name}</h2>
               <p className="text-[0.8rem] text-ink-3">
-                {h.status === "PUBLISHED" ? "Live on Pegah" : "Not live yet"}
+                {h.status === "PUBLISHED" ? t("overview.live") : t("overview.notLive")}
               </p>
               <ul className="mt-3 grid gap-2">
                 {h.rooms.map((r) => (
@@ -99,13 +99,13 @@ export default async function PartnerOverview() {
                   >
                     <span className={r.isActive ? "" : "text-ink-3"}>
                       {r.name}
-                      {!r.isActive && " (not on sale)"}
+                      {!r.isActive && ` ${t("overview.notOnSale")}`}
                     </span>
                     <Link
                       href={`/partner/rooms/${r.id}`}
                       className={buttonClass("ink", "sm", "no-underline")}
                     >
-                      Rooms and rates
+                      {t("overview.roomsRates")}
                     </Link>
                   </li>
                 ))}
@@ -113,26 +113,28 @@ export default async function PartnerOverview() {
             </section>
           ))}
 
-          {o.supplier.tours.map((t) => (
-            <section key={t.slug} className="panel p-5 md:p-6">
-              <h2 className="text-[1.05rem] font-semibold">{t.title}</h2>
-              <p className="text-[0.8rem] text-ink-3">Upcoming departures (Dhaka time)</p>
-              {t.departures.length === 0 ? (
-                <p className="mt-3 text-[0.9rem] text-ink-2">
-                  No upcoming departures. Ask the Pegah team to add dates.
-                </p>
+          {o.supplier.tours.map((tour) => (
+            <section key={tour.slug} className="panel p-5 md:p-6">
+              <h2 className="text-[1.05rem] font-semibold">{tour.title}</h2>
+              <p className="text-[0.8rem] text-ink-3">{t("overview.departures")}</p>
+              {tour.departures.length === 0 ? (
+                <p className="mt-3 text-[0.9rem] text-ink-2">{t("overview.noDepartures")}</p>
               ) : (
                 <ul className="mt-3 grid gap-2">
-                  {t.departures.map((d) => (
+                  {tour.departures.map((d) => (
                     <li
                       key={d.id}
                       className="grid gap-2 rounded-[12px] border border-rule px-4 py-3 md:grid-cols-[minmax(0,1fr)_auto]"
                     >
                       <span>
-                        <b>{dhakaDateTime(d.departsAt)}</b>
+                        <b>{dhakaDateTime(d.departsAt, locale)}</b>
                         <span className="block text-[0.82rem] text-ink-2">
-                          {d.sold} sold · {d.held} held · {d.capacity} seats · {money(d.priceAdult)}{" "}
-                          adult
+                          {t("overview.departureLine", {
+                            sold: d.sold,
+                            held: d.held,
+                            capacity: d.capacity,
+                            price: money(d.priceAdult),
+                          })}
                         </span>
                       </span>
                       <DepartureControls departure={d} csrfToken={session.csrfToken} />

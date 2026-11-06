@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { Logo, ThemeToggle, cx } from "@pegah/ui";
+import { LanguageSwitch } from "@/components/language-switch";
 import { browserApi, csrf } from "@/lib/api-browser";
 
 export function PartnerShell({
@@ -19,22 +21,24 @@ export function PartnerShell({
   csrfToken: string;
   children: ReactNode;
 }) {
+  const t = useTranslations("partner");
+  const th = useTranslations("header");
   const path = usePathname();
   const router = useRouter();
   const nav =
     kind === "SUPPLIER"
       ? [
-          { href: "/partner", label: "Overview" },
-          { href: "/partner/reservations", label: "Reservations" },
-          { href: "/partner/account", label: "Account" },
+          { href: "/partner", label: t("nav.overview") },
+          { href: "/partner/reservations", label: t("nav.reservations") },
+          { href: "/partner/account", label: t("nav.account") },
         ]
       : [
-          { href: "/partner", label: "Overview" },
-          { href: "/stays", label: "Find stays" },
-          { href: "/tours", label: "Find tours" },
-          { href: "/partner/bookings", label: "Client bookings" },
-          { href: "/partner/statement", label: "Statement" },
-          { href: "/partner/account", label: "Account" },
+          { href: "/partner", label: t("nav.overview") },
+          { href: "/stays", label: t("nav.findStays") },
+          { href: "/tours", label: t("nav.findTours") },
+          { href: "/partner/bookings", label: t("nav.clientBookings") },
+          { href: "/partner/statement", label: t("nav.statement") },
+          { href: "/partner/account", label: t("nav.account") },
         ];
 
   async function signOut() {
@@ -50,10 +54,10 @@ export function PartnerShell({
           <Link href="/partner" className="flex items-center gap-3 no-underline">
             <Logo tone="light" className="h-10" />
             <span className="rounded-full border border-white/20 px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/75">
-              {kind === "SUPPLIER" ? "Supplier" : "Agent"}
+              {t(`kind.${kind}`)}
             </span>
           </Link>
-          <nav aria-label="Partner" className="flex flex-1 flex-wrap gap-1">
+          <nav aria-label={t("navLabel")} className="flex flex-1 flex-wrap gap-1">
             {nav.map((n) => {
               const active = n.href === "/partner" ? path === "/partner" : path.startsWith(n.href);
               return (
@@ -74,13 +78,17 @@ export function PartnerShell({
           <span className="text-[0.8rem] text-white/70">
             {userName} · {partnerName}
           </span>
-          <ThemeToggle className="size-8 hover:bg-white/15" />
+          <LanguageSwitch className="text-[0.8rem]" />
+          <ThemeToggle
+            className="size-8 hover:bg-white/15"
+            labels={{ toDark: th("toDark"), toLight: th("toLight") }}
+          />
           <button
             type="button"
             onClick={signOut}
             className="rounded-full border border-white/30 px-3 py-1 text-[0.8rem] font-semibold hover:bg-white hover:text-night"
           >
-            Sign out
+            {t("signOut")}
           </button>
         </div>
       </header>

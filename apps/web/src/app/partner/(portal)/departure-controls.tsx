@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
@@ -15,6 +16,7 @@ export function DepartureControls({
   departure: Departure;
   csrfToken: string;
 }) {
+  const t = useTranslations("partner");
   const router = useRouter();
   const [capacity, setCapacity] = useState(String(d.capacity));
   const [busy, setBusy] = useState(false);
@@ -40,7 +42,7 @@ export function DepartureControls({
     <div className="grid gap-1">
       <div className="flex flex-wrap items-center gap-2">
         <label className="sr-only" htmlFor={`cap-${d.id}`}>
-          Seats
+          {t("departure.seats")}
         </label>
         <input
           id={`cap-${d.id}`}
@@ -48,7 +50,7 @@ export function DepartureControls({
           min={d.held + d.sold}
           value={capacity}
           onChange={(e) => setCapacity(e.target.value)}
-          className="h-9 w-20 rounded-control border border-rule px-2"
+          className="h-9 w-20 rounded-control border border-rule bg-card px-2"
         />
         <button
           type="button"
@@ -56,7 +58,7 @@ export function DepartureControls({
           onClick={() => patch({ capacity: Number(capacity) })}
           className="h-9 rounded-control bg-ink px-3 text-[0.8rem] font-semibold text-card"
         >
-          Save seats
+          {t("departure.save")}
         </button>
         {d.status === "SCHEDULED" ? (
           <button
@@ -65,7 +67,7 @@ export function DepartureControls({
             onClick={() => patch({ status: "CLOSED" })}
             className="h-9 rounded-control border border-rule px-3 text-[0.8rem] font-semibold"
           >
-            Close sales
+            {t("departure.close")}
           </button>
         ) : d.status === "CLOSED" ? (
           <button
@@ -74,10 +76,10 @@ export function DepartureControls({
             onClick={() => patch({ status: "SCHEDULED" })}
             className="h-9 rounded-control border border-rule px-3 text-[0.8rem] font-semibold"
           >
-            Reopen
+            {t("departure.reopen")}
           </button>
         ) : (
-          <span className="text-[0.8rem] text-critical">Cancelled</span>
+          <span className="text-[0.8rem] text-critical">{t("departure.cancelled")}</span>
         )}
       </div>
       {error && <p className="text-[0.78rem] text-critical">{error}</p>}

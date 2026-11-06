@@ -69,5 +69,5 @@ Status per item: ✅ done (built, tested, documented) · 🔶 partly done ·
 - ✅ Playwright end-to-end + axe accessibility checks in CI (deploys require them).
 - ✅ Worker process and Redis rate limits (ADR-0027); owner runs `enable-worker-redis.sh` once.
 - ✅ Monitoring: Prometheus, node_exporter, Grafana dashboard and alert rules (owner runs `enable-monitoring.sh`). ⬜ Loki (with a second server), alert notifications (need a destination), backup restore drill.
-- ✅ Bangla on the customer website (ADR-0028). ✅ Bangla emails (ADR-0036). ⬜ Bangla partner portal.
+- ✅ Bangla on the customer website (ADR-0028). ✅ Bangla emails (ADR-0036) and partner portal.
 - ⬜ Staging instance; remove demo data before launch.

@@ -671,3 +671,9 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   `lang="bn"` and a Bengali font fallback. Unit tests check that every Bangla
   email is fully Bangla and that the honesty rules ("not confirmed until
   payment") hold in both languages.
+
+### ADR-0028 update (2026-11-06)
+
+The partner portal now uses the same next-intl messages (`partner`
+namespace) and language cookie as the customer website; the translation
+guard test no longer skips `app/partner`. The console (staff) stays English.

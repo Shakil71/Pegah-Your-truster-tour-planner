@@ -658,5 +658,159 @@
     "resend": "Send the link again",
     "sending": "Sending…",
     "sent": "Link sent"
+  },
+  "partner": {
+    "portal": "Partner portal",
+    "brandTemplate": "{page} · Pegah partners",
+    "kind": {
+      "SUPPLIER": "Supplier",
+      "AGENT": "Agent"
+    },
+    "navLabel": "Partner",
+    "nav": {
+      "overview": "Overview",
+      "reservations": "Reservations",
+      "account": "Account",
+      "findStays": "Find stays",
+      "findTours": "Find tours",
+      "clientBookings": "Client bookings",
+      "statement": "Statement"
+    },
+    "signOut": "Sign out",
+    "login": {
+      "title": "Sign in",
+      "metaTitle": "Partner sign in",
+      "intro": "For hotels, tour operators and travel agents working with Pegah. Accounts are created by the Pegah team.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "tooMany": "Too many attempts. Wait a minute.",
+      "failed": "Sign-in failed."
+    },
+    "account": {
+      "you": "You",
+      "company": "Company",
+      "agentCommission": "Agent · {pct}% commission",
+      "contact": "To change company details or add colleagues, contact the Pegah team."
+    },
+    "reservations": {
+      "intro": "Guests booked at your properties and on your tours. Only confirmed bookings are guaranteed; held ones may still expire.",
+      "older": "Older reservations →"
+    },
+    "bookings": {
+      "intro": "Commission is earned once a booking is confirmed (paid).",
+      "bookStay": "Book a stay",
+      "bookTour": "Book a tour",
+      "older": "Older bookings →"
+    },
+    "table": {
+      "empty": "Nothing here yet.",
+      "reference": "Reference",
+      "guest": "Guest",
+      "what": "What",
+      "dates": "Dates",
+      "booked": "Booked",
+      "status": "Status",
+      "total": "Total",
+      "commission": "Commission",
+      "guests": "{count, plural, one {# guest} other {# guests}}"
+    },
+    "overview": {
+      "bookings30d": "Bookings, last 30 days",
+      "earned": "Commission earned",
+      "pending": "Commission pending payment",
+      "bookTitle": "Book for a client",
+      "bookIntro": "Find a stay or tour, then choose <b>Book for a client</b> on its page. You earn {pct}% commission on the total once the booking is confirmed. The client receives the booking emails.",
+      "upcoming": "Upcoming reservations",
+      "seeReservations": "See reservations →",
+      "confirmed30d": "Confirmed value, last 30 days",
+      "nothingAssigned": "No hotels or tours are assigned to you yet. The Pegah team will add them.",
+      "live": "Live on Pegah",
+      "notLive": "Not live yet",
+      "notOnSale": "(not on sale)",
+      "roomsRates": "Rooms and rates",
+      "departures": "Upcoming departures (Dhaka time)",
+      "noDepartures": "No upcoming departures. Ask the Pegah team to add dates.",
+      "departureLine": "{sold} sold · {held} held · {capacity} seats · {price} adult"
+    },
+    "departure": {
+      "seats": "Seats",
+      "save": "Save seats",
+      "close": "Close sales",
+      "reopen": "Reopen",
+      "cancelled": "Cancelled"
+    },
+    "statement": {
+      "eyebrow": "Commission statement",
+      "previous": "← Previous",
+      "next": "Next →",
+      "bookingsMade": "Bookings made",
+      "confirmedValue": "Confirmed value",
+      "earned": "Commission earned",
+      "empty": "No bookings in this month.",
+      "footnote": "Months follow Bangladesh time. Commission counts only confirmed or completed bookings; cancelled and refunded bookings earn nothing. Payouts are settled with the Pegah team."
+    },
+    "room": {
+      "metaTitle": "Rooms and rates",
+      "intro": "Rooms on sale and the nightly rate per date. Held means a guest is in the 15-minute checkout; sold means confirmed.",
+      "earlier": "Earlier",
+      "today": "Today",
+      "later": "Later",
+      "committed": "Room-nights held or sold",
+      "occupancy": "Occupancy in view",
+      "calendar": "Calendar",
+      "off": "Off",
+      "noRate": "No rate",
+      "dayNotOnSale": "{date}: not on sale",
+      "dayFree": "{date}: {left} of {total} free, {held} held, {sold} sold",
+      "dayRate": "{label}, {rate}",
+      "dayNoRate": "{label}, no rate"
+    },
+    "editor": {
+      "title": "Change a date range",
+      "from": "From",
+      "to": "To (inclusive)",
+      "weekdays": "On these weekdays",
+      "tip": "Tip: Thu + Fri only for a weekend rate.",
+      "rooms": "Rooms on sale per night",
+      "keep": "Leave empty to keep",
+      "roomsHint": "Cannot go below rooms already held or sold. 0 stops sales.",
+      "rate": "Nightly rate (৳, per room)",
+      "rateHint": "Before service charge and VAT. Existing bookings keep their price.",
+      "apply": "Apply to dates",
+      "applying": "Applying…",
+      "badRate": "Enter the rate in taka, e.g. 6500 or 6500.50.",
+      "nothing": "Set rooms on sale, a rate, or both.",
+      "noDay": "Pick at least one weekday.",
+      "updated": "{count} dates updated. The website shows them within a minute."
+    },
+    "booking": {
+      "metaTitle": "Client booking",
+      "held": "<b>Held for your client.</b> It is not confirmed until payment is completed.",
+      "paid": "Payment received. The booking is confirmed.",
+      "failed": "The payment did not complete. You can try again while the hold lasts.",
+      "waiting": "Waiting for the payment provider to confirm. Refresh in a minute.",
+      "reference": "Reference {ref}",
+      "trip": "Trip",
+      "checkIn": "Check-in",
+      "departs": "Departs",
+      "checkOut": "Check-out",
+      "returns": "Returns",
+      "clientTravellers": "Client and travellers",
+      "lead": "(lead)",
+      "adult": "adult",
+      "child": "child",
+      "price": "Price",
+      "base": "Base",
+      "discount": "Discount",
+      "serviceCharge": "Service charge",
+      "vat": "VAT",
+      "total": "Total",
+      "commission": "Your commission",
+      "earned": "Earned. It appears on your monthly statement.",
+      "earnedOnce": "Earned once confirmed.",
+      "history": "History"
+    }
   }
 }

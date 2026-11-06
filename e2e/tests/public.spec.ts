@@ -61,3 +61,12 @@ test("the site switches to Bangla and stays accessible @mobile", async ({ page }
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
+
+test("the partner portal sign-in works in Bangla @mobile", async ({ page }) => {
+  await page.goto("/partner/login");
+  await page.getByRole("button", { name: "বাংলা" }).click();
+  await expect(page.getByRole("heading", { name: "সাইন ইন" })).toBeVisible();
+  await expect(page.getByLabel("পাসওয়ার্ড")).toBeVisible();
+  await expectAccessible(page, "partner sign in (Bangla)");
+  await expectNoHorizontalScroll(page);
+});

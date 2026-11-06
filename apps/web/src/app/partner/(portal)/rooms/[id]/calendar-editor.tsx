@@ -1,12 +1,12 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormAlert, TextField, buttonClass, cx } from "@pegah/ui";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { parseTaka } from "@pegah/shared";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const addDays = (iso: string, n: number) => {
   const d = new Date(`${iso}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + n);
@@ -23,12 +23,16 @@ export function CalendarEditor({
   from,
   today,
   csrfToken,
+  weekdays,
 }: {
   roomId: string;
   from: string;
   today: string;
   csrfToken: string;
+  /** Short weekday names, Sunday first, in the page language. */
+  weekdays: string[];
 }) {
+  const t = useTranslations("partner");
   const router = useRouter();
   const [start, setStart] = useState(from);
   const [end, setEnd] = useState(addDays(from, 30));
@@ -43,15 +47,15 @@ export function CalendarEditor({
     setMessage(null);
     const rateMinor = rate.trim() ? parseTaka(rate) : undefined;
     if (rateMinor === null) {
-      setMessage({ tone: "critical", text: "Enter the rate in taka, e.g. 6500 or 6500.50." });
+      setMessage({ tone: "critical", text: t("editor.badRate") });
       return;
     }
     if (!total.trim() && rateMinor === undefined) {
-      setMessage({ tone: "critical", text: "Set rooms on sale, a rate, or both." });
+      setMessage({ tone: "critical", text: t("editor.nothing") });
       return;
     }
     if (days.length === 0) {
-      setMessage({ tone: "critical", text: "Pick at least one weekday." });
+      setMessage({ tone: "critical", text: t("editor.noDay") });
       return;
     }
     setBusy(true);
@@ -73,26 +77,23 @@ export function CalendarEditor({
       setMessage({ tone: "critical", text: problemMessage(error) });
       return;
     }
-    setMessage({
-      tone: "good",
-      text: `${data.datesUpdated} dates updated. The website shows them within a minute.`,
-    });
+    setMessage({ tone: "good", text: t("editor.updated", { count: data.datesUpdated }) });
     router.refresh();
   }
 
   return (
     <form onSubmit={apply} className="panel grid content-start gap-4 p-5 md:p-6">
-      <h2 className="text-[0.95rem] font-semibold">Change a date range</h2>
+      <h2 className="text-[0.95rem] font-semibold">{t("editor.title")}</h2>
       <div className="grid grid-cols-2 gap-3">
         <TextField
-          label="From"
+          label={t("editor.from")}
           type="date"
           min={today}
           value={start}
           onChange={(e) => setStart(e.target.value)}
         />
         <TextField
-          label="To (inclusive)"
+          label={t("editor.to")}
           type="date"
           min={start}
           value={end}
@@ -100,9 +101,9 @@ export function CalendarEditor({
         />
       </div>
       <fieldset>
-        <legend className="text-[0.84rem] font-semibold">On these weekdays</legend>
+        <legend className="text-[0.84rem] font-semibold">{t("editor.weekdays")}</legend>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {WEEKDAYS.map((label, i) => {
+          {weekdays.map((label, i) => {
             const on = days.includes(i);
             return (
               <button
@@ -122,29 +123,29 @@ export function CalendarEditor({
             );
           })}
         </div>
-        <p className="mt-1.5 text-[0.76rem] text-ink-3">Tip: Thu + Fri only for a weekend rate.</p>
+        <p className="mt-1.5 text-[0.76rem] text-ink-3">{t("editor.tip")}</p>
       </fieldset>
       <TextField
-        label="Rooms on sale per night"
+        label={t("editor.rooms")}
         type="number"
         min={0}
         max={500}
-        placeholder="Leave empty to keep"
+        placeholder={t("editor.keep")}
         value={total}
         onChange={(e) => setTotal(e.target.value)}
-        hint="Cannot go below rooms already held or sold. 0 stops sales."
+        hint={t("editor.roomsHint")}
       />
       <TextField
-        label="Nightly rate (৳, per room)"
+        label={t("editor.rate")}
         inputMode="decimal"
-        placeholder="Leave empty to keep"
+        placeholder={t("editor.keep")}
         value={rate}
         onChange={(e) => setRate(e.target.value)}
-        hint="Before service charge and VAT. Existing bookings keep their price."
+        hint={t("editor.rateHint")}
       />
       {message && <FormAlert tone={message.tone}>{message.text}</FormAlert>}
       <button type="submit" disabled={busy} className={buttonClass("primary", "md")}>
-        {busy ? "Applying…" : "Apply to dates"}
+        {busy ? t("editor.applying") : t("editor.apply")}
       </button>
     </form>
   );

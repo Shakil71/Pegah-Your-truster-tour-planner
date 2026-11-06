@@ -39,7 +39,6 @@ function sourceFiles(dir: string): string[] {
 function usedKeys(): { key: string; file: string; prefixOnly: boolean }[] {
   const used: { key: string; file: string; prefixOnly: boolean }[] = [];
   for (const file of sourceFiles(join(root, "src"))) {
-    if (file.includes(`${join("app", "partner")}`)) continue; // partner portal stays English
     const text = readFileSync(file, "utf8");
     const bindings = new Map<string, string>();
     for (const m of text.matchAll(

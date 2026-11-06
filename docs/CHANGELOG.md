@@ -4,6 +4,13 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Bangla partner portal (2026-11-06)
+
+- The supplier and agent portal (sign-in, overview, room calendar and rate
+  editor, departures, reservations, client bookings, statement, account) is
+  available in Bangla with a language switch in the header; dates and weekday
+  names follow the language. The translation guard now covers the portal.
+
 ### Added — Bangla emails (2026-11-06)
 
 - Customer emails (bookings, refunds, verification, password reset, orders,

@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FormAlert, TextField, buttonClass } from "@pegah/ui";
 import { browserApi, problemMessage } from "@/lib/api-browser";
 
 export function PartnerLoginForm() {
+  const t = useTranslations("partner");
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,9 +24,7 @@ export function PartnerLoginForm() {
     setBusy(false);
     if (!response.ok) {
       setError(
-        response.status === 429
-          ? "Too many attempts. Wait a minute."
-          : problemMessage(problem, "Sign-in failed."),
+        response.status === 429 ? t("login.tooMany") : problemMessage(problem, t("login.failed")),
       );
       return;
     }
@@ -35,14 +35,14 @@ export function PartnerLoginForm() {
   return (
     <form onSubmit={submit} className="mt-6 grid gap-4">
       <TextField
-        label="Email"
+        label={t("login.email")}
         type="email"
         autoComplete="username"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <TextField
-        label="Password"
+        label={t("login.password")}
         type="password"
         autoComplete="current-password"
         value={password}
@@ -54,7 +54,7 @@ export function PartnerLoginForm() {
         disabled={busy || !email || !password}
         className={buttonClass("primary", "md", "h-12")}
       >
-        {busy ? "Signing in…" : "Sign in"}
+        {busy ? t("login.submitting") : t("login.submit")}
       </button>
     </form>
   );
