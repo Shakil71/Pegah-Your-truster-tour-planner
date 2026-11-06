@@ -1,0 +1,45 @@
+name: Start MariaDB 11.4 (no containers)
+description: >
+  Downloads the official MariaDB 11.4 LTS binary tarball (checksum-verified,
+  cached), starts it as a plain process on 127.0.0.1:3308 and exports
+  PEGAH_IT_DATABASE_URL for a user limited to `pegah_it_%` databases. Used to
+  prove the schema and queries also work on cPanel hosts that run MariaDB
+  (ADR-0040).
+runs:
+  using: composite
+  steps:
+    - uses: actions/cache@v4
+      with:
+        path: ~/mariadb-dl
+        key: mariadb-${{ env.MARIADB_VERSION }}-linux-systemd-x86_64
+
+    - name: Start MariaDB ${{ env.MARIADB_VERSION }}
+      shell: bash
+      run: |
+        sudo apt-get install -y --no-install-recommends libaio1t64 libnuma1 libncurses6
+        sudo ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+        f=~/mariadb-dl/mariadb.tar.gz
+        if [ ! -f "$f" ]; then
+          mkdir -p ~/mariadb-dl
+          curl -fsSL -o "$f" "https://archive.mariadb.org/mariadb-${MARIADB_VERSION}/bintar-linux-systemd-x86_64/mariadb-${MARIADB_VERSION}-linux-systemd-x86_64.tar.gz"
+        fi
+        echo "${MARIADB_SHA256}  $f" | sha256sum -c -
+        mkdir -p ~/mariadb && tar -xzf "$f" -C ~/mariadb --strip-components=1
+        data="$RUNNER_TEMP/mariadb-data"
+        ~/mariadb/scripts/mariadb-install-db --no-defaults --basedir="$HOME/mariadb" \
+          --datadir="$data" --user="$(whoami)" --auth-root-authentication-method=normal >/dev/null
+        ~/mariadb/bin/mariadbd --no-defaults --basedir="$HOME/mariadb" --datadir="$data" \
+          --user="$(whoami)" --port=3308 --bind-address=127.0.0.1 \
+          --socket="$RUNNER_TEMP/mariadb.sock" --log-error="$RUNNER_TEMP/mariadbd.err" &
+        for _ in $(seq 1 60); do
+          ~/mariadb/bin/mariadb-admin --no-defaults -uroot -h127.0.0.1 -P3308 ping >/dev/null 2>&1 && break
+          sleep 1
+        done
+        pw="$(openssl rand -hex 16)"
+        echo "::add-mask::$pw"
+        ~/mariadb/bin/mariadb --no-defaults -uroot -h127.0.0.1 -P3308 -e \
+          "CREATE USER 'pegah_it'@'127.0.0.1' IDENTIFIED BY '$pw';
+           GRANT ALL PRIVILEGES ON \`pegah\_it\_%\`.* TO 'pegah_it'@'127.0.0.1';
+           SELECT VERSION();"
+        echo "PEGAH_IT_DATABASE_URL=mysql://pegah_it:$pw@127.0.0.1:3308/" >> "$GITHUB_ENV"
+        echo "PEGAH_IT_COLLATION=utf8mb4_unicode_ci" >> "$GITHUB_ENV"

@@ -100,6 +100,37 @@ jobs:
         if: failure()
         run: tail -n 100 "$RUNNER_TEMP/mysqld.err" || true
 
+  db-integration-mariadb:
+    # The same integration suite on MariaDB 11.4 LTS (tarball, plain process,
+    # no containers): the database cPanel shared hosts provide (ADR-0040).
+    name: Database integration (MariaDB 11.4)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MARIADB_VERSION: 11.4.5
+      MARIADB_SHA256: 2a44cb70a87dba7eb2cab3b5af2c0416a0204d93a8fda387b4b70c9f1bab7bd6
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: ./.github/actions/setup-mariadb
+
+      - name: Build database package
+        run: npm run build -w @pegah/db
+
+      - name: Integration tests
+        run: npx vitest run apps/api/src/test/ --exclude "**/app.e2e.test.ts"
+
+      - name: MariaDB error log
+        if: failure()
+        run: tail -n 100 "$RUNNER_TEMP/mariadbd.err" || true
+
   e2e:
     # The whole stack (API, website, console) against real MySQL 8.4, driven by
     # Playwright in Chromium, with an axe WCAG 2.1 AA scan on every key page.

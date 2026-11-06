@@ -16,6 +16,10 @@ import { PRISMA } from "../prisma/prisma.service";
 import { ROLE_DEFAULTS } from "../rbac/role-defaults";
 
 export const ADMIN_URL = process.env.PEGAH_IT_DATABASE_URL;
+/** MySQL 8.4 default; MariaDB (cPanel hosts, ADR-0040) has no 0900 collations. */
+const COLLATION = /^utf8mb4_[a-z0-9_]+$/.test(process.env.PEGAH_IT_COLLATION ?? "")
+  ? process.env.PEGAH_IT_COLLATION!
+  : "utf8mb4_0900_ai_ci";
 export const ORIGIN = "http://localhost:3000";
 const taka = (t: number) => BigInt(t) * 100n;
 
@@ -58,7 +62,7 @@ export async function createHarness(env: Record<string, string> = {}): Promise<H
   };
   const admin = createPrismaClient({ url: urlFor(""), connectionLimit: 1 });
   await admin.$executeRawUnsafe(
-    `CREATE DATABASE \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci`,
+    `CREATE DATABASE \`${dbName}\` CHARACTER SET utf8mb4 COLLATE ${COLLATION}`,
   );
   const dbUrl = urlFor(dbName);
   const dbPackage = resolve(__dirname, "../../../../packages/db");
