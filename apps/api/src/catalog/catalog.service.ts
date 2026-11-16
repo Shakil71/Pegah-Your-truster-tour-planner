@@ -49,6 +49,24 @@ type TourRow = Prisma.TourGetPayload<{
 }>;
 
 /**
+ * Guide price for a tour sold on request: the offer price when one is set
+ * (with the list price as "was"), else the list price.
+ */
+function guidePrices(t: {
+  listPriceMinor: bigint | null;
+  salePriceMinor: bigint | null;
+  currency: string;
+}) {
+  const list = t.listPriceMinor && t.listPriceMinor > 0n ? t.listPriceMinor : null;
+  const sale = t.salePriceMinor && t.salePriceMinor > 0n ? t.salePriceMinor : null;
+  const shown = sale ?? list;
+  return {
+    guidePrice: shown ? toMoney(shown, t.currency) : null,
+    guideWasPrice: sale && list && list > sale ? toMoney(list, t.currency) : null,
+  };
+}
+
+/**
  * Public catalog reads. Only PUBLISHED records are visible, and every price
  * is computed here from rates in the database.
  */
@@ -378,7 +396,6 @@ export class CatalogService {
       highlights: stringList(t.highlights),
       includes: stringList(t.includes),
       excludes: stringList(t.excludes),
-      tourType: t.tourType,
       overview: t.overview,
       itinerary: t.itinerary,
       policy: t.policy,
@@ -424,6 +441,8 @@ export class CatalogService {
       hero: toMedia(t.hero, this.media),
       fromPrice: from ? toMoney(from.amount, from.currency) : null,
       nextDepartureAt: open[0]?.departsAt.toISOString() ?? null,
+      ...guidePrices(t),
+      tourType: t.tourType,
     };
   }
 }

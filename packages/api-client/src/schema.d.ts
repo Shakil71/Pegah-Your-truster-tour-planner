@@ -2398,6 +2398,9 @@ export interface components {
       hero: components["schemas"]["Media_Output"] | null;
       fromPrice: components["schemas"]["Money_Output"] | null;
       nextDepartureAt: string | null;
+      guidePrice: components["schemas"]["Money_Output"] | null;
+      guideWasPrice: components["schemas"]["Money_Output"] | null;
+      tourType: string | null;
     };
     Money_Output: {
       amountMinor: number;
@@ -2548,13 +2551,15 @@ export interface components {
       hero: components["schemas"]["Media_Output"] | null;
       fromPrice: components["schemas"]["Money_Output"] | null;
       nextDepartureAt: string | null;
+      guidePrice: components["schemas"]["Money_Output"] | null;
+      guideWasPrice: components["schemas"]["Money_Output"] | null;
+      tourType: string | null;
       description: string;
       meetingPoint: string;
       groupSizeMax: number;
       highlights: string[];
       includes: string[];
       excludes: string[];
-      tourType: string | null;
       overview: string | null;
       itinerary: string | null;
       policy: string | null;
@@ -3425,6 +3430,8 @@ export interface components {
       pickupPoints?: string[];
       tags?: string[];
       minAdults?: number | null;
+      listPrice?: components["schemas"]["Money"] | null;
+      salePrice?: components["schemas"]["Money"] | null;
       gallery?: string[];
       amenities?: string[];
       slug: string;
@@ -3533,6 +3540,8 @@ export interface components {
       pickupPoints?: string[];
       tags?: string[];
       minAdults?: number | null;
+      listPrice?: components["schemas"]["Money"] | null;
+      salePrice?: components["schemas"]["Money"] | null;
       gallery?: string[];
       amenities?: string[];
     };

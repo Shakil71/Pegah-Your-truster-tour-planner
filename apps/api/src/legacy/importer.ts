@@ -24,6 +24,7 @@ import {
   dhakaToUtc,
   htmlToList,
   htmlToText,
+  inclusionLists,
   int,
   mapUrl,
   slugify,
@@ -666,7 +667,29 @@ async function importAll(tx: Tx, dump: Dump, media: Map<string, bigint | null>, 
   const tourPickups = groupBy(dump.tour_pickup_locations, "tour_id");
   const tourFacilities = groupBy(dump.tour_facility_pairs, "tour_id");
   for (const t of dump.tours ?? []) {
-    if (imported("tours", t.id!)) {
+    const done = imported("tours", t.id!);
+    if (done) {
+      // Earlier imports put the "Exclusion" list under includes. Separate it,
+      // but only while both lists are still exactly as imported (staff edits win).
+      const lists = inclusionLists(t.inclusion);
+      if (lists.excludes.length > 0) {
+        const cur = await tx.tour.findUnique({
+          where: { id: done },
+          select: { includes: true, excludes: true },
+        });
+        const asImported = JSON.stringify(htmlToList(t.inclusion));
+        if (
+          cur &&
+          JSON.stringify(cur.includes) === asImported &&
+          JSON.stringify(cur.excludes ?? []) === "[]"
+        ) {
+          await tx.tour.update({
+            where: { id: done },
+            data: { includes: lists.includes, excludes: lists.excludes },
+          });
+          report.add("tours: exclusions moved out of inclusions");
+        }
+      }
       report.add("tours already imported");
       continue;
     }
@@ -707,8 +730,7 @@ async function importAll(tx: Tx, dump: Dump, media: Map<string, bigint | null>, 
         meetingPoint: clip(pickups[0] ?? htmlToText(t.location) ?? place.name, 255) || place.name,
         groupSizeMax: int(t.max_capacity, 999) ?? int(t.capacity, 999) ?? 20,
         highlights: htmlToList(t.highlights),
-        includes: htmlToList(t.inclusion),
-        excludes: [],
+        ...inclusionLists(t.inclusion),
         currency: "BDT",
         heroMediaId: gallery[0] ?? null,
         status: "DRAFT",

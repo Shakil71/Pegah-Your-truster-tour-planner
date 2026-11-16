@@ -121,7 +121,7 @@ export async function RoomCard({
               close: t("closePhotos"),
               previous: t("previousPhoto"),
               next: t("nextPhoto"),
-              count: t("photoCount"),
+              count: t.raw("photoCount") as string,
             }}
           />
         </div>

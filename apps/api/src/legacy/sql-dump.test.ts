@@ -3,6 +3,7 @@ import {
   clip,
   dhakaToUtc,
   htmlToList,
+  inclusionLists,
   htmlToText,
   mapUrl,
   parseDump,
@@ -42,6 +43,21 @@ describe("text helpers", () => {
     );
     expect(htmlToList(html)).toEqual(["Breakfast", "Cox's Bazar tour"]);
     expect(htmlToList("<p>One</p><p>Two</p>")).toEqual(["One", "Two"]);
+  });
+
+  it("splits a tour's inclusion field at its exclusion heading", () => {
+    const html =
+      "<p><strong>Inclusion:</strong></p><ul><li>Round bus ticket</li><li>Breakfast</li></ul>" +
+      "<p>&nbsp;</p><p><strong>EXCLUSIVE</strong>:</p><ul><li>Personal expenses</li><li>Lunch</li></ul>";
+    expect(inclusionLists(html)).toEqual({
+      includes: ["Round bus ticket", "Breakfast"],
+      excludes: ["Personal expenses", "Lunch"],
+    });
+    expect(inclusionLists("<ul><li>Hotel</li><li>Exclusive dinner</li></ul>")).toEqual({
+      includes: ["Hotel", "Exclusive dinner"],
+      excludes: [],
+    });
+    expect(inclusionLists(null)).toEqual({ includes: [], excludes: [] });
   });
 
   it("clips, slugs and parses times, money, maps and dates", () => {

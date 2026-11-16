@@ -159,6 +159,29 @@ export function htmlToList(html: string | null | undefined): string[] {
     .filter(Boolean);
 }
 
+/** "Exclusion:", "EXCLUSIVE;" (sic, old site), "Not included" — a heading line on its own. */
+const EXCLUDE_HEADING = /^(?:## )?(?:exclu[a-z]*|not included|what'?s not included)\s*[:;]?$/i;
+
+/**
+ * Old-site tour "inclusion" fields hold two lists: what is included and,
+ * under an "Exclusion" heading, what is not. Splits them; text without such
+ * a heading is all inclusions (same as htmlToList).
+ */
+export function inclusionLists(html: string | null | undefined): {
+  includes: string[];
+  excludes: string[];
+} {
+  const lines = htmlToText(html).split("\n");
+  const cut = lines.findIndex((l) => EXCLUDE_HEADING.test(l.trim()));
+  if (cut < 0) return { includes: htmlToList(html), excludes: [] };
+  const bullets = (part: string[]) =>
+    part
+      .filter((l) => l.startsWith("• "))
+      .map((l) => l.slice(2).trim())
+      .filter(Boolean);
+  return { includes: bullets(lines.slice(0, cut)), excludes: bullets(lines.slice(cut + 1)) };
+}
+
 /** Shortens text at a word boundary to at most `max` characters. */
 export function clip(text: string, max: number): string {
   const t = text.replace(/\s+/g, " ").trim();

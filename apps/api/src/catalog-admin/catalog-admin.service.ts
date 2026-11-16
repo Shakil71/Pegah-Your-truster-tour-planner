@@ -49,6 +49,37 @@ const notFound = (what: string) =>
     `${what[0]!.toUpperCase()}${what.slice(1)} not found`,
   );
 
+type MoneyInput = { amountMinor: number; currency: string } | null | undefined;
+
+/**
+ * Tour guide prices (shown on the website while a tour is sold on request).
+ * Tours sell in BDT; an offer price must be below the list price. Omitted
+ * fields stay as they are.
+ */
+function tourGuidePrices(listPrice: MoneyInput, salePrice: MoneyInput) {
+  for (const m of [listPrice, salePrice]) {
+    if (m && m.currency !== "BDT") {
+      throw new ProblemException(422, "currency-mismatch", "Wrong currency", "Tours sell in BDT.");
+    }
+  }
+  if (listPrice && salePrice && salePrice.amountMinor >= listPrice.amountMinor) {
+    throw new ProblemException(
+      422,
+      "offer-not-lower",
+      "Offer price too high",
+      "The offer price must be lower than the regular price.",
+    );
+  }
+  return {
+    ...(listPrice !== undefined
+      ? { listPriceMinor: listPrice ? BigInt(listPrice.amountMinor) : null }
+      : {}),
+    ...(salePrice !== undefined
+      ? { salePriceMinor: salePrice ? BigInt(salePrice.amountMinor) : null }
+      : {}),
+  };
+}
+
 function uniqueViolation(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
@@ -775,7 +806,17 @@ export class CatalogAdminService {
   }
 
   async createTour(input: CreateTour, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
+    const {
+      destinationSlug,
+      supplierId,
+      heroMedia,
+      gallery,
+      amenities,
+      listPrice,
+      salePrice,
+      ...rest
+    } = input;
+    const fields = { ...rest, ...tourGuidePrices(listPrice, salePrice) };
     try {
       await this.db.$transaction(async (tx) => {
         const destinationId = await this.destinationId(tx, destinationSlug);
@@ -804,7 +845,17 @@ export class CatalogAdminService {
   }
 
   async updateTour(slug: string, input: TourInput, actor: AuthContext, ip: string | null) {
-    const { destinationSlug, supplierId, heroMedia, gallery, amenities, ...fields } = input;
+    const {
+      destinationSlug,
+      supplierId,
+      heroMedia,
+      gallery,
+      amenities,
+      listPrice,
+      salePrice,
+      ...rest
+    } = input;
+    const fields = { ...rest, ...tourGuidePrices(listPrice, salePrice) };
     await this.db.$transaction(async (tx) => {
       const found = await tx.tour.findUnique({ where: { slug } });
       if (!found) throw notFound("tour");

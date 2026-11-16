@@ -288,6 +288,17 @@ export const TourInputSchema = z.object({
   pickupPoints: StringList.optional(),
   tags: StringList.optional(),
   minAdults: z.number().int().min(1).max(50).nullable().optional(),
+  /**
+   * Guide price shown on the website while no departure is on sale ("from
+   * …"); salePrice, when set, is shown with listPrice struck through.
+   * Departures still carry the price that is charged.
+   */
+  listPrice: MoneySchema.refine((m) => m.amountMinor > 0, "Price must be above zero")
+    .nullable()
+    .optional(),
+  salePrice: MoneySchema.refine((m) => m.amountMinor > 0, "Price must be above zero")
+    .nullable()
+    .optional(),
   gallery: GalleryKeys,
   amenities: AmenitySlugs,
 });
@@ -352,7 +363,7 @@ export const AdminTourDetailSchema = AdminTourSummarySchema.extend({
   pickupPoints: z.array(z.string()),
   tags: z.array(z.string()),
   minAdults: z.number().int().nullable(),
-  /** Reference prices from the old website; departures carry the real price. */
+  /** Guide prices shown on the website; departures carry the real price. */
   listPrice: MoneySchema.nullable(),
   salePrice: MoneySchema.nullable(),
   gallery: z.array(HeroRefSchema),

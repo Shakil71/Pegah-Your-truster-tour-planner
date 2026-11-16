@@ -7,9 +7,8 @@ import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass } from "@pegah/ui";
 import { AmenityPicker, GalleryPicker } from "@/components/gallery-picker";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
-import { money } from "@/lib/format";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
-import { bpsToPercent, percentToBps } from "@/lib/money-input";
+import { bpsToPercent, parseTaka, percentToBps, takaText } from "@/lib/money-input";
 
 type Tour = Schemas["AdminTourDetailDto_Output"];
 type Values = {
@@ -40,6 +39,8 @@ type Values = {
   pickupPoints: string;
   tags: string;
   minAdults: string;
+  listPrice: string;
+  salePrice: string;
 };
 
 const lines = (text: string) =>
@@ -94,6 +95,8 @@ export function TourForm({
       pickupPoints: (tour?.pickupPoints ?? []).join("\n"),
       tags: (tour?.tags ?? []).join("\n"),
       minAdults: tour?.minAdults ? String(tour.minAdults) : "",
+      listPrice: takaText(tour?.listPrice),
+      salePrice: takaText(tour?.salePrice),
     },
   });
 
@@ -103,6 +106,20 @@ export function TourForm({
     const vat = percentToBps(v.vat);
     if (vat === null) {
       setFieldErrors({ vatBps: "Enter a percentage like 5" });
+      return;
+    }
+    const price = (text: string) => {
+      if (!text.trim()) return null;
+      const minor = parseTaka(text);
+      return minor === null ? undefined : { amountMinor: minor, currency: "BDT" as const };
+    };
+    const listPrice = price(v.listPrice);
+    const salePrice = price(v.salePrice);
+    if (listPrice === undefined || salePrice === undefined) {
+      setFieldErrors({
+        ...(listPrice === undefined ? { listPrice: "Enter taka like 12900" } : {}),
+        ...(salePrice === undefined ? { salePrice: "Enter taka like 11900" } : {}),
+      });
       return;
     }
     const body = {
@@ -133,6 +150,8 @@ export function TourForm({
       pickupPoints: lines(v.pickupPoints),
       tags: lines(v.tags),
       minAdults: v.minAdults ? Number(v.minAdults) : null,
+      listPrice,
+      salePrice,
       gallery: gallery.map((g) => g.key),
       amenities,
     };
@@ -267,13 +286,20 @@ export function TourForm({
       />
       <fieldset disabled={readOnly} className="grid gap-4 border-t border-rule pt-4 md:grid-cols-2">
         <legend className="mb-2 text-[0.84rem] font-semibold">Trip details</legend>
-        {(tour?.listPrice || tour?.salePrice) && (
-          <p className="text-[0.8rem] text-ink-3 md:col-span-2">
-            Old website price: {tour.listPrice ? money(tour.listPrice) : "—"}
-            {tour.salePrice ? ` (offer ${money(tour.salePrice)})` : ""} — reference only; departures
-            carry the real price.
-          </p>
-        )}
+        <TextField
+          label="Guide price, taka (optional)"
+          inputMode="decimal"
+          hint="Shown as “from ৳…” while no departure is on sale. Departures set the price charged."
+          error={err("listPrice")}
+          {...register("listPrice")}
+        />
+        <TextField
+          label="Offer price, taka (optional)"
+          inputMode="decimal"
+          hint="Lower than the guide price; the guide price is then shown struck through."
+          error={err("salePrice")}
+          {...register("salePrice")}
+        />
         <TextField label="Tour type" error={err("tourType")} {...register("tourType")} />
         <TextField label="Timing" error={err("timing")} {...register("timing")} />
         <TextAreaField

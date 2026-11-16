@@ -4,6 +4,31 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed — Tour pages (2026-11-16)
+
+- Tour page redesigned: photo banner (large photo + side photos, all open
+  the viewer), "at a glance" tiles (duration, type, group size, meeting
+  point, start time, transport), in-page section bar, and titled sections:
+  overview with a key-facts sheet, a day-by-day timeline with clock times,
+  included / not included side by side, getting there (pick-up points,
+  transport, facilities), policies as collapsible groups with a
+  cancellation summary, and good to know. "More tours in …" at the end.
+- Free text from the console or the old website is laid out by
+  `lib/tour-details.ts` (unit-tested); nothing is invented.
+- Tours with no departure on sale show a "Request this tour" card: guide
+  price, WhatsApp, call, and a link to `/contact` that pre-fills the message.
+  A price bar with the booking button stays at the bottom on phones.
+- Guide price: Console → Tours → "Guide price" / "Offer price" (BDT; offer
+  must be lower). Public tour summaries gain `guidePrice`, `guideWasPrice`
+  and `tourType` (additive; OpenAPI and client regenerated). Departures still
+  set the price charged.
+- Tour cards (tours list, home, related tours) show the guide price and type.
+- Legacy import: the old "Inclusion" field's "Exclusion" list now goes to
+  `excludes`; re-running the import fixes tours imported earlier, only where
+  staff have not edited the lists.
+- Fix: the photo viewer's "Photo n of total" label failed to format on hotel,
+  room and tour pages.
+
 ### Added — Contact form and menu settings (2026-11-16)
 
 - `/contact` (in the main menu and the footer): anyone can ask about a new

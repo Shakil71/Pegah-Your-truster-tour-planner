@@ -183,6 +183,13 @@ export const TourSummarySchema = z
     hero: MediaSchema.nullable(),
     fromPrice: MoneySchema.nullable(),
     nextDepartureAt: InstantSchema.nullable(),
+    /**
+     * Staff-set guide price ("from …") for tours sold on request; the exact
+     * price is confirmed by Pegah. wasPrice is the struck-through list price.
+     */
+    guidePrice: MoneySchema.nullable(),
+    guideWasPrice: MoneySchema.nullable(),
+    tourType: nullableText(80),
   })
   .meta({ id: "TourSummary" });
 export type TourSummary = z.infer<typeof TourSummarySchema>;
@@ -196,7 +203,6 @@ export const TourDetailSchema = TourSummarySchema.extend({
   highlights: z.array(z.string()),
   includes: z.array(z.string()),
   excludes: z.array(z.string()),
-  tourType: nullableText(80),
   overview: nullableText(),
   itinerary: nullableText(),
   policy: nullableText(),

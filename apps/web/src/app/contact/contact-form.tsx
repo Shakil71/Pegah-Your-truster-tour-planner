@@ -15,9 +15,11 @@ type Topic = (typeof TOPICS)[number];
 export function ContactForm({
   initial,
   initialTopic,
+  initialMessage = "",
 }: {
   initial: { name: string; email: string; phone: string };
   initialTopic?: Topic;
+  initialMessage?: string;
 }) {
   const t = useTranslations("contact");
   const locale = useLocale();
@@ -27,7 +29,7 @@ export function ContactForm({
   const [phone, setPhone] = useState(initial.phone);
   const [travelDate, setTravelDate] = useState("");
   const [guests, setGuests] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [website, setWebsite] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

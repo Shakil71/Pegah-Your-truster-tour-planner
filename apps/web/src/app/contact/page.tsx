@@ -17,13 +17,19 @@ const TOPICS = ["BOOKING", "RESERVATION", "PACKAGE", "OTHER"] as const;
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ topic?: string }>;
+  searchParams: Promise<{ topic?: string; about?: string }>;
 }) {
   const t = await getTranslations("contact");
   const session = await getCustomer();
   const api = await serverApi();
   const general = (await api.GET("/api/v1/site")).data?.general;
-  const asked = (await searchParams).topic?.toUpperCase();
+  const query = await searchParams;
+  const asked = query.topic?.toUpperCase();
+  // "Request this tour" links here with the tour's name; it only pre-fills the message.
+  const about = query.about
+    ?.replace(/[\u0000-\u001f<>]/g, "")
+    .trim()
+    .slice(0, 160);
   const initialTopic = TOPICS.find((k) => k === asked);
   const whatsapp = general?.whatsapp.replace(/[^\d]/g, "");
 
@@ -81,6 +87,7 @@ export default async function ContactPage({
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <ContactForm
             initialTopic={initialTopic}
+            initialMessage={about ? t("aboutTrip", { name: about }) : ""}
             initial={{
               name: session?.user.fullName ?? "",
               email: session?.user.email ?? "",

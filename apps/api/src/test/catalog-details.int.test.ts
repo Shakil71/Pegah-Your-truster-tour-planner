@@ -247,4 +247,59 @@ describe.skipIf(!ADMIN_URL)("catalog details against MySQL 8.4", () => {
     });
     expect(site.gallery).toHaveLength(2);
   });
+
+  it("shows a staff-set guide price for tours sold on request", async () => {
+    const cur = (await h.call("GET", "/admin/tours/it-tour", { session: owner })).json();
+    const body = {
+      destinationSlug: cur.destination.slug,
+      title: cur.title,
+      summary: cur.summary,
+      description: cur.description,
+      durationDays: cur.durationDays,
+      durationNights: cur.durationNights,
+      meetingPoint: cur.meetingPoint,
+      groupSizeMax: cur.groupSizeMax,
+      highlights: cur.highlights,
+      includes: cur.includes,
+      excludes: cur.excludes,
+      vatBps: cur.vatBps,
+      status: cur.status,
+    };
+    const bdt = (taka: number) => ({ amountMinor: taka * 100, currency: "BDT" });
+
+    const saved = await h.call("PUT", "/admin/tours/it-tour", {
+      session: owner,
+      body: { ...body, listPrice: bdt(12_900), salePrice: bdt(11_900) },
+    });
+    expect(saved.statusCode).toBe(200);
+    expect(saved.json()).toMatchObject({ listPrice: bdt(12_900), salePrice: bdt(11_900) });
+    const site = (await h.call("GET", "/tours/it-tour")).json();
+    expect(site).toMatchObject({ guidePrice: bdt(11_900), guideWasPrice: bdt(12_900) });
+    const listed = (await h.call("GET", "/tours"))
+      .json()
+      .items.find((t: { slug: string }) => t.slug === "it-tour");
+    expect(listed).toMatchObject({ guidePrice: bdt(11_900), guideWasPrice: bdt(12_900) });
+
+    // An offer must be cheaper than the regular price; tours sell in BDT.
+    const higher = await h.call("PUT", "/admin/tours/it-tour", {
+      session: owner,
+      body: { ...body, listPrice: bdt(10_000), salePrice: bdt(11_000) },
+    });
+    expect(higher.statusCode).toBe(422);
+    const usd = await h.call("PUT", "/admin/tours/it-tour", {
+      session: owner,
+      body: { ...body, listPrice: { amountMinor: 5000, currency: "USD" } },
+    });
+    expect([400, 422]).toContain(usd.statusCode);
+
+    // Clearing both removes the guide price; leaving them out keeps it.
+    await h.call("PUT", "/admin/tours/it-tour", {
+      session: owner,
+      body: { ...body, listPrice: null, salePrice: null },
+    });
+    expect((await h.call("GET", "/tours/it-tour")).json()).toMatchObject({
+      guidePrice: null,
+      guideWasPrice: null,
+    });
+  });
 });

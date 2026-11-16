@@ -4,8 +4,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import type { Schemas } from "@pegah/api-client";
 import { Icon } from "@pegah/ui";
 import type { Locale } from "@/i18n/locales";
-import { dhakaDateTime, localName, money } from "@/lib/format";
+import { localName } from "@/lib/format";
 import { photoFor } from "@/lib/trip";
+import { TourCard } from "./shop/tour-card";
 import { SectionHead } from "./section-head";
 
 type Home = Schemas["PublicHomeDto_Output"];
@@ -116,8 +117,6 @@ export async function FeaturedStays({ items }: { items: Home["hotels"] }) {
 /** Tours chosen in the console, with their real next departure and price. */
 export async function FeaturedTours({ items }: { items: Home["tours"] }) {
   const t = await getTranslations("home");
-  const tt = await getTranslations("tours");
-  const locale = (await getLocale()) as Locale;
   return (
     <section id="tours" className={`${gutter} pt-28`} aria-labelledby="tours-h">
       <div className="mx-auto max-w-[1280px]">
@@ -129,47 +128,8 @@ export async function FeaturedTours({ items }: { items: Home["tours"] }) {
         />
         <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {items.map((tour) => (
-            <li key={tour.slug} className="panel group relative flex flex-col overflow-hidden">
-              <div className="relative aspect-[16/10]">
-                <Image
-                  src={tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug)}
-                  alt={tour.hero?.alt ?? ""}
-                  unoptimized={!!tour.hero}
-                  fill
-                  sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-[0.76rem] font-semibold text-ink">
-                  {tt("duration", { days: tour.durationDays, nights: tour.durationNights })}
-                </span>
-              </div>
-              <div className="flex flex-1 flex-col p-5">
-                <p className="text-[0.78rem] text-ink-3">{tour.destination.name}</p>
-                <h3 className="mt-1 font-display text-[1.4rem] font-medium leading-tight">
-                  <Link
-                    href={`/tours/${tour.slug}`}
-                    className="no-underline after:absolute after:inset-0 hover:underline"
-                  >
-                    {localName(locale, tour.title, tour.titleBn)}
-                  </Link>
-                </h3>
-                <p className="mt-2 line-clamp-2 flex-1 text-[0.9rem] text-ink-2">{tour.summary}</p>
-                <div className="mt-4 flex items-end justify-between gap-3 border-t border-rule pt-4 text-[0.8rem] text-ink-3">
-                  <span>
-                    {tour.nextDepartureAt
-                      ? `${tt("next")} ${dhakaDateTime(tour.nextDepartureAt, locale)}`
-                      : tt("noDepartures")}
-                  </span>
-                  {tour.fromPrice && (
-                    <span className="text-right">
-                      <span className="block">{tt("fromPerAdult")}</span>
-                      <span className="tabular font-display text-[1.25rem] font-medium text-ink">
-                        {money(tour.fromPrice)}
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </div>
+            <li key={tour.slug}>
+              <TourCard tour={tour} headingLevel={3} />
             </li>
           ))}
         </ul>

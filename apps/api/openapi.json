@@ -6662,6 +6662,37 @@
                 "type": "null"
               }
             ]
+          },
+          "guidePrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guideWasPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -6675,7 +6706,10 @@
           "summary",
           "hero",
           "fromPrice",
-          "nextDepartureAt"
+          "nextDepartureAt",
+          "guidePrice",
+          "guideWasPrice",
+          "tourType"
         ],
         "additionalProperties": false
       },
@@ -7496,6 +7530,37 @@
               }
             ]
           },
+          "guidePrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guideWasPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tourType": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "description": {
             "type": "string"
           },
@@ -7524,17 +7589,6 @@
             "items": {
               "type": "string"
             }
-          },
-          "tourType": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 80
-              },
-              {
-                "type": "null"
-              }
-            ]
           },
           "overview": {
             "anyOf": [
@@ -7679,13 +7733,15 @@
           "hero",
           "fromPrice",
           "nextDepartureAt",
+          "guidePrice",
+          "guideWasPrice",
+          "tourType",
           "description",
           "meetingPoint",
           "groupSizeMax",
           "highlights",
           "includes",
           "excludes",
-          "tourType",
           "overview",
           "itinerary",
           "policy",
@@ -11781,6 +11837,26 @@
               }
             ]
           },
+          "listPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "salePrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "gallery": {
             "maxItems": 40,
             "type": "array",
@@ -12533,6 +12609,26 @@
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 50
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "listPrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "salePrice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Money"
               },
               {
                 "type": "null"
