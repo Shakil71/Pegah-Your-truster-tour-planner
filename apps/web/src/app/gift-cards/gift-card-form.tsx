@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FormAlert, TextField, buttonClass, cx } from "@pegah/ui";
+import { FormAlert, Icon, TextField, buttonClass, cx } from "@pegah/ui";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 
 const PRESETS = [1000, 2000, 5000, 10000];
@@ -15,20 +15,25 @@ export function GiftCardForm({
   minTaka,
   maxTaka,
   buyer: initialBuyer,
+  theme,
 }: {
   csrfToken: string;
   minTaka: number;
   maxTaka: number;
   buyer: { name: string; email: string; phone: string };
+  /** A seasonal card chosen above the form: preselects its amount and message. */
+  theme?: { name: string; amountTaka: number; message: string };
 }) {
   const t = useTranslations("giftCards");
   const router = useRouter();
-  const [amount, setAmount] = useState(2000);
-  const [custom, setCustom] = useState("");
+  const themed = theme && theme.amountTaka >= minTaka && theme.amountTaka <= maxTaka;
+  const presetHit = themed && PRESETS.includes(theme.amountTaka);
+  const [amount, setAmount] = useState(presetHit ? theme.amountTaka : 2000);
+  const [custom, setCustom] = useState(themed && !presetHit ? String(theme.amountTaka) : "");
   const [forSelf, setForSelf] = useState(false);
   const [recipientName, setRecipientName] = useState("");
   const [recipientEmail, setRecipientEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(themed ? theme.message : "");
   const [buyer, setBuyer] = useState(initialBuyer);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,6 +73,12 @@ export function GiftCardForm({
   return (
     <form onSubmit={submit} className="panel grid gap-6 p-6 md:p-8" noValidate>
       <h2 className="font-display text-[1.8rem] font-medium">{t("formTitle")}</h2>
+      {themed && (
+        <p className="-mt-3 flex items-start gap-2 rounded-[12px] bg-primary-soft px-4 py-3 text-[0.9rem] text-ink">
+          <Icon name="gift" className="mt-0.5 size-4 shrink-0 text-primary-ink" />
+          <span>{t("season.chosenNote", { name: theme.name })}</span>
+        </p>
+      )}
 
       <fieldset className="grid gap-3">
         <legend className="mb-2 text-[0.9rem] font-semibold">{t("amount")}</legend>

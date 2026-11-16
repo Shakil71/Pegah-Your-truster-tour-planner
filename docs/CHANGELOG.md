@@ -4,6 +4,17 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Seasonal gift cards (2026-11-16)
+
+- `/gift-cards` shows four sea-season cards — Cox's Bazar Sunset Weekend
+  (৳3,000), Saint Martin Island Escape (৳5,000), Cox's Bazar Family Holiday
+  (৳10,000) and Saint Martin Coral Getaway (৳15,000) — with licensed photos
+  and credits, in English and Bangla.
+- Choosing a card fills the order form's amount and gift message (both can
+  be changed); visitors who are not signed in come back to the chosen card
+  after signing in. Each is an ordinary Pegah gift card usable on any stay
+  or tour, and the page says so; no new data is stored.
+
 ### Changed — Offer pages (2026-11-16)
 
 - Offer pages lay the package out in titled cards — what's included, hotels

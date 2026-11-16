@@ -699,7 +699,43 @@
     "balanceResult": "Balance on card ending {last4}",
     "validUntil": "Valid until {date}",
     "notUsable": "This card can no longer be used.",
-    "notFound": "We could not find that gift card. Check the code and try again."
+    "notFound": "We could not find that gift card. Check the code and try again.",
+    "cardLabel": "Gift card",
+    "places": {
+      "coxsBazar": "Cox's Bazar",
+      "saintMartin": "Saint Martin's Island"
+    },
+    "season": {
+      "eyebrow": "In season now · November to March",
+      "title": "Sea-season gift cards",
+      "intro": "Cox's Bazar sunsets and Saint Martin's blue water are at their best now. Pick a card, and we'll fill in the amount and a message for you.",
+      "choose": "Choose this card",
+      "chosen": "Chosen — fill in the details below",
+      "anyTrip": "Every card is a Pegah gift card for any stay or tour on Pegah, not only in Cox's Bazar or Saint Martin. Valid for two years.",
+      "chosenNote": "{name} — the amount and a message are filled in. Change anything you like."
+    },
+    "themes": {
+      "coxs-sunset": {
+        "name": "Cox's Bazar Sunset Weekend",
+        "line": "A weekend for two by the world's longest sea beach, with sunsets to match.",
+        "message": "For a sunset weekend at Cox's Bazar — the sea is waiting for you. Enjoy every wave!"
+      },
+      "saint-martin-escape": {
+        "name": "Saint Martin Island Escape",
+        "line": "Blue water, coconut palms and a night on Bangladesh's only coral island.",
+        "message": "Pack light and go: Saint Martin's blue water and quiet beaches are calling. Have a wonderful escape!"
+      },
+      "coxs-family": {
+        "name": "Cox's Bazar Family Holiday",
+        "line": "Room for the whole family: a beach holiday with stays, tours and time together.",
+        "message": "A beach holiday for the whole family at Cox's Bazar — make memories together by the sea."
+      },
+      "saint-martin-coral": {
+        "name": "Saint Martin Coral Getaway",
+        "line": "A special trip for two: the island, the coral and a quiet sea-facing stay.",
+        "message": "For a special getaway to Saint Martin's Island — just the two of you, the sea and the stars."
+      }
+    }
   },
   "orders": {
     "title": "Orders and gift cards",
