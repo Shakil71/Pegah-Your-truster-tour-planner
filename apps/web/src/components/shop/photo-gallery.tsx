@@ -3,8 +3,15 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@pegah/ui";
+import { isLibraryImage, isLowRes, sharpWidth } from "@/lib/media";
 
-export type GalleryPhoto = { url: string; alt: string; credit: string | null };
+export type GalleryPhoto = {
+  url: string;
+  alt: string;
+  credit: string | null;
+  width?: number | null;
+  height?: number | null;
+};
 
 /**
  * Photo strip with a full-screen viewer (native <dialog>: focus trap, Esc to
@@ -60,6 +67,7 @@ export function PhotoGallery({
                 src={p.url}
                 alt=""
                 fill
+                unoptimized={isLibraryImage(p.url)}
                 sizes={
                   i === 0 ? "(min-width: 1024px) 420px, 66vw" : "(min-width: 1024px) 210px, 33vw"
                 }
@@ -83,14 +91,46 @@ export function PhotoGallery({
       >
         {photo && (
           <figure className="grid gap-3 p-3 text-white">
-            <div className="relative aspect-[3/2] w-full overflow-hidden rounded-[12px] bg-night">
-              <Image
-                src={photo.url}
-                alt={photo.alt}
-                fill
-                sizes="1100px"
-                className="object-contain"
-              />
+            <div className="relative grid aspect-[3/2] w-full place-items-center overflow-hidden rounded-[12px] bg-night">
+              {isLowRes(photo) ? (
+                <>
+                  {/* Small photo: soft backdrop, the photo itself near its real size so it stays sharp. */}
+                  <Image
+                    src={photo.url}
+                    alt=""
+                    aria-hidden
+                    fill
+                    unoptimized
+                    sizes="1100px"
+                    className="scale-110 object-cover opacity-50 blur-2xl"
+                  />
+                  <div
+                    className="relative h-full w-full"
+                    style={{
+                      maxWidth: sharpWidth(photo.width ?? 0),
+                      maxHeight: sharpWidth(photo.height ?? photo.width ?? 0),
+                    }}
+                  >
+                    <Image
+                      src={photo.url}
+                      alt={photo.alt}
+                      fill
+                      unoptimized
+                      sizes={`${sharpWidth(photo.width ?? 0)}px`}
+                      className="object-contain"
+                    />
+                  </div>
+                </>
+              ) : (
+                <Image
+                  src={photo.url}
+                  alt={photo.alt}
+                  fill
+                  unoptimized={isLibraryImage(photo.url)}
+                  sizes="1100px"
+                  className="object-contain"
+                />
+              )}
             </div>
             <figcaption className="flex flex-wrap items-center justify-between gap-3 text-[0.86rem]">
               <span>

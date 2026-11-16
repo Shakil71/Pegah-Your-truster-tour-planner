@@ -39,6 +39,7 @@ export async function FeaturedDestinations({
                 <Image
                   src={d.hero?.url ?? photoFor(d.slug)}
                   alt={d.hero?.alt ?? ""}
+                  unoptimized={!!d.hero}
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-700 ease-pegah group-hover:scale-105"
@@ -82,6 +83,7 @@ export async function FeaturedStays({ items }: { items: Home["hotels"] }) {
                 <Image
                   src={h.hero?.url ?? photoFor(h.slug, h.destination.slug)}
                   alt={h.hero?.alt ?? ""}
+                  unoptimized={!!h.hero}
                   fill
                   sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-700 ease-pegah group-hover:scale-105"
@@ -132,6 +134,7 @@ export async function FeaturedTours({ items }: { items: Home["tours"] }) {
                 <Image
                   src={tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug)}
                   alt={tour.hero?.alt ?? ""}
+                  unoptimized={!!tour.hero}
                   fill
                   sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"

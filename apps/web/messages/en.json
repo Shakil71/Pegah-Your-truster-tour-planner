@@ -19,7 +19,10 @@
     "giftCards": "Gift cards",
     "toDark": "Switch to dark theme",
     "toLight": "Switch to light theme",
-    "visa": "Visa"
+    "visa": "Visa",
+    "hotels": "Hotels",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "footer": {
     "tagline": "Stays, tours and travel planning across Bangladesh.",
@@ -188,6 +191,19 @@
     "fromPerRoomNight": "from {price} per room per night",
     "seeRooms": "See rooms",
     "pricedAt": "Prices were checked {time} Dhaka time and are confirmed again when you hold a room."
+  },
+  "hotels": {
+    "title": "All hotels",
+    "eyebrow": "Hotels across Bangladesh",
+    "inPlace": "Hotels in {name}",
+    "intro": "Every hotel we work with, by destination. Open a hotel to see its rooms, choose your dates and book.",
+    "count": "{count, plural, one {# hotel} other {# hotels}}",
+    "filter": "Filter by destination",
+    "all": "All",
+    "stars": "{count}-star",
+    "view": "See rooms and book",
+    "unknownWhere": "We don't list hotels in “{where}” yet. Showing all hotels.",
+    "none": "No hotels are listed yet."
   },
   "property": {
     "fallbackTitle": "Stay",

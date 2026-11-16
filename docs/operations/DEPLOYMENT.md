@@ -253,12 +253,12 @@ on 80/443 by `infra/nginx/pegah-public.conf` with a Let's Encrypt
 certificate. Public certificates last at most 200 days (and less from 2027),
 so there is no multi-year certificate: renewal is automatic.
 
-| Piece           | Where                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| Certificate     | `/etc/letsencrypt/live/pegah.com.bd/` (certbot, webroot `/var/www/pegah-acme`)              |
-| Renewal         | `certbot-renew.timer` (enabled); test with `sudo certbot renew --dry-run`                   |
-| Reload on renew | `/etc/letsencrypt/renewal-hooks/deploy/pegah-nginx.sh` = `infra/letsencrypt/…-hook.sh`      |
-| HTTP            | port 80 serves ACME challenges and redirects everything else to `https://pegah.com.bd`      |
+| Piece           | Where                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Certificate     | `/etc/letsencrypt/live/pegah.com.bd/` (certbot, webroot `/var/www/pegah-acme`)             |
+| Renewal         | `certbot-renew.timer` (enabled); test with `sudo certbot renew --dry-run`                  |
+| Reload on renew | `/etc/letsencrypt/renewal-hooks/deploy/pegah-nginx.sh` = `infra/letsencrypt/…-hook.sh`     |
+| HTTP            | port 80 serves ACME challenges and redirects everything else to `https://pegah.com.bd`     |
 | API origins     | `APP_ORIGINS` in `api.env` must include `https://pegah.com.bd` (else "Origin not allowed") |
 
 Current `APP_ORIGINS`:

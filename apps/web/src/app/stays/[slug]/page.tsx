@@ -5,11 +5,13 @@ import Link from "next/link";
 import { problemMessage } from "@pegah/api-client";
 import { Icon, buttonClass } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
+import { HeroPhoto } from "@/components/shop/hero-photo";
 import { PhotoGallery } from "@/components/shop/photo-gallery";
 import { TextBlocks } from "@/components/shop/text-blocks";
 import { StaySearchBar } from "@/components/shop/stay-search-bar";
 import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
+import { isLibraryImage, isLowRes } from "@/lib/media";
 import { localName, money } from "@/lib/format";
 import { nightsOf, parseStayParams, photoFor, stayQuery } from "@/lib/trip";
 
@@ -84,16 +86,11 @@ export default async function HotelPage({ params, searchParams }: Props) {
         </div>
 
         <section className="relative overflow-hidden rounded-card bg-night text-white">
-          <Image
-            src={hotel.hero?.url ?? photoFor(hotel.slug, hotel.destination.slug)}
-            alt={hotel.hero?.alt ?? ""}
-            fill
-            priority
-            sizes="(min-width: 1280px) 1280px, 100vw"
-            className="object-cover opacity-75"
-          />
+          <HeroPhoto media={hotel.hero} fallback={photoFor(hotel.slug, hotel.destination.slug)} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgb(10_12_28/0.85))]" />
-          <div className="relative flex min-h-[340px] flex-col justify-end p-6 md:min-h-[420px] md:p-10">
+          <div
+            className={`relative flex min-h-[340px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 ${isLowRes(hotel.hero) ? "md:max-w-[56%]" : ""}`}
+          >
             <p className="text-[0.86rem] text-white/80">
               {hotel.starRating ? `${"★".repeat(hotel.starRating)} · ` : ""}
               {hotel.destination.name}
@@ -138,6 +135,7 @@ export default async function HotelPage({ params, searchParams }: Props) {
                         src={cover.url}
                         alt={cover.alt}
                         fill
+                        unoptimized={isLibraryImage(cover.url)}
                         sizes="(min-width: 768px) 180px, 100vw"
                         className="object-cover"
                       />

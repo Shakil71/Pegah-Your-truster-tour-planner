@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@pegah/ui";
 import { PageShell, PaymentNotice } from "@/components/shop/page-shell";
+import { HeroPhoto } from "@/components/shop/hero-photo";
 import { PhotoGallery } from "@/components/shop/photo-gallery";
 import { TextBlocks } from "@/components/shop/text-blocks";
 import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
+import { isLowRes } from "@/lib/media";
 import { localName } from "@/lib/format";
 import { photoFor } from "@/lib/trip";
 import { DeparturePicker } from "./departure-picker";
@@ -81,16 +82,11 @@ export default async function TourPage({ params }: Props) {
         </Link>
 
         <section className="relative overflow-hidden rounded-card bg-night text-white">
-          <Image
-            src={tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug)}
-            alt={tour.hero?.alt ?? ""}
-            fill
-            priority
-            sizes="(min-width: 1280px) 1280px, 100vw"
-            className="object-cover opacity-75"
-          />
+          <HeroPhoto media={tour.hero} fallback={photoFor(tour.slug, tour.destination.slug)} />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgb(10_12_28/0.85))]" />
-          <div className="relative flex min-h-[340px] flex-col justify-end p-6 md:min-h-[420px] md:p-10">
+          <div
+            className={`relative flex min-h-[340px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 ${isLowRes(tour.hero) ? "md:max-w-[56%]" : ""}`}
+          >
             <p className="text-[0.86rem] text-white/80">
               {t("facts", {
                 place: tour.destination.name,

@@ -4,6 +4,7 @@ import { expectAccessible, expectNoHorizontalScroll } from "./helpers";
 /** Public pages render, are accessible, and fit a phone screen. */
 const pages = [
   { path: "/", name: "home" },
+  { path: "/hotels", name: "all hotels" },
   { path: "/stays?where=srimangal", name: "stay results" },
   { path: "/tours", name: "tours" },
   { path: "/login", name: "sign in" },
@@ -20,6 +21,15 @@ for (const p of pages) {
     await expectNoHorizontalScroll(page);
   });
 }
+
+test("the phone menu opens and leads to the hotels page @mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.locator("#site-menu").getByRole("link", { name: "Hotels" }).click();
+  await expect(page).toHaveURL(/\/hotels$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});
 
 test("property and tour pages are accessible @mobile", async ({ page }) => {
   await page.goto("/stays?where=srimangal");

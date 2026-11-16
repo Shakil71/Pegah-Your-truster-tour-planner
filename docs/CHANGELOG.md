@@ -4,6 +4,17 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Hotels page, phone menu and sharper old photos (2026-11-16)
+
+- `/hotels` lists every published hotel by destination, with a destination
+  filter, no dates needed; each card opens the hotel page to choose dates and
+  book. "Hotels" is the first item in the main menu (English and Bangla).
+- Phones and tablets get a menu button; the full menu shows from 1024 px.
+- Photos from the old website are mostly 300–480 px. Hotel and tour banners
+  now show such a photo sharp, near its real size, over a blurred backdrop
+  instead of stretching it to 1280 px; the full-screen gallery does the same.
+  Media library images are no longer re-encoded by the Next.js optimiser.
+
 ### Fixed — Public domain sign-in and HTTPS config (2026-11-16)
 
 - `enable-https.sh` no longer replaces `APP_ORIGINS`: it adds the IP origins
