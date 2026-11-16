@@ -32,8 +32,8 @@ supplier contracts.
 
 - Public domain live (2026-11-16): `https://pegah.com.bd` with a Let's
   Encrypt certificate and automatic renewal; `APP_ORIGINS` includes the
-  domain. **Owner next (root):** copy the updated `pegah-public.conf`
-  (document upload size, HSTS) and add `www.pegah.com.bd` to the
+  domain. **Owner next (root):** install the updated `pegah-public.conf`
+  (document upload size, HSTS, www redirect); www is already on the
   certificate (`docs/operations/DEPLOYMENT.md#public-domain-https-pegahcombd--live-since-2026-11-16`).
 
 - Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);

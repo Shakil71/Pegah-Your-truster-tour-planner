@@ -269,12 +269,11 @@ Inside the office network the public IP is not reachable (no NAT
 hairpin), so office PCs map the domain to the private IP in
 `C:\Windows\System32\drivers\etc\hosts`: `192.168.197.100  pegah.com.bd`.
 
-Not done yet (needs root): `www.pegah.com.bd` is not on the certificate
-(`certbot certonly --webroot -w /var/www/pegah-acme -d pegah.com.bd -d
-www.pegah.com.bd --expand`, then add it to `server_name` with a redirect),
-and the repository version of `pegah-public.conf` (document upload size,
-HSTS) still has to be copied to the server:
-`sudo install -m 0644 infra/nginx/pegah-public.conf /etc/nginx/conf.d/ && sudo nginx -t && sudo systemctl reload nginx`.
+`www.pegah.com.bd` is on the certificate (expanded 2026-11-16) and every
+`www` request is redirected to `https://pegah.com.bd`, the only origin in
+`APP_ORIGINS`. To install a changed `pegah-public.conf` (as root, from the
+deployed release):
+`install -m 0644 /opt/pegah/current/infra/nginx/pegah-public.conf /etc/nginx/conf.d/ && nginx -t && systemctl reload nginx`.
 
 ### Admin panel access
 
