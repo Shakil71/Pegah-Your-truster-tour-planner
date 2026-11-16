@@ -40,6 +40,9 @@ import {
   PublicVisasController,
 } from "./services/services.controllers";
 import { VisaProductsService } from "./services/visa-products.service";
+import { AdminContactController, PublicContactController } from "./contact/contact.controllers";
+import { ContactMailer } from "./contact/contact-mailer.service";
+import { ContactService } from "./contact/contact.service";
 import { AuditQueryService } from "./admin/audit-query.service";
 import { DashboardService } from "./admin/dashboard.service";
 import { StaffService } from "./admin/staff.service";
@@ -147,6 +150,8 @@ export class AppModule {
         PublicVisasController,
         MyRequestsController,
         AdminRequestsController,
+        PublicContactController,
+        AdminContactController,
       ],
       providers: [
         { provide: APP_CONFIG, useValue: config },
@@ -162,6 +167,8 @@ export class AppModule {
         ServiceRequestService,
         VisaProductsService,
         ServiceMailer,
+        ContactService,
+        ContactMailer,
         // Registered so Nest closes the Redis connection on shutdown.
         ...(rateLimitStorage
           ? [{ provide: RedisThrottlerStorage, useValue: rateLimitStorage }]

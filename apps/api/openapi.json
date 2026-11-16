@@ -3892,6 +3892,40 @@
         "tags": ["admin"]
       }
     },
+    "/api/v1/admin/settings/menu": {
+      "put": {
+        "operationId": "AdminSettingsController_menu",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminMenuSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSiteSettingsDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
     "/api/v1/admin/settings/booking": {
       "put": {
         "operationId": "AdminSettingsController_booking",
@@ -5952,6 +5986,141 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminVisaProductListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/contact": {
+      "post": {
+        "operationId": "PublicContactController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactMessageCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactMessageReceiptDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["contact"]
+      }
+    },
+    "/api/v1/admin/contact-messages": {
+      "get": {
+        "operationId": "AdminContactController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["NEW", "IN_PROGRESS", "CLOSED"]
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 30,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminContactListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin"]
+      }
+    },
+    "/api/v1/admin/contact-messages/{id}": {
+      "put": {
+        "operationId": "AdminContactController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminContactUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminContactMessageDto_Output"
                 }
               }
             }
@@ -14679,6 +14848,22 @@
             "required": ["enabled", "tone", "textEn", "textBn", "linkHref"],
             "additionalProperties": false
           },
+          "menu": {
+            "type": "object",
+            "properties": {
+              "showStays": {
+                "type": "boolean"
+              },
+              "showFlights": {
+                "type": "boolean"
+              },
+              "showVisa": {
+                "type": "boolean"
+              }
+            },
+            "required": ["showStays", "showFlights", "showVisa"],
+            "additionalProperties": false
+          },
           "booking": {
             "type": "object",
             "properties": {
@@ -14796,6 +14981,7 @@
         "required": [
           "general",
           "announcement",
+          "menu",
           "booking",
           "payments",
           "email",
@@ -14880,6 +15066,21 @@
           }
         },
         "required": ["enabled", "tone", "textEn", "textBn", "linkHref"]
+      },
+      "AdminMenuSettingsDto": {
+        "type": "object",
+        "properties": {
+          "showStays": {
+            "type": "boolean"
+          },
+          "showFlights": {
+            "type": "boolean"
+          },
+          "showVisa": {
+            "type": "boolean"
+          }
+        },
+        "required": ["showStays", "showFlights", "showVisa"]
       },
       "AdminBookingSettingsDto": {
         "type": "object",
@@ -15064,9 +15265,25 @@
                 "type": "null"
               }
             ]
+          },
+          "menu": {
+            "type": "object",
+            "properties": {
+              "showStays": {
+                "type": "boolean"
+              },
+              "showFlights": {
+                "type": "boolean"
+              },
+              "showVisa": {
+                "type": "boolean"
+              }
+            },
+            "required": ["showStays", "showFlights", "showVisa"],
+            "additionalProperties": false
           }
         },
-        "required": ["general", "announcement"],
+        "required": ["general", "announcement", "menu"],
         "additionalProperties": false
       },
       "AdminMediaListDto_Output": {
@@ -20043,6 +20260,350 @@
           "requirements",
           "status"
         ]
+      },
+      "ContactMessageCreateDto": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "enum": ["BOOKING", "RESERVATION", "PACKAGE", "OTHER"]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[\\d\\s-]{7,20}$"
+          },
+          "travelDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "guests": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500
+          },
+          "message": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 3000
+          },
+          "locale": {
+            "type": "string",
+            "enum": ["en", "bn"]
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 0
+          }
+        },
+        "required": ["topic", "name", "email", "phone", "message"]
+      },
+      "ContactMessageReceiptDto_Output": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          }
+        },
+        "required": ["reference"],
+        "additionalProperties": false
+      },
+      "AdminContactListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "reference": {
+                  "type": "string"
+                },
+                "topic": {
+                  "type": "string",
+                  "enum": ["BOOKING", "RESERVATION", "PACKAGE", "OTHER"]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["NEW", "IN_PROGRESS", "CLOSED"]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "travelDate": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "guests": {
+                  "anyOf": [
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "signedIn": {
+                  "type": "boolean"
+                },
+                "staffNote": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 1000
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "handledBy": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 120
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "handledAt": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "reference",
+                "topic",
+                "status",
+                "name",
+                "email",
+                "phone",
+                "travelDate",
+                "guests",
+                "message",
+                "signedIn",
+                "staffNote",
+                "handledBy",
+                "handledAt",
+                "createdAt"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "NEW": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "IN_PROGRESS": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "CLOSED": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["NEW", "IN_PROGRESS", "CLOSED"],
+            "additionalProperties": false
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["items", "counts", "nextCursor"],
+        "additionalProperties": false
+      },
+      "AdminContactUpdateDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["NEW", "IN_PROGRESS", "CLOSED"]
+          },
+          "staffNote": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": ["status"]
+      },
+      "AdminContactMessageDto_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string",
+            "enum": ["BOOKING", "RESERVATION", "PACKAGE", "OTHER"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["NEW", "IN_PROGRESS", "CLOSED"]
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "travelDate": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "guests": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "signedIn": {
+            "type": "boolean"
+          },
+          "staffNote": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handledBy": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "handledAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "reference",
+          "topic",
+          "status",
+          "name",
+          "email",
+          "phone",
+          "travelDate",
+          "guests",
+          "message",
+          "signedIn",
+          "staffNote",
+          "handledBy",
+          "handledAt",
+          "createdAt"
+        ],
+        "additionalProperties": false
       }
     }
   }

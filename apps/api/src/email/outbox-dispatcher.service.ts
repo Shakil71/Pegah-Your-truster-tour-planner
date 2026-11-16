@@ -1,6 +1,7 @@
 import { taka } from "./taka";
 import { CommerceMailer } from "../commerce/commerce-mailer.service";
 import { ServiceMailer } from "../services/service-mailer.service";
+import { ContactMailer } from "../contact/contact-mailer.service";
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { formatCalendarDate } from "../common/time";
 import { APP_CONFIG, type AppConfig } from "../config/config";
@@ -39,6 +40,7 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
     @Inject(APP_CONFIG) private readonly config: AppConfig,
     @Inject(CommerceMailer) private readonly commerce: CommerceMailer,
     @Inject(ServiceMailer) private readonly services: ServiceMailer,
+    @Inject(ContactMailer) private readonly contact: ContactMailer,
   ) {}
 
   onModuleInit(): void {
@@ -118,6 +120,8 @@ export class OutboxDispatcher implements OnModuleInit, OnModuleDestroy {
     if (this.commerce.handles(type)) return this.commerce.handle(type, bookingPublicId, payload);
     // Visa and flight requests (ADR-0039).
     if (this.services.handles(type)) return this.services.handle(type, bookingPublicId, payload);
+    // Contact form (ADR-0041).
+    if (this.contact.handles(type)) return this.contact.handle(type, bookingPublicId, payload);
     const render = (
       b: BookingFacts,
       l: EmailLocale,

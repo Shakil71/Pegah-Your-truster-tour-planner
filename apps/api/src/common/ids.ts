@@ -16,6 +16,13 @@ export function newBookingReference(): string {
   return `PG-${out}`;
 }
 
+/** Contact message reference, e.g. PC-7K3QX9 (ADR-0041). */
+export function newContactReference(): string {
+  let out = "";
+  for (let i = 0; i < 6; i++) out += REFERENCE_ALPHABET[randomInt(REFERENCE_ALPHABET.length)];
+  return `PC-${out}`;
+}
+
 /** Order reference (offers, gift cards), e.g. PO-7K3QX9; distinct from bookings. */
 export function newOrderReference(): string {
   let out = "";

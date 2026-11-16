@@ -1428,6 +1428,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/settings/menu": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminSettingsController_menu"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/admin/settings/booking": {
     parameters: {
       query?: never;
@@ -2205,6 +2221,54 @@ export interface paths {
     };
     get?: never;
     put: operations["AdminRequestsController_updateVisa"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/contact": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations["PublicContactController_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/contact-messages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminContactController_list"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/contact-messages/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminContactController_update"];
     post?: never;
     delete?: never;
     options?: never;
@@ -4022,6 +4086,11 @@ export interface components {
         textBn: string;
         linkHref: string | "";
       };
+      menu: {
+        showStays: boolean;
+        showFlights: boolean;
+        showVisa: boolean;
+      };
       booking: {
         holdMinutes: number;
         paymentExtensionMinutes: number;
@@ -4068,6 +4137,11 @@ export interface components {
       textBn: string;
       linkHref: string | "";
     };
+    AdminMenuSettingsDto: {
+      showStays: boolean;
+      showFlights: boolean;
+      showVisa: boolean;
+    };
     AdminBookingSettingsDto: {
       holdMinutes: number;
       paymentExtensionMinutes: number;
@@ -4113,6 +4187,11 @@ export interface components {
         textBn: string;
         linkHref: string | "";
       } | null;
+      menu: {
+        showStays: boolean;
+        showFlights: boolean;
+        showVisa: boolean;
+      };
     };
     AdminMediaListDto_Output: {
       items: {
@@ -5129,6 +5208,76 @@ export interface components {
       /** @default 0 */
       sortOrder: number;
       heroMedia?: string | null;
+    };
+    ContactMessageCreateDto: {
+      /** @enum {string} */
+      topic: "BOOKING" | "RESERVATION" | "PACKAGE" | "OTHER";
+      name: string;
+      email: string;
+      phone: string;
+      /** Format: date */
+      travelDate?: string;
+      guests?: number;
+      message: string;
+      /** @enum {string} */
+      locale?: "en" | "bn";
+      website?: string;
+    };
+    ContactMessageReceiptDto_Output: {
+      reference: string;
+    };
+    AdminContactListDto_Output: {
+      items: {
+        id: string;
+        reference: string;
+        /** @enum {string} */
+        topic: "BOOKING" | "RESERVATION" | "PACKAGE" | "OTHER";
+        /** @enum {string} */
+        status: "NEW" | "IN_PROGRESS" | "CLOSED";
+        name: string;
+        email: string;
+        phone: string;
+        travelDate: string | null;
+        guests: number | null;
+        message: string;
+        signedIn: boolean;
+        staffNote: string | null;
+        handledBy: string | null;
+        handledAt: string | null;
+        /** Format: date-time */
+        createdAt: string;
+      }[];
+      counts: {
+        NEW: number;
+        IN_PROGRESS: number;
+        CLOSED: number;
+      };
+      nextCursor: string | null;
+    };
+    AdminContactUpdateDto: {
+      /** @enum {string} */
+      status: "NEW" | "IN_PROGRESS" | "CLOSED";
+      staffNote?: string;
+    };
+    AdminContactMessageDto_Output: {
+      id: string;
+      reference: string;
+      /** @enum {string} */
+      topic: "BOOKING" | "RESERVATION" | "PACKAGE" | "OTHER";
+      /** @enum {string} */
+      status: "NEW" | "IN_PROGRESS" | "CLOSED";
+      name: string;
+      email: string;
+      phone: string;
+      travelDate: string | null;
+      guests: number | null;
+      message: string;
+      signedIn: boolean;
+      staffNote: string | null;
+      handledBy: string | null;
+      handledAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
     };
   };
   responses: never;
@@ -7525,6 +7674,29 @@ export interface operations {
       };
     };
   };
+  AdminSettingsController_menu: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminMenuSettingsDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminSiteSettingsDto_Output"];
+        };
+      };
+    };
+  };
   AdminSettingsController_booking: {
     parameters: {
       query?: never;
@@ -8799,6 +8971,78 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AdminVisaProductListDto_Output"];
+        };
+      };
+    };
+  };
+  PublicContactController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ContactMessageCreateDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ContactMessageReceiptDto_Output"];
+        };
+      };
+    };
+  };
+  AdminContactController_list: {
+    parameters: {
+      query?: {
+        status?: "NEW" | "IN_PROGRESS" | "CLOSED";
+        q?: string;
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminContactListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminContactController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminContactUpdateDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminContactMessageDto_Output"];
         };
       };
     };

@@ -1511,6 +1511,30 @@ Customers whose email already exists are linked, never overwritten.
   minute late, request body limits set by the host.
 - **Runbook:** `docs/operations/CPANEL_DEPLOYMENT.md`.
 
+## ADR-0041 — Contact form and owner-controlled menu links
+
+- **Date:** 2026-11-16 · **Status:** Accepted
+- **Context:** the owner wants visitors to reach the team for bookings,
+  reservations and any other question without signing in, and wants Stays
+  (date search), Flights and Visa out of the public menu until they are
+  ready, while customers can still reach them.
+- **Decision:**
+  - New `contact_messages` table (additive migration) and
+    `POST /api/v1/contact`: public, origin-checked, rate-limited to 5 per
+    10 minutes per address, with a hidden honeypot field. A signed-in
+    customer's message is linked to the account. Staff with `service:manage`
+    list and update messages (`/admin/contact-messages`, audited); emails go
+    through the outbox (acknowledgement in the sender's language, alert to
+    the purchase-alert address). A message holds or confirms nothing.
+  - New settings section `menu` (`showStays`, `showFlights`, `showVisa`,
+    default off), edited in Console → Settings → Website menu
+    (`settings:manage`, audited) and exposed on `GET /api/v1/site`. The
+    header is now a server component that reads it. The pages keep working
+    and are always linked from My account ("Plan a trip").
+  - The home search panel drops its Visa tab; its tabs are centred.
+- **Consequences:** contact messages contain personal data (name, email,
+  phone): only staff with `service:manage` see them; no retention job yet.
+
 ### ADR-0028 update (2026-11-06)
 
 The partner portal now uses the same next-intl messages (`partner`

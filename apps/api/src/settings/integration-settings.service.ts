@@ -9,10 +9,12 @@ import {
   AnnouncementSchema,
   BookingSettingsSchema,
   GeneralSettingsSchema,
+  MenuSettingsSchema,
   type Announcement,
   type BookingSettings,
   type EmailSettingsInput,
   type GeneralSettings,
+  type MenuSettings,
   type PaymentSettingsInput,
   type PublicSite,
   type SiteSettingsView,
@@ -80,6 +82,8 @@ const DEFAULT_GENERAL: GeneralSettings = {
   officeAddress: "153/1, Shahalibag, Mirpur-1, Dhaka-1216",
   notificationEmail: "pegah.com.bd@gmail.com",
 };
+/** Stays search, flights and visa stay out of the public menu until turned on (ADR-0041). */
+const DEFAULT_MENU: MenuSettings = { showStays: false, showFlights: false, showVisa: false };
 const DEFAULT_ANNOUNCEMENT: Announcement = {
   enabled: false,
   tone: "info",
@@ -104,6 +108,7 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
 
   private general = DEFAULT_GENERAL;
   private announcement = DEFAULT_ANNOUNCEMENT;
+  private menu = DEFAULT_MENU;
   private booking: BookingSettings;
   private payments: EffectivePayments;
   private email: EffectiveEmail;
@@ -170,6 +175,7 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
     return {
       general: this.general,
       announcement: this.announcement.enabled ? this.announcement : null,
+      menu: this.menu,
     };
   }
 
@@ -179,6 +185,7 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
     return {
       general: this.general,
       announcement: this.announcement,
+      menu: this.menu,
       booking: this.booking,
       payments: {
         provider: p.provider,
@@ -213,6 +220,10 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
       enabled: input.enabled,
       tone: input.tone,
     });
+    return this.view();
+  }
+  async saveMenu(input: MenuSettings, actor: AuthContext, ip: string | null) {
+    await this.saveSection("menu", input, actor, ip, input);
     return this.view();
   }
   async saveBooking(input: BookingSettings, actor: AuthContext, ip: string | null) {
@@ -354,6 +365,7 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
       this.general = GeneralSettingsSchema.safeParse(value("general")).data ?? DEFAULT_GENERAL;
       this.announcement =
         AnnouncementSchema.safeParse(value("announcement")).data ?? DEFAULT_ANNOUNCEMENT;
+      this.menu = MenuSettingsSchema.safeParse(value("menu")).data ?? DEFAULT_MENU;
       this.booking = BookingSettingsSchema.safeParse(value("booking")).data ?? {
         holdMinutes: this.config.BOOKING_HOLD_MINUTES,
         paymentExtensionMinutes: this.config.PAYMENT_HOLD_EXTENSION_MINUTES,

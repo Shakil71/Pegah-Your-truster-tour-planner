@@ -56,6 +56,12 @@ export const navGroups: Array<{ title: string; items: NavItem[] }> = [
     title: "Services",
     items: [
       {
+        href: "/messages",
+        label: "Contact messages",
+        icon: "chat",
+        permission: "service:manage",
+      },
+      {
         href: "/requests",
         label: "Visa and flight requests",
         icon: "ticket",

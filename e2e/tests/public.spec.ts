@@ -10,6 +10,7 @@ const pages = [
   { path: "/login", name: "sign in" },
   { path: "/partner/login", name: "partner sign in" },
   { path: "/about", name: "about" },
+  { path: "/contact", name: "contact" },
 ];
 
 for (const p of pages) {
@@ -29,6 +30,26 @@ test("the phone menu opens and leads to the hotels page @mobile", async ({ page 
   await page.locator("#site-menu").getByRole("link", { name: "Hotels" }).click();
   await expect(page).toHaveURL(/\/hotels$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+});
+
+test("a visitor sends a message from the contact page in the menu", async ({ page }) => {
+  await page.goto("/");
+  // Stays, Flights and Visa are off in the menu by default; Contact is always there.
+  const menu = page.getByRole("navigation", { name: "Main" }).first();
+  await expect(menu.getByRole("link", { name: "Visa" })).toHaveCount(0);
+  await menu.getByRole("link", { name: "Contact" }).click();
+  await expect(page).toHaveURL(/\/contact$/);
+
+  await page.getByRole("button", { name: "A package or offer" }).click();
+  const form = page.locator("main form").first();
+  await form.getByLabel("Full name", { exact: true }).fill("Karim Ahmed");
+  await form.getByLabel("Email", { exact: true }).fill("karim@example.com");
+  await form.getByLabel("Phone or WhatsApp", { exact: true }).fill("+8801711000000");
+  await form
+    .getByLabel("Your message", { exact: true })
+    .fill("Please send prices for the Umrah package in March.");
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.getByRole("status")).toContainText(/PC-[2-9A-HJ-NP-Z]{6}/);
 });
 
 test("property and tour pages are accessible @mobile", async ({ page }) => {

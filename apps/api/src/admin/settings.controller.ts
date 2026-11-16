@@ -6,6 +6,7 @@ import {
   EmailSettingsInputSchema,
   EmailTestResultSchema,
   GeneralSettingsSchema,
+  MenuSettingsSchema,
   PaymentSettingsInputSchema,
   PublicSiteSchema,
   SiteSettingsViewSchema,
@@ -26,6 +27,7 @@ class AdminSystemSettingsDto extends createZodDto(SystemSettingsSchema) {}
 class AdminSiteSettingsDto extends createZodDto(SiteSettingsViewSchema) {}
 class AdminGeneralSettingsDto extends createZodDto(GeneralSettingsSchema) {}
 class AdminAnnouncementDto extends createZodDto(AnnouncementSchema) {}
+class AdminMenuSettingsDto extends createZodDto(MenuSettingsSchema) {}
 class AdminBookingSettingsDto extends createZodDto(BookingSettingsSchema) {}
 class AdminPaymentSettingsDto extends createZodDto(PaymentSettingsInputSchema) {}
 class AdminEmailSettingsDto extends createZodDto(EmailSettingsInputSchema) {}
@@ -128,6 +130,14 @@ export class AdminSettingsController {
     @Req() r: FastifyRequest,
   ) {
     return this.settings.saveAnnouncement(b, a, ip(r));
+  }
+
+  /** Which optional pages (stays search, flights, visa) appear in the website menu. */
+  @RequirePermissions("settings:manage")
+  @Put("menu")
+  @ZodResponse({ status: 200, type: AdminSiteSettingsDto })
+  menu(@Body() b: AdminMenuSettingsDto, @CurrentAuth() a: AuthContext, @Req() r: FastifyRequest) {
+    return this.settings.saveMenu(b, a, ip(r));
   }
 
   @RequirePermissions("settings:manage")

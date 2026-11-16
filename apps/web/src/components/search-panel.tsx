@@ -3,7 +3,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type ReactNode } from "react";
 import { dhakaDate } from "@pegah/shared";
@@ -123,7 +122,10 @@ export function SearchPanel() {
   return (
     <div className="relative z-10 mx-auto -mt-10 max-w-[1280px] md:-mt-24">
       <Tabs.Root defaultValue="stays" className="rounded-card bg-card shadow-lift">
-        <Tabs.List aria-label={t("tabsLabel")} className="flex flex-wrap gap-1 px-3.5 pt-2.5">
+        <Tabs.List
+          aria-label={t("tabsLabel")}
+          className="flex flex-wrap justify-center gap-1 px-3.5 pt-2.5"
+        >
           <Tabs.Trigger value="stays" className={tabClass}>
             <Icon name="bed" />
             {t("stays")}
@@ -135,10 +137,6 @@ export function SearchPanel() {
           <Tabs.Trigger value="flights" className={tabClass}>
             <Icon name="plane" />
             {t("flights")}
-          </Tabs.Trigger>
-          <Tabs.Trigger value="visa" className={tabClass}>
-            <Icon name="doc" />
-            {t("visa")}
           </Tabs.Trigger>
         </Tabs.List>
 
@@ -374,15 +372,6 @@ export function SearchPanel() {
             <p className="m-0 text-[0.84rem] text-ink-2 md:col-span-4">{t("flightsSoon")}</p>
           </form>
         </Tabs.Content>
-        <Tabs.Content value="visa">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-rule px-6 pb-6 pt-5">
-            <p className="m-0 max-w-[60ch] text-ink-2">{t("visaSoon")}</p>
-            <Link href="/visa" className={buttonClass("primary", "lg", "h-12 no-underline")}>
-              {t("visaCta")} <Icon name="arrowRight" />
-            </Link>
-          </div>
-        </Tabs.Content>
-
         <datalist id="pg-places">
           {places.map((p) => (
             <option key={p} value={p} />

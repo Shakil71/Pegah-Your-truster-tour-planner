@@ -18,6 +18,18 @@ export const GeneralSettingsSchema = z.object({
 });
 export type GeneralSettings = z.infer<typeof GeneralSettingsSchema>;
 
+/**
+ * Optional links in the website's main menu (ADR-0041). Off by default: the
+ * pages still work and stay linked from My account, they are just not in the
+ * public menu until the owner turns them on in the console.
+ */
+export const MenuSettingsSchema = z.object({
+  showStays: z.boolean(),
+  showFlights: z.boolean(),
+  showVisa: z.boolean(),
+});
+export type MenuSettings = z.infer<typeof MenuSettingsSchema>;
+
 export const AnnouncementSchema = z
   .object({
     enabled: z.boolean(),
@@ -79,6 +91,7 @@ export type EmailSettingsInput = z.infer<typeof EmailSettingsInputSchema>;
 export const SiteSettingsViewSchema = z.object({
   general: GeneralSettingsSchema,
   announcement: AnnouncementSchema,
+  menu: MenuSettingsSchema,
   booking: BookingSettingsSchema,
   payments: z.object({
     provider: z.enum(["none", "sslcommerz", "simulator"]),
@@ -111,9 +124,10 @@ export const EmailTestResultSchema = z.object({
   to: z.string(),
 });
 
-/** What the public website needs: contact details and the announcement. */
+/** What the public website needs: contact details, the announcement and menu links. */
 export const PublicSiteSchema = z.object({
   general: GeneralSettingsSchema,
   announcement: AnnouncementSchema.nullable(),
+  menu: MenuSettingsSchema,
 });
 export type PublicSite = z.infer<typeof PublicSiteSchema>;

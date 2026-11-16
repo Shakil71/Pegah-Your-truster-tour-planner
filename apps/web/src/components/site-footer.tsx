@@ -24,7 +24,7 @@ const columns: { title: string; links: { key: string; href: string | null }[] }[
       { key: "manageBooking", href: "/account/bookings" },
       { key: "cancellations", href: "/pages/cancellations" },
       { key: "paymentMethods", href: "/pages/payments" },
-      { key: "contact", href: "/pages/contact" },
+      { key: "contact", href: "/contact" },
     ],
   },
   {

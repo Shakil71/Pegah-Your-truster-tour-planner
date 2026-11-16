@@ -68,6 +68,7 @@ function useSave(csrfToken: string) {
     path:
       | "/api/v1/admin/settings/general"
       | "/api/v1/admin/settings/announcement"
+      | "/api/v1/admin/settings/menu"
       | "/api/v1/admin/settings/booking"
       | "/api/v1/admin/settings/payments"
       | "/api/v1/admin/settings/email",
@@ -197,6 +198,42 @@ export function AnnouncementForm({ view, csrfToken }: { view: View; csrfToken: s
         className={buttonClass("primary", "sm", "justify-self-start")}
       >
         {busy ? "Saving…" : "Save banner"}
+      </button>
+    </Section>
+  );
+}
+
+export function MenuForm({ view, csrfToken }: { view: View; csrfToken: string }) {
+  const [v, setV] = useState(view.menu);
+  const { busy, note, save } = useSave(csrfToken);
+  return (
+    <Section
+      title="Website menu"
+      intro="Choose which optional pages appear in the website's main menu. Pages that are off still work and stay linked from the customer's My account page. Hotels, Tours, Offers, Gift cards, About and Contact are always in the menu."
+    >
+      <Toggle
+        label="Stays (search by dates and destination)"
+        checked={v.showStays}
+        onChange={(showStays) => setV({ ...v, showStays })}
+      />
+      <Toggle
+        label="Flights (ticket requests)"
+        checked={v.showFlights}
+        onChange={(showFlights) => setV({ ...v, showFlights })}
+      />
+      <Toggle
+        label="Visa (visa services)"
+        checked={v.showVisa}
+        onChange={(showVisa) => setV({ ...v, showVisa })}
+      />
+      {note && <FormAlert tone={note.tone}>{note.text}</FormAlert>}
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => save("/api/v1/admin/settings/menu", v)}
+        className={buttonClass("primary", "sm", "justify-self-start")}
+      >
+        {busy ? "Saving…" : "Save menu"}
       </button>
     </Section>
   );

@@ -10,6 +10,7 @@ import {
   BookingForm,
   EmailForm,
   GeneralForm,
+  MenuForm,
   PaymentsForm,
 } from "./settings-forms";
 
@@ -212,6 +213,7 @@ export default async function SettingsPage() {
       <div className="grid gap-5 lg:grid-cols-2">
         {canManage && <GeneralForm view={view} csrfToken={session.csrfToken} />}
         {canManage && <AnnouncementForm view={view} csrfToken={session.csrfToken} />}
+        {canManage && <MenuForm view={view} csrfToken={session.csrfToken} />}
         {canManage && <BookingForm view={view} csrfToken={session.csrfToken} />}
         {canSecrets && <PaymentsForm view={view} csrfToken={session.csrfToken} />}
         {canSecrets && <EmailForm view={view} csrfToken={session.csrfToken} />}

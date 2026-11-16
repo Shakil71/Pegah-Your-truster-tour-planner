@@ -22,7 +22,8 @@
     "visa": "Visa",
     "hotels": "Hotels",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "contact": "Contact"
   },
   "footer": {
     "tagline": "Stays, tours and travel planning across Bangladesh.",
@@ -402,7 +403,8 @@
     "signOut": "Sign out",
     "signingOut": "Signing out…",
     "ordersTab": "Orders and gift cards",
-    "requestsTab": "Visa & flights"
+    "requestsTab": "Visa & flights",
+    "servicesLabel": "Plan a trip"
   },
   "trip": {
     "title": "Trip details",
@@ -1045,5 +1047,48 @@
     "tripLine": "{from} → {to}",
     "people": "{count, plural, one {# traveller} other {# travellers}}",
     "addedBy": "added by Pegah"
+  },
+  "contact": {
+    "title": "Contact us",
+    "eyebrow": "We're here to help",
+    "intro": "Ask about a new booking, an existing reservation, a package or anything else. A travel planner replies by phone or email, usually the same day.",
+    "formTitle": "Send us a message",
+    "formIntro": "Tell us what you need and how to reach you.",
+    "topicLabel": "What is it about?",
+    "topics": {
+      "BOOKING": "A new booking",
+      "RESERVATION": "My reservation",
+      "PACKAGE": "A package or offer",
+      "OTHER": "Something else"
+    },
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone or WhatsApp",
+    "travelDate": "Travel date (optional)",
+    "guests": "Number of guests (optional)",
+    "message": "Your message",
+    "messageHint": "At least 10 characters. Include the hotel, tour or booking reference if you have one.",
+    "placeholders": {
+      "BOOKING": "Where would you like to go, when, and for how many people?",
+      "RESERVATION": "Your booking reference (PG-…) and what you'd like to change or ask.",
+      "PACKAGE": "Which package or offer, your dates and the number of travellers.",
+      "OTHER": "How can we help?"
+    },
+    "send": "Send message",
+    "sending": "Sending…",
+    "noBooking": "Sending a message does not hold or confirm a booking.",
+    "sentTitle": "Message sent",
+    "sentBody": "Thank you. A travel planner will contact you soon. Your reference is {reference}.",
+    "another": "Send another message",
+    "otherWays": "Other ways to reach us",
+    "call": "Call",
+    "emailUs": "Email",
+    "office": "Office",
+    "whatNext": "What happens next",
+    "steps": {
+      "one": "We read your message and check prices and availability.",
+      "two": "A travel planner calls or emails you with options.",
+      "three": "When you're happy, we book it and send your confirmation."
+    }
   }
 }

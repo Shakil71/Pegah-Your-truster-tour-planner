@@ -59,6 +59,7 @@ model User {
   travellers      TravellerProfile[]
   resetTokens     PasswordResetToken[]
   verifyTokens    EmailVerificationToken[]
+  contactMessages ContactMessage[]
   partner         Partner?                 @relation(fields: [partnerId], references: [id], onDelete: Restrict)
 
   @@index([partnerId])
@@ -1204,6 +1205,52 @@ model GiftCardTxn {
 }
 
 // ─── Old website import (ADR-0038) ───────────────────────────────────────────
+
+// ─── Contact messages (ADR-0041) ─────────────────────────────────────────────
+
+enum ContactTopic {
+  BOOKING
+  RESERVATION
+  PACKAGE
+  OTHER
+}
+
+enum ContactStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+/// A message sent from the website's contact form, by a visitor or a signed-in
+/// customer. Asking never holds or confirms anything; staff reply by phone or
+/// email and track the status here.
+model ContactMessage {
+  id          BigInt        @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId    String        @unique @map("public_id") @db.Char(26)
+  /// Read over the phone, e.g. PC-7K3QX9.
+  reference   String        @unique @db.VarChar(12)
+  topic       ContactTopic
+  status      ContactStatus @default(NEW)
+  name        String        @db.VarChar(120)
+  email       String        @db.VarChar(254)
+  phone       String        @db.VarChar(20)
+  /// Optional trip details for booking and reservation questions.
+  travelDate  DateTime?     @map("travel_date") @db.Date
+  guests      Int?          @db.UnsignedSmallInt
+  message     String        @db.Text
+  userId      BigInt?       @map("user_id") @db.UnsignedBigInt
+  staffNote   String?       @map("staff_note") @db.VarChar(1000)
+  handledById BigInt?       @map("handled_by_id") @db.UnsignedBigInt
+  handledAt   DateTime?     @map("handled_at") @db.DateTime(3)
+  createdAt   DateTime      @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.DateTime(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Restrict)
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("contact_messages")
+}
 
 /// Every row imported from the old Pegah website, verbatim except credentials,
 /// so no source field is lost. target_* points at the row it became, if any.

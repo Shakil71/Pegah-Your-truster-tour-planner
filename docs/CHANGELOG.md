@@ -4,6 +4,20 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Contact form and menu settings (2026-11-16)
+
+- `/contact` (in the main menu and the footer): anyone can ask about a new
+  booking, a reservation, a package or anything else; optional travel date
+  and guests; the sender gets a reference (PC-…) and an acknowledgement
+  email, staff get an alert. Rate-limited, honeypot against bots; nothing is
+  held or confirmed by sending a message.
+- Console → Services → Contact messages: filter by status, search, call or
+  email, staff notes, New → In progress → Closed (audited).
+- Console → Settings → Website menu: Stays, Flights and Visa are off in the
+  public menu by default and can be turned on; My account shows a "Plan a
+  trip" row with every service.
+- Home search panel: the Visa tab is removed and the tabs are centred.
+
 ### Added — Seasonal gift cards (2026-11-16)
 
 - `/gift-cards` shows four sea-season cards — Cox's Bazar Sunset Weekend
