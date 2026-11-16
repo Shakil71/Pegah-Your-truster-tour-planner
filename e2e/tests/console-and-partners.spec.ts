@@ -134,14 +134,15 @@ test("a photo uploaded in the console becomes a hotel's main photo on the websit
 
   await staffSignIn(page);
   await page.goto("/admin/catalog/media");
-  await page.getByLabel("Photo (JPEG, PNG or WebP)").setInputFiles({
+  await page.getByLabel("Photo files").setInputFiles({
     name: "lodge.png",
     mimeType: "image/png",
     buffer: png,
   });
-  await page
-    .getByLabel("Description for screen readers (required)")
-    .fill("Lodge veranda at sunset");
+  // The description is prefilled from the file name ("Lodge"); replace it.
+  const description = page.getByLabel("Description: lodge.png");
+  await expect(description).toHaveValue("Lodge");
+  await description.fill("Lodge veranda at sunset");
   await page.getByRole("button", { name: "Upload photo" }).click();
   await expect(page.getByText("Lodge veranda at sunset").first()).toBeVisible();
   await expectAccessible(page, "media library");

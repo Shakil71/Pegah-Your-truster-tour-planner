@@ -94,7 +94,7 @@ export function UploadForm({
           add(e.dataTransfer.files);
         }}
         className={cx(
-          "grid cursor-pointer justify-items-center gap-1.5 rounded-[12px] border-2 border-dashed px-4 py-6 text-center transition-colors",
+          "grid cursor-pointer justify-items-center gap-1.5 rounded-[12px] border-2 border-dashed px-4 py-6 text-center transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary",
           dragging ? "border-primary bg-primary-soft" : "border-rule hover:border-ink-3",
         )}
       >
@@ -111,6 +111,7 @@ export function UploadForm({
           ref={input}
           type="file"
           accept="image/*,.heic,.heif"
+          aria-label={multiple ? "Photo files" : "Photo file"}
           multiple={multiple}
           onChange={(e) => add(e.target.files)}
           className="sr-only"
