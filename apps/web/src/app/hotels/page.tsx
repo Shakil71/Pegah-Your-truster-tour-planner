@@ -8,6 +8,7 @@ import { ensure, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
 import { localName } from "@/lib/format";
 import { matchDestination, photoFor } from "@/lib/trip";
+import { cleanText } from "@/lib/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("hotels");
@@ -141,7 +142,7 @@ export default async function HotelsPage({
                             </Link>
                           </h3>
                           <p className="mt-1.5 line-clamp-2 flex-1 text-[0.86rem] text-ink-2">
-                            {h.summary}
+                            {cleanText(h.summary)}
                           </p>
                           <span className="mt-3 inline-flex items-center gap-1 text-[0.86rem] font-semibold text-primary-ink">
                             {t("view")} <Icon name="arrowRight" className="size-4" />

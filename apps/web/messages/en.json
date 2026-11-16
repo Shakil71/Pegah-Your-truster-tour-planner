@@ -245,7 +245,13 @@
     "petPolicy": "Pets",
     "breakfast": "Breakfast included",
     "houseRules": "House rules",
-    "specialNote": "Good to know"
+    "specialNote": "Good to know",
+    "photoTotal": "{count} photos",
+    "allRoomDetails": "Show {count} more room details",
+    "askHint": "Online prices for these dates are not published yet. Message us and a travel planner will confirm the price and availability.",
+    "askOnWhatsApp": "Ask on WhatsApp",
+    "callUs": "Call us",
+    "askMessage": "Hello Pegah, I'd like the price and availability of the {room} at {hotel}, {checkIn} to {checkOut}, {adults} adults, {children} children, {rooms} room(s)."
   },
   "tours": {
     "title": "Tours",

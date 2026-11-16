@@ -4,6 +4,18 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed — Hotel room cards (2026-11-16)
+
+- Room cards on hotel pages are redesigned: a fixed 4:3 photo with a photo
+  count, key facts, the room description split into a checklist (four shown,
+  the rest behind "Show more room details"), up to six facilities, and the
+  price with the booking button in a footer row.
+- When a room is not on sale for the chosen dates, the card offers "Ask on
+  WhatsApp" (message prefilled with hotel, room, dates and guests) and "Call
+  us" instead of a dead end. Asking holds or confirms nothing.
+- Text imported from the old website no longer shows HTML entities
+  ("Caf&eacute;" → "Café") anywhere on the hotel page or hotel list.
+
 ### Added — Hotels page, phone menu and sharper old photos (2026-11-16)
 
 - `/hotels` lists every published hotel by destination, with a destination
