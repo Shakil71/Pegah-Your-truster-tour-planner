@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Icon, buttonClass } from "@pegah/ui";
+import { Icon, buttonClass, cx } from "@pegah/ui";
 import sajek from "@/assets/images/sajek-sunrise.jpg";
+import { GiftCardFace } from "@/components/gift-card-face";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { GIFT_CARD_THEMES } from "@/data/gift-card-themes";
 import type { Locale } from "@/i18n/locales";
 import { getCustomer, serverApi } from "@/lib/api-server";
 import { localName } from "@/lib/format";
-import { isLibraryImage } from "@/lib/media";
 import { GiftCardForm } from "./gift-card-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -122,20 +122,34 @@ export default async function GiftCardsPage({
                 {t("checkBalance")} →
               </Link>
             </div>
-            {/* A card-like preview of what the recipient gets. */}
-            <div
-              aria-hidden="true"
-              className="relative mx-auto aspect-[1.6/1] w-full max-w-[440px] rotate-[-4deg] rounded-[22px] bg-[linear-gradient(135deg,var(--pg-primary),var(--pg-primary-hover))] p-7 text-fixed-ink shadow-lift"
-            >
-              <span className="block text-[0.72rem] font-bold uppercase tracking-[0.18em] opacity-80">
-                Gift card
-              </span>
-              {/* eslint-disable-next-line @next/next/no-img-element -- brand wordmark */}
-              <img src="/brand/pegah-logo.webp" alt="" className="mt-4 h-14 w-auto" />
-              <span className="absolute bottom-6 left-7 font-mono text-[1.05rem] tracking-[0.18em]">
-                XXXX-XXXX-XXXX-XXXX
-              </span>
-            </div>
+            {/* What the recipient gets: the chosen design, or the plain brand card. */}
+            {theme ? (
+              <div aria-hidden="true" className="mx-auto w-full max-w-[440px] rotate-[-4deg]">
+                <GiftCardFace
+                  image={theme.image}
+                  focus={theme.focus}
+                  amountTaka={theme.amountTaka}
+                  label={theme.label}
+                  cardLabel={t("cardLabel")}
+                  sizes="440px"
+                  priority
+                />
+              </div>
+            ) : (
+              <div
+                aria-hidden="true"
+                className="relative mx-auto aspect-[1.6/1] w-full max-w-[440px] rotate-[-4deg] rounded-[22px] bg-[linear-gradient(135deg,var(--pg-primary),var(--pg-primary-hover))] p-7 text-fixed-ink shadow-lift"
+              >
+                <span className="block text-[0.72rem] font-bold uppercase tracking-[0.18em] opacity-80">
+                  Gift card
+                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element -- brand wordmark */}
+                <img src="/brand/pegah-logo.webp" alt="" className="mt-4 h-14 w-auto" />
+                <span className="absolute bottom-6 left-7 font-mono text-[1.05rem] tracking-[0.18em]">
+                  XXXX-XXXX-XXXX-XXXX
+                </span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -158,57 +172,49 @@ export default async function GiftCardsPage({
                   </p>
                 </div>
               </div>
-              <ul className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                {cards.map((g) => (
-                  <li key={g.id}>
-                    <article className="group relative flex h-full flex-col overflow-hidden rounded-card bg-card shadow-lift ring-1 ring-rule">
-                      <div className="relative aspect-[1.6/1] overflow-hidden bg-night text-white">
-                        <Image
-                          src={g.image}
+              <ul className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
+                {cards.map((g) => {
+                  const chosen = theme?.id === g.id;
+                  return (
+                    <li key={g.id}>
+                      <article className="group relative flex h-full flex-col">
+                        <GiftCardFace
+                          image={g.image}
                           alt={g.alt}
-                          fill
-                          unoptimized={isLibraryImage(g.image)}
-                          placeholder={typeof g.image === "string" ? "empty" : "blur"}
+                          focus={g.focus}
+                          amountTaka={g.amountTaka}
+                          label={g.label}
+                          cardLabel={t("cardLabel")}
                           sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
-                          style={{ objectPosition: g.focus }}
-                          className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-                        />
-                        <div className="absolute inset-0 bg-[linear-gradient(160deg,rgb(9_12_34/0.15),rgb(9_12_34/0.75))]" />
-                        {/* eslint-disable-next-line @next/next/no-img-element -- brand wordmark */}
-                        <img
-                          src="/brand/pegah-logo.webp"
-                          alt=""
-                          className="absolute left-4 top-4 h-8 w-auto drop-shadow"
-                        />
-                        <span className="absolute right-4 top-4 rounded-full bg-primary px-3 py-1 font-display text-[1.15rem] font-medium text-on-primary tabular">
-                          ৳{g.amountTaka.toLocaleString("en-IN")}
-                        </span>
-                        <span className="absolute bottom-3 left-4 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/90">
-                          {t("cardLabel")}
-                          {g.label ? ` · ${g.label}` : ""}
-                        </span>
-                      </div>
-                      <div className="flex flex-1 flex-col p-5">
-                        <h3 className="font-display text-[1.35rem] font-medium leading-tight">
-                          {g.name}
-                        </h3>
-                        <p className="mt-1.5 flex-1 text-[0.9rem] text-ink-2">{g.line}</p>
-                        <Link
-                          href={chooseHref(g.id)}
-                          aria-label={`${t("season.choose")}: ${g.name}`}
-                          className={buttonClass(
-                            theme?.id === g.id ? "primary" : "outline",
-                            "md",
-                            "mt-4 no-underline after:absolute after:inset-0",
+                          className={cx(
+                            "transition duration-500 group-hover:-translate-y-1.5 group-hover:-rotate-2",
+                            chosen && "ring-4 ring-primary",
                           )}
-                        >
-                          {theme?.id === g.id ? t("season.chosen") : t("season.choose")}
-                        </Link>
-                        {g.credit && <p className="mt-3 text-[0.7rem] text-ink-3">{g.credit}</p>}
-                      </div>
-                    </article>
-                  </li>
-                ))}
+                        />
+                        <div className="flex flex-1 flex-col px-1 pt-4">
+                          <h3 className="font-display text-[1.3rem] font-medium leading-tight">
+                            {g.name}
+                          </h3>
+                          <p className="mt-1 flex-1 text-[0.9rem] text-ink-2">{g.line}</p>
+                          <Link
+                            href={chooseHref(g.id)}
+                            aria-label={`${t("season.choose")}: ${g.name}`}
+                            className={buttonClass(
+                              chosen ? "primary" : "outline",
+                              "md",
+                              "mt-4 no-underline after:absolute after:inset-0",
+                            )}
+                          >
+                            {chosen ? t("season.chosen") : t("season.choose")}
+                          </Link>
+                          {g.credit && (
+                            <p className="mt-2.5 text-[0.7rem] text-ink-3">{g.credit}</p>
+                          )}
+                        </div>
+                      </article>
+                    </li>
+                  );
+                })}
               </ul>
               <p className="mt-5 flex items-start gap-2 text-[0.86rem] text-ink-2">
                 <Icon name="check" className="mt-0.5 size-4 shrink-0 text-good" />
