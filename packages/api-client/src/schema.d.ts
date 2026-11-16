@@ -3071,6 +3071,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       } | null;
       /** Format: date-time */
       updatedAt: string;
@@ -3171,6 +3173,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       }[];
       amenities: string[];
     };
@@ -3206,6 +3210,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       } | null;
       propertyType: ("HOTEL" | "RESORT" | "HOTEL_RESORT") | null;
       distanceFromCity: string | null;
@@ -3220,6 +3226,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       }[];
       amenities: string[];
       rooms: components["schemas"]["AdminRoom_Output"][];
@@ -3404,6 +3412,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       } | null;
       tourType: string | null;
       overview: string | null;
@@ -3423,6 +3433,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       }[];
       amenities: string[];
       departures: components["schemas"]["AdminDeparture_Output"][];
@@ -4210,6 +4222,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         } | null;
         validUntil: string | null;
         remaining: number | null;
@@ -4229,6 +4243,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       } | null;
       validUntil: string | null;
       remaining: number | null;
@@ -4247,6 +4263,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         };
         linkHref: string;
         /** @enum {string} */
@@ -4396,6 +4414,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         } | null;
         validUntil: string | null;
         remaining: number | null;
@@ -4442,6 +4462,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         } | null;
         validUntil: string | null;
         remaining: number | null;
@@ -4484,6 +4506,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         };
         linkHref: string;
         /** @enum {string} */
@@ -4520,6 +4544,8 @@ export interface components {
           key: string;
           url: string;
           alt: string;
+          width?: number | null;
+          height?: number | null;
         };
         linkHref: string;
         /** @enum {string} */
@@ -5063,6 +5089,8 @@ export interface components {
         key: string;
         url: string;
         alt: string;
+        width?: number | null;
+        height?: number | null;
       } | null;
       openRequests: number;
     };

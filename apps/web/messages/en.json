@@ -628,7 +628,40 @@
     "signInFirst": "Sign in to place an order",
     "unavailable": "This offer is no longer available.",
     "priceChanged": "The price changed. The page has been refreshed.",
-    "howItWorks": "After you order, pay online if it is available, or our team will call you to complete the payment by bKash, bank transfer or cash."
+    "howItWorks": "After you order, pay online if it is available, or our team will call you to complete the payment by bKash, bank transfer or cash.",
+    "badge": "Package offer",
+    "from": "From",
+    "noDetails": "Ask us for the full details of this package.",
+    "facts": {
+      "title": "Package at a glance",
+      "duration": "Duration",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "nights": "{count, plural, one {# night} other {# nights}}",
+      "visa": "Visa",
+      "flights": "Air tickets",
+      "meals": "Meals",
+      "transport": "Transport",
+      "insurance": "Insurance",
+      "included": "Included"
+    },
+    "sections": {
+      "included": "What's included",
+      "hotels": "Hotels",
+      "requirements": "What you need",
+      "policy": "Payment and cancellation",
+      "contact": "Our offices",
+      "about": "About this package"
+    },
+    "steps": {
+      "order": "Place your order — nothing is charged yet.",
+      "confirm": "A planner calls you to confirm dates, travellers and the final price.",
+      "pay": "Pay online if available, or by bKash, bank transfer or cash."
+    },
+    "questions": "Questions about this package?",
+    "questionsHint": "Talk to a travel planner before you order.",
+    "askOnWhatsApp": "Ask on WhatsApp",
+    "callUs": "Call {phone}",
+    "askMessage": "Hello Pegah, I'd like to know more about the \"{offer}\" package."
   },
   "giftCards": {
     "title": "Gift cards",

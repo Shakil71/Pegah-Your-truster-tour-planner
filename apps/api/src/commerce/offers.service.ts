@@ -17,7 +17,9 @@ import { ProblemException } from "../common/problem";
 import { APP_CONFIG, type AppConfig } from "../config/config";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 
-const MEDIA = { select: { storageKey: true, altText: true } } as const;
+const MEDIA = {
+  select: { storageKey: true, altText: true, width: true, height: true },
+} as const;
 const OFFER_INCLUDE = { hero: MEDIA } satisfies Prisma.OfferInclude;
 const AD_INCLUDE = { media: MEDIA } satisfies Prisma.AdInclude;
 type OfferRow = Prisma.OfferGetPayload<{ include: typeof OFFER_INCLUDE }>;
@@ -32,12 +34,16 @@ export class OffersService {
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
-  private ref(m: { storageKey: string; altText: string } | null) {
+  private ref(
+    m: { storageKey: string; altText: string; width: number | null; height: number | null } | null,
+  ) {
     if (!m) return null;
     return {
       key: m.storageKey,
       url: `${this.config.MEDIA_BASE_URL.replace(/\/$/, "")}/${m.storageKey}`,
       alt: m.altText,
+      width: m.width,
+      height: m.height,
     };
   }
 

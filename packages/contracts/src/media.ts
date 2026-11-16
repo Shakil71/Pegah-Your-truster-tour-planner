@@ -54,4 +54,11 @@ export const MediaUpdateSchema = z.object({
 export const MediaResultSchema = z.object({ media: MediaAssetViewSchema });
 
 /** Main photo picked for a destination, hotel or tour (admin view). */
-export const HeroRefSchema = z.object({ key: MediaKeySchema, url: z.string(), alt: z.string() });
+export const HeroRefSchema = z.object({
+  key: MediaKeySchema,
+  url: z.string(),
+  alt: z.string(),
+  /** Pixel size, when known: pages show small photos near their real size. */
+  width: z.number().int().nullable().optional(),
+  height: z.number().int().nullable().optional(),
+});

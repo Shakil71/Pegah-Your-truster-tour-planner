@@ -4,6 +4,21 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed — Offer pages (2026-11-16)
+
+- Offer pages lay the package out in titled cards — what's included, hotels
+  (one tile per city), what you need, payment and cancellation, offices
+  (phone and email as links) — read from the offer text ("~" points,
+  "Label: value" rows, "## Heading" and "Heading~" titles).
+- A "package at a glance" row shows duration, nights per city and whether
+  visa, air tickets, meals, transport and insurance are included; each
+  fact appears only when the offer text says so.
+- The price card stays in view while scrolling, explains the three steps
+  after ordering, and a "Questions?" card offers WhatsApp and a call.
+- Offer photos now carry their size (`width`/`height`, optional, on the
+  shared media reference), so small photos are shown sharp like on hotel
+  pages; summaries clipped on import end at the last full sentence.
+
 ### Changed — Hotel room cards (2026-11-16)
 
 - Room cards on hotel pages are redesigned: a fixed 4:3 photo with a photo

@@ -1,7 +1,7 @@
 import Image, { type StaticImageData } from "next/image";
 import { isLibraryImage, isLowRes, sharpWidth } from "@/lib/media";
 
-type Media = { url: string; alt: string; width: number | null; height: number | null };
+type Media = { url: string; alt: string; width?: number | null; height?: number | null };
 
 /**
  * Background photo for the hotel and tour page banners. A large photo fills
