@@ -28,6 +28,30 @@ const nextConfig: NextConfig = {
     qualities: [90],
   },
   poweredByHeader: false,
+  // Security headers on every page (ADR-0015). The full script CSP stays
+  // with Nginx/the API; here: no framing (clickjacking), no MIME sniffing,
+  // a strict referrer, HTTPS only, and no camera/microphone/location use.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
+          },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Strict-Transport-Security", value: "max-age=31536000" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=()",
+          },
+        ],
+      },
+    ];
+  },
   // Self-contained server bundle for hosts without a build step (cPanel, ADR-0040).
   ...(process.env.NEXT_OUTPUT === "standalone"
     ? { output: "standalone" as const, outputFileTracingRoot: path.join(__dirname, "../..") }

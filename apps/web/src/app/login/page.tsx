@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { safeRedirectPath } from "@pegah/shared";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 function safeNext(next: string | undefined): string {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/account/bookings";
+  return safeRedirectPath(next, "/account/bookings");
 }
 
 export default async function LoginPage({

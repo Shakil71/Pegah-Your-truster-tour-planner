@@ -4,6 +4,27 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Security — Full review (2026-11-17)
+
+- Fixed an open redirect after sign-in: `?next=/\evil.com` passed the old
+  check (browsers read "\" as "/"). Website and console now share
+  `safeRedirectPath` (@pegah/shared), which only accepts same-site paths.
+- Website and console pages now send X-Frame-Options (console: DENY),
+  CSP frame-ancestors, nosniff, Referrer-Policy, HSTS and
+  Permissions-Policy. The console could previously be framed
+  (clickjacking on buttons such as Delete).
+- Reviewed with no change needed: every raw SQL query is parameterised;
+  all 98 /admin routes require a staff permission; customer and partner
+  reads are scoped to their owner; sessions are hashed, idle- and
+  absolute-expiring and revoked on password change/reset or disable;
+  Argon2id passwords with timing-safe login; CSRF token and origin check
+  on mutations; uploads re-encoded or magic-byte checked; payments
+  verified server-side (amount, currency, signature); simulator refused in
+  production; email HTML escaped; old-site passwords and ID numbers never
+  archived; no secrets in the repository or its history.
+- Open: `npm audit` reports 2 low issues (deepmerge via nestjs-zod, used
+  only to build the API document); fixing needs nestjs-zod 5.6.
+
 ### Added — Delete and show/hide everywhere in the console (2026-11-16)
 
 - One control (`ItemActions`) on every listing: a Showing/Hidden switch and

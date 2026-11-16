@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { safeRedirectPath } from "@pegah/shared";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Logo } from "@pegah/ui";
@@ -9,7 +10,7 @@ import { LoginForm } from "./login-form";
 export const metadata: Metadata = { title: "Sign in" };
 
 function safeNext(next: string | undefined): string {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  return safeRedirectPath(next, "/");
 }
 
 export default async function LoginPage({
