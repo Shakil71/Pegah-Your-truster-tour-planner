@@ -14,22 +14,55 @@ describe("decodeEntities", () => {
 });
 
 describe("featureList", () => {
-  it("splits a bullet-joined line from the old website", () => {
+  it("splits a bullet-joined line and drops a point cut short by the import", () => {
     expect(
-      featureList("• express check — in and check out • welcome drinks on arrival • Caf&eacute;"),
-    ).toEqual(["Express check — in and check out", "Welcome drinks on arrival", "Café"]);
+      featureList(
+        "• express check — in and check out • welcome drinks on arrival • 2 Caf&eacute;s with Bangla, Indian, Thai, Chinese cuisine. • Exclusive dining room •…",
+      ),
+    ).toEqual([
+      "Express check — in and check out",
+      "Welcome drinks on arrival",
+      "2 Cafés with Bangla, Indian, Thai, Chinese cuisine",
+      "Exclusive dining room",
+    ]);
   });
 
-  it("splits one item per line", () => {
+  it("turns an 'in room – a, b, c' sentence into points and drops list intros", () => {
+    expect(
+      featureList(
+        "Deluxe room with a large balcony and sea view. in room – mini bar, safe deposit box, led tv , hot & cold water, daily newspaper etc. The room includes the following privileges of complimentary services as follows: • express…",
+      ),
+    ).toEqual([
+      "Deluxe room with a large balcony and sea view",
+      "Mini bar",
+      "Safe deposit box",
+      "Led tv",
+      "Hot & cold water",
+      "Daily newspaper",
+    ]);
+  });
+
+  it("reads ** lists and skips the intro sentence", () => {
+    expect(
+      featureList(
+        "You get the below amenities & facilities for this room. ** Wooden interior. ** Mizoram view balcony. ** Room service 6AM-11PM",
+      ),
+    ).toEqual(["Wooden interior", "Mizoram view balcony", "Room service 6AM-11PM"]);
+  });
+
+  it("splits one item per line and plain sentences", () => {
     expect(featureList("Sea view\n- Balcony\n\nFree WiFi.")).toEqual([
       "Sea view",
       "Balcony",
       "Free WiFi",
     ]);
+    expect(featureList("## A calm room. It faces the hills.")).toEqual([
+      "A calm room",
+      "It faces the hills",
+    ]);
   });
 
-  it("returns a sentence as one item and nothing for empty text", () => {
-    expect(featureList("A calm room facing the hills.")).toEqual(["A calm room facing the hills"]);
+  it("returns nothing for empty text", () => {
     expect(featureList(null)).toEqual([]);
     expect(cleanText("  a  b ")).toBe("a b");
   });

@@ -7,9 +7,11 @@ All notable changes to this project. Format based on Keep a Changelog.
 ### Changed — Hotel room cards (2026-11-16)
 
 - Room cards on hotel pages are redesigned: a fixed 4:3 photo with a photo
-  count, key facts, the room description split into a checklist (four shown,
-  the rest behind "Show more room details"), up to six facilities, and the
-  price with the booking button in a footer row.
+  count that never stretches with long text, key facts, the room description
+  as one point per line (six shown, the rest behind "Show more room
+  details"; "•", "\*\*" and "in room – a, b, c" lists are split, list intros
+  and points cut short by the import are dropped), up to six facilities, and
+  the price with the booking button in a footer row.
 - When a room is not on sale for the chosen dates, the card offers "Ask on
   WhatsApp" (message prefilled with hotel, room, dates and guests) and "Call
   us" instead of a dead end. Asking holds or confirms nothing.

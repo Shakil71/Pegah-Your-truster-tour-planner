@@ -21,7 +21,7 @@ const REASONS: Record<string, string> = {
 };
 
 /** Highlights shown before "Show all room details". */
-const SHOWN = 4;
+const SHOWN = 6;
 
 /**
  * One room on a hotel page: photo, key facts, highlights, facilities and
@@ -48,7 +48,10 @@ export async function RoomCard({
   const room = offer.room;
   const cover = info?.gallery[0];
   const photoCount = info?.gallery.length ?? 0;
-  const highlights = featureList(room.description);
+  // Some imported rooms repeat their name as the whole description.
+  const highlights = featureList(room.description).filter(
+    (h) => h.toLowerCase() !== cleanText(room.name).toLowerCase(),
+  );
   const amenities = info?.amenities ?? [];
   const reason = t(REASONS[offer.reason ?? ""] ?? "reasonUnavailable");
 
@@ -67,15 +70,16 @@ export async function RoomCard({
 
   return (
     <article className="panel overflow-hidden">
-      <div className="grid sm:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
-        <div className="relative aspect-[4/3] bg-paper-2 sm:aspect-auto sm:min-h-full">
+      <div className="grid sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]">
+        {/* Fixed 4:3 at the top: the photo never stretches with a long description. */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-paper-2 sm:m-5 sm:mr-0 sm:self-start sm:rounded-[12px] md:m-6 md:mr-0">
           {cover ? (
             <Image
               src={cover.url}
               alt={cover.alt}
               fill
               unoptimized={isLibraryImage(cover.url)}
-              sizes="(min-width: 640px) 240px, 100vw"
+              sizes="(min-width: 1024px) 240px, (min-width: 640px) 200px, 100vw"
               className="object-cover"
             />
           ) : (
@@ -113,7 +117,7 @@ export async function RoomCard({
 
           {highlights.length > 0 && (
             <div className="mt-4">
-              <ul className="grid gap-x-5 gap-y-1.5 text-[0.88rem] text-ink-2 md:grid-cols-2">
+              <ul className="grid gap-y-2 text-[0.9rem] leading-snug text-ink-2">
                 {highlights.slice(0, SHOWN).map((h) => (
                   <li key={h} className="flex items-start gap-2">
                     <Icon name="check" className="mt-[3px] size-4 shrink-0 text-good" />
@@ -130,7 +134,7 @@ export async function RoomCard({
                       className="size-4 rotate-90 transition-transform group-open:-rotate-90"
                     />
                   </summary>
-                  <ul className="mt-2 grid gap-x-5 gap-y-1.5 text-[0.88rem] text-ink-2 md:grid-cols-2">
+                  <ul className="mt-2 grid gap-y-2 text-[0.9rem] leading-snug text-ink-2">
                     {highlights.slice(SHOWN).map((h) => (
                       <li key={h} className="flex items-start gap-2">
                         <Icon name="check" className="mt-[3px] size-4 shrink-0 text-good" />

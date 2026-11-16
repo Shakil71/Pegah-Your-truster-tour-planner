@@ -55,16 +55,58 @@ export function cleanText(text: string | null | undefined): string {
     .trim();
 }
 
+/** Intro sentences that only announce a list ("…includes the following privileges as follows:"). */
+const LIST_INTRO = /(?:below|following)\s+(?:amenities|facilities|privileges|services)|as follows/i;
+
+/** "in room – mini bar, safe box, tv" → the comma list after the dash. */
+const DASH_LIST = /^(.{0,40}?)\s+[–—-]\s+(.+,.+,.+)$/;
+
 /**
- * Splits a feature list ("• a • b • c", or one item per line) into items.
- * Text that is not a list comes back as a single item.
+ * Splits a room or hotel description into short points. Handles the shapes
+ * found in old-website text: "• a • b", "** a. ** b.", one item per line,
+ * "in room – a, b, c" comma lists, and plain sentences. Intro sentences that
+ * only announce a list are dropped, as is a final point cut short by the
+ * import ("express…").
  */
 export function featureList(text: string | null | undefined): string[] {
-  const clean = cleanText(text);
+  const clean = cleanText(text)
+    .replace(/^#+\s*/gm, "")
+    .replace(/\*\*/g, "•");
   if (!clean) return [];
-  const parts = /•/.test(clean) ? clean.split(/\s*•\s*/) : clean.split(/\s*\n+\s*/);
-  return parts
-    .map((p) => p.replace(/^[-–—*\s]+/, "").replace(/[\s.;,]+$/, ""))
-    .filter((p) => p.length > 1)
+
+  const bulleted = /•/.test(clean);
+  const chunks = bulleted ? clean.split(/\s*•\s*/) : clean.split(/\s*\n+\s*/);
+  const items: string[] = [];
+  for (const [i, chunk] of chunks.entries()) {
+    // Text after a "•" is one point already ("Bangla, Indian, Thai cuisine");
+    // prose before the first bullet may still hold a comma list.
+    const isBullet = bulleted && i > 0;
+    for (const sentence of chunk.split(/(?<=[.!?])\s+(?=\S)/)) {
+      const s = sentence.trim();
+      if (!s || s.endsWith(":") || LIST_INTRO.test(s)) continue;
+      const dash = isBullet ? null : DASH_LIST.exec(s);
+      const commas = isBullet ? [s] : s.split(/\s*,\s*/);
+      if (dash) {
+        items.push(...dash[2]!.split(/\s*,\s*/));
+      } else if (commas.length >= 4 && commas.every((c) => c.length <= 40)) {
+        items.push(...commas);
+      } else {
+        items.push(s);
+      }
+    }
+  }
+
+  const out = items
+    .map((p) =>
+      p
+        .replace(/^[-–—*\s]+/, "")
+        .replace(/\s+etc\.?$/i, "")
+        .replace(/[\s.;,]+$/, "")
+        .trim(),
+    )
+    .filter((p) => p.length > 1 && !/^(?:…|\.\.\.)$/.test(p))
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1));
+  // A last point cut off by the import ("Express…") reads as a mistake.
+  if (out.length > 1 && /…$/.test(out[out.length - 1]!)) out.pop();
+  return [...new Set(out)];
 }
