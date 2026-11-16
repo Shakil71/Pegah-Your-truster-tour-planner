@@ -179,14 +179,14 @@ export class AdminSettingsController {
   @HttpCode(200)
   @ZodResponse({ status: 200, type: AdminEmailTestDto })
   async emailTest(@CurrentAuth() a: AuthContext) {
-    const status = await this.email.send({
+    const { status, reason } = await this.email.deliver({
       to: a.user.email,
       template: "settings-test",
       subject: "Pegah email test",
       text: "This is a test message from the Pegah console. Email sending works.",
       html: "<p>This is a test message from the Pegah console. Email sending works.</p>",
     });
-    return { status, to: a.user.email };
+    return { status, to: a.user.email, reason };
   }
 }
 

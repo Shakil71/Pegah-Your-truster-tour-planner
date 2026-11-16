@@ -4259,6 +4259,7 @@ export interface components {
       /** @enum {string} */
       status: "SENT" | "SKIPPED" | "FAILED";
       to: string;
+      reason?: string | null;
     };
     PublicSiteDto_Output: {
       general: {

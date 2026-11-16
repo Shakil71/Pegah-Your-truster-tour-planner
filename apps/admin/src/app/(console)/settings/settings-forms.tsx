@@ -471,7 +471,7 @@ export function EmailForm({ view, csrfToken }: { view: View; csrfToken: string }
               text:
                 data.status === "SKIPPED"
                   ? "Email sending is off, so nothing was sent."
-                  : "Sending failed. Check the server, user name and password.",
+                  : (data.reason ?? "Sending failed. Check the server, user name and password."),
             }
         : { tone: "critical", text: problemMessage(error) },
     );

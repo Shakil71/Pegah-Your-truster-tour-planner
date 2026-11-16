@@ -122,6 +122,8 @@ export type SiteSettingsView = z.infer<typeof SiteSettingsViewSchema>;
 export const EmailTestResultSchema = z.object({
   status: z.enum(["SENT", "SKIPPED", "FAILED"]),
   to: z.string(),
+  /** Why it failed, in plain words with the server's short error; null otherwise. */
+  reason: nullableText(400).optional(),
 });
 
 /** What the public website needs: contact details, the announcement and menu links. */

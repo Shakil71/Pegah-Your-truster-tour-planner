@@ -37,7 +37,10 @@ describe.skipIf(!ADMIN_URL)("console delete and show/hide against MySQL 8.4", ()
     expect((await h.call("GET", "/tours/it-tour")).statusCode).toBe(200);
 
     expect((await visibility("hotel", "no-such-hotel", false)).statusCode).toBe(404);
-    expect((await visibility("contact-message", "x", false)).statusCode).toBe(404);
+    // Messages can be deleted but have no show/hide.
+    const noSwitch = await visibility("contact-message", "x", false);
+    expect(noSwitch.statusCode).toBe(422);
+    expect(noSwitch.json().type).toMatch(/no-visibility/);
   });
 
   it("needs the right permission and a staff session", async () => {

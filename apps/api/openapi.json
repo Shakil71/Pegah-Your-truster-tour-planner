@@ -15523,6 +15523,17 @@
           },
           "to": {
             "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": ["status", "to"],

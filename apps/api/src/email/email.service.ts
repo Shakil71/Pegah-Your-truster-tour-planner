@@ -33,6 +33,16 @@ export class EmailService {
 
   /** Sends one message; never throws (the caller's business action already succeeded). */
   async send(msg: OutgoingEmail): Promise<"SENT" | "FAILED" | "SKIPPED"> {
+    return (await this.deliver(msg)).status;
+  }
+
+  /**
+   * Like send(), plus a plain-language reason when it fails, for the
+   * console's "Send me a test email" button.
+   */
+  async deliver(
+    msg: OutgoingEmail,
+  ): Promise<{ status: "SENT" | "FAILED" | "SKIPPED"; reason: string | null }> {
     const row = await this.db.emailMessage.create({
       data: {
         bookingId: msg.bookingId ?? null,
@@ -59,7 +69,7 @@ export class EmailService {
     const channel = this.integrations.emailChannel();
     if (channel.transport === "none") {
       await finish("SKIPPED");
-      return "SKIPPED";
+      return { status: "SKIPPED", reason: null };
     }
     if (channel.transport === "log") {
       this.logger.log(
@@ -67,11 +77,12 @@ export class EmailService {
         "Email (log transport)",
       );
       await finish("SENT", { providerId: "log" });
-      return "SENT";
+      return { status: "SENT", reason: null };
     }
     if (!channel.transporter) {
-      await finish("FAILED", { error: "SMTP is selected but not fully configured" });
-      return "FAILED";
+      const reason = "SMTP is selected but the server or password is missing.";
+      await finish("FAILED", { error: reason });
+      return { status: "FAILED", reason };
     }
     try {
       const info = await channel.transporter.sendMail({
@@ -82,12 +93,46 @@ export class EmailService {
         html: msg.html,
       });
       await finish("SENT", { providerId: String(info.messageId ?? "") });
-      return "SENT";
+      return { status: "SENT", reason: null };
     } catch (error) {
-      const reason = error instanceof Error ? error.message : "send failed";
-      this.logger.warn({ template: msg.template, reason }, "Email failed");
-      await finish("FAILED", { error: reason });
-      return "FAILED";
+      const raw = error instanceof Error ? error.message : "send failed";
+      this.logger.warn({ template: msg.template, reason: raw }, "Email failed");
+      await finish("FAILED", { error: raw });
+      return { status: "FAILED", reason: explainSmtpError(error) };
     }
   }
+}
+
+/**
+ * Turns a nodemailer error into advice staff can act on. Nodemailer messages
+ * never contain the password, so the short technical detail is safe to show.
+ */
+export function explainSmtpError(error: unknown): string {
+  const e = (error ?? {}) as { code?: string; responseCode?: number; message?: string };
+  const code = e.code ?? "";
+  const rc = e.responseCode;
+  const detail = `${[code, rc].filter(Boolean).join(" ")}: ${(e.message ?? "").slice(0, 160)}`;
+  let advice: string;
+  if (code === "EAUTH" || rc === 535 || rc === 534) {
+    advice =
+      "The mail server refused the user name or password. Use the full email address as the user name and type the mailbox password again.";
+  } else if (code === "EDNS" || /ENOTFOUND|EAI_AGAIN/.test(e.message ?? "")) {
+    advice = "The SMTP server name could not be found. Check the spelling of the server.";
+  } else if (
+    code === "ETIMEDOUT" ||
+    code === "ECONNECTION" ||
+    /ECONNREFUSED|ETIMEDOUT|timeout/i.test(e.message ?? "")
+  ) {
+    advice =
+      'Could not connect to the mail server. The web server may block this outgoing port: try port 587 with "Use TLS from the start" off, or ask the hosting provider to allow it.';
+  } else if (/certificate|self.signed|altnames|SSL|TLS|wrong version/i.test(e.message ?? "")) {
+    advice =
+      "The secure connection failed. Use the server name from the hosting's mail settings, and port 465 with TLS from the start (or 587 without).";
+  } else if (code === "EENVELOPE" || (rc !== undefined && rc >= 550 && rc <= 554)) {
+    advice =
+      "The mail server refused the sender or the recipient. The From address must be the same mailbox as the user name.";
+  } else {
+    advice = "Sending failed. Check the server, port, user name and password.";
+  }
+  return `${advice} (${detail})`.slice(0, 400);
 }
