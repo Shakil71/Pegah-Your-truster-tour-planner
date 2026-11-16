@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanText, decodeEntities, featureList } from "./text";
+import { cleanText, decodeEntities, detailSections, featureList } from "./text";
 
 describe("decodeEntities", () => {
   it("decodes named, decimal and hex entities", () => {
@@ -65,5 +65,42 @@ describe("featureList", () => {
   it("returns nothing for empty text", () => {
     expect(featureList(null)).toEqual([]);
     expect(cleanText("  a  b ")).toBe("a b");
+  });
+});
+
+describe("detailSections", () => {
+  it("groups points under ## headings and decodes &Prime;", () => {
+    expect(
+      detailSections(
+        "## Make your stay new\n\nA suite for couples and families.\n\n## Suite Features and Amenities\n\nThe bedroom contains a king-size bed, 32&Prime; LCD TV, Mini Fridge, Hair Dryer, and ISD Telephone.",
+      ),
+    ).toEqual([
+      { title: "Make your stay new", points: ["A suite for couples and families"] },
+      {
+        title: "Suite Features and Amenities",
+        points: [
+          "The bedroom contains a king-size bed",
+          "32″ LCD TV",
+          "Mini Fridge",
+          "Hair Dryer",
+          "ISD Telephone",
+        ],
+      },
+    ]);
+  });
+
+  it("keeps a prose sentence with commas whole", () => {
+    expect(
+      featureList(
+        "With amenities such as, a romantic Jacuzzi, bathrobe, and luxurious bathroom fittings, your life would enjoy the most wonderful experience ever in our honeymoon suite.",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("returns one untitled section for plain text and none for empty text", () => {
+    expect(detailSections("• Sea view\n• Balcony")).toEqual([
+      { title: null, points: ["Sea view", "Balcony"] },
+    ]);
+    expect(detailSections("")).toEqual([]);
   });
 });

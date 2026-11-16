@@ -34,6 +34,13 @@ const NAMED: Record<string, string> = {
   ouml: "ö",
   uuml: "ü",
   auml: "ä",
+  // Case matters for these two: &Prime; is a double prime (32″ TV).
+  Prime: "″",
+  prime: "′",
+  trade: "™",
+  reg: "®",
+  copy: "©",
+  frac12: "½",
 };
 
 /** Decodes HTML entities (named, decimal and hex) into plain characters. */
@@ -44,7 +51,7 @@ export function decodeEntities(text: string): string {
         code[1] === "x" || code[1] === "X" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1));
       return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : match;
     }
-    return NAMED[code.toLowerCase()] ?? match;
+    return NAMED[code] ?? NAMED[code.toLowerCase()] ?? match;
   });
 }
 
@@ -88,7 +95,15 @@ export function featureList(text: string | null | undefined): string[] {
       const commas = isBullet ? [s] : s.split(/\s*,\s*/);
       if (dash) {
         items.push(...dash[2]!.split(/\s*,\s*/));
-      } else if (commas.length >= 4 && commas.every((c) => c.length <= 40)) {
+      } else if (
+        // A list sentence: short middle items, and neither end a long clause
+        // ("…contains a king bed, TV, fridge, and a phone" yes;
+        //  "With amenities such as, a Jacuzzi, …, your stay would be…" no).
+        commas.length >= 4 &&
+        commas[0]!.length <= 70 &&
+        commas[commas.length - 1]!.length <= 70 &&
+        commas.slice(1, -1).every((c) => c.length <= 40)
+      ) {
         items.push(...commas);
       } else {
         items.push(s);
@@ -100,6 +115,7 @@ export function featureList(text: string | null | undefined): string[] {
     .map((p) =>
       p
         .replace(/^[-–—*\s]+/, "")
+        .replace(/^and\s+/i, "")
         .replace(/\s+etc\.?$/i, "")
         .replace(/[\s.;,]+$/, "")
         .trim(),
@@ -109,4 +125,33 @@ export function featureList(text: string | null | undefined): string[] {
   // A last point cut off by the import ("Express…") reads as a mistake.
   if (out.length > 1 && /…$/.test(out[out.length - 1]!)) out.pop();
   return [...new Set(out)];
+}
+
+export type DetailSection = { title: string | null; points: string[] };
+
+/**
+ * Splits full room details into sections at "## Heading" lines (as the old
+ * website wrote them), each with its points. Text without headings is one
+ * untitled section. Empty sections are dropped.
+ */
+export function detailSections(text: string | null | undefined): DetailSection[] {
+  const sections: DetailSection[] = [];
+  let title: string | null = null;
+  let body: string[] = [];
+  const flush = () => {
+    const points = featureList(body.join("\n"));
+    if (points.length > 0) sections.push({ title, points });
+    body = [];
+  };
+  for (const line of cleanText(text).split("\n")) {
+    const heading = /^#{1,6}\s+(.+?)\s*:?\s*$/.exec(line.trim());
+    if (heading) {
+      flush();
+      title = heading[1]!;
+    } else {
+      body.push(line);
+    }
+  }
+  flush();
+  return sections;
 }

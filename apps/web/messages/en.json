@@ -251,7 +251,8 @@
     "askHint": "Online prices for these dates are not published yet. Message us and a travel planner will confirm the price and availability.",
     "askOnWhatsApp": "Ask on WhatsApp",
     "callUs": "Call us",
-    "askMessage": "Hello Pegah, I'd like the price and availability of the {room} at {hotel}, {checkIn} to {checkOut}, {adults} adults, {children} children, {rooms} room(s)."
+    "askMessage": "Hello Pegah, I'd like the price and availability of the {room} at {hotel}, {checkIn} to {checkOut}, {adults} adults, {children} children, {rooms} room(s).",
+    "fewerRoomDetails": "Show fewer details"
   },
   "tours": {
     "title": "Tours",

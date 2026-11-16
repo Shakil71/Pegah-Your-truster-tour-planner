@@ -5,7 +5,7 @@ import type { Schemas } from "@pegah/api-client";
 import { Icon, buttonClass } from "@pegah/ui";
 import { money } from "@/lib/format";
 import { isLibraryImage } from "@/lib/media";
-import { cleanText, featureList } from "@/lib/text";
+import { cleanText, detailSections, type DetailSection } from "@/lib/text";
 import { stayQuery, type StayParams } from "@/lib/trip";
 
 type Offer = Schemas["HotelRoomOffer_Output"];
@@ -20,8 +20,47 @@ const REASONS: Record<string, string> = {
   currency: "reasonUnavailable",
 };
 
-/** Highlights shown before "Show all room details". */
+/** Points shown before "Show more room details". */
 const SHOWN = 6;
+
+/** The first `n` points (keeping their section titles), and the rest. */
+function splitAfter(sections: DetailSection[], n: number) {
+  const shown: DetailSection[] = [];
+  const rest: DetailSection[] = [];
+  let left = n;
+  for (const s of sections) {
+    const head = s.points.slice(0, Math.max(left, 0));
+    const tail = s.points.slice(head.length);
+    if (head.length > 0) shown.push({ title: s.title, points: head });
+    if (tail.length > 0) rest.push({ title: head.length > 0 ? null : s.title, points: tail });
+    left -= head.length;
+  }
+  return { shown, rest, restCount: rest.reduce((c, s) => c + s.points.length, 0) };
+}
+
+function Points({ sections }: { sections: DetailSection[] }) {
+  return (
+    <div className="grid gap-3">
+      {sections.map((s, i) => (
+        <div key={`${s.title ?? ""}-${i}`}>
+          {s.title && (
+            <h4 className="mb-1.5 text-[0.74rem] font-bold uppercase tracking-[0.1em] text-ink-3">
+              {s.title}
+            </h4>
+          )}
+          <ul className="grid gap-y-2 text-[0.9rem] leading-snug text-ink-2">
+            {s.points.map((p) => (
+              <li key={p} className="flex items-start gap-2">
+                <Icon name="check" className="mt-[3px] size-4 shrink-0 text-good" />
+                <span className="min-w-0">{p}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /**
  * One room on a hotel page: photo, key facts, highlights, facilities and
@@ -48,10 +87,13 @@ export async function RoomCard({
   const room = offer.room;
   const cover = info?.gallery[0];
   const photoCount = info?.gallery.length ?? 0;
-  // Some imported rooms repeat their name as the whole description.
-  const highlights = featureList(room.description).filter(
-    (h) => h.toLowerCase() !== cleanText(room.name).toLowerCase(),
-  );
+  // Full details when the room has them (the description was clipped on
+  // import, ADR-0038); a description that only repeats the name is skipped.
+  const name = cleanText(room.name).toLowerCase();
+  const sections = detailSections(info?.details || room.description)
+    .map((s) => ({ ...s, points: s.points.filter((p) => p.toLowerCase() !== name) }))
+    .filter((s) => s.points.length > 0);
+  const { shown, rest, restCount } = splitAfter(sections, SHOWN);
   const amenities = info?.amenities ?? [];
   const reason = t(REASONS[offer.reason ?? ""] ?? "reasonUnavailable");
 
@@ -115,33 +157,24 @@ export async function RoomCard({
             {info && info.extraBeds > 0 && <li>{t("extraBeds", { count: info.extraBeds })}</li>}
           </ul>
 
-          {highlights.length > 0 && (
+          {shown.length > 0 && (
             <div className="mt-4">
-              <ul className="grid gap-y-2 text-[0.9rem] leading-snug text-ink-2">
-                {highlights.slice(0, SHOWN).map((h) => (
-                  <li key={h} className="flex items-start gap-2">
-                    <Icon name="check" className="mt-[3px] size-4 shrink-0 text-good" />
-                    <span className="min-w-0">{h}</span>
-                  </li>
-                ))}
-              </ul>
-              {highlights.length > SHOWN && (
-                <details className="group mt-2">
-                  <summary className="inline-flex cursor-pointer list-none items-center gap-1 text-[0.84rem] font-semibold text-primary-ink [&::-webkit-details-marker]:hidden">
-                    {t("allRoomDetails", { count: highlights.length - SHOWN })}
+              <Points sections={shown} />
+              {restCount > 0 && (
+                <details className="group mt-3">
+                  <summary className="inline-flex cursor-pointer list-none items-center gap-1 rounded-full border border-rule px-3 py-1 text-[0.82rem] font-semibold text-primary-ink hover:border-ink [&::-webkit-details-marker]:hidden">
+                    <span className="group-open:hidden">
+                      {t("allRoomDetails", { count: restCount })}
+                    </span>
+                    <span className="hidden group-open:inline">{t("fewerRoomDetails")}</span>
                     <Icon
                       name="arrowRight"
                       className="size-4 rotate-90 transition-transform group-open:-rotate-90"
                     />
                   </summary>
-                  <ul className="mt-2 grid gap-y-2 text-[0.9rem] leading-snug text-ink-2">
-                    {highlights.slice(SHOWN).map((h) => (
-                      <li key={h} className="flex items-start gap-2">
-                        <Icon name="check" className="mt-[3px] size-4 shrink-0 text-good" />
-                        <span className="min-w-0">{h}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="mt-3">
+                    <Points sections={rest} />
+                  </div>
                 </details>
               )}
             </div>

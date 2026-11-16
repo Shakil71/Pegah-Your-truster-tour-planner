@@ -251,7 +251,8 @@
     "askHint": "এই তারিখের অনলাইন দাম এখনো প্রকাশ করা হয়নি। আমাদের মেসেজ দিন, একজন ট্রাভেল প্ল্যানার দাম ও রুম খালি আছে কি না নিশ্চিত করবেন।",
     "askOnWhatsApp": "WhatsApp-এ জিজ্ঞেস করুন",
     "callUs": "কল করুন",
-    "askMessage": "হ্যালো Pegah, {hotel}-এর {room} রুমটির দাম ও খালি আছে কি না জানতে চাই: {checkIn} থেকে {checkOut}, {adults} জন প্রাপ্তবয়স্ক, {children} শিশু, {rooms}টি রুম।"
+    "askMessage": "হ্যালো Pegah, {hotel}-এর {room} রুমটির দাম ও খালি আছে কি না জানতে চাই: {checkIn} থেকে {checkOut}, {adults} জন প্রাপ্তবয়স্ক, {children} শিশু, {rooms}টি রুম।",
+    "fewerRoomDetails": "কম দেখান"
   },
   "tours": {
     "title": "ট্যুর",
