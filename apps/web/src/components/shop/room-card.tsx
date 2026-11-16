@@ -1,12 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { Schemas } from "@pegah/api-client";
 import { Icon, buttonClass } from "@pegah/ui";
 import { money } from "@/lib/format";
-import { isLibraryImage } from "@/lib/media";
 import { cleanText, detailSections, type DetailSection } from "@/lib/text";
 import { stayQuery, type StayParams } from "@/lib/trip";
+import { RoomPhotos } from "./room-photos";
 
 type Offer = Schemas["HotelRoomOffer_Output"];
 type RoomInfo = Schemas["HotelDetailDto_Output"]["rooms"][number];
@@ -85,8 +84,6 @@ export async function RoomCard({
 }) {
   const t = await getTranslations("property");
   const room = offer.room;
-  const cover = info?.gallery[0];
-  const photoCount = info?.gallery.length ?? 0;
   // Full details when the room has them (the description was clipped on
   // import, ADR-0038); a description that only repeats the name is skipped.
   const name = cleanText(room.name).toLowerCase();
@@ -113,28 +110,20 @@ export async function RoomCard({
   return (
     <article className="panel overflow-hidden">
       <div className="grid sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[240px_minmax(0,1fr)]">
-        {/* Fixed 4:3 at the top: the photo never stretches with a long description. */}
-        <div className="relative aspect-[4/3] overflow-hidden bg-paper-2 sm:m-5 sm:mr-0 sm:self-start sm:rounded-[12px] md:m-6 md:mr-0">
-          {cover ? (
-            <Image
-              src={cover.url}
-              alt={cover.alt}
-              fill
-              unoptimized={isLibraryImage(cover.url)}
-              sizes="(min-width: 1024px) 240px, (min-width: 640px) 200px, 100vw"
-              className="object-cover"
-            />
-          ) : (
-            <div className="grid h-full min-h-[160px] place-items-center text-ink-3">
-              <Icon name="bed" className="size-9" />
-            </div>
-          )}
-          {photoCount > 1 && (
-            <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-night/75 px-2.5 py-1 text-[0.72rem] font-semibold text-white backdrop-blur">
-              <Icon name="view" className="size-3.5" />
-              {t("photoTotal", { count: photoCount })}
-            </span>
-          )}
+        {/* Main photo at a fixed 4:3 with the other photos underneath; never stretches with the text. */}
+        <div className="p-4 pb-0 sm:self-start sm:p-5 sm:pr-0 md:p-6 md:pr-0">
+          <RoomPhotos
+            photos={info?.gallery ?? []}
+            countLabel={t("photoTotal", { count: info?.gallery.length ?? 0 })}
+            labels={{
+              title: t("photos", { name: cleanText(room.name) }),
+              open: t("openPhoto"),
+              close: t("closePhotos"),
+              previous: t("previousPhoto"),
+              next: t("nextPhoto"),
+              count: t("photoCount"),
+            }}
+          />
         </div>
 
         <div className="flex min-w-0 flex-col p-5 md:p-6">

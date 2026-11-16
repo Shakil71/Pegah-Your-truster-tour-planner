@@ -15,6 +15,10 @@ All notable changes to this project. Format based on Keep a Changelog.
 - When a room is not on sale for the chosen dates, the card offers "Ask on
   WhatsApp" (message prefilled with hotel, room, dates and guests) and "Call
   us" instead of a dead end. Asking holds or confirms nothing.
+- Each room shows its other photos as thumbnails under the main photo
+  ("+N" when there are more); any photo opens a full-screen viewer with
+  previous/next buttons, arrow keys and a thumbnail strip. The hotel
+  gallery uses the same viewer.
 - Room cards read the room's full details (kept on import in `details`),
   not the 480-character description, so no point is cut off; "## Heading"
   lines become small section titles above their points.
