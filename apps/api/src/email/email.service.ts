@@ -128,6 +128,11 @@ export function explainSmtpError(error: unknown): string {
   } else if (/certificate|self.signed|altnames|SSL|TLS|wrong version/i.test(e.message ?? "")) {
     advice =
       "The secure connection failed. Use the server name from the hosting's mail settings, and port 465 with TLS from the start (or 587 without).";
+  } else if (
+    /recipients were rejected|recipient|user unknown|does not exist/i.test(e.message ?? "")
+  ) {
+    advice =
+      "Sign-in worked, but the mail server could not deliver to that recipient address. Send the test to a real inbox you can open.";
   } else if (code === "EENVELOPE" || (rc !== undefined && rc >= 550 && rc <= 554)) {
     advice =
       "The mail server refused the sender or the recipient. The From address must be the same mailbox as the user name.";

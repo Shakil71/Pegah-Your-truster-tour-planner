@@ -119,6 +119,11 @@ export const SiteSettingsViewSchema = z.object({
 });
 export type SiteSettingsView = z.infer<typeof SiteSettingsViewSchema>;
 
+/** Where to send the test; empty = the alerts address in General settings. */
+export const EmailTestRequestSchema = z.object({
+  to: z.union([z.email().max(254), z.literal("")]).optional(),
+});
+
 export const EmailTestResultSchema = z.object({
   status: z.enum(["SENT", "SKIPPED", "FAILED"]),
   to: z.string(),

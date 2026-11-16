@@ -273,7 +273,17 @@ describe.skipIf(!ADMIN_URL)("admin control against MySQL 8.4", () => {
     expect(saved.json().email).toMatchObject({ transport: "smtp", smtpPasswordSet: true });
 
     await h.call("PUT", "/admin/settings/email", { session: owner, body: NO_EMAIL });
-    const test = await h.call("POST", "/admin/settings/email/test", { session: owner });
-    expect(test.json()).toMatchObject({ status: "SKIPPED" });
+    const test = await h.call("POST", "/admin/settings/email/test", {
+      session: owner,
+      body: { to: "inbox@example.com" },
+    });
+    expect(test.json()).toMatchObject({ status: "SKIPPED", to: "inbox@example.com" });
+    // No address given: the alerts address from General settings.
+    const fallback = await h.call("POST", "/admin/settings/email/test", {
+      session: owner,
+      body: { to: "" },
+    });
+    expect(fallback.statusCode).toBe(200);
+    expect(fallback.json().to).toMatch(/@/);
   });
 });

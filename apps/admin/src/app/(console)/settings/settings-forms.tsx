@@ -440,6 +440,7 @@ export function EmailForm({ view, csrfToken }: { view: View; csrfToken: string }
   const [password, setPassword] = useState("");
   const [testNote, setTestNote] = useState<Note>(null);
   const [testing, setTesting] = useState(false);
+  const [testTo, setTestTo] = useState("");
   const { busy, note, save } = useSave(csrfToken);
 
   async function submit() {
@@ -460,6 +461,7 @@ export function EmailForm({ view, csrfToken }: { view: View; csrfToken: string }
     setTestNote(null);
     const { data, error, response } = await browserApi.POST("/api/v1/admin/settings/email/test", {
       headers: csrf(csrfToken),
+      body: { to: testTo.trim() },
     });
     setTesting(false);
     setTestNote(
@@ -518,6 +520,14 @@ export function EmailForm({ view, csrfToken }: { view: View; csrfToken: string }
         hint="Off = STARTTLS on port 587. Unencrypted SMTP is never used."
         checked={secure}
         onChange={setSecure}
+      />
+      <TextField
+        label="Send the test email to"
+        type="email"
+        value={testTo}
+        onChange={(e) => setTestTo(e.target.value)}
+        placeholder="you@gmail.com"
+        hint="Any inbox you can open. Empty = the purchase-alerts email in General settings."
       />
       {note && <FormAlert tone={note.tone}>{note.text}</FormAlert>}
       {testNote && <FormAlert tone={testNote.tone}>{testNote.text}</FormAlert>}

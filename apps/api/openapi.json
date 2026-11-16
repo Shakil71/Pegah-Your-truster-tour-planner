@@ -4032,6 +4032,16 @@
       "post": {
         "operationId": "AdminSettingsController_emailTest",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminEmailTestRequestDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -15513,6 +15523,25 @@
           }
         },
         "required": ["transport", "from", "smtpHost", "smtpPort", "smtpSecure", "smtpUser"]
+      },
+      "AdminEmailTestRequestDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 254,
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          }
+        }
       },
       "AdminEmailTestDto_Output": {
         "type": "object",

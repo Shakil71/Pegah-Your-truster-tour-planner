@@ -27,5 +27,10 @@ describe("explainSmtpError", () => {
       explainSmtpError(Object.assign(new Error("getaddrinfo ENOTFOUND x"), { code: "EDNS" })),
     ).toMatch(/could not be found/);
     expect(explainSmtpError(new Error("??"))).toMatch(/^Sending failed/);
+    const bounce = Object.assign(
+      new Error("Can't send mail - all recipients were rejected: 550 owner@pegah.local"),
+      { code: "EENVELOPE", responseCode: 550 },
+    );
+    expect(explainSmtpError(bounce)).toMatch(/Sign-in worked/);
   });
 });

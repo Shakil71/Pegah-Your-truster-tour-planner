@@ -1,9 +1,11 @@
 import { Body, Controller, Get, HttpCode, Inject, Post, Put, Req, Res } from "@nestjs/common";
 import { ApiCookieAuth, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
 import {
   AnnouncementSchema,
   BookingSettingsSchema,
   EmailSettingsInputSchema,
+  EmailTestRequestSchema,
   EmailTestResultSchema,
   GeneralSettingsSchema,
   MenuSettingsSchema,
@@ -32,6 +34,7 @@ class AdminBookingSettingsDto extends createZodDto(BookingSettingsSchema) {}
 class AdminPaymentSettingsDto extends createZodDto(PaymentSettingsInputSchema) {}
 class AdminEmailSettingsDto extends createZodDto(EmailSettingsInputSchema) {}
 class AdminEmailTestDto extends createZodDto(EmailTestResultSchema) {}
+class AdminEmailTestRequestDto extends createZodDto(EmailTestRequestSchema) {}
 class PublicSiteDto extends createZodDto(PublicSiteSchema) {}
 
 const noStore = (reply: FastifyReply) => void reply.header("cache-control", "no-store");
@@ -173,20 +176,26 @@ export class AdminSettingsController {
     return this.settings.saveEmail(b, a, ip(r));
   }
 
-  /** Sends a test message to the signed-in owner with the current email settings. */
+  /**
+   * Sends a test message with the current email settings, to the address
+   * given or else the alerts address from General settings (staff accounts
+   * may use internal addresses that cannot receive mail).
+   */
   @RequirePermissions("settings:secrets")
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @Post("email/test")
   @HttpCode(200)
   @ZodResponse({ status: 200, type: AdminEmailTestDto })
-  async emailTest(@CurrentAuth() a: AuthContext) {
+  async emailTest(@Body() body: AdminEmailTestRequestDto) {
+    const to = body.to || this.settings.notificationEmail();
     const { status, reason } = await this.email.deliver({
-      to: a.user.email,
+      to,
       template: "settings-test",
       subject: "Pegah email test",
       text: "This is a test message from the Pegah console. Email sending works.",
       html: "<p>This is a test message from the Pegah console. Email sending works.</p>",
     });
-    return { status, to: a.user.email, reason };
+    return { status, to, reason };
   }
 }
 

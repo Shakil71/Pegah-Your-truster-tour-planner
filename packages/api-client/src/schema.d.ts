@@ -4255,6 +4255,9 @@ export interface components {
       smtpUser: string;
       smtpPassword?: string;
     };
+    AdminEmailTestRequestDto: {
+      to?: string | "";
+    };
     AdminEmailTestDto_Output: {
       /** @enum {string} */
       status: "SENT" | "SKIPPED" | "FAILED";
@@ -7954,7 +7957,11 @@ export interface operations {
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminEmailTestRequestDto"];
+      };
+    };
     responses: {
       200: {
         headers: {
