@@ -161,8 +161,9 @@ test("a photo uploaded in the console becomes a hotel's main photo on the websit
   await page.goto(`/stays/${slug}`);
   const hero = page.locator("section img").first();
   await expect(hero).toHaveAttribute("alt", "Lodge veranda at sunset");
-  // Served through the Next.js image optimizer from the media library.
-  await expect(hero).toHaveAttribute("src", /%2Fmedia%2F[a-f0-9]{24}\.webp/);
+  // Served straight from the media library (already WebP; the Next.js
+  // optimiser would only re-encode it and lose detail).
+  await expect(hero).toHaveAttribute("src", /^\/media\/[a-f0-9]{24}\.webp$/);
   await expect
     .poll(() => hero.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
     .toBeGreaterThan(0);
