@@ -503,7 +503,12 @@ export function EmailForm({ view, csrfToken }: { view: View; csrfToken: string }
           label="Port"
           type="number"
           value={port}
-          onChange={(e) => setPort(e.target.value)}
+          onChange={(e) => {
+            setPort(e.target.value);
+            // 465 = TLS from the start; 587 = STARTTLS. Keep the switch in step.
+            if (e.target.value === "465") setSecure(true);
+            if (e.target.value === "587") setSecure(false);
+          }}
           hint="587 with STARTTLS, or 465 with TLS."
         />
         <TextField label="User name" value={user} onChange={(e) => setUser(e.target.value)} />

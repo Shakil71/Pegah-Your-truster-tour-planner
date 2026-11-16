@@ -33,6 +33,17 @@ import { PRISMA, type Db } from "../prisma/prisma.service";
 import { SecretBox } from "./secret-box";
 
 const REFRESH_MS = 30_000;
+
+/**
+ * Port 465 always speaks TLS from the first byte and 587 (and 25) always
+ * start plain and upgrade with STARTTLS. Following the port avoids the
+ * silent "Greeting never received" hang when the switch does not match it.
+ */
+export function smtpImplicitTls(port: number, secure: boolean): boolean {
+  if (port === 465) return true;
+  if (port === 587 || port === 25) return false;
+  return secure;
+}
 const SECRET = { storePassword: "sslcommerz.storePassword", smtpPassword: "smtp.password" };
 
 const StoredPayments = z.object({
@@ -432,12 +443,13 @@ export class IntegrationSettings implements OnModuleInit, OnModuleDestroy {
           ? createTransport({
               host: e.smtpHost,
               port: e.smtpPort,
-              secure: e.smtpSecure,
-              requireTLS: !e.smtpSecure,
+              secure: smtpImplicitTls(e.smtpPort, e.smtpSecure),
+              requireTLS: !smtpImplicitTls(e.smtpPort, e.smtpSecure),
               auth: { user: e.smtpUser, pass: e.smtpPassword },
-              connectionTimeout: 10_000,
-              greetingTimeout: 10_000,
-              socketTimeout: 20_000,
+              connectionTimeout: 15_000,
+              // Some shared hosts delay the greeting on purpose (anti-spam).
+              greetingTimeout: 30_000,
+              socketTimeout: 30_000,
             })
           : null;
     }

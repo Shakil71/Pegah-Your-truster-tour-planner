@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { smtpImplicitTls } from "../settings/integration-settings.service";
 import { explainSmtpError } from "./email.service";
 
 describe("explainSmtpError", () => {
@@ -9,6 +10,11 @@ describe("explainSmtpError", () => {
     });
     expect(explainSmtpError(e)).toMatch(/refused the user name or password/);
     expect(explainSmtpError(e)).toMatch(/EAUTH 535/);
+  });
+
+  it("names a port/TLS mismatch when the greeting never comes", () => {
+    const e = Object.assign(new Error("Greeting never received"), { code: "ETIMEDOUT" });
+    expect(explainSmtpError(e)).toMatch(/port 465 needs/);
   });
 
   it("points at a blocked port when the server cannot be reached", () => {
@@ -32,5 +38,15 @@ describe("explainSmtpError", () => {
       { code: "EENVELOPE", responseCode: 550 },
     );
     expect(explainSmtpError(bounce)).toMatch(/Sign-in worked/);
+  });
+});
+
+describe("smtpImplicitTls", () => {
+  it("follows the port, whatever the switch says", () => {
+    expect(smtpImplicitTls(465, false)).toBe(true);
+    expect(smtpImplicitTls(587, true)).toBe(false);
+    expect(smtpImplicitTls(25, true)).toBe(false);
+    expect(smtpImplicitTls(2525, true)).toBe(true);
+    expect(smtpImplicitTls(2525, false)).toBe(false);
   });
 });

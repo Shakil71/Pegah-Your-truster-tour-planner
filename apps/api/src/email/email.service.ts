@@ -116,6 +116,9 @@ export function explainSmtpError(error: unknown): string {
   if (code === "EAUTH" || rc === 535 || rc === 534) {
     advice =
       "The mail server refused the user name or password. Use the full email address as the user name and type the mailbox password again.";
+  } else if (/greeting never received/i.test(e.message ?? "")) {
+    advice =
+      'The mail server answered but never said hello. Usually the port and the TLS switch do not match: port 465 needs "Use TLS from the start" on, port 587 needs it off. Save again (the switch now follows the port) and retry.';
   } else if (code === "EDNS" || /ENOTFOUND|EAI_AGAIN/.test(e.message ?? "")) {
     advice = "The SMTP server name could not be found. Check the spelling of the server.";
   } else if (
