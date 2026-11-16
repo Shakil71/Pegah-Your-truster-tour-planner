@@ -5,7 +5,7 @@ import type { Schemas } from "@pegah/api-client";
 import { Icon } from "@pegah/ui";
 import type { Locale } from "@/i18n/locales";
 import { dhakaDateTime, localName, money } from "@/lib/format";
-import { isLibraryImage } from "@/lib/media";
+import { isLibraryImage, isLowRes } from "@/lib/media";
 import { photoFor } from "@/lib/trip";
 
 type Tour = Schemas["TourSummary_Output"];
@@ -18,7 +18,10 @@ type Tour = Schemas["TourSummary_Output"];
 export async function TourCard({ tour, headingLevel = 2 }: { tour: Tour; headingLevel?: 2 | 3 }) {
   const t = await getTranslations("tours");
   const locale = (await getLocale()) as Locale;
-  const src = tour.hero?.url ?? photoFor(tour.slug, tour.destination.slug);
+  // Old-website photos are often 480 px wide and blur on a card; a licensed
+  // HD photo of the destination stands in until a sharp one is uploaded.
+  const hd = tour.hero && !isLowRes(tour.hero) ? tour.hero : null;
+  const src = hd?.url ?? photoFor(tour.slug, tour.destination.slug);
   const H = headingLevel === 2 ? "h2" : "h3";
   const price = tour.fromPrice ?? tour.guidePrice;
 
@@ -27,7 +30,7 @@ export async function TourCard({ tour, headingLevel = 2 }: { tour: Tour; heading
       <div className="relative aspect-[4/3] overflow-hidden bg-paper-2">
         <Image
           src={src}
-          alt={tour.hero?.alt ?? ""}
+          alt={hd?.alt ?? ""}
           fill
           unoptimized={isLibraryImage(src)}
           sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"

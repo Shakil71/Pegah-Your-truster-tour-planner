@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Logo } from "@pegah/ui";
-import { photoCredits } from "@/data/home";
 import { serverApi } from "@/lib/api-server";
-import { buildInfo } from "@/lib/build-info";
 
 const columns: { title: string; links: { key: string; href: string | null }[] }[] = [
   {
@@ -35,6 +33,7 @@ const columns: { title: string; links: { key: string; href: string | null }[] }[
       { key: "partnerSignIn", href: "/partner/login" },
       { key: "terms", href: "/pages/terms" },
       { key: "privacy", href: "/pages/privacy" },
+      { key: "photoCredits", href: "/credits" },
     ],
   },
 ];
@@ -98,31 +97,7 @@ export async function SiteFooter() {
           ))}
         </div>
         <hr aria-hidden="true" className="stitch my-12 border-0" />
-        <div className="flex flex-wrap justify-between gap-x-6 gap-y-2 text-[0.8rem] opacity-70">
-          <span>{t("copyright")}</span>
-          <span>{t("prelaunch")}</span>
-          {buildInfo.commitUrl ? (
-            <a
-              href={buildInfo.commitUrl}
-              className="tabular underline-offset-2 hover:underline"
-              title={t("deployedCommit")}
-            >
-              {t("build")} {buildInfo.sha} · {buildInfo.builtAtLabel}
-            </a>
-          ) : (
-            <span className="tabular">
-              {t("build")} {buildInfo.sha}
-            </span>
-          )}
-        </div>
-        <details className="mt-[18px] text-[0.78rem] opacity-75">
-          <summary className="cursor-pointer">{t("photoCredits")}</summary>
-          <ul className="mt-2.5 grid gap-1 text-[0.76rem]">
-            {photoCredits.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
-        </details>
+        <p className="text-[0.8rem] opacity-70">{t("copyright")}</p>
       </div>
     </footer>
   );

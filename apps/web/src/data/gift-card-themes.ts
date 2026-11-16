@@ -3,7 +3,8 @@ import coxsBazar from "@/assets/images/coxs-bazar-sunset.jpg";
 import saintMartin from "@/assets/images/saint-martin-boats.jpg";
 
 /**
- * Seasonal gift card themes shown on /gift-cards. A theme only preselects an
+ * Built-in seasonal gift card themes, shown on /gift-cards until the owner
+ * adds designs in the console (Gift cards → Card designs). A theme only preselects an
  * amount and a gift message: the card itself is an ordinary Pegah gift card,
  * usable on any stay or tour (the page says so). Names, lines and messages
  * live in messages/*.json under giftCards.themes.<id>.
@@ -58,7 +59,3 @@ export const GIFT_CARD_THEMES: GiftCardTheme[] = [
     credit: SAINT_MARTIN_CREDIT,
   },
 ];
-
-export function giftCardTheme(id: string | undefined): GiftCardTheme | undefined {
-  return id ? GIFT_CARD_THEMES.find((t) => t.id === id) : undefined;
-}

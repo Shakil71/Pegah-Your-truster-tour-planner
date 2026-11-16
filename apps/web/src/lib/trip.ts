@@ -3,6 +3,7 @@ import { dhakaDate } from "@pegah/shared";
 import bogaLake from "@/assets/images/hero-boga-lake.jpg";
 import coxsBazar from "@/assets/images/coxs-bazar-sunset.jpg";
 import nafakhum from "@/assets/images/nafakhum-falls.jpg";
+import saintMartin from "@/assets/images/saint-martin-boats.jpg";
 import sajek from "@/assets/images/sajek-sunrise.jpg";
 import srimangal from "@/assets/images/srimangal-tea.jpg";
 import sundarbans from "@/assets/images/hero-sundarbans-sunrise.jpg";
@@ -111,6 +112,7 @@ export function matchDestination<T extends { slug: string; name: string; region:
 
 /** Licensed photos (docs/design/IMAGE_CREDITS.md) for listings without their own media yet. */
 const PHOTOS: Array<[RegExp, StaticImageData]> = [
+  [/saint[- ]?martin|st[-. ]+martin|coral|teknaf/, saintMartin],
   [/srimangal|sreemangal|tea|lawachara/, srimangal],
   [/cox|marine|beach|sea/, coxsBazar],
   [/sundarban|mangrove|cruise/, sundarbans],

@@ -11,6 +11,7 @@ import {
 } from "./commerce/commerce.controllers";
 import { GiftCardService } from "./commerce/gift-card.service";
 import { GiftCardRedemption } from "./commerce/gift-card-redemption.service";
+import { GiftCardDesignsService } from "./commerce/gift-card-designs.service";
 import { OffersService } from "./commerce/offers.service";
 import { OrderFulfilment } from "./commerce/order-fulfilment.service";
 import { OrderService } from "./commerce/order.service";
@@ -162,6 +163,7 @@ export class AppModule {
         GiftCardRedemption,
         OrderFulfilment,
         OffersService,
+        GiftCardDesignsService,
         OrderService,
         CommerceMailer,
         ServiceRequestService,

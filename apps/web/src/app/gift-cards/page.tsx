@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Icon, buttonClass } from "@pegah/ui";
 import sajek from "@/assets/images/sajek-sunrise.jpg";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { GIFT_CARD_THEMES, giftCardTheme } from "@/data/gift-card-themes";
+import { GIFT_CARD_THEMES } from "@/data/gift-card-themes";
+import type { Locale } from "@/i18n/locales";
 import { getCustomer, serverApi } from "@/lib/api-server";
+import { localName } from "@/lib/format";
+import { isLibraryImage } from "@/lib/media";
 import { GiftCardForm } from "./gift-card-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,6 +21,20 @@ export const dynamic = "force-dynamic";
 
 const gutter = "px-[max(16px,env(safe-area-inset-left,0px))]";
 
+/** A card shown in the "this season" row: an owner design or a built-in one. */
+type CardView = {
+  id: string;
+  name: string;
+  label: string;
+  line: string;
+  message: string;
+  amountTaka: number;
+  image: string | StaticImageData;
+  alt: string;
+  focus: string;
+  credit: string | null;
+};
+
 export default async function GiftCardsPage({
   searchParams,
 }: {
@@ -27,7 +44,38 @@ export default async function GiftCardsPage({
   const session = await getCustomer();
   const api = await serverApi();
   const availability = (await api.GET("/api/v1/gift-cards/availability")).data;
-  const theme = giftCardTheme((await searchParams).card);
+  const locale = (await getLocale()) as Locale;
+  // Designs made in the console replace the built-in seasonal cards.
+  const designs = (await api.GET("/api/v1/gift-cards/designs")).data?.items ?? [];
+  const cards: CardView[] =
+    designs.length > 0
+      ? designs.map((d) => ({
+          id: d.id,
+          name: localName(locale, d.nameEn, d.nameBn),
+          label: localName(locale, d.labelEn, d.labelBn),
+          line: localName(locale, d.lineEn, d.lineBn),
+          message: localName(locale, d.messageEn, d.messageBn),
+          amountTaka: d.amount.amountMinor / 100,
+          image: d.image.url,
+          alt: d.image.alt,
+          focus: "50% 50%",
+          credit: null,
+        }))
+      : GIFT_CARD_THEMES.map((g) => ({
+          id: g.id,
+          name: t(`themes.${g.id}.name`),
+          label: t(`places.${g.place}`),
+          line: t(`themes.${g.id}.line`),
+          message: t(`themes.${g.id}.message`),
+          amountTaka: g.amountTaka,
+          image: g.image,
+          alt: t(`places.${g.place}`),
+          focus: g.focus,
+          credit: g.credit,
+        }));
+  const chosen = (await searchParams).card;
+  const theme = chosen ? cards.find((c) => c.id === chosen) : undefined;
+  const own = designs.length > 0;
   const chooseHref = (id: string) => {
     const target = `/gift-cards?card=${id}#buy`;
     return session ? target : `/login?next=${encodeURIComponent(target)}`;
@@ -97,27 +145,30 @@ export default async function GiftCardsPage({
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-primary-ink">
-                    {t("season.eyebrow")}
+                    {t(own ? "season.ownEyebrow" : "season.eyebrow")}
                   </p>
                   <h2
                     id="season-h"
                     className="mt-1.5 font-display text-[clamp(1.9rem,3.4vw,2.8rem)] font-medium leading-tight"
                   >
-                    {t("season.title")}
+                    {t(own ? "season.ownTitle" : "season.title")}
                   </h2>
-                  <p className="mt-1 max-w-[62ch] text-ink-2">{t("season.intro")}</p>
+                  <p className="mt-1 max-w-[62ch] text-ink-2">
+                    {t(own ? "season.ownIntro" : "season.intro")}
+                  </p>
                 </div>
               </div>
               <ul className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-                {GIFT_CARD_THEMES.map((g) => (
+                {cards.map((g) => (
                   <li key={g.id}>
                     <article className="group relative flex h-full flex-col overflow-hidden rounded-card bg-card shadow-lift ring-1 ring-rule">
                       <div className="relative aspect-[1.6/1] overflow-hidden bg-night text-white">
                         <Image
                           src={g.image}
-                          alt={t(`places.${g.place}`)}
+                          alt={g.alt}
                           fill
-                          placeholder="blur"
+                          unoptimized={isLibraryImage(g.image)}
+                          placeholder={typeof g.image === "string" ? "empty" : "blur"}
                           sizes="(min-width: 1280px) 300px, (min-width: 640px) 50vw, 100vw"
                           style={{ objectPosition: g.focus }}
                           className="object-cover transition-transform duration-700 group-hover:scale-[1.05]"
@@ -133,19 +184,18 @@ export default async function GiftCardsPage({
                           ৳{g.amountTaka.toLocaleString("en-IN")}
                         </span>
                         <span className="absolute bottom-3 left-4 text-[0.7rem] font-bold uppercase tracking-[0.16em] text-white/90">
-                          {t("cardLabel")} · {t(`places.${g.place}`)}
+                          {t("cardLabel")}
+                          {g.label ? ` · ${g.label}` : ""}
                         </span>
                       </div>
                       <div className="flex flex-1 flex-col p-5">
                         <h3 className="font-display text-[1.35rem] font-medium leading-tight">
-                          {t(`themes.${g.id}.name`)}
+                          {g.name}
                         </h3>
-                        <p className="mt-1.5 flex-1 text-[0.9rem] text-ink-2">
-                          {t(`themes.${g.id}.line`)}
-                        </p>
+                        <p className="mt-1.5 flex-1 text-[0.9rem] text-ink-2">{g.line}</p>
                         <Link
                           href={chooseHref(g.id)}
-                          aria-label={`${t("season.choose")}: ${t(`themes.${g.id}.name`)}`}
+                          aria-label={`${t("season.choose")}: ${g.name}`}
                           className={buttonClass(
                             theme?.id === g.id ? "primary" : "outline",
                             "md",
@@ -154,7 +204,7 @@ export default async function GiftCardsPage({
                         >
                           {theme?.id === g.id ? t("season.chosen") : t("season.choose")}
                         </Link>
-                        <p className="mt-3 text-[0.7rem] text-ink-3">{g.credit}</p>
+                        {g.credit && <p className="mt-3 text-[0.7rem] text-ink-3">{g.credit}</p>}
                       </div>
                     </article>
                   </li>
@@ -162,7 +212,7 @@ export default async function GiftCardsPage({
               </ul>
               <p className="mt-5 flex items-start gap-2 text-[0.86rem] text-ink-2">
                 <Icon name="check" className="mt-0.5 size-4 shrink-0 text-good" />
-                {t("season.anyTrip")}
+                {t(own ? "season.anyTripOwn" : "season.anyTrip")}
               </p>
             </div>
           </section>
@@ -180,11 +230,7 @@ export default async function GiftCardsPage({
                 maxTaka={availability.maxTaka}
                 theme={
                   theme
-                    ? {
-                        name: t(`themes.${theme.id}.name`),
-                        amountTaka: theme.amountTaka,
-                        message: t(`themes.${theme.id}.message`),
-                      }
+                    ? { name: theme.name, amountTaka: theme.amountTaka, message: theme.message }
                     : undefined
                 }
                 buyer={{

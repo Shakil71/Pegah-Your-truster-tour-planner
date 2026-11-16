@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
 import { ensure, requireStaff, serverApi } from "@/lib/api-server";
+import { DesignsManager } from "./designs-manager";
 import { GiftCardsManager } from "./gift-cards-manager";
 
 export const metadata: Metadata = { title: "Gift cards" };
@@ -17,6 +18,8 @@ export default async function GiftCardsPage({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const q = sp.q?.trim().slice(0, 80) || undefined;
   const api = await serverApi();
+  const canDesign = session.user.permissions.includes("promotion:manage");
+  const designs = canDesign ? ensure(await api.GET("/api/v1/admin/gift-card-designs")) : null;
   const page = ensure(
     await api.GET("/api/v1/admin/gift-cards", {
       params: { query: { q, cursor: sp.cursor?.slice(0, 200) || undefined, limit: 30 } },
@@ -27,8 +30,10 @@ export default async function GiftCardsPage({ searchParams }: { searchParams: Pr
       <PageHeader
         eyebrow="Growth"
         title="Gift cards"
-        intro="Cards bought on the website are issued automatically once paid, and the code is emailed to the recipient. Codes are stored encrypted; staff only ever see the last four characters."
+        intro="Design the cards customers can buy, and see every card issued. Cards bought on the website are issued automatically once paid, and the code is emailed to the recipient."
       />
+      {designs && <DesignsManager items={designs.items} csrfToken={session.csrfToken} />}
+      <h2 className="mt-4 text-[1.1rem] font-semibold">Issued cards</h2>
       <form className="flex flex-wrap gap-2" role="search">
         <label htmlFor="gc-q" className="sr-only">
           Search gift cards

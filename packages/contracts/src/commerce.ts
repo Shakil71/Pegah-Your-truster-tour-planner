@@ -121,6 +121,58 @@ export const AdminAdListSchema = z.object({ items: z.array(AdminAdSchema) });
 export const AdminAdResultSchema = z.object({ ad: AdminAdSchema });
 export const AdListQuerySchema = z.object({ placement: AdPlacementSchema });
 
+// ─── Gift card designs ───────────────────────────────────────────────────────
+
+/** A design the owner shows on /gift-cards; choosing it prefills the purchase form. */
+export const GiftCardDesignInputSchema = z.object({
+  nameEn: Line(2, 80),
+  nameBn: Line(2, 80),
+  labelEn: z.string().trim().max(60),
+  labelBn: z.string().trim().max(60),
+  lineEn: z.string().trim().max(200),
+  lineBn: z.string().trim().max(200),
+  // Same limit as the gift message on an order (it prefills that field).
+  messageEn: z.string().trim().max(300),
+  messageBn: z.string().trim().max(300),
+  /** Suggested amount in paisa: ৳500 to ৳100,000, whole taka. */
+  amountMinor: z
+    .number()
+    .int()
+    .min(500_00)
+    .max(100_000_00)
+    .refine((n) => n % 100 === 0, "Use whole taka"),
+  media: MediaKeySchema,
+  active: z.boolean(),
+  sortOrder: z.number().int().min(0).max(9999),
+});
+export type GiftCardDesignInput = z.infer<typeof GiftCardDesignInputSchema>;
+
+export const PublicGiftCardDesignSchema = z.object({
+  id: PublicIdSchema,
+  nameEn: z.string(),
+  nameBn: z.string(),
+  labelEn: z.string(),
+  labelBn: z.string(),
+  lineEn: z.string(),
+  lineBn: z.string(),
+  messageEn: z.string(),
+  messageBn: z.string(),
+  amount: MoneySchema,
+  image: HeroRefSchema,
+});
+export const PublicGiftCardDesignListSchema = z.object({
+  items: z.array(PublicGiftCardDesignSchema),
+});
+export const AdminGiftCardDesignSchema = PublicGiftCardDesignSchema.extend({
+  active: z.boolean(),
+  sortOrder: z.number().int(),
+  updatedAt: InstantSchema,
+});
+export const AdminGiftCardDesignListSchema = z.object({
+  items: z.array(AdminGiftCardDesignSchema),
+});
+export const AdminGiftCardDesignResultSchema = z.object({ design: AdminGiftCardDesignSchema });
+
 // ─── Orders ──────────────────────────────────────────────────────────────────
 
 const Buyer = z.object({

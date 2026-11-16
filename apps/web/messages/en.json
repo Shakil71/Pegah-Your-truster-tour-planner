@@ -49,13 +49,10 @@
       "terms": "Terms",
       "privacy": "Privacy",
       "offers": "Offers",
-      "giftCards": "Gift cards"
+      "giftCards": "Gift cards",
+      "photoCredits": "Photo credits"
     },
-    "copyright": "© 2026 Pegah. Prices in BDT.",
-    "prelaunch": "Pre-launch · demo listings · online payment not yet live",
-    "deployedCommit": "Deployed commit",
-    "build": "Build",
-    "photoCredits": "Photo credits (Wikimedia Commons)"
+    "copyright": "© 2026 Pegah. Prices in BDT."
   },
   "shop": {
     "paymentNotice": "<b>How holding works:</b> we keep the room or seats for you for 15 minutes. A booking is <b>confirmed only after your payment is verified</b>; unpaid holds are released automatically."
@@ -756,7 +753,11 @@
       "choose": "Choose this card",
       "chosen": "Chosen — fill in the details below",
       "anyTrip": "Every card is a Pegah gift card for any stay or tour on Pegah, not only in Cox's Bazar or Saint Martin. Valid for two years.",
-      "chosenNote": "{name} — the amount and a message are filled in. Change anything you like."
+      "chosenNote": "{name} — the amount and a message are filled in. Change anything you like.",
+      "ownEyebrow": "Gift cards",
+      "ownTitle": "Choose a gift card",
+      "ownIntro": "Pick a design and we'll fill in the amount and a message for you. You can change both before paying.",
+      "anyTripOwn": "Every card works on any stay or tour on Pegah. Valid for two years."
     },
     "themes": {
       "coxs-sunset": {
@@ -1133,5 +1134,9 @@
       "three": "When you're happy, we book it and send your confirmation."
     },
     "aboutTrip": "I would like to book \"{name}\". Our preferred date: … Number of travellers: …"
+  },
+  "credits": {
+    "title": "Photo credits",
+    "intro": "Some destination photos on this site come from Wikimedia Commons and are used under the licences below. Thank you to the photographers."
   }
 }

@@ -168,18 +168,19 @@ model MediaAsset {
   createdAt  DateTime @default(now()) @map("created_at") @db.DateTime(3)
   updatedAt  DateTime @updatedAt @map("updated_at") @db.DateTime(3)
 
-  blob         MediaBlob?
-  offers       Offer[]
-  ads          Ad[]
-  destinations Destination[]
-  hotels       Hotel[]
-  hotelGallery HotelMedia[]
-  roomGallery  RoomMedia[]
-  tourGallery  TourMedia[]
-  offerGallery OfferMedia[]
-  amenityIcons Amenity[]
-  visaProducts VisaProduct[]
-  tours        Tour[]
+  blob            MediaBlob?
+  offers          Offer[]
+  ads             Ad[]
+  destinations    Destination[]
+  hotels          Hotel[]
+  hotelGallery    HotelMedia[]
+  roomGallery     RoomMedia[]
+  tourGallery     TourMedia[]
+  offerGallery    OfferMedia[]
+  amenityIcons    Amenity[]
+  visaProducts    VisaProduct[]
+  tours           Tour[]
+  giftCardDesigns GiftCardDesign[]
 
   @@map("media_assets")
 }
@@ -1174,6 +1175,36 @@ model GiftCard {
 
   @@index([status, expiresAt])
   @@map("gift_cards")
+}
+
+/// A gift card design the owner shows on /gift-cards: a photo, a name, a
+/// suggested amount and a gift message. Choosing one only prefills the
+/// purchase form; every card bought is an ordinary Pegah gift card.
+model GiftCardDesign {
+  id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  publicId    String   @unique @map("public_id") @db.Char(26)
+  nameEn      String   @map("name_en") @db.VarChar(80)
+  nameBn      String   @map("name_bn") @db.VarChar(80)
+  /// Small label on the card, e.g. "Cox's Bazar".
+  labelEn     String   @default("") @map("label_en") @db.VarChar(60)
+  labelBn     String   @default("") @map("label_bn") @db.VarChar(60)
+  lineEn      String   @default("") @map("line_en") @db.VarChar(200)
+  lineBn      String   @default("") @map("line_bn") @db.VarChar(200)
+  messageEn   String   @default("") @map("message_en") @db.VarChar(300)
+  messageBn   String   @default("") @map("message_bn") @db.VarChar(300)
+  amountMinor BigInt   @map("amount_minor")
+  currency    String   @default("BDT") @db.Char(3)
+  mediaId     BigInt   @map("media_id") @db.UnsignedBigInt
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.DateTime(3)
+
+  media MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@index([active, sortOrder])
+  @@index([mediaId])
+  @@map("gift_card_designs")
 }
 
 enum GiftCardTxnKind {

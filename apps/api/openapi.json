@@ -4436,6 +4436,25 @@
         "tags": ["offers"]
       }
     },
+    "/api/v1/gift-cards/designs": {
+      "get": {
+        "operationId": "PublicCommerceController_designList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicGiftCardDesignListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["offers"]
+      }
+    },
     "/api/v1/gift-cards/balance": {
       "get": {
         "operationId": "PublicCommerceController_balance",
@@ -4718,6 +4737,129 @@
           }
         ],
         "tags": ["me"]
+      }
+    },
+    "/api/v1/admin/gift-card-designs": {
+      "get": {
+        "operationId": "AdminCommerceController_designList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardDesignListDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "post": {
+        "operationId": "AdminCommerceController_createDesign",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminGiftCardDesignInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardDesignResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      }
+    },
+    "/api/v1/admin/gift-card-designs/{id}": {
+      "put": {
+        "operationId": "AdminCommerceController_updateDesign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminGiftCardDesignInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminGiftCardDesignResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
+      },
+      "delete": {
+        "operationId": "AdminCommerceController_deleteDesign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-commerce"]
       }
     },
     "/api/v1/admin/offers": {
@@ -16340,6 +16482,107 @@
         "required": ["available", "minTaka", "maxTaka"],
         "additionalProperties": false
       },
+      "PublicGiftCardDesignListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "nameEn": {
+                  "type": "string"
+                },
+                "nameBn": {
+                  "type": "string"
+                },
+                "labelEn": {
+                  "type": "string"
+                },
+                "labelBn": {
+                  "type": "string"
+                },
+                "lineEn": {
+                  "type": "string"
+                },
+                "lineBn": {
+                  "type": "string"
+                },
+                "messageEn": {
+                  "type": "string"
+                },
+                "messageBn": {
+                  "type": "string"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "image": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{24}\\.webp$"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "height": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["key", "url", "alt"],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "id",
+                "nameEn",
+                "nameBn",
+                "labelEn",
+                "labelBn",
+                "lineEn",
+                "lineBn",
+                "messageEn",
+                "messageBn",
+                "amount",
+                "image"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
       "GiftCardBalanceDto_Output": {
         "type": "object",
         "properties": {
@@ -16867,6 +17110,307 @@
           }
         },
         "required": ["applied", "amountDue", "cardBalance", "bookingStatus"],
+        "additionalProperties": false
+      },
+      "AdminGiftCardDesignListDto_Output": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+                },
+                "nameEn": {
+                  "type": "string"
+                },
+                "nameBn": {
+                  "type": "string"
+                },
+                "labelEn": {
+                  "type": "string"
+                },
+                "labelBn": {
+                  "type": "string"
+                },
+                "lineEn": {
+                  "type": "string"
+                },
+                "lineBn": {
+                  "type": "string"
+                },
+                "messageEn": {
+                  "type": "string"
+                },
+                "messageBn": {
+                  "type": "string"
+                },
+                "amount": {
+                  "$ref": "#/components/schemas/Money_Output"
+                },
+                "image": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "pattern": "^[a-f0-9]{24}\\.webp$"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "alt": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "height": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": ["key", "url", "alt"],
+                  "additionalProperties": false
+                },
+                "active": {
+                  "type": "boolean"
+                },
+                "sortOrder": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": [
+                "id",
+                "nameEn",
+                "nameBn",
+                "labelEn",
+                "labelBn",
+                "lineEn",
+                "lineBn",
+                "messageEn",
+                "messageBn",
+                "amount",
+                "image",
+                "active",
+                "sortOrder",
+                "updatedAt"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items"],
+        "additionalProperties": false
+      },
+      "AdminGiftCardDesignInputDto": {
+        "type": "object",
+        "properties": {
+          "nameEn": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "nameBn": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "labelEn": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "labelBn": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "lineEn": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "lineBn": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "messageEn": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "messageBn": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "amountMinor": {
+            "type": "integer",
+            "minimum": 50000,
+            "maximum": 10000000
+          },
+          "media": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{24}\\.webp$"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "sortOrder": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "nameEn",
+          "nameBn",
+          "labelEn",
+          "labelBn",
+          "lineEn",
+          "lineBn",
+          "messageEn",
+          "messageBn",
+          "amountMinor",
+          "media",
+          "active",
+          "sortOrder"
+        ]
+      },
+      "AdminGiftCardDesignResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "design": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+              },
+              "nameEn": {
+                "type": "string"
+              },
+              "nameBn": {
+                "type": "string"
+              },
+              "labelEn": {
+                "type": "string"
+              },
+              "labelBn": {
+                "type": "string"
+              },
+              "lineEn": {
+                "type": "string"
+              },
+              "lineBn": {
+                "type": "string"
+              },
+              "messageEn": {
+                "type": "string"
+              },
+              "messageBn": {
+                "type": "string"
+              },
+              "amount": {
+                "$ref": "#/components/schemas/Money_Output"
+              },
+              "image": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{24}\\.webp$"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "alt": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "height": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": ["key", "url", "alt"],
+                "additionalProperties": false
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "sortOrder": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              }
+            },
+            "required": [
+              "id",
+              "nameEn",
+              "nameBn",
+              "labelEn",
+              "labelBn",
+              "lineEn",
+              "lineBn",
+              "messageEn",
+              "messageBn",
+              "amount",
+              "image",
+              "active",
+              "sortOrder",
+              "updatedAt"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": ["design"],
         "additionalProperties": false
       },
       "AdminOfferListDto_Output": {

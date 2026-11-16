@@ -19,6 +19,8 @@ import {
   AdListQuerySchema,
   AdminAdListSchema,
   AdminAdResultSchema,
+  AdminGiftCardDesignListSchema,
+  AdminGiftCardDesignResultSchema,
   AdminGiftCardListQuerySchema,
   AdminGiftCardListSchema,
   AdminGiftCardResultSchema,
@@ -35,6 +37,7 @@ import {
   CreateOfferSchema,
   GiftCardBalanceQuerySchema,
   GiftCardBalanceSchema,
+  GiftCardDesignInputSchema,
   IssueGiftCardSchema,
   MarkOrderPaidSchema,
   OfferInputSchema,
@@ -43,6 +46,7 @@ import {
   PaginationQuerySchema,
   PaymentSessionResponseSchema,
   PublicAdListSchema,
+  PublicGiftCardDesignListSchema,
   PublicIdSchema,
   PublicOfferListSchema,
   PublicOfferSchema,
@@ -59,6 +63,7 @@ import type { AuthContext } from "../auth/auth.types";
 import { CurrentAuth, Public, RequirePermissions } from "../auth/decorators";
 import { ProblemException } from "../common/problem";
 import { PaymentService } from "../payments/payment.service";
+import { GiftCardDesignsService } from "./gift-card-designs.service";
 import { GiftCardRedemption } from "./gift-card-redemption.service";
 import { GiftCardService } from "./gift-card.service";
 import { OffersService } from "./offers.service";
@@ -73,6 +78,7 @@ class GiftCardBalanceDto extends createZodDto(GiftCardBalanceSchema) {}
 class GiftCardAvailabilityDto extends createZodDto(
   z.object({ available: z.boolean(), minTaka: z.number().int(), maxTaka: z.number().int() }),
 ) {}
+class PublicGiftCardDesignListDto extends createZodDto(PublicGiftCardDesignListSchema) {}
 class MyOrderListQueryDto extends createZodDto(PaginationQuerySchema) {}
 class MyOrderListDto extends createZodDto(OrderListSchema) {}
 class MyOrderDto extends createZodDto(OrderViewSchema) {}
@@ -98,6 +104,9 @@ class AdminGiftCardListDto extends createZodDto(AdminGiftCardListSchema) {}
 class AdminGiftCardResultDto extends createZodDto(AdminGiftCardResultSchema) {}
 class AdminIssueGiftCardDto extends createZodDto(IssueGiftCardSchema) {}
 class AdminVoidGiftCardDto extends createZodDto(VoidGiftCardSchema) {}
+class AdminGiftCardDesignListDto extends createZodDto(AdminGiftCardDesignListSchema) {}
+class AdminGiftCardDesignResultDto extends createZodDto(AdminGiftCardDesignResultSchema) {}
+class AdminGiftCardDesignInputDto extends createZodDto(GiftCardDesignInputSchema) {}
 
 const ip = (r: FastifyRequest) => r.ip ?? null;
 const noStore = (reply: FastifyReply) => void reply.header("cache-control", "no-store");
@@ -116,6 +125,7 @@ export class PublicCommerceController {
   constructor(
     @Inject(OffersService) private readonly offers: OffersService,
     @Inject(GiftCardService) private readonly giftCards: GiftCardService,
+    @Inject(GiftCardDesignsService) private readonly designs: GiftCardDesignsService,
   ) {}
 
   @Get("offers")
@@ -145,6 +155,13 @@ export class PublicCommerceController {
   @ZodResponse({ status: 200, type: GiftCardAvailabilityDto })
   availability() {
     return { available: this.giftCards.available, minTaka: 500, maxTaka: 100_000 };
+  }
+
+  @Get("gift-cards/designs")
+  @ZodResponse({ status: 200, type: PublicGiftCardDesignListDto })
+  designList(@Res({ passthrough: true }) reply: FastifyReply) {
+    void reply.header("cache-control", "public, max-age=60, stale-while-revalidate=120");
+    return this.designs.publicList();
   }
 
   /** Balance by code. Rate limited: codes have 80 random bits, and lookups are slowed further. */
@@ -261,7 +278,51 @@ export class AdminCommerceController {
     @Inject(OffersService) private readonly offers: OffersService,
     @Inject(OrderService) private readonly orders: OrderService,
     @Inject(GiftCardService) private readonly giftCards: GiftCardService,
+    @Inject(GiftCardDesignsService) private readonly designs: GiftCardDesignsService,
   ) {}
+
+  // Gift card designs
+  @RequirePermissions("promotion:manage")
+  @Get("gift-card-designs")
+  @ZodResponse({ status: 200, type: AdminGiftCardDesignListDto })
+  designList(@Res({ passthrough: true }) reply: FastifyReply) {
+    noStore(reply);
+    return this.designs.adminList();
+  }
+
+  @RequirePermissions("promotion:manage")
+  @Post("gift-card-designs")
+  @ZodResponse({ status: 201, type: AdminGiftCardDesignResultDto })
+  createDesign(
+    @Body() body: AdminGiftCardDesignInputDto,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    return this.designs.create(body, a, ip(r));
+  }
+
+  @RequirePermissions("promotion:manage")
+  @Put("gift-card-designs/:id")
+  @ZodResponse({ status: 200, type: AdminGiftCardDesignResultDto })
+  updateDesign(
+    @Param("id") id: string,
+    @Body() body: AdminGiftCardDesignInputDto,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    return this.designs.update(pid(id, "design"), body, a, ip(r));
+  }
+
+  @RequirePermissions("promotion:manage")
+  @Delete("gift-card-designs/:id")
+  @HttpCode(204)
+  async deleteDesign(
+    @Param("id") id: string,
+    @CurrentAuth() a: AuthContext,
+    @Req() r: FastifyRequest,
+  ) {
+    await this.designs.remove(pid(id, "design"), a, ip(r));
+  }
 
   // Offers
   @RequirePermissions("promotion:manage")

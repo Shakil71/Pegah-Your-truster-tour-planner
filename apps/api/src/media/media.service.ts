@@ -102,7 +102,7 @@ export class MediaService {
       output = await input
         .rotate()
         .resize({ width: MAX_EDGE, height: MAX_EDGE, fit: "inside", withoutEnlargement: true })
-        .webp({ quality: 82 })
+        .webp({ quality: 90, smartSubsample: true })
         .toBuffer({ resolveWithObject: true });
     } catch {
       throw new ProblemException(422, "image-unreadable", "Use a JPEG, PNG or WebP image");

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon, Logo, cx } from "@pegah/ui";
-import { buildInfo } from "@/lib/build-info";
 import { navGroups } from "@/lib/nav";
 import { useStaff } from "./staff-context";
 
@@ -74,29 +73,6 @@ export function Sidebar({ open, onNavigate }: { open: boolean; onNavigate: () =>
           </div>
         ))}
       </nav>
-      <div className="m-3 rounded-[14px] border border-dashed border-primary/50 bg-primary/[0.07] p-3.5 text-[0.78rem]">
-        <p className="flex items-center gap-2 font-semibold text-white">
-          <span className="relative flex size-2">
-            <span className="animate-ping-soft absolute inline-flex size-full rounded-full bg-primary" />
-            <span className="relative inline-flex size-2 rounded-full bg-primary" />
-          </span>
-          Live API · pre-launch
-        </p>
-        <p className="mt-1 text-white/65">
-          Demo listings. Online payment stays off until the payment provider account is approved;{" "}
-          <Link
-            href="/settings"
-            onClick={onNavigate}
-            className="font-semibold text-white underline"
-          >
-            see Settings
-          </Link>
-          .
-        </p>
-        <p className="tabular mt-2 text-[0.72rem] text-white/65">
-          Build {buildInfo.sha} · {buildInfo.builtAtLabel}
-        </p>
-      </div>
     </aside>
   );
 }

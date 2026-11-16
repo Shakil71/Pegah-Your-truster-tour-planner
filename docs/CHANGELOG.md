@@ -4,6 +4,26 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Gift card designs, launch clean-up (2026-11-16)
+
+- Console → Gift cards → "Card designs on the website": the owner makes
+  gift card designs (uploaded photo, name, label, short line, gift message,
+  suggested amount ৳500–৳100,000, show/hide, order) with a live preview.
+  New table `gift_card_designs` (migration `20261119090000_gift_card_designs`,
+  additive), `GET /api/v1/gift-cards/designs` (public, cached 60 s) and
+  `/api/v1/admin/gift-card-designs` CRUD (`promotion:manage`, audited).
+  /gift-cards shows the owner's designs; the four built-in seasonal cards
+  show only until the first design is added. A design only prefills the
+  purchase form; the server still validates and recomputes the amount.
+- Removed the "pre-launch · demo listings" note and build stamp from the
+  website footer and the admin sidebar (the build is still in Settings and
+  /health). Photo credits moved from the footer to a /credits page linked
+  in the footer, as CC BY / BY-SA licences require attribution.
+- Sharper photos: Next.js images encode at quality 90; uploads are stored as
+  WebP at quality 90. Tours whose own photos are low resolution (old-website
+  photos are 480 px) lead with a licensed HD destination photo on the tour
+  page and on cards; Saint Martin tours get the Saint Martin photo.
+
 ### Changed — Tour pages (2026-11-16)
 
 - Tour page redesigned: photo banner (large photo + side photos, all open

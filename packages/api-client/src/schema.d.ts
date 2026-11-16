@@ -1652,6 +1652,22 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/gift-cards/designs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["PublicCommerceController_designList"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/gift-cards/balance": {
     parameters: {
       query?: never;
@@ -1775,6 +1791,38 @@ export interface paths {
     put?: never;
     post?: never;
     delete: operations["MyBookingGiftCardController_remove"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gift-card-designs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations["AdminCommerceController_designList"];
+    put?: never;
+    post: operations["AdminCommerceController_createDesign"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/gift-card-designs/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["AdminCommerceController_updateDesign"];
+    post?: never;
+    delete: operations["AdminCommerceController_deleteDesign"];
     options?: never;
     head?: never;
     patch?: never;
@@ -4364,6 +4412,27 @@ export interface components {
       minTaka: number;
       maxTaka: number;
     };
+    PublicGiftCardDesignListDto_Output: {
+      items: {
+        id: string;
+        nameEn: string;
+        nameBn: string;
+        labelEn: string;
+        labelBn: string;
+        lineEn: string;
+        lineBn: string;
+        messageEn: string;
+        messageBn: string;
+        amount: components["schemas"]["Money_Output"];
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+          width?: number | null;
+          height?: number | null;
+        };
+      }[];
+    };
     GiftCardBalanceDto_Output: {
       last4: string;
       balance: components["schemas"]["Money_Output"];
@@ -4487,6 +4556,70 @@ export interface components {
       amountDue: components["schemas"]["Money_Output"];
       cardBalance: components["schemas"]["Money_Output"];
       bookingStatus: string;
+    };
+    AdminGiftCardDesignListDto_Output: {
+      items: {
+        id: string;
+        nameEn: string;
+        nameBn: string;
+        labelEn: string;
+        labelBn: string;
+        lineEn: string;
+        lineBn: string;
+        messageEn: string;
+        messageBn: string;
+        amount: components["schemas"]["Money_Output"];
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+          width?: number | null;
+          height?: number | null;
+        };
+        active: boolean;
+        sortOrder: number;
+        /** Format: date-time */
+        updatedAt: string;
+      }[];
+    };
+    AdminGiftCardDesignInputDto: {
+      nameEn: string;
+      nameBn: string;
+      labelEn: string;
+      labelBn: string;
+      lineEn: string;
+      lineBn: string;
+      messageEn: string;
+      messageBn: string;
+      amountMinor: number;
+      media: string;
+      active: boolean;
+      sortOrder: number;
+    };
+    AdminGiftCardDesignResultDto_Output: {
+      design: {
+        id: string;
+        nameEn: string;
+        nameBn: string;
+        labelEn: string;
+        labelBn: string;
+        lineEn: string;
+        lineBn: string;
+        messageEn: string;
+        messageBn: string;
+        amount: components["schemas"]["Money_Output"];
+        image: {
+          key: string;
+          url: string;
+          alt: string;
+          width?: number | null;
+          height?: number | null;
+        };
+        active: boolean;
+        sortOrder: number;
+        /** Format: date-time */
+        updatedAt: string;
+      };
     };
     AdminOfferListDto_Output: {
       items: {
@@ -8050,6 +8183,25 @@ export interface operations {
       };
     };
   };
+  PublicCommerceController_designList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PublicGiftCardDesignListDto_Output"];
+        };
+      };
+    };
+  };
   PublicCommerceController_balance: {
     parameters: {
       query: {
@@ -8213,6 +8365,92 @@ export interface operations {
       path: {
         id: string;
         paymentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  AdminCommerceController_designList: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardDesignListDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_createDesign: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminGiftCardDesignInputDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardDesignResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_updateDesign: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AdminGiftCardDesignInputDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AdminGiftCardDesignResultDto_Output"];
+        };
+      };
+    };
+  };
+  AdminCommerceController_deleteDesign: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
       };
       cookie?: never;
     };

@@ -16,6 +16,7 @@ import {
 import { ensure, getPartner, serverApi } from "@/lib/api-server";
 import type { Locale } from "@/i18n/locales";
 import { localName, money } from "@/lib/format";
+import { isLowRes } from "@/lib/media";
 import { wholeSentences } from "@/lib/offer-details";
 import { cleanText } from "@/lib/text";
 import {
@@ -143,7 +144,24 @@ export default async function TourPage({ params }: Props) {
     next: t("nextPhoto"),
     count: t.raw("photoCount") as string,
   };
-  const photos = tour.gallery.length > 0 ? tour.gallery : tour.hero ? [{ ...tour.hero }] : [];
+  const own = tour.gallery.length > 0 ? tour.gallery : tour.hero ? [{ ...tour.hero }] : [];
+  // Lead with a sharp photo: when the tour's own cover is low resolution
+  // (old-website photos are 480 px), a licensed HD photo of the destination
+  // takes the large tile and the tour's photos sit beside it.
+  const destinationPhoto = photoFor(tour.slug, tour.destination.slug);
+  const photos =
+    own.length === 0 || isLowRes(own[0])
+      ? [
+          {
+            url: destinationPhoto.src,
+            alt: tour.destination.name,
+            credit: null,
+            width: destinationPhoto.width,
+            height: destinationPhoto.height,
+          },
+          ...own,
+        ]
+      : own;
   const whatsapp = general?.whatsapp.replace(/[^\d]/g, "");
   const ask = encodeURIComponent(t("askMessage", { tour: tour.title }));
   const requestHref = `/contact?${new URLSearchParams({ topic: "package", about: tour.title })}`;
@@ -242,7 +260,7 @@ export default async function TourPage({ params }: Props) {
           <div className="order-1 p-2 md:p-3 lg:order-2 lg:min-h-[460px]">
             <TourPhotos
               photos={photos}
-              fallback={photoFor(tour.slug, tour.destination.slug)}
+              fallback={destinationPhoto}
               labels={galleryLabels}
               countLabel={t("photoTotal", { count: photos.length })}
             />

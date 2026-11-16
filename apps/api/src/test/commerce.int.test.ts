@@ -123,6 +123,60 @@ describe.skipIf(!ADMIN_URL)("offers, ads, orders and gift cards against MySQL 8.
     expect((await h.call("GET", "/ads?placement=OFFERS_TOP")).json().items).toEqual([]);
   });
 
+  it("lets staff make gift card designs; only switched-on ones show on the website", async () => {
+    const design = {
+      nameEn: "Cox's Bazar sunset",
+      nameBn: "কক্সবাজারের সূর্যাস্ত",
+      labelEn: "Cox's Bazar",
+      labelBn: "কক্সবাজার",
+      lineEn: "Two nights by the sea.",
+      lineBn: "সমুদ্রের ধারে দুই রাত।",
+      messageEn: "Happy birthday!",
+      messageBn: "শুভ জন্মদিন!",
+      amountMinor: 300_000,
+      media: mediaKey,
+      active: true,
+      sortOrder: 0,
+    };
+    const made = await h.call("POST", "/admin/gift-card-designs", { session: owner, body: design });
+    expect(made.statusCode).toBe(201);
+    const id = made.json().design.id;
+    const hidden = await h.call("POST", "/admin/gift-card-designs", {
+      session: owner,
+      body: { ...design, nameEn: "Hidden card", active: false },
+    });
+    expect(hidden.statusCode).toBe(201);
+
+    const live = (await h.call("GET", "/gift-cards/designs")).json();
+    expect(live.items).toHaveLength(1);
+    expect(live.items[0]).toMatchObject({
+      id,
+      nameEn: "Cox's Bazar sunset",
+      amount: { amountMinor: 300_000, currency: "BDT" },
+      image: { url: `/media/${mediaKey}` },
+    });
+
+    // Amounts outside ৳500–৳100,000, or with paisa, are refused.
+    for (const amountMinor of [10_000, 200_000_00, 300_050]) {
+      const bad = await h.call("PUT", `/admin/gift-card-designs/${id}`, {
+        session: owner,
+        body: { ...design, amountMinor },
+      });
+      expect(bad.statusCode).toBe(400);
+    }
+    // Customers cannot manage designs.
+    const denied = await h.call("POST", "/admin/gift-card-designs", {
+      session: customer,
+      body: design,
+    });
+    expect([401, 403]).toContain(denied.statusCode);
+
+    expect(
+      (await h.call("DELETE", `/admin/gift-card-designs/${id}`, { session: owner })).statusCode,
+    ).toBe(204);
+    expect((await h.call("GET", "/gift-cards/designs")).json().items).toEqual([]);
+  });
+
   it("sells an offer at the server price, reserves stock, and alerts staff by email", async () => {
     const wrong = await h.call("POST", "/me/orders/offer", {
       session: customer,

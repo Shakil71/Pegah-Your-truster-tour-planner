@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@pegah/ui", "@pegah/shared", "@pegah/design-tokens", "@pegah/api-client"],
   images: {
     formats: ["image/avif", "image/webp"],
+    // Photos are the product: encode at 90 rather than the default 75 so
+    // banners and cards stay crisp (Next.js uses the closest allowed value).
+    qualities: [90],
   },
   poweredByHeader: false,
   // Self-contained server bundle for hosts without a build step (cPanel, ADR-0040).
