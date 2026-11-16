@@ -143,7 +143,7 @@ export function MediaLibrary({
           <h2 id="upload-h" className="mb-3 text-[0.95rem] font-semibold">
             Upload a photo
           </h2>
-          <UploadForm csrfToken={csrfToken} onUploaded={() => router.refresh()} />
+          <UploadForm csrfToken={csrfToken} multiple onUploaded={() => router.refresh()} />
         </section>
       )}
       {items.length === 0 ? (

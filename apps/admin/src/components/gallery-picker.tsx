@@ -141,6 +141,7 @@ export function GalleryPicker({
           </div>
           <UploadForm
             csrfToken={csrfToken}
+            multiple
             onUploaded={(m) => {
               setItems((list) => [m as MediaItem, ...(list ?? [])]);
               setPicked((s) => new Set(s).add(m.key));

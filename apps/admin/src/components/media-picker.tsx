@@ -3,78 +3,176 @@
 import { useRef, useState } from "react";
 import { FormAlert, TextField, buttonClass, cx } from "@pegah/ui";
 import { browserApi, problemMessage } from "@/lib/api-browser";
-import { uploadImage, type MediaItem } from "@/lib/upload-image";
+import { altFromFileName, uploadImage, type MediaItem } from "@/lib/upload-image";
 
 export type HeroRef = { key: string; url: string; alt: string };
 
-/** Upload form shared by the picker and the media library page. */
+type Pending = { id: number; file: File; preview: string; alt: string };
+
+/**
+ * Upload form shared by the picker and the media library page: pick photos
+ * from the computer or phone (or drop them here), any format the browser can
+ * open. Each photo gets a description from its file name, editable before
+ * upload; photos are resized and compressed in the browser first.
+ */
 export function UploadForm({
   csrfToken,
   onUploaded,
+  multiple = false,
 }: {
   csrfToken: string;
   onUploaded: (m: MediaItem) => void;
+  /** Allow several photos in one go (galleries, media library). */
+  multiple?: boolean;
 }) {
-  const [file, setFile] = useState<File | null>(null);
-  const [alt, setAlt] = useState("");
+  const [pending, setPending] = useState<Pending[]>([]);
   const [credit, setCredit] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [dragging, setDragging] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const nextId = useRef(0);
+
+  function add(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setErrors([]);
+    const list = Array.from(files).filter(
+      (f) => !f.type || f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name),
+    );
+    const chosen = (multiple ? list : list.slice(0, 1)).map((file) => ({
+      id: nextId.current++,
+      file,
+      preview: URL.createObjectURL(file),
+      alt: altFromFileName(file.name),
+    }));
+    setPending((old) => {
+      if (!multiple) old.forEach((p) => URL.revokeObjectURL(p.preview));
+      return multiple ? [...old, ...chosen].slice(0, 20) : chosen;
+    });
+    if (input.current) input.current.value = "";
+  }
+
+  function drop(id: number) {
+    setPending((old) => {
+      old.filter((p) => p.id === id).forEach((p) => URL.revokeObjectURL(p.preview));
+      return old.filter((p) => p.id !== id);
+    });
+  }
 
   async function submit() {
-    if (!file) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const m = await uploadImage(file, { alt, credit: credit || undefined }, csrfToken);
-      setFile(null);
-      setAlt("");
-      setCredit("");
-      if (input.current) input.current.value = "";
-      onUploaded(m);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed.");
-    } finally {
-      setBusy(false);
+    const failed: string[] = [];
+    for (const [i, p] of pending.entries()) {
+      setBusy(`Uploading ${i + 1} of ${pending.length}…`);
+      try {
+        const m = await uploadImage(
+          p.file,
+          { alt: p.alt.trim().length >= 3 ? p.alt.trim() : "Photo", credit: credit || undefined },
+          csrfToken,
+        );
+        URL.revokeObjectURL(p.preview);
+        setPending((old) => old.filter((x) => x.id !== p.id));
+        onUploaded(m);
+      } catch (e) {
+        failed.push(e instanceof Error ? e.message : `"${p.file.name}": upload failed.`);
+      }
     }
+    setErrors(failed);
+    setBusy(null);
   }
 
   return (
     <div className="grid gap-3 rounded-[14px] border border-dashed border-rule p-4">
-      <label className="grid gap-1 text-[0.84rem] font-semibold">
-        Photo (JPEG, PNG or WebP)
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          add(e.dataTransfer.files);
+        }}
+        className={cx(
+          "grid cursor-pointer justify-items-center gap-1.5 rounded-[12px] border-2 border-dashed px-4 py-6 text-center transition-colors",
+          dragging ? "border-primary bg-primary-soft" : "border-rule hover:border-ink-3",
+        )}
+      >
+        <span className="text-[0.95rem] font-semibold">
+          {multiple
+            ? "Choose photos from your computer or phone"
+            : "Choose a photo from your computer or phone"}
+        </span>
+        <span className="text-[0.8rem] text-ink-2">
+          or drag {multiple ? "them" : "it"} here · JPEG, PNG, WebP, GIF, AVIF, any size
+        </span>
+        <span className={buttonClass("outline", "sm", "pointer-events-none mt-1")}>Browse…</span>
         <input
           ref={input}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-          className="text-[0.86rem] font-normal"
+          accept="image/*,.heic,.heif"
+          multiple={multiple}
+          onChange={(e) => add(e.target.files)}
+          className="sr-only"
         />
       </label>
-      <TextField
-        label="Description for screen readers (required)"
-        value={alt}
-        maxLength={255}
-        onChange={(e) => setAlt(e.target.value)}
-        hint="Say what the photo shows, e.g. 'Tea bushes on a hillside at sunrise'."
-      />
-      <TextField
-        label="Credit (photographer or source)"
-        value={credit}
-        maxLength={255}
-        onChange={(e) => setCredit(e.target.value)}
-        hint="Use only photos you own or are licensed to use."
-      />
-      {error && <FormAlert>{error}</FormAlert>}
-      <button
-        type="button"
-        disabled={busy || !file || alt.trim().length < 3}
-        onClick={submit}
-        className={buttonClass("primary", "sm", "justify-self-start")}
-      >
-        {busy ? "Uploading…" : "Upload photo"}
-      </button>
+
+      {pending.length > 0 && (
+        <ul className="grid gap-3">
+          {pending.map((p) => (
+            <li key={p.id} className="flex items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element -- local preview */}
+              <img
+                src={p.preview}
+                alt=""
+                className="size-16 shrink-0 rounded-[8px] bg-paper-2 object-cover"
+              />
+              <div className="min-w-0 flex-1">
+                <TextField
+                  label={`Description: ${p.file.name}`}
+                  value={p.alt}
+                  maxLength={255}
+                  onChange={(e) =>
+                    setPending((old) =>
+                      old.map((x) => (x.id === p.id ? { ...x, alt: e.target.value } : x)),
+                    )
+                  }
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => drop(p.id)}
+                disabled={!!busy}
+                className={buttonClass("ghost", "sm", "mt-6")}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {pending.length > 0 && (
+        <TextField
+          label="Credit (optional: photographer or source)"
+          value={credit}
+          maxLength={255}
+          onChange={(e) => setCredit(e.target.value)}
+          hint="Use only photos you own or are licensed to use."
+        />
+      )}
+      {errors.map((m) => (
+        <FormAlert key={m}>{m}</FormAlert>
+      ))}
+      {pending.length > 0 && (
+        <button
+          type="button"
+          disabled={!!busy}
+          onClick={submit}
+          className={buttonClass("primary", "sm", "justify-self-start")}
+        >
+          {busy ?? (pending.length > 1 ? `Upload ${pending.length} photos` : "Upload photo")}
+        </button>
+      )}
     </div>
   );
 }

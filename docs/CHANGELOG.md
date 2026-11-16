@@ -4,6 +4,15 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Changed — Photo uploads in the console (2026-11-16)
+
+- Staff can upload any photo the browser can open (JPEG, PNG, WebP, GIF,
+  AVIF; HEIC in Safari, with a clear "save as JPEG" message elsewhere) from
+  their computer or phone, by browsing or drag and drop, several at once in
+  galleries and the media library (up to 20), with previews.
+- Large or very detailed photos are scaled down a step instead of refused;
+  the description is prefilled from the file name and stays editable.
+
 ### Added — Gift card designs, launch clean-up (2026-11-16)
 
 - Console → Gift cards → "Card designs on the website": the owner makes
