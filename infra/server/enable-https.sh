@@ -12,7 +12,8 @@
 #   2. Installs infra/nginx/pegah.conf (8443 HTTPS, 8180 → HTTPS redirect),
 #      tests it, and rolls back if the test fails (nginx is shared).
 #   3. SELinux: makes sure 8180 and 8443 are http_port_t. firewalld: opens 8443.
-#   4. Adds the https:// origins to APP_ORIGINS in api.env and restarts the API.
+#   4. Adds the https:// IP origins to APP_ORIGINS in api.env (keeping any
+#      origins already there, such as the public domain) and restarts the API.
 # It never prints secrets, never touches other tenants' sites, and never
 # disables SELinux or firewalld.
 set -euo pipefail
@@ -82,8 +83,15 @@ firewall-cmd --list-ports
 # ── 4. API origins ────────────────────────────────────────────────────────────
 log "API allowed origins"
 if [[ -f "$ENV_FILE" ]]; then
-  origins="$(printf 'https://%s:'"$HTTPS_PORT"',' "${IPS[@]}")"
-  origins="${origins%,}"
+  # Add the IP origins without dropping any already listed (for example the
+  # public domain, https://pegah.com.bd): replacing the list breaks sign-in
+  # on the domain with "Origin not allowed".
+  current="$(grep '^APP_ORIGINS=' "$ENV_FILE" | head -1 | cut -d= -f2- || true)"
+  origins="$current"
+  for ip in "${IPS[@]}"; do
+    o="https://${ip}:${HTTPS_PORT}"
+    [[ ",${origins}," == *",${o},"* ]] || origins="${origins:+${origins},}${o}"
+  done
   if grep -q '^APP_ORIGINS=' "$ENV_FILE"; then
     sed -i "s#^APP_ORIGINS=.*#APP_ORIGINS=${origins}#" "$ENV_FILE"
   else

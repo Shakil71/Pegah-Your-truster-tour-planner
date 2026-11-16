@@ -29,6 +29,11 @@ id_ed25519*
 *.ibd
 backups/
 
+# Old website import inputs: customer data and photos whose licence is not
+# recorded. Keep them outside the repository (docs/operations/LEGACY_IMPORT.md).
+/images/
+/legacy-*/
+
 # Logs
 *.log
 logs/

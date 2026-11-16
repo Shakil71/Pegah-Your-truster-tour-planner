@@ -4,6 +4,23 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Fixed — Public domain sign-in and HTTPS config (2026-11-16)
+
+- `enable-https.sh` no longer replaces `APP_ORIGINS`: it adds the IP origins
+  and keeps the rest, so re-running it cannot break sign-in on
+  `https://pegah.com.bd` with "Origin not allowed".
+- The public-domain nginx config (`infra/nginx/pegah-public.conf`) and the
+  certbot deploy hook are now in the repository; the config gains the 6 MB
+  limit on document upload routes and an HSTS header.
+- `.gitignore` keeps old-website import inputs (`/images/`, `/legacy-*/`)
+  out of the repository.
+
+### Operations — Old website data live (2026-11-16)
+
+- Old website imported on the production server and its hotels, tours,
+  destinations, packages and pages published; demo catalog unpublished
+  (docs/operations/LEGACY_IMPORT.md#production-run-2026-11-16).
+
 ### Added — cPanel shared hosting support (2026-11-06)
 
 - Upload bundle built by GitHub Actions (cPanel bundle workflow), standalone

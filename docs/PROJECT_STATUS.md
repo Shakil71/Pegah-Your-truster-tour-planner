@@ -1,6 +1,6 @@
 # Project Status
 
-_Last updated: 2026-11-06_
+_Last updated: 2026-11-16_
 
 ## Current phase
 
@@ -23,10 +23,18 @@ supplier contracts.
   the new config to switch uploads on; add the visas Pegah offers in
   Console → Visa services.
 
-- Old website import (ADR-0038): schema for galleries, amenities and the old
-  fields; importer + verifier rehearsed locally (nothing missing, nothing
-  changed). **Not yet run on the server** — needs owner approval and a
-  backup first (`docs/operations/LEGACY_IMPORT.md`).
+- Old website import (ADR-0038): **run on the production server
+  2026-11-16** with the owner's approval (verifier: nothing missing, nothing
+  changed). 44 hotels, 15 tours, 6 packages and 15 destinations published;
+  demo catalog unpublished. **Owner next:** add rates and room counts,
+  tour departures and current package prices — imported items are visible
+  but not bookable until then (`docs/operations/LEGACY_IMPORT.md`).
+
+- Public domain live (2026-11-16): `https://pegah.com.bd` with a Let's
+  Encrypt certificate and automatic renewal; `APP_ORIGINS` includes the
+  domain. **Owner next (root):** copy the updated `pegah-public.conf`
+  (document upload size, HSTS) and add `www.pegah.com.bd` to the
+  certificate (`docs/operations/DEPLOYMENT.md#public-domain-https-pegahcombd--live-since-2026-11-16`).
 
 - Offers, ads, orders and gift cards with purchase-alert emails (ADR-0032);
   light/dark theme toggle (ADR-0033); gift cards at checkout (ADR-0034);

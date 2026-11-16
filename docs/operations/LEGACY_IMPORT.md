@@ -88,6 +88,40 @@ supplier must have allowed their use) and text, then publish.
 
 Running the import again is safe: rows already in `legacy_records` are skipped.
 
+## Production run (2026-11-16)
+
+Run as `pegah` on 192.168.197.100 with the owner's approval.
+
+- Source: a fresh export of `pegaoafz_db` taken from cPanel the same day was
+  compared with the 2026-11-06 dump: 89 tables, no row added, changed or
+  removed, so the 2026-11-06 dump was imported. The cPanel images folder
+  matched the local copy file for file.
+- Backups before writing: `pre-legacy-import-20261116-123456.sql.gz`,
+  then `pre-publish-…` and `pre-publish2-…` in `/databackup/mysql-backups`.
+- Result: identical to the rehearsal (45 hotels, 169 rooms, 16 tours,
+  8 packages, 15 customers, 708 photos stored, 7,868 archive rows).
+  Verifier: 56,277 fields, `OK: nothing missing, nothing changed.`
+- The 10 missing photos are not on the cPanel host either (checked the live
+  folder, `bkp-21082026` and `shakil`): the old site already linked to
+  files that no longer existed.
+- Server copies of the dump and photos were deleted afterwards.
+
+Published at the owner's request on the same day (audit log, actor
+`SYSTEM`, note "Owner request 2026-11-16"):
+
+- 44 hotels, 15 tours, 15 destinations, 6 packages (offers); home page
+  featured lists set; old site's Terms and Privacy text moved to
+  `/pages/terms` and `/pages/privacy` (the earlier drafts kept as
+  `terms-draft` and `privacy-draft`); Cancellations, Payments, Partners and
+  Contact pages published; `about-old-website` published.
+- Kept as drafts: "Demo Hotel One" and the "coxs" tour (old site test data),
+  "10 Days Umrah Package 2022-2023" and "Winter Sunset 2023" (past events),
+  "Across Bangladesh". Both coupons stay paused (they expired in 2023 and
+  2025). The six seeded `demo-*` hotels and tours were unpublished.
+- No rates, inventory or departures were created: the old prices were last
+  changed in November 2024, and the old site held no room counts. Imported
+  hotels and tours are visible but not bookable until staff add them.
+
 ## Results of the local rehearsal (2026-11-06)
 
 45 hotels, 169 rooms (4 rooms belonged to hotels deleted on the old site and

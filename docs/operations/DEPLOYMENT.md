@@ -246,6 +246,36 @@ ports `http_port_t`, opens them in firewalld, sets `APP_ORIGINS` to the HTTPS
 origins and restarts the API. It prints the certificate fingerprint: compare
 it with the one your browser shows before accepting the warning.
 
+### Public domain HTTPS (pegah.com.bd) — live since 2026-11-16
+
+`pegah.com.bd` (DNS `A` → 27.147.147.228, NAT to 192.168.197.100) is served
+on 80/443 by `infra/nginx/pegah-public.conf` with a Let's Encrypt
+certificate. Public certificates last at most 200 days (and less from 2027),
+so there is no multi-year certificate: renewal is automatic.
+
+| Piece           | Where                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------- |
+| Certificate     | `/etc/letsencrypt/live/pegah.com.bd/` (certbot, webroot `/var/www/pegah-acme`)              |
+| Renewal         | `certbot-renew.timer` (enabled); test with `sudo certbot renew --dry-run`                   |
+| Reload on renew | `/etc/letsencrypt/renewal-hooks/deploy/pegah-nginx.sh` = `infra/letsencrypt/…-hook.sh`      |
+| HTTP            | port 80 serves ACME challenges and redirects everything else to `https://pegah.com.bd`      |
+| API origins     | `APP_ORIGINS` in `api.env` must include `https://pegah.com.bd` (else "Origin not allowed") |
+
+Current `APP_ORIGINS`:
+`https://pegah.com.bd,https://192.168.197.100:8443,https://27.147.147.228:8443`.
+`enable-https.sh` keeps existing origins when re-run.
+
+Inside the office network the public IP is not reachable (no NAT
+hairpin), so office PCs map the domain to the private IP in
+`C:\Windows\System32\drivers\etc\hosts`: `192.168.197.100  pegah.com.bd`.
+
+Not done yet (needs root): `www.pegah.com.bd` is not on the certificate
+(`certbot certonly --webroot -w /var/www/pegah-acme -d pegah.com.bd -d
+www.pegah.com.bd --expand`, then add it to `server_name` with a redirect),
+and the repository version of `pegah-public.conf` (document upload size,
+HSTS) still has to be copied to the server:
+`sudo install -m 0644 infra/nginx/pegah-public.conf /etc/nginx/conf.d/ && sudo nginx -t && sudo systemctl reload nginx`.
+
 ### Admin panel access
 
 `https://<server>:8443/admin` → staff sign-in. Create the first owner account
