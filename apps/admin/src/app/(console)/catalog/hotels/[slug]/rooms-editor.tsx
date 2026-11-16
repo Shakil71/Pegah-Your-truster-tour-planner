@@ -7,6 +7,7 @@ import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, TextField, buttonClass, cx } from "@pegah/ui";
 import { AmenityPicker, GalleryPicker } from "@/components/gallery-picker";
 import type { HeroRef } from "@/components/media-picker";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { money } from "@/lib/format";
 
@@ -266,7 +267,7 @@ export function RoomsEditor({
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {canInventory && (
                   <Link href={`/catalog/rooms/${r.id}`} className={buttonClass("ink", "sm")}>
                     <Icon name="calendar" className="size-4" /> Calendar and rates
@@ -280,6 +281,15 @@ export function RoomsEditor({
                   >
                     Edit
                   </button>
+                )}
+                {canManage && (
+                  <ItemActions
+                    kind="room"
+                    itemKey={r.id}
+                    name={r.name}
+                    visible={r.isActive}
+                    csrfToken={csrfToken}
+                  />
                 )}
               </div>
             </li>

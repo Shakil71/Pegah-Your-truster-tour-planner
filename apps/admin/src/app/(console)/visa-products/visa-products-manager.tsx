@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, TextField, buttonClass, cx } from "@pegah/ui";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { money } from "@/lib/format";
 import { parseTaka, takaText } from "@/lib/money-input";
@@ -261,13 +262,22 @@ export function VisaProductsManager({
                 </p>
               </div>
               {canManage && (
-                <button
-                  type="button"
-                  onClick={() => open(v)}
-                  className={buttonClass("ghost", "sm")}
-                >
-                  Edit
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => open(v)}
+                    className={buttonClass("ghost", "sm")}
+                  >
+                    Edit
+                  </button>
+                  <ItemActions
+                    kind="visa"
+                    itemKey={v.slug}
+                    name={`${v.country} · ${v.visaType}`}
+                    visible={v.status === "PUBLISHED"}
+                    csrfToken={csrfToken}
+                  />
+                </div>
               )}
             </li>
           ),

@@ -16,6 +16,7 @@ export * from "./settings";
 export * from "./media";
 export * from "./home";
 export * from "./commerce";
+export * from "./manage";
 export * from "./legacy";
 export * from "./services";
 export * from "./contact";

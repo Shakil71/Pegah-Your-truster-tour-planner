@@ -32,6 +32,8 @@ import { AccountService } from "./account/account.service";
 import { EmailVerificationService } from "./account/email-verification.service";
 import { CancellationService } from "./account/cancellation.service";
 import { AdminController } from "./admin/admin.controllers";
+import { ManageController } from "./admin/manage.controller";
+import { ManageService } from "./admin/manage.service";
 import { LegacyAdminController } from "./legacy/legacy.controller";
 import { ServiceMailer } from "./services/service-mailer.service";
 import { ServiceRequestService } from "./services/service-request.service";
@@ -148,6 +150,7 @@ export class AppModule {
         MyOrdersController,
         MyBookingGiftCardController,
         AdminCommerceController,
+        ManageController,
         PublicVisasController,
         MyRequestsController,
         AdminRequestsController,
@@ -164,6 +167,7 @@ export class AppModule {
         OrderFulfilment,
         OffersService,
         GiftCardDesignsService,
+        ManageService,
         OrderService,
         CommerceMailer,
         ServiceRequestService,

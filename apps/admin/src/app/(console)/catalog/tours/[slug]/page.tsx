@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon, buttonClass } from "@pegah/ui";
+import { ItemActions } from "@/components/item-actions";
 import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
 import { PublishPill } from "@/components/publish-pill";
@@ -51,6 +52,16 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
               >
                 View on website <Icon name="arrowRight" className="size-[18px]" />
               </a>
+            )}
+            {can("catalog:manage") && (
+              <ItemActions
+                kind="tour"
+                itemKey={tour.slug}
+                name={tour.title}
+                visible={tour.status === "PUBLISHED"}
+                csrfToken={session.csrfToken}
+                afterDelete="/catalog/tours"
+              />
             )}
           </>
         }

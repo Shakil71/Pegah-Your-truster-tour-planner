@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, buttonClass, cx } from "@pegah/ui";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { dhakaDateTime } from "@/lib/format";
 
@@ -140,6 +141,13 @@ export function MessagesManager({ items, csrfToken }: { items: Message[]; csrfTo
                     Last updated by {m.handledBy}, {dhakaDateTime(m.handledAt)}
                   </span>
                 )}
+                <ItemActions
+                  kind="contact-message"
+                  itemKey={m.id}
+                  name={`message ${m.reference}`}
+                  csrfToken={csrfToken}
+                  className="ml-auto"
+                />
               </div>
             </div>
           </li>

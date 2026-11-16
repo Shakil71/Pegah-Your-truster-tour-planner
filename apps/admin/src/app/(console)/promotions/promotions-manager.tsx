@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, SelectField, TextField, buttonClass, cx } from "@pegah/ui";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { dhakaDateTime, money } from "@/lib/format";
 import { bpsToPercent, parseTaka, percentToBps, takaText } from "@/lib/money-input";
@@ -329,6 +330,14 @@ export function PromotionsManager({ items, csrfToken }: { items: Promotion[]; cs
                         >
                           Edit
                         </button>
+                        <ItemActions
+                          kind="promotion"
+                          itemKey={p.id}
+                          name={`the code ${p.code}`}
+                          visible={p.status === "ACTIVE"}
+                          csrfToken={csrfToken}
+                          className="mt-1.5"
+                        />
                       </td>
                     </tr>
                   );

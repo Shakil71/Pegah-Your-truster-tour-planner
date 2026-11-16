@@ -18,6 +18,7 @@ import {
 } from "@pegah/ui";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
 import { PublishPill } from "@/components/publish-pill";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 
 type Destination = Schemas["AdminDestination_Output"];
@@ -149,7 +150,19 @@ export function DestinationManager({
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <PublishPill status={d.status} />
+                    {canManage ? (
+                      <ItemActions
+                        kind="destination"
+                        itemKey={d.slug}
+                        name={d.name}
+                        visible={d.status === "PUBLISHED"}
+                        csrfToken={csrfToken}
+                        toggleOnly
+                        className="justify-items-start"
+                      />
+                    ) : (
+                      <PublishPill status={d.status} />
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <Link href="/catalog/hotels" className="hover:underline">
@@ -170,6 +183,15 @@ export function DestinationManager({
                       >
                         Edit
                       </button>
+                    )}
+                    {canManage && (
+                      <ItemActions
+                        kind="destination"
+                        itemKey={d.slug}
+                        name={d.name}
+                        csrfToken={csrfToken}
+                        className="mt-1"
+                      />
                     )}
                   </td>
                 </tr>

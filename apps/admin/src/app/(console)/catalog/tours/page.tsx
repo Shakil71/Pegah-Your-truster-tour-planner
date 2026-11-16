@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Icon, buttonClass } from "@pegah/ui";
 import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
+import { ItemActions } from "@/components/item-actions";
 import { PublishPill } from "@/components/publish-pill";
 import { ensure, requireStaff, serverApi } from "@/lib/api-server";
 import { timeAgo } from "@/lib/format";
@@ -14,6 +15,7 @@ export default async function ToursPage() {
   if (!session.user.permissions.includes("catalog:read")) {
     return <NoAccess what="the catalog" permission="catalog:read" />;
   }
+  const canManage = session.user.permissions.includes("catalog:manage");
   const api = await serverApi();
   const { items } = ensure(await api.GET("/api/v1/admin/tours"));
   return (
@@ -61,6 +63,11 @@ export default async function ToursPage() {
                   <th scope="col" className="px-4 py-3 font-semibold">
                     Updated
                   </th>
+                  {canManage && (
+                    <th scope="col" className="px-4 py-3 text-right font-semibold">
+                      Delete
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -79,7 +86,19 @@ export default async function ToursPage() {
                     </td>
                     <td className="px-4 py-3">{t.destination.name}</td>
                     <td className="px-4 py-3">
-                      <PublishPill status={t.status} />
+                      {canManage ? (
+                        <ItemActions
+                          kind="tour"
+                          itemKey={t.slug}
+                          name={t.title}
+                          visible={t.status === "PUBLISHED"}
+                          csrfToken={session.csrfToken}
+                          toggleOnly
+                          className="justify-items-start"
+                        />
+                      ) : (
+                        <PublishPill status={t.status} />
+                      )}
                     </td>
                     <td className="px-4 py-3">{t.upcomingDepartures}</td>
                     <td className="px-4 py-3">
@@ -95,6 +114,16 @@ export default async function ToursPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-ink-3">{timeAgo(t.updatedAt)}</td>
+                    {canManage && (
+                      <td className="px-4 py-3">
+                        <ItemActions
+                          kind="tour"
+                          itemKey={t.slug}
+                          name={t.title}
+                          csrfToken={session.csrfToken}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

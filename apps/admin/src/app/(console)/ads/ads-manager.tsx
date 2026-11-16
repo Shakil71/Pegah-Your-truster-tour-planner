@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextField, buttonClass, cx } from "@pegah/ui";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { dhakaDateTime } from "@/lib/format";
 
@@ -224,6 +225,14 @@ export function AdsManager({ items, csrfToken }: { items: Ad[]; csrfToken: strin
               >
                 {a.live ? "Showing now" : a.active ? "Scheduled / ended" : "Off"}
               </span>
+              <ItemActions
+                kind="ad"
+                itemKey={a.id}
+                name={a.titleEn}
+                visible={a.active}
+                csrfToken={csrfToken}
+                toggleOnly
+              />
               <button
                 type="button"
                 onClick={() => open(a)}

@@ -2004,6 +2004,38 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/admin/manage/{kind}/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations["ManageController_remove"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/admin/manage/{kind}/{key}/visibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["ManageController_visibility"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/visas": {
     parameters: {
       query?: never;
@@ -4935,6 +4967,12 @@ export interface components {
     };
     AdminVoidGiftCardDto: {
       reason: string;
+    };
+    SetVisibilityDto: {
+      visible: boolean;
+    };
+    VisibilityResultDto_Output: {
+      visible: boolean;
     };
     VisaProductSummary_Output: {
       slug: string;
@@ -8799,6 +8837,76 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  ManageController_remove: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        kind:
+          | "destination"
+          | "hotel"
+          | "room"
+          | "tour"
+          | "departure"
+          | "offer"
+          | "promotion"
+          | "page"
+          | "visa"
+          | "ad"
+          | "gift-card-design"
+          | "contact-message";
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ManageController_visibility: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        kind:
+          | "destination"
+          | "hotel"
+          | "room"
+          | "tour"
+          | "departure"
+          | "offer"
+          | "promotion"
+          | "page"
+          | "visa"
+          | "ad"
+          | "gift-card-design"
+          | "contact-message";
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetVisibilityDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VisibilityResultDto_Output"];
+        };
       };
     };
   };

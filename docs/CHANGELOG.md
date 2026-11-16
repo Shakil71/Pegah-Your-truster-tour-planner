@@ -4,6 +4,24 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Delete and show/hide everywhere in the console (2026-11-16)
+
+- One control (`ItemActions`) on every listing: a Showing/Hidden switch and
+  a Delete button with confirmation. Hotels and tours (list and detail),
+  rooms, departures, destinations, offers, promo codes, visas, content
+  pages, ads, gift card designs and contact messages.
+- API: `DELETE /api/v1/admin/manage/{kind}/{key}` and
+  `PUT /api/v1/admin/manage/{kind}/{key}/visibility`, checked per kind
+  against the permission that edits it (catalog:manage, inventory:manage,
+  promotion:manage, content:manage, service:manage), audited, one
+  transaction. Hiding sets DRAFT / inactive / paused.
+- Safety: anything bookings, holds, orders or customer requests point at
+  is never deleted (409 with "hide it instead"), so money and history stay
+  traceable. A hotel delete removes its rooms, photos, facilities, rates
+  and availability; a tour delete removes its unbooked departures. Old
+  website import records are kept, so a re-import does not bring deleted
+  items back.
+
 ### Changed — Photo uploads in the console (2026-11-16)
 
 - Staff can upload any photo the browser can open (JPEG, PNG, WebP, GIF,

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, Icon, TextField, buttonClass, cx } from "@pegah/ui";
+import { ItemActions } from "@/components/item-actions";
 import { PublishPill } from "@/components/publish-pill";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { dhakaDateTime, money } from "@/lib/format";
@@ -311,6 +312,16 @@ export function DeparturesManager({
                           </>
                         )}
                       </span>
+                    )}
+                    {canManage && !editing && taken === 0 && (
+                      <ItemActions
+                        kind="departure"
+                        itemKey={d.id}
+                        name={`the departure on ${dhakaDateTime(d.departsAt)}`}
+                        csrfToken={csrfToken}
+                        compact
+                        className="mt-1.5"
+                      />
                     )}
                   </td>
                 </tr>

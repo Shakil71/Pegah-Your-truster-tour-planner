@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Icon, buttonClass } from "@pegah/ui";
 import { NoAccess } from "@/components/no-access";
 import { PageHeader } from "@/components/page-header";
+import { ItemActions } from "@/components/item-actions";
 import { PublishPill } from "@/components/publish-pill";
 import { ensure, requireStaff, serverApi } from "@/lib/api-server";
 import { timeAgo } from "@/lib/format";
@@ -63,6 +64,11 @@ export default async function HotelsPage() {
                   <th scope="col" className="px-4 py-3 font-semibold">
                     Updated
                   </th>
+                  {canManage && (
+                    <th scope="col" className="px-4 py-3 text-right font-semibold">
+                      Delete
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +87,19 @@ export default async function HotelsPage() {
                     </td>
                     <td className="px-4 py-3">{h.destination.name}</td>
                     <td className="px-4 py-3">
-                      <PublishPill status={h.status} />
+                      {canManage ? (
+                        <ItemActions
+                          kind="hotel"
+                          itemKey={h.slug}
+                          name={h.name}
+                          visible={h.status === "PUBLISHED"}
+                          csrfToken={session.csrfToken}
+                          toggleOnly
+                          className="justify-items-start"
+                        />
+                      ) : (
+                        <PublishPill status={h.status} />
+                      )}
                     </td>
                     <td className="px-4 py-3">{h.roomCount}</td>
                     <td className="px-4 py-3">
@@ -97,6 +115,16 @@ export default async function HotelsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-ink-3">{timeAgo(h.updatedAt)}</td>
+                    {canManage && (
+                      <td className="px-4 py-3">
+                        <ItemActions
+                          kind="hotel"
+                          itemKey={h.slug}
+                          name={h.name}
+                          csrfToken={session.csrfToken}
+                        />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

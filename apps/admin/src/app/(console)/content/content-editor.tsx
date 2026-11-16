@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass, cx } from "@pegah/ui";
+import { ItemActions } from "@/components/item-actions";
 import { PublishPill } from "@/components/publish-pill";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { timeAgo } from "@/lib/format";
@@ -108,7 +109,18 @@ export function ContentEditor({
           <h2 className="text-[0.95rem] font-semibold">
             {current ? `Edit /pages/${current.slug}` : "New page"}
           </h2>
-          {current && <PublishPill status={current.status} />}
+          {current && (
+            <div className="flex flex-wrap items-center gap-2">
+              <PublishPill status={current.status} />
+              <ItemActions
+                kind="page"
+                itemKey={current.slug}
+                name={`/pages/${current.slug}`}
+                csrfToken={csrfToken}
+                afterDelete="/content"
+              />
+            </div>
+          )}
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <TextField

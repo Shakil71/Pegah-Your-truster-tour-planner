@@ -5421,6 +5421,119 @@
         "tags": ["admin-commerce"]
       }
     },
+    "/api/v1/admin/manage/{kind}/{key}": {
+      "delete": {
+        "operationId": "ManageController_remove",
+        "parameters": [
+          {
+            "name": "kind",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "destination",
+                "hotel",
+                "room",
+                "tour",
+                "departure",
+                "offer",
+                "promotion",
+                "page",
+                "visa",
+                "ad",
+                "gift-card-design",
+                "contact-message"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-manage"]
+      }
+    },
+    "/api/v1/admin/manage/{kind}/{key}/visibility": {
+      "put": {
+        "operationId": "ManageController_visibility",
+        "parameters": [
+          {
+            "name": "kind",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "destination",
+                "hotel",
+                "room",
+                "tour",
+                "departure",
+                "offer",
+                "promotion",
+                "page",
+                "visa",
+                "ad",
+                "gift-card-design",
+                "contact-message"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetVisibilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisibilityResultDto_Output"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "staff": []
+          }
+        ],
+        "tags": ["admin-manage"]
+      }
+    },
     "/api/v1/visas": {
       "get": {
         "operationId": "PublicVisasController_list",
@@ -19078,6 +19191,25 @@
           }
         },
         "required": ["reason"]
+      },
+      "SetVisibilityDto": {
+        "type": "object",
+        "properties": {
+          "visible": {
+            "type": "boolean"
+          }
+        },
+        "required": ["visible"]
+      },
+      "VisibilityResultDto_Output": {
+        "type": "object",
+        "properties": {
+          "visible": {
+            "type": "boolean"
+          }
+        },
+        "required": ["visible"],
+        "additionalProperties": false
       },
       "VisaProductSummary_Output": {
         "type": "object",

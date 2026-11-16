@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Schemas } from "@pegah/api-client";
-import { FormAlert, SelectField, TextAreaField, TextField, buttonClass, cx } from "@pegah/ui";
+import { FormAlert, SelectField, TextAreaField, TextField, buttonClass } from "@pegah/ui";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 
 type Design = Schemas["AdminGiftCardDesignListDto_Output"]["items"][number];
@@ -293,14 +294,14 @@ export function DesignsManager({ items, csrfToken }: { items: Design[]; csrfToke
                     {taka(d.amount.amountMinor)} · order {d.sortOrder}
                   </p>
                 </div>
-                <span
-                  className={cx(
-                    "shrink-0 rounded-full px-2.5 py-1 text-[0.74rem] font-semibold",
-                    d.active ? "bg-good-soft text-good" : "bg-paper-2 text-ink-2",
-                  )}
-                >
-                  {d.active ? "Showing" : "Hidden"}
-                </span>
+                <ItemActions
+                  kind="gift-card-design"
+                  itemKey={d.id}
+                  name={d.nameEn}
+                  visible={d.active}
+                  csrfToken={csrfToken}
+                  toggleOnly
+                />
               </div>
               <div className="flex gap-2">
                 <button

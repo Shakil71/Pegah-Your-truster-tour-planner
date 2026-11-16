@@ -6,7 +6,7 @@ import type { Schemas } from "@pegah/api-client";
 import { parseTaka, takaText } from "@pegah/shared";
 import { FormAlert, SelectField, TextAreaField, TextField, buttonClass, cx } from "@pegah/ui";
 import { HeroPicker, type HeroRef } from "@/components/media-picker";
-import { PublishPill } from "@/components/publish-pill";
+import { ItemActions } from "@/components/item-actions";
 import { browserApi, csrf, problemMessage } from "@/lib/api-browser";
 import { money } from "@/lib/format";
 
@@ -207,7 +207,6 @@ export function OffersManager({ items, csrfToken }: { items: Offer[]; csrfToken:
                   {o.validUntil ? ` · until ${o.validUntil.slice(0, 10)}` : ""}
                 </p>
               </div>
-              <PublishPill status={o.status} />
               <span
                 className={cx(
                   "text-[0.78rem] font-semibold",
@@ -223,6 +222,13 @@ export function OffersManager({ items, csrfToken }: { items: Offer[]; csrfToken:
               >
                 Edit
               </button>
+              <ItemActions
+                kind="offer"
+                itemKey={o.id}
+                name={o.titleEn}
+                visible={o.status === "PUBLISHED"}
+                csrfToken={csrfToken}
+              />
             </li>
           ))}
         </ul>
