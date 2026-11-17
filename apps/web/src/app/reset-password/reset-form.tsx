@@ -6,7 +6,7 @@ import { useState } from "react";
 import { FormAlert, TextField, buttonClass } from "@pegah/ui";
 import { browserApi, problemMessage } from "@/lib/api-browser";
 
-export function ResetForm({ token }: { token: string }) {
+export function ResetForm({ token, signIn }: { token: string; signIn: string }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -40,7 +40,7 @@ export function ResetForm({ token }: { token: string }) {
     return (
       <div className="mt-2 grid gap-3">
         <FormAlert tone="good">{t("passwordChangedAll")}</FormAlert>
-        <Link href="/login" className={buttonClass("primary", "md", "h-12 no-underline")}>
+        <Link href={signIn} className={buttonClass("primary", "md", "h-12 no-underline")}>
           {t("signIn")}
         </Link>
       </div>

@@ -391,8 +391,10 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   `smtp` (STARTTLS or implicit TLS only). Every message is logged in
   `email_messages` without its body; staff see the log on each booking.
 - **Password reset:** single-use token, 30 minutes, only its SHA-256 stored,
-  sent directly (never written to the outbox), always `202` so accounts
-  cannot be probed; success revokes every session. Password change revokes
+  sent directly (never written to the outbox, and in the background so
+  timing reveals nothing), always `202` so accounts cannot be probed;
+  success revokes every session. Covers customers, staff (link opens
+  `/admin/reset-password`) and partners (amended 2026-11-17). Password change revokes
   other sessions.
 - **Saved travellers:** names, age group, optional date of birth and
   nationality; no identity documents. Offered as suggestions at checkout.
@@ -1115,8 +1117,10 @@ Format: context → decision → consequences. Status is Accepted, Proposed or S
   `smtp` (STARTTLS or implicit TLS only). Every message is logged in
   `email_messages` without its body; staff see the log on each booking.
 - **Password reset:** single-use token, 30 minutes, only its SHA-256 stored,
-  sent directly (never written to the outbox), always `202` so accounts
-  cannot be probed; success revokes every session. Password change revokes
+  sent directly (never written to the outbox, and in the background so
+  timing reveals nothing), always `202` so accounts cannot be probed;
+  success revokes every session. Covers customers, staff (link opens
+  `/admin/reset-password`) and partners (amended 2026-11-17). Password change revokes
   other sessions.
 - **Saved travellers:** names, age group, optional date of birth and
   nationality; no identity documents. Offered as suggestions at checkout.

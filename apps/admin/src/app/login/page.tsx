@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { safeRedirectPath } from "@pegah/shared";
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@pegah/ui";
 import hero from "@/assets/images/hero-sundarbans-sunrise.jpg";
@@ -48,6 +49,12 @@ export default async function LoginPage({
             Use the account an owner created for you. Sessions end after 30 idle minutes.
           </p>
           <LoginForm next={target} />
+          <Link
+            href="/forgot-password"
+            className="mt-4 inline-block text-[0.88rem] font-semibold text-primary-ink"
+          >
+            Forgot your password?
+          </Link>
           <p className="mt-8 text-[0.78rem] text-ink-3">
             Sign-ins are logged. Travellers can return to the{" "}
             {/* The public site lives outside this app's /admin basePath, so <Link> cannot reach it. */}

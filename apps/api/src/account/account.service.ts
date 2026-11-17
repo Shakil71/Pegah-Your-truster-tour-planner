@@ -21,6 +21,17 @@ import { emailLocale, templates } from "../email/templates";
 import { PRISMA, type Db } from "../prisma/prisma.service";
 
 const RESET_TTL_MS = 30 * 60_000;
+
+/** Where a reset link opens: where that kind of account signs in. */
+export function resetLink(
+  base: string,
+  kind: "CUSTOMER" | "STAFF" | "PARTNER",
+  token: string,
+): string {
+  if (kind === "STAFF") return `${base}/admin/reset-password?token=${token}`;
+  if (kind === "PARTNER") return `${base}/reset-password?token=${token}&for=partner`;
+  return `${base}/reset-password?token=${token}`;
+}
 const MAX_TRAVELLERS = 20;
 
 /**
@@ -107,8 +118,11 @@ export class AccountService {
   }
 
   /**
-   * Starts a reset. Always succeeds from the caller's point of view, so the
-   * endpoint never reveals whether an email is registered. Customers only.
+   * Starts a reset for a customer, staff member or partner. Always succeeds
+   * from the caller's point of view, so the endpoint never reveals whether an
+   * email is registered; the email is sent in the background so the response
+   * time does not reveal it either. The link opens where that person signs
+   * in: the website, the console (/admin) or the partner portal.
    */
   async requestPasswordReset(
     email: string,
@@ -116,7 +130,7 @@ export class AccountService {
     now: Date = new Date(),
   ): Promise<void> {
     const user = await this.db.user.findUnique({ where: { email } });
-    if (!user || user.kind !== "CUSTOMER" || user.status !== "ACTIVE") return;
+    if (!user || user.status !== "ACTIVE") return;
     const token = randomBytes(32).toString("base64url");
     await this.db.$transaction(async (tx) => {
       // Only the newest link works.
@@ -133,7 +147,7 @@ export class AccountService {
       });
       await this.audit.record(
         {
-          actorType: "CUSTOMER",
+          actorType: user.kind,
           actorUserId: user.id,
           action: "account.password_reset_requested",
           targetType: "user",
@@ -144,14 +158,17 @@ export class AccountService {
       );
     });
     const base = this.config.PUBLIC_BASE_URL?.replace(/\/$/, "");
-    const link = base ? `${base}/reset-password?token=${token}` : null;
-    if (!link) return;
-    // Sent directly (not via the outbox): the link is a credential and is never stored.
-    await this.email.send({
-      to: user.email,
-      template: "password-reset",
-      ...templates.passwordReset(user.fullName, link, emailLocale(user.locale)),
-    });
+    if (!base) return;
+    const link = resetLink(base, user.kind, token);
+    // Sent directly (not via the outbox): the link is a credential and is never
+    // stored. Not awaited: a slow mail server must not reveal the account exists.
+    void this.email
+      .send({
+        to: user.email,
+        template: "password-reset",
+        ...templates.passwordReset(user.fullName, link, emailLocale(user.locale)),
+      })
+      .catch(() => undefined);
   }
 
   async confirmPasswordReset(
@@ -186,7 +203,7 @@ export class AccountService {
       });
       await this.audit.record(
         {
-          actorType: "CUSTOMER",
+          actorType: row.user.kind,
           actorUserId: row.userId,
           action: "account.password_reset",
           targetType: "user",

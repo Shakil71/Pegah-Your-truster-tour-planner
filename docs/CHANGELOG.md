@@ -4,6 +4,17 @@ All notable changes to this project. Format based on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added — Password reset for staff and partners (2026-11-17)
+
+- Staff can use "Forgot your password?" on the console sign-in
+  (`/admin/forgot-password`); the emailed link opens `/admin/reset-password`.
+  Partners get the same from the partner sign-in. Customers already had it.
+- Same rules for everyone: single-use link, 30 minutes, only its hash
+  stored, disabled accounts get nothing, success signs the person out
+  everywhere. Audit events now record the real actor type.
+- The reset email is sent in the background so the response time no longer
+  hints whether an email address has an account.
+
 ### Security — Full review (2026-11-17)
 
 - Fixed an open redirect after sign-in: `?next=/\evil.com` passed the old

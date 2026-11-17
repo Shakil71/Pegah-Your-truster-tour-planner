@@ -12,9 +12,9 @@ export const dynamic = "force-dynamic";
 export default async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; for?: string }>;
 }) {
-  const { token } = await searchParams;
+  const { token, for: audience } = await searchParams;
   const t = await getTranslations("auth");
   const valid = typeof token === "string" && /^[A-Za-z0-9_-]{32,128}$/.test(token);
   return (
@@ -22,7 +22,7 @@ export default async function ResetPasswordPage({
       <div className="panel mx-auto grid max-w-[520px] gap-2 p-6 md:p-10">
         <h1 className="font-display text-[2rem] font-medium">{t("resetTitle")}</h1>
         {valid ? (
-          <ResetForm token={token} />
+          <ResetForm token={token} signIn={audience === "partner" ? "/partner/login" : "/login"} />
         ) : (
           <p className="text-ink-2">
             {t.rich("linkIncomplete", {

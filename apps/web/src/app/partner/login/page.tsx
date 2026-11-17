@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@pegah/ui";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -17,6 +18,7 @@ export const dynamic = "force-dynamic";
 export default async function PartnerLoginPage() {
   if (await getPartner()) redirect("/partner");
   const t = await getTranslations("partner");
+  const auth = await getTranslations("auth");
   return (
     <main className="grid min-h-dvh place-items-center bg-night px-4 py-12">
       <div className="w-full max-w-[420px] rounded-card bg-card p-6 md:p-8">
@@ -32,6 +34,12 @@ export default async function PartnerLoginPage() {
         </h1>
         <p className="mt-1 text-[0.92rem] text-ink-2">{t("login.intro")}</p>
         <PartnerLoginForm />
+        <Link
+          href="/forgot-password"
+          className="mt-4 inline-block text-[0.88rem] font-semibold text-primary-ink"
+        >
+          {auth("forgot")}
+        </Link>
       </div>
     </main>
   );
